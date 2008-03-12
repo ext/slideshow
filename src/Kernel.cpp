@@ -173,6 +173,12 @@ void Kernel::parse_argv(int argc, char* argv[]){
 			
 			continue;
 		}
+		if ( strcmp(argv[i], "--resolution") == 0 ){
+			i++;
+			
+			sscanf(argv[i], "%dx%d", &_width, &_height);
+			continue;
+		}
 	}
 }
 
