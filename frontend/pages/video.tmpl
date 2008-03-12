@@ -1,0 +1,11 @@
+  <h1><a href="/index.php/">Slideshow</a> &gt; Video</h1>
+  <p>To upload a video please use [s]ftp or mount the drive with nfs. Files in the video subfolder gets listed here.</p>
+  <p class="notice">WARNING: Even if the system handles multiple requests (items are queued) there is no way of telling how long the queue is and most importantly <b>there is now way to remove items from the queue!<b/>.</p>
+
+  <div id="videolist">
+<? foreach ( $files as $file ){ ?>
+    <div class="videoitem">
+      <img src="/<? echo video_thumbnail($file); ?>" alt="" width="50" height="50" /><?=$file?> [<a href="/index.php/video/play?name=<? echo urlencode($file); ?>">play</a>]
+    </div>
+<? } ?>
+  </div>

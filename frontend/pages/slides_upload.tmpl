@@ -1,0 +1,38 @@
+  <h1><a href="/index.php/">Slideshow</a> &gt; Upload slide</h1>
+
+  <h2>Image</h2>
+
+  <form action="/index.php/slides/submit_image" method="post" enctype="multipart/form-data">
+    <fieldset>
+      <input type="file" id="filename" name="filename" />
+      <input type="submit" value="Upload" />
+    </fieldset>
+  </form>
+
+  <h2>Text</h2>
+
+  <form action="/index.php/slides/upload" method="post" accept-charset="utf-8">
+    <fieldset>
+      <table>
+        <tr valign="top">
+          <td>
+            <label for="title">Title</label><br/>
+            <input type="text" id="title" name="title" size="70" value="<?=$title?>" /><br/>
+            <label for="content">Content</label><br/>
+            <textarea id="content" name="content" cols="60" rows="15"><?=$content?></textarea><br/>
+            <input type="submit" name="submit" value="Preview" />
+            <input type="submit" name="submit" value="Upload" /><br/>
+          </td>
+          <td>
+            <label for="title">Alignment</label><br/>
+            <input type="radio" name="align" value="0" <?=$align==0?"checked=\"checked\"":""?> />Left<br/>
+            <input type="radio" name="align" value="1" <?=$align==1?"checked=\"checked\"":""?> />Center<br/>
+            <input type="radio" name="align" value="2" <?=$align==2?"checked=\"checked\"":""?> />Right<br/>
+          </td>
+        </tr>
+      </table>
+<? if ( $image != NULL ) { ?>
+      <img src="<?=$image?>" />
+<? } ?>
+    </fieldset>
+  </form>

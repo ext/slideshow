@@ -1,0 +1,17 @@
+body {
+	background:	#ffc;
+}
+
+img { 
+	border:		1px solid black;
+}
+
+.slide { 
+	float:		left;
+}
+
+#log { 
+	font-family:	monospace;
+	background:	white;
+	padding:	5px;
+}
