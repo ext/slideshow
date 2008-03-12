@@ -37,23 +37,16 @@ class Maintenance extends Module {
       throw new exception("Deamon is not stopped, cannot start.");
     }
 
-    global $app_dir, $binary;
-    $cmd = "ulimit -c unlimited; DISPLAY=\":0\" $binary --daemon --fullscreen >> /dev/null 2>&1";
+    global $app_dir, $binary, $db_user, $db_pass, $db_name, $resolution_x, $resolution_y;
+    $cmd = "ulimit -c unlimited; DISPLAY=\":0\" $binary --daemon --fullscreen --db_user $db_user --db_pass $db_pass --db_name $db_name --resolution {$resolution_x}x{$resolution_y} 2>&1";
     chdir($app_dir);
-    
-    echo "$cmd<br/>\n";
 
     $stdout = array();
     $ret = 0;
     exec($cmd, $stdout, $ret);
 
     if ( $ret != 0 ){
-      $lines = implode('\n', $stdout);
-      
-      foreach ( $lines as $line ){
-        echo "$line<br/>\n";
-      }
-       
+      $lines = implode('\n', $stdout);       
       throw new exception( $lines );
     }
 

@@ -56,13 +56,20 @@ class Slides extends Module {
   }
 
   function submit_image(){
-    global $image_dir;
+    global $image_dir, $resolution_x, $resolution_y;
 
     $name = $_FILES['filename']['name'];
     $hash = crc32(uniqid());
     $fullpath = "$image_dir/{$hash}_$name";
+    
+    $uploaded = $_FILES['filename']['tmp_name'];
+    
+    if ( !is_uploaded_file( $uploaded ) ){
+    	die("Handling file that was not uploaded");
+	}
 
-    move_uploaded_file($_FILES['filename']['tmp_name'], $fullpath);
+    exec("convert $uploaded -resize {$resolution_x}x{$resolution_y} -background black -gravity center -extent {$resolution_x}x{$resolution_y} $fullpath");
+    unlink($uploaded);
 
     q("INSERT INTO files (fullpath) VALUES ('$fullpath')");
     $this->send_signal("Reload");
@@ -96,21 +103,21 @@ class Slides extends Module {
   function _create_image($title, $content, $alignment, $filename = NULL){
     //$im = @imagecreatefrompng($imgname);
 
-    ///@note Hardcoded resolution
-    $im  = imagecreatetruecolor(800, 600);
+    global $resolution_x, $resolution_y;
+    $im  = imagecreatetruecolor($resolution_x, $resolution_y);
 
     $black  = imagecolorallocate($im, 0, 0, 0);
     $white  = imagecolorallocate($im, 255, 255, 255);
     $font = "/usr/share/fonts/ttf-bitstream-vera/Vera.ttf";
 
-    $title_size = 42;
-    $content_size = 22;
+    $title_size = 82;
+    $content_size = 42;
 
-    imagefilledrectangle($im, 0, 0, 800, 600, $black);
+    imagefilledrectangle($im, 0, 0, $resolution_x, $resolution_y, $black);
 
-    $this->_string_centered($im, 70, $title_size, $font, $white, $title);
+    $this->_string_centered($im, 100, $title_size, $font, $white, $title);
 
-    $y = 120;
+    $y = 180;
     foreach ( $content as $paragraph ){
       $y = $this->_render_string_aligned($im, $alignment, $y, $content_size, $font, $white, $paragraph);
     }
@@ -123,9 +130,9 @@ class Slides extends Module {
   }
 
   function _render_string_aligned($im, $alignment, $y, $size, $font, $color, $string){
-    ///@note Hardcoded resoultion
-    $width = 800;
-    $margin = 30;
+    global $resolution_x;
+    $width = $resolution_x;
+    $margin = 60;
 
     $line_spacing = (int)($size * 1.5);
 
@@ -186,8 +193,8 @@ class Slides extends Module {
     $data = imagettfbbox( $size, 0, $font, $string );
     $width = $data[2] - $data[0];
 
-    ///@note Hardcoded resolution
-    $x = 800/2 - $width/2;
+    global $resolution_x;
+    $x = $resolution_x/2 - $width/2;
 
     imagefttext( $im, $size, 0, $x, $y, $color, $font, $string );
   }
