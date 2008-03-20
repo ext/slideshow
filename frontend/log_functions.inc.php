@@ -1,13 +1,13 @@
 <?
 
 function get_log($lines, $show_debug){
-  global $log_file, $debug_log_file;
+  global $Files, $BasePath;
 
   //  $grep_expr = $show_debug ? "\"\"" : "-v \"(DD)\"";
 
   //  $lines = explode("\n", `tail -n $lines $log_file $grep_cmd`);
-  $filename = $show_debug ? $debug_log_file :  $log_file;
-  $lines = explode("\n", `tail -n $lines $filename`);
+  $filename = $show_debug ? $Files['Log']['Debug'] :  $Files['Log']['Base'];
+  $lines = explode("\n", `tail -n $lines $BasePath/$filename`);
 
   $log = array();
 

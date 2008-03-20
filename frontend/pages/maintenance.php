@@ -22,13 +22,15 @@ class Maintenance extends Module {
   }
 
   function forcestart(){
-    global $pid_file, $log_file;
+    global $Files;
 
+	$pid_file = $Files['PID'];
+	
     $pid = (int)`cat $pid_file`;
     posix_kill($pid, 9);
 
     unlink($pid_file);
-    unlink($log_file);
+    unlink($Files['Log']['Base']);
     $this->start();
   }
 
@@ -37,9 +39,14 @@ class Maintenance extends Module {
       throw new exception("Deamon is not stopped, cannot start.");
     }
 
-    global $app_dir, $binary, $db_user, $db_pass, $db_name, $resolution_x, $resolution_y;
-    $cmd = "ulimit -c unlimited; DISPLAY=\":0\" $binary --daemon --fullscreen --db_user $db_user --db_pass $db_pass --db_name $db_name --resolution {$resolution_x}x{$resolution_y} 2>&1";
-    chdir($app_dir);
+    global $BasePath, $Path, $Files, $Database, $Settings;
+    
+    $binary = "$Path[Build]/$Files[Binary]";
+    $resolution_x = $Settings['Resolution'][0];
+    $resolution_y = $Settings['Resolution'][1];
+    
+    $cmd = "ulimit -c unlimited; DISPLAY=\":0\" $binary --daemon --fullscreen --db_user {$Database['Username']} --db_pass {$Database['Password']} --db_name {$Database['Name']} --resolution {$resolution_x}x{$resolution_y} >> {$Files['Log']['Base']} 2>&1";
+    chdir($BasePath);
 
     $stdout = array();
     $ret = 0;
@@ -49,6 +56,8 @@ class Maintenance extends Module {
       $lines = implode('\n', $stdout);       
       throw new exception( $lines );
     }
+    
+    usleep(1000*200);
 
     Module::redirect('/index.php/maintenance', array("show_debug"));
   }
@@ -69,11 +78,12 @@ class Maintenance extends Module {
   //   1: Daemon started
   //   2: Daemon crashed
   function _get_daemon_status(){
-    global $pid_file;
-    if ( !file_exists( $pid_file ) ){
+    global $Files, $BasePath;
+    if ( !file_exists( $BasePath."/".$Files['PID'] ) ){
       return 0;
     }
 
+	$pid_file = $Files['PID'];
     $pid = (int)`cat $pid_file`;
     if ( posix_kill($pid, 0) ){
       return 1;
@@ -83,9 +93,9 @@ class Maintenance extends Module {
   }
 
   function coredump(){
-    global $app_dir;
+    global $BasePath;
 
-    $filename = "$app_dir/core";
+    $filename = "$BasePath/core";
     $filesize = filesize($filename);
 
     header("Pragma: public");

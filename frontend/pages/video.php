@@ -7,11 +7,11 @@ require_once('../core/module.inc.php');
 class Video extends Module {
   function index(){
     Module::set_template('video.tmpl');
-    global $video_dir;
+    global $Path;
 
     $files = array();
 
-    if ($dh = opendir($video_dir)) {
+    if ($dh = opendir($Path['Video'])) {
       while (($file = readdir($dh)) !== false) {
 	if ( $file[0] == "." ){
 	  continue;
@@ -27,8 +27,8 @@ class Video extends Module {
   }
 
   function play(){
-    global $video_dir;
-    $fullpath = "$video_dir/$_GET[name]";
+    global $Path;
+    $fullpath = "$Path[Video]/$_GET[name]";
 
     $this->send_signal("PlayVideo", "s", array($fullpath));
     Module::redirect('/index.php');
