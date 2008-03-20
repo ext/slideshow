@@ -24,7 +24,7 @@ class Maintenance extends Module {
   function forcestart(){
     global $Files;
 
-	$pid_file = $Files['PID'];
+    $pid_file = $Files['PID'];
 	
     $pid = (int)`cat $pid_file`;
     posix_kill($pid, 9);
@@ -44,6 +44,10 @@ class Maintenance extends Module {
     $binary = "$Path[Build]/$Files[Binary]";
     $resolution_x = $Settings['Resolution'][0];
     $resolution_y = $Settings['Resolution'][1];
+
+    if ( !file_exists($binary) ){
+      throw new exception("Could not find binary \"$binary\" or did not have permission to execute it");
+    }
     
     $cmd = "ulimit -c unlimited; DISPLAY=\":0\" $binary --daemon --fullscreen --db_user {$Database['Username']} --db_pass {$Database['Password']} --db_name {$Database['Name']} --resolution {$resolution_x}x{$resolution_y} >> {$Files['Log']['Base']} 2>&1";
     chdir($BasePath);
@@ -53,7 +57,7 @@ class Maintenance extends Module {
     exec($cmd, $stdout, $ret);
 
     if ( $ret != 0 ){
-      $lines = implode('\n', $stdout);       
+      $lines = implode('\n', $stdout);
       throw new exception( $lines );
     }
     
@@ -83,7 +87,7 @@ class Maintenance extends Module {
       return 0;
     }
 
-	$pid_file = $Files['PID'];
+    $pid_file = $Files['PID'];
     $pid = (int)`cat $pid_file`;
     if ( posix_kill($pid, 0) ){
       return 1;

@@ -24,7 +24,15 @@ class Module {
   }
 
   function execute( $section ){
-    $this->_data = $this->$section();
+    try {
+      $this->_data = $this->$section();
+    } catch ( Exception $e ){
+      $this->set_template( "exception.tmpl" );
+      $this->_data = array(
+			   "Message" => $e->getMessage(),
+			   "Stack" => $e->getTrace()
+			   );
+    }
   }
 
   function redirect($location, array $keep = NULL){
