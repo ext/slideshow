@@ -27,23 +27,23 @@ class Slides extends Module {
 
     if ( isset($_POST['submit']) ){
       if ( $_POST['submit'] == 'Preview' ){
-		$image = '/index.php/slides/preview?title='.urlencode($title).'&content='.urlencode($content)."&align=$align";
+	$image = '/index.php/slides/preview?title='.urlencode($title).'&content='.urlencode($content)."&align=$align";
       }
       if ( $_POST['submit'] == 'Upload' ){
-		global $Path;
+	global $Path;
 	
-		$title = $this->_utf_hack($title_orig);
-		$content = explode("\n", $this->_utf_hack($content_orig));
+	$title = $this->_utf_hack($title_orig);
+	$content = explode("\n", $this->_utf_hack($content_orig));
 	
-		$filename = crc32(uniqid());
-		$fullpath = "$Path[Image]/$filename.png";
+	$filename = md5(uniqid());
+	$fullpath = "$Path[Image]/$filename.png";
 	
-		$this->_create_image($title, $content, $align, $fullpath);
-		q("INSERT INTO files (fullpath) VALUES ('$fullpath')");
-		$this->send_signal("Reload");
+	$this->_create_image($title, $content, $align, $fullpath);
+	q("INSERT INTO files (fullpath) VALUES ('$fullpath')");
+	$this->send_signal("Reload");
 	
-		Module::redirect("/index.php");
-		exit();
+	Module::redirect("/index.php");
+	exit();
       }
     }
 
@@ -56,23 +56,37 @@ class Slides extends Module {
   }
 
   function submit_image(){
-    global $Path, $Settings;
+    global $Path, $Settings, $Files;
+
+    $convert = $Files['convert'];
+
+    if ( !file_exists($convert) ){
+      throw new Exception("Could not find ImageMagick 'convert' executable.");
+    }
 
     $name = $_FILES['filename']['name'];
-    $hash = crc32(uniqid());
+    $hash = md5(uniqid());
     $fullpath = "{$Path['Image']}/{$hash}_$name";
     
     $uploaded = $_FILES['filename']['tmp_name'];
     
     if ( !is_uploaded_file( $uploaded ) ){
-    	die("Handling file that was not uploaded");
-	}
+      die("Handling file that was not uploaded");
+    }
 	
-	$resolution_x = $Settings['Resolution'][0];
-	$resolution_y = $Settings['Resolution'][1];
+    $resolution = $Settings['Resolution'];
+    $resolution_x = $resolution[0];
+    $resolution_y = $resolution[1];
 
-    exec("convert $uploaded -resize {$resolution_x}x{$resolution_y} -background black -gravity center -extent {$resolution_x}x{$resolution_y} $fullpath");
-    unlink($uploaded);
+    move_uploaded_file($uploaded, $fullpath);
+
+    $cmd = "$convert ".escapeshellarg($fullpath)." -resize {$resolution_x}x{$resolution_y} -background black -gravity center -extent {$resolution_x}x{$resolution_y} ".escapeshellarg($fullpath)." 2>&1 ";
+
+    passthru($cmd, $rc);
+
+    if ( $rc != 0 ){
+      die("\n<br/>$cmd\n");
+    }
 
     q("INSERT INTO files (fullpath) VALUES ('$fullpath')");
     $this->send_signal("Reload");
@@ -104,29 +118,35 @@ class Slides extends Module {
   }
 
   function _create_image($title, $content, $alignment, $filename = NULL){
-    //$im = @imagecreatefrompng($imgname);
 
-    global $Settings;
+
+    global $Settings, $Files;
     
     $resolution_x = $Settings['Resolution'][0];
-	$resolution_y = $Settings['Resolution'][1];
-	
-    $im  = imagecreatetruecolor($resolution_x, $resolution_y);
+    $resolution_y = $Settings['Resolution'][1];
 
-    $black  = imagecolorallocate($im, 0, 0, 0);
-    $white  = imagecolorallocate($im, 255, 255, 255);
-    
-    ///@note Magic constant
-    $font = "/usr/share/fonts/ttf-bitstream-vera/Vera.ttf";
+    $bgfile = $Files['background'];
+    //die("$bgfile\n");
+    $im = @imagecreatefrompng($bgfile);
+    if ( !$im ){
+      $im  = imagecreatetruecolor($resolution_x, $resolution_y);
+      $black  = imagecolorallocate($im, 0, 0, 0);
+      $white  = imagecolorallocate($im, 255, 255, 255);
+      imagefilledrectangle($im, 0, 0, $resolution_x, $resolution_y, $black);
+    } else {
+      $black  = imagecolorallocate($im, 0, 0, 0);
+      $white  = imagecolorallocate($im, 255, 255, 255);
+    }
 
-	///@note Magic numbers
+    //$font = "/usr/share/fonts/ttf-bitstream-vera/Vera.ttf";
+    $font = $Files['font'];
+
+    ///@note Magic numbers
     $title_size = 82;
     $content_size = 42;
 
-    imagefilledrectangle($im, 0, 0, $resolution_x, $resolution_y, $black);
-
-	// 1 is alignment (center)
-	// 100 is y-coordinate
+    // 1 is alignment (center)
+    // 100 is y-coordinate
     $this->_render_string_aligned($im, 1, 100, $title_size, $font, $white, $title);
 
     $y = 180;

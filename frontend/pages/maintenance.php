@@ -83,11 +83,13 @@ class Maintenance extends Module {
   //   2: Daemon crashed
   function _get_daemon_status(){
     global $Files, $BasePath;
-    if ( !file_exists( $BasePath."/".$Files['PID'] ) ){
+
+    $pid_file = $BasePath."/".$Files['PID'];
+
+    if ( !file_exists( $pid_file) ){
       return 0;
     }
 
-    $pid_file = $Files['PID'];
     $pid = (int)`cat $pid_file`;
     if ( posix_kill($pid, 0) ){
       return 1;
@@ -116,6 +118,11 @@ class Maintenance extends Module {
     echo fread($file, $filesize);
 
     fclose($file);
+  }
+
+  function kill_mplayer(){
+    `killall mplayer`;
+    Module::redirect("index.php/maintenance");
   }
 
   function ping(){
