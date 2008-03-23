@@ -114,7 +114,7 @@ void OS::init_view(int width, int height, bool fullscreen){
              cursor,
              CurrentTime);*/
 
-             //lockAndHideMouse(true);
+    XDefineCursor(dpy, win, no_cursor);
 
     if ( fullscreen ){
         XEvent xev;
@@ -139,19 +139,18 @@ void OS::swap_gl_buffers(){
 }
 
 void OS::cleanup(){
-	glXDestroyContext(dpy, ctx);
+  XDefineCursor(dpy, win, default_cursor);
+  glXDestroyContext(dpy, ctx);
 	
-    if( win && dpy ){
-        XDestroyWindow( dpy, win );
-        win = (Window) 0;
-    }
+  if( win && dpy ){
+    XDestroyWindow( dpy, win );
+    win = (Window) 0;
+  }
 
-    if ( dpy )
-    {
-        XCloseDisplay( dpy );
-        dpy = 0;
-    }
-
+  if ( dpy ){
+    XCloseDisplay( dpy );
+    dpy = 0;
+  }
 }
 
 void OS::poll_events(bool& running){
