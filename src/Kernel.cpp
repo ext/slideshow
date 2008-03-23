@@ -47,7 +47,7 @@ Kernel::Kernel(int argc, char* argv[]):
 	_fullscreen(false),
 	_daemon(false),
 	_transition_time(5.0f),
-	_switch_time(3.0f),
+	_switch_time(15.0f),
 	_graphics(NULL),
 	_browser(NULL),
 	_ipc(NULL),
@@ -206,7 +206,7 @@ void Kernel::transition_state(double t){
 	
 	// If the transition is complete the state changes to VIEW
 	if ( s > 1.0f ){
-	  printf("Frames: %d\nFPS: %f\n\n", _frames, (float)_frames/_transition_time);
+	  //printf("Frames: %d\nFPS: %f\n\n", _frames, (float)_frames/_transition_time);
 		_state = VIEW;
 		_last_switch = t;
 	}
@@ -251,7 +251,7 @@ void Kernel::play_video(const char* fullpath){
 	int status;
 	
 	if ( fork() == 0 ){
-		execlp("mplayer", "", "-fs", fullpath, NULL);
+	  execlp("mplayer", "", "-fs", "-really-quiet", fullpath, NULL);
 		exit(0);
 	}
 	
