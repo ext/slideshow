@@ -42,6 +42,7 @@ class Slides extends Module {
 	q("INSERT INTO files (fullpath) VALUES ('$fullpath')");
 	$this->send_signal("Reload");
 	
+	Module::log("Added slide titled '$title'");
 	Module::redirect("/index.php");
 	exit();
       }
@@ -91,6 +92,7 @@ class Slides extends Module {
     q("INSERT INTO files (fullpath) VALUES ('$fullpath')");
     $this->send_signal("Reload");
 
+    Module::log("Uploaded $name");
     Module::redirect('/index.php');
   }
   
@@ -225,6 +227,7 @@ class Slides extends Module {
     if ( array_key_exists('confirm', $_GET) === true ){
       q("DELETE FROM files WHERE id = $id");
       $this->send_signal("Reload");
+      Module::log("Removed slide with id $id");
       Module::redirect('/index.php');
       return;
     } 

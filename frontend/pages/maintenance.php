@@ -14,8 +14,14 @@ class Maintenance extends Module {
       $show_debug = true;
     }
 
+    global $BasePath, $Files;
+
+    $activity_log = $BasePath . "/" . $Files['Log']['Activity'];
+    $activity = explode("\n", `tail $activity_log`);
+
     return array(
 		 'log' => get_log(25, $show_debug),
+		 'activity' => $activity,
 		 'status' => $this->_get_daemon_status(),
 		 'show_debug' => $show_debug
 		 );

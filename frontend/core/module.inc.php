@@ -59,6 +59,16 @@ class Module {
     exit();
   }
 
+  function log($msg){
+    global $BasePath, $Files;
+
+    $user = $_SERVER['PHP_AUTH_USER'];
+    $file = fopen($BasePath . "/" . $Files['Log']['Activity'], 'a');
+    
+    fwrite($file, "$user $msg\n");
+    fclose($file);
+  }
+
   function render(){
     if ( $this->_template == '' ){
       throw new Exception('No template specified for module \''.get_class($this).'\'');
