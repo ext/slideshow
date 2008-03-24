@@ -42,6 +42,8 @@ disconnect();
 
 ?>
 
+<hr>
+Inloggad som <?=$_SERVER['PHP_AUTH_USER'];?>
 </body>
 
 </html>
