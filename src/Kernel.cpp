@@ -241,16 +241,6 @@ void Kernel::switch_state(double t){
 		return;
 	}
 	
-	///@fulhack, register handlers instead...
-	char* ext = get_file_ext(filename);
-	if ( is_movie_ext(ext) ){
-		play_video(filename);
-		free(ext);
-		return;
-	}
-	
-	free(ext);
-	
 	Log::message(Log::Debug, "Kernel: Switching to image \"%s\"\n", filename);
 	
 	try {
@@ -276,59 +266,6 @@ void Kernel::play_video(const char* fullpath){
 	}
 	
 	::wait(&status);
-}
-
-char* Kernel::get_file_ext(const char* filename){
-	const char* start = filename;
-    const char* ptr = filename + strlen(filename);
-    
-    ///@note Hmm, copy&paste is not always good... Rewrite using strrchr... 2008-02-27 --ext
-    while( ptr > start){
-        if( *ptr == '.'){
-        	unsigned int len = strlen(ptr) - 1;
-        	char* ext = (char*)malloc( len + 1 );
-        	
-        	unsigned int i;
-        	for ( i = 0; i < len; i++ ){
-        		ext[i] = tolower( *(ptr+i+1) );
-        	}
-        	ext[i] = '\0';
-        	
-            return ext;
-        }
-        ptr--;
-    }
-    return NULL;
-}
-
-bool Kernel::is_movie_ext(const char* ext){
-	if ( !ext ){
-		return false;
-	}
-	
-	if ( strcmp(ext, "avi") == 0 ){
-		return true;
-	}
-	if ( strcmp(ext, "mpg") == 0 ){
-		return true;
-	}
-	if ( strcmp(ext, "mpeg") == 0 ){
-		return true;
-	}
-	if ( strcmp(ext, "mkv") == 0 ){
-		return true;
-	}
-	if ( strcmp(ext, "ogv") == 0 ){
-		return true;
-	}
-	if ( strcmp(ext, "mov") == 0 ){
-		return true;
-	}
-	if ( strcmp(ext, "wmv") == 0 ){
-		return true;
-	}
-	
-	return false;
 }
 
 void Kernel::quit(){

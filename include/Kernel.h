@@ -48,11 +48,6 @@ class Kernel {
 		void transition_state(double t);
 		void switch_state(double t);
 		
-		char* get_file_ext(const char* filename);
-		
-		///@todo fulhack
-		bool is_movie_ext(const char* ext);
-		
 		int _width;
 		int _height;
 		int _frames;
