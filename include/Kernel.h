@@ -48,6 +48,8 @@ class Kernel {
 		void transition_state(double t);
 		void switch_state(double t);
 		
+		void print_licence_statement();
+		
 		int _width;
 		int _height;
 		int _frames;

@@ -92,6 +92,7 @@ Kernel::Kernel(int argc, char* argv[]):
 		daemon_running = &_running;
 	} else {
 		Log::message(Log::Verbose, "Kernel: Starting slideshow\n");
+		print_licence_statement();
 	}
 	
 	_graphics = new Graphics(_width, _height, _fullscreen);
@@ -123,6 +124,14 @@ Kernel::~Kernel(){
 	_ipc = NULL;
 	
 	Log::deinitialize();
+}
+
+void Kernel::print_licence_statement(){
+    printf("Slideshow  Copyright (C) 2008 David Sveningsson <ext@sidvind.com>\n");
+    printf("This program comes with ABSOLUTELY NO WARRANTY.\n");
+	printf("This is free software, and you are welcome to redistribute it\n");
+	printf("under certain conditions; see COPYING or <http://www.gnu.org/licenses/>\n");
+	printf("for details.\n");
 }
 
 void Kernel::run(){
