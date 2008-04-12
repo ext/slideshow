@@ -1,3 +1,20 @@
+/**
+ * This file is part of Slideshow.
+ * 
+ * Slideshow is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Slideshow is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "Kernel.h"
 #include "Graphics.h"
 #include "OS.h"
@@ -206,7 +223,10 @@ void Kernel::transition_state(double t){
 	
 	// If the transition is complete the state changes to VIEW
 	if ( s > 1.0f ){
-	  //printf("Frames: %d\nFPS: %f\n\n", _frames, (float)_frames/_transition_time);
+		if ( !_daemon ){
+			printf("Frames: %d\nFPS: %f\n\n", _frames, (float)_frames/_transition_time);
+		}
+
 		_state = VIEW;
 		_last_switch = t;
 	}
@@ -251,7 +271,7 @@ void Kernel::play_video(const char* fullpath){
 	int status;
 	
 	if ( fork() == 0 ){
-	  execlp("mplayer", "", "-fs", "-really-quiet", fullpath, NULL);
+		execlp("mplayer", "", "-fs", "-really-quiet", fullpath, NULL);
 		exit(0);
 	}
 	

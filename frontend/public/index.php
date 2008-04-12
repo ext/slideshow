@@ -43,7 +43,7 @@ disconnect();
 ?>
 
 <hr>
-Inloggad som <?=$_SERVER['PHP_AUTH_USER'];?>
+Inloggad som <?=$_SERVER['PHP_AUTH_USER'];?> (<a href="/logout.php">Logout</a>)
 </body>
 
 </html>
