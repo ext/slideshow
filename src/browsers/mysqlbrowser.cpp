@@ -112,14 +112,7 @@ struct st_mysql_res* MySQLBrowser::query(const char* str, ...){
 void MySQLBrowser::reload(){
 	clear_fields();
 	
-	bool immediate = true;
-	MYSQL_RES *res = query("SELECT fullpath FROM immediate ORDER BY id LIMIT 1");
-	if ( mysql_num_rows(res) == 0 ){
-		immediate = false;
-		mysql_free_result(res);
-		res = query("SELECT fullpath FROM files ORDER BY id");
-	}
-	
+	MYSQL_RES *res = query("SELECT fullpath FROM files ORDER BY id");
 	MYSQL_ROW row;
 	
 	_nr_of_fields = mysql_num_rows(res);
@@ -136,10 +129,6 @@ void MySQLBrowser::reload(){
 	set_field(i, NULL);
 	
 	mysql_free_result(res);
-	
-	if ( immediate ){
-		query("DELETE FROM immediate ORDER BY id LIMIT 1");
-	}
 }
 
 void MySQLBrowser::clear_fields(){
