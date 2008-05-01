@@ -23,7 +23,6 @@ function get_slides(){
   $slides = array();
 
   $set = array(
-	       q("SELECT id, fullpath FROM immediate ORDER BY id"),
 	       q("SELECT id, fullpath FROM files ORDER BY id")
 	       );
 
