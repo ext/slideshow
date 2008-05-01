@@ -1,3 +1,21 @@
+/**
+ * This file is part of Slideshow.
+ * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
+ * 
+ * Slideshow is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Slideshow is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "mysqlbrowser.h"
 #include "Log.h"
 #include <cstring>
@@ -94,14 +112,7 @@ struct st_mysql_res* MySQLBrowser::query(const char* str, ...){
 void MySQLBrowser::reload(){
 	clear_fields();
 	
-	bool immediate = true;
-	MYSQL_RES *res = query("SELECT fullpath FROM immediate ORDER BY id LIMIT 1");
-	if ( mysql_num_rows(res) == 0 ){
-		immediate = false;
-		mysql_free_result(res);
-		res = query("SELECT fullpath FROM files ORDER BY id");
-	}
-	
+	MYSQL_RES *res = query("SELECT fullpath FROM files ORDER BY id");
 	MYSQL_ROW row;
 	
 	_nr_of_fields = mysql_num_rows(res);
@@ -118,10 +129,6 @@ void MySQLBrowser::reload(){
 	set_field(i, NULL);
 	
 	mysql_free_result(res);
-	
-	if ( immediate ){
-		query("DELETE FROM immediate ORDER BY id LIMIT 1");
-	}
 }
 
 void MySQLBrowser::clear_fields(){

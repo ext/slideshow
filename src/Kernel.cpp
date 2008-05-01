@@ -1,3 +1,21 @@
+/**
+ * This file is part of Slideshow.
+ * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
+ * 
+ * Slideshow is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Slideshow is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "Kernel.h"
 #include "Graphics.h"
 #include "OS.h"
@@ -75,6 +93,7 @@ Kernel::Kernel(int argc, char* argv[]):
 		daemon_running = &_running;
 	} else {
 		Log::message(Log::Verbose, "Kernel: Starting slideshow\n");
+		print_licence_statement();
 	}
 	
 	_graphics = new Graphics(_width, _height, _fullscreen);
@@ -106,6 +125,14 @@ Kernel::~Kernel(){
 	_ipc = NULL;
 	
 	Log::deinitialize();
+}
+
+void Kernel::print_licence_statement(){
+    printf("Slideshow  Copyright (C) 2008 David Sveningsson <ext@sidvind.com>\n");
+    printf("This program comes with ABSOLUTELY NO WARRANTY.\n");
+	printf("This is free software, and you are welcome to redistribute it\n");
+	printf("under certain conditions; see COPYING or <http://www.gnu.org/licenses/>\n");
+	printf("for details.\n");
 }
 
 void Kernel::run(){
@@ -206,7 +233,10 @@ void Kernel::transition_state(double t){
 	
 	// If the transition is complete the state changes to VIEW
 	if ( s > 1.0f ){
-	  //printf("Frames: %d\nFPS: %f\n\n", _frames, (float)_frames/_transition_time);
+		if ( !_daemon ){
+			printf("Frames: %d\nFPS: %f\n\n", _frames, (float)_frames/_transition_time);
+		}
+
 		_state = VIEW;
 		_last_switch = t;
 	}
@@ -220,16 +250,6 @@ void Kernel::switch_state(double t){
 		//wait( _switch_time * 0.9f );
 		return;
 	}
-	
-	///@fulhack, register handlers instead...
-	char* ext = get_file_ext(filename);
-	if ( is_movie_ext(ext) ){
-		play_video(filename);
-		free(ext);
-		return;
-	}
-	
-	free(ext);
 	
 	Log::message(Log::Debug, "Kernel: Switching to image \"%s\"\n", filename);
 	
@@ -251,64 +271,11 @@ void Kernel::play_video(const char* fullpath){
 	int status;
 	
 	if ( fork() == 0 ){
-	  execlp("mplayer", "", "-fs", "-really-quiet", fullpath, NULL);
+		execlp("mplayer", "", "-fs", "-really-quiet", fullpath, NULL);
 		exit(0);
 	}
 	
 	::wait(&status);
-}
-
-char* Kernel::get_file_ext(const char* filename){
-	const char* start = filename;
-    const char* ptr = filename + strlen(filename);
-    
-    ///@note Hmm, copy&paste is not always good... Rewrite using strrchr... 2008-02-27 --ext
-    while( ptr > start){
-        if( *ptr == '.'){
-        	unsigned int len = strlen(ptr) - 1;
-        	char* ext = (char*)malloc( len + 1 );
-        	
-        	unsigned int i;
-        	for ( i = 0; i < len; i++ ){
-        		ext[i] = tolower( *(ptr+i+1) );
-        	}
-        	ext[i] = '\0';
-        	
-            return ext;
-        }
-        ptr--;
-    }
-    return NULL;
-}
-
-bool Kernel::is_movie_ext(const char* ext){
-	if ( !ext ){
-		return false;
-	}
-	
-	if ( strcmp(ext, "avi") == 0 ){
-		return true;
-	}
-	if ( strcmp(ext, "mpg") == 0 ){
-		return true;
-	}
-	if ( strcmp(ext, "mpeg") == 0 ){
-		return true;
-	}
-	if ( strcmp(ext, "mkv") == 0 ){
-		return true;
-	}
-	if ( strcmp(ext, "ogv") == 0 ){
-		return true;
-	}
-	if ( strcmp(ext, "mov") == 0 ){
-		return true;
-	}
-	if ( strcmp(ext, "wmv") == 0 ){
-		return true;
-	}
-	
-	return false;
 }
 
 void Kernel::quit(){
