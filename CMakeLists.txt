@@ -2,10 +2,10 @@ project(SLIDESHOW)
 
 set( CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" )
 
-message( STATUS "Looking for X11" )
+message( STATUS "Looking for X11 dev" )
 include(FindX11)
 if( X11_FOUND )
-	message( STATUS "Looking for X11 - found" )
+	message( STATUS "Looking for X11 dev - found" )
 
 	find_library( X11_VIDEO_LIBRARY Xxf86vm
 		/usr/lib64
@@ -26,9 +26,9 @@ if( X11_FOUND )
 	set( X11_LIBRARIES ${X11_LIBRARIES} ${X11_VIDEO_LIBRARY} )
 else( X11_FOUND )
 	if( UNIX )
-		message( FATAL_ERROR "Looking for X11 - not found (development libraries)" )
+		message( FATAL_ERROR "Looking for X11 dev - not found" )
 	else( UNIX )
-		message( STATUS "Looking for X11 - not found (development libraries)" )
+		message( STATUS "Looking for X11 dev - not found" )
 	endif( UNIX )
 endif( X11_FOUND )
 
