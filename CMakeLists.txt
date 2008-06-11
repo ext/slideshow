@@ -28,7 +28,7 @@ else( X11_FOUND )
 	if( UNIX )
 		message( FATAL_ERROR "Looking for X11 - not found" )
 	else( UNIX )
-		message( STATUS "Looking for X11 - not found" )
+		message( STATUS "Looking for X11 - not found (development libraries)" )
 	endif( UNIX )
 endif( X11_FOUND )
 
