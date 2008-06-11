@@ -32,10 +32,20 @@ else( X11_FOUND )
 	endif( UNIX )
 endif( X11_FOUND )
 
+# OpenGL
+message( STATUS "Looking for OpenGL" )
+INCLUDE( FindOpenGL )
+IF( OPENGL_FOUND )
+	MESSAGE( STATUS "Looking for OpenGL - found" )
+ELSE( OPENGL_FOUND )
+	MESSAGE( FATAL_ERROR "Looking for OpenGL - not found" )
+ENDIF( OPENGL_FOUND )
+
+set( FREEIMAGE_FIND_REQUIRED TRUE )
+include(FindFreeImage)
+
 set( DBUS_FIND_REQUIRED TRUE )
 include(FindDBus)
-
-add_subdirectory( vendor/libportable )
 
 include_directories(
 	include
@@ -45,6 +55,11 @@ include_directories(
 
 set( CMAKE_CXX_FLAGS_DEBUG "-Wall -g" )
 set( CMAKE_CXX_FLAGS_RELEASE "-Wall -g -O2" )
+
+add_subdirectory( vendor/libportable )
+add_subdirectory( src/browsers )
+add_subdirectory( src/IPC )
+add_subdirectory( src/transitions )
 
 set( SLIDESHOW_SRCS
 	src/main.cpp
@@ -59,15 +74,17 @@ else (UNIX)
 	message( FATAL_ERROR "Sorry, Slideshow does not yet build on this platform. Please feel free to contribute!" )
 endif (UNIX)
 
-set( SLIDESHOW_LIBS libportable GL freeimage mysqlclient )
-
-set( SLIDESHOW_SRCS ${SLIDESHOW_SRCS} src/transitions/dummy.cpp src/transitions/fade.cpp )
-set( SLIDESHOW_SRCS ${SLIDESHOW_SRCS} src/browsers/mysqlbrowser.cpp)
-set( SLIDESHOW_SRCS ${SLIDESHOW_SRCS} src/IPC/dbus.cpp)
+set( SLIDESHOW_LIBS mysqlclient )
 
 add_executable( slideshow ${SLIDESHOW_SRCS} )
 target_link_libraries( slideshow
+	Browsers
+	IPC
+	Transitions
+	libportable
 	${SLIDESHOW_LIBS}
 	${X11_LIBRARIES}
 	${DBUS_LIBRARY}
+	${OPENGL_LIBRARIES}
+	${FREEIMAGE_LIBRARY}
 )
