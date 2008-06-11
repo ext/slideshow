@@ -47,10 +47,16 @@ include(FindFreeImage)
 set( DBUS_FIND_REQUIRED TRUE )
 include(FindDBus)
 
+set( MYSQL_FIND_REQUIRED TRUE )
+include(FindMySQL)
+
 include_directories(
 	include
 	vendor/libportable/include
 	${DBUS_INCLUDE_PATH}
+	${OPENGL_INCLUDE_PATH}
+	${FREEIMAGE_INCLUDE_PATH}
+	${MYSQL_INCLUDE_PATH}
 )
 
 set( CMAKE_CXX_FLAGS_DEBUG "-Wall -g" )
@@ -74,8 +80,6 @@ else (UNIX)
 	message( FATAL_ERROR "Sorry, Slideshow does not yet build on this platform. Please feel free to contribute!" )
 endif (UNIX)
 
-set( SLIDESHOW_LIBS mysqlclient )
-
 add_executable( slideshow ${SLIDESHOW_SRCS} )
 target_link_libraries( slideshow
 	Browsers
@@ -87,4 +91,5 @@ target_link_libraries( slideshow
 	${DBUS_LIBRARY}
 	${OPENGL_LIBRARIES}
 	${FREEIMAGE_LIBRARY}
+	${MYSQL_LIBRARY}
 )
