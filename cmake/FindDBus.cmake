@@ -36,7 +36,6 @@ ELSE (WIN32)
 	get_filename_component(_dbusLibPath ${DBUS_LIBRARY} PATH)
 
 	SET( DBUS_INCLUDE_PATH ${DBUS_INCLUDE_PATH} ${_dbusLibPath}/dbus-1.0/include )
-	message( ${DBUS_INCLUDE_PATH} )
 ENDIF (WIN32)
 
 IF ( DBUS_INCLUDE_PATH AND DBUS_LIBRARY )
