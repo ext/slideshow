@@ -20,7 +20,7 @@
 <?
 
 if ( !file_exists("../settings.json") ){
-	die("settings.json not found!");
+	throw new Exception("settings.json not found!");
 }
 
 $json_string = file_get_contents("../settings.json");

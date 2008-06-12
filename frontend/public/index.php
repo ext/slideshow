@@ -18,16 +18,21 @@
  */
 ?>
 <?
-require_once("../settings.inc.php");
-require_once("../db_functions.inc.php");
-require_once("../thumb_functions.inc.php");
 
 require_once("../core/path.inc.php");
+require_once("../db_functions.inc.php");
+require_once("../thumb_functions.inc.php");
 require_once("../core/module.inc.php");
 
-connect();
+$path = NULL;
+if ( !file_exists('../settings.json') ){
+  $path = new Path( 'install', 'welcome' );
+} else {
+  $path = new Path();
+  require_once("../settings.inc.php");
+}
 
-$path = new Path();
+connect();
 
 $module = $path->module();
 $page = Module::factory( $module );

@@ -1,0 +1,128 @@
+<?
+/**
+ * This file is part of Slideshow.
+ * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
+ * 
+ * Slideshow is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Slideshow is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
+ */
+?>
+  <h1>Slideshow &gt; Welcome</h1>
+
+<? if ( !$writable_config ){ ?>
+<div class="notice">
+  <p> `<?=$path?>' is not writable, the configuration file will not be automaticly written. You will need to save and upload the configuration manually.</p>
+</div>
+<? } ?>
+
+<div id="install">
+
+  <h2>Paths</h2>
+  <table>
+    <tr>
+      <td>
+        <label>
+          Base path
+          <span class="field_description">Absolute path to the root directory, eg `/home/slideshow'.</span>
+        </label>
+      </td>
+      <td>
+        <input type="text" name="basepath" id="basepath" />
+      </td>
+      <td>
+        &nbsp;
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label>
+          Images
+          <span class="field_description">The directory to put images into.</span>
+        </label>
+     </td>
+     <td>
+       <input type="text" name="imagepath" id="imagepath" value="image" />
+     </td>
+     <td>
+       &nbsp;
+     </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label>
+          Video
+          <span class="field_description">The directory to put videos into.</span>
+        </label>
+     </td>
+     <td>
+       <input type="text" name="videopath" id="videopath" value="video" />
+     </td>
+     <td>
+       &nbsp;
+     </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label>
+          Temp
+          <span class="field_description">The directory to store temporary files in.</span>
+        </label>
+     </td>
+     <td>
+       <input type="text" name="temppath" id="temppath" value="tmp" />
+     </td>
+     <td>
+       &nbsp;
+     </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label>
+          Binary
+          <span class="field_description">Path to backend binary.</span>
+        </label>
+     </td>
+     <td>
+       <input type="text" name="binpath" id="binpath" value="" />
+     </td>
+     <td>
+       &nbsp;
+     </td>
+    </tr>
+  </table>
+
+  <h2>Files</h2>
+  <table>
+    <tr>
+      <td>
+        <label>
+          Binary
+          <span class="field_description">Name of the backend binary.</span>
+        </label>
+      </td>
+      <td>
+        <input type="text" name="binary" id="binary" value="slideshow" />
+      </td>
+      <td>
+        &nbsp;
+      </td>
+    </tr>
+  </table>
+
+  <div class="space"></div>
+</div>
+

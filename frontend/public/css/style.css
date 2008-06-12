@@ -10,6 +10,11 @@ img {
 	float:		left;
 }
 
+.space {
+	clear:		both;
+	height:		1px;
+}
+
 #log { 
 	font-family:	monospace;
 	background:	white;
@@ -20,4 +25,27 @@ img {
 	border:		3px solid red;
 	text-align:	center;
 	padding:	1em;
+}
+
+#install {
+	width:		500px;
+}
+
+#install .field_description {
+	display:	block;
+	width:		300px;
+	text-align:	right;
+	float:		left;
+	font-size:	0.7em;
+}
+
+#install label {
+	display:	block;
+	width:		300px;
+	text-align:	right;
+	float:		left;
+}
+
+#install input {
+	float:		right;
 }

@@ -22,29 +22,34 @@
 class Path {
   private $path;
 
-  function Path(){
-    if ( isset($_SERVER['PATH_INFO']) ){
-      $path = $_SERVER['PATH_INFO'];
+  function Path( $module = NULL, $section = NULL ){
+    if ( isset( $module ) && isset( $section ) ){
+      $this->path = array( $module, $section );
+      return;
+    }
 
-      if ( $path == '/' ){
-	$this->path = array ( 'main', 'index' );
-	return;
-      }
-
-      $this->path = array_slice(explode("/",$_SERVER['PATH_INFO']),1);
-
-      $section_missing = count($this->path) == 1;
-      if ( $section_missing ){
-	$this->path[1] = 'index';
-      }
-
-      $section_invalid = $this->path[1] == '';
-      if ( $section_invalid ){
-	$this->path[1] = 'index';
-      }
-
-    } else {
+    if ( !isset($_SERVER['PATH_INFO']) ){
       $this->path = array( 'main', 'index' );
+      return;
+    }
+
+    $path = $_SERVER['PATH_INFO'];
+
+    if ( $path == '/' ){
+      $this->path = array ( 'main', 'index' );
+      return;
+    }
+
+    $this->path = array_slice(explode("/",$_SERVER['PATH_INFO']),1);
+
+    $section_missing = count($this->path) == 1;
+    if ( $section_missing ){
+      $this->path[1] = 'index';
+    }
+
+    $section_invalid = $this->path[1] == '';
+    if ( $section_invalid ){
+      $this->path[1] = 'index';
     }
   }
 
