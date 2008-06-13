@@ -42,13 +42,13 @@ $page->execute( $path->section(), $path->argv() );
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <link rel="stylesheet" href="/css/style.css" type="text/css" media="screen" />
-  <title>Slideshow</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" href="/css/style.css" type="text/css" media="screen" />
+	<title>Slideshow</title>
 <?
   //@note hack to get the maintenance page refresh
   if ( $path->module() == 'maintenance' ) { ?>
-  <meta http-equiv="refresh" content="5" />
+	<meta http-equiv="refresh" content="5" />
 <? } ?>
 </head>
 
@@ -60,8 +60,8 @@ $page->render();
 
 ?>
 
-<hr>
-Inloggad som <?=$_SERVER['PHP_AUTH_USER'];?> (<a href="/logout.php">Logout</a>)
+	<hr>
+	Inloggad som <?=$_SERVER['PHP_AUTH_USER'];?> (<a href="/logout.php">Logout</a>)
 </body>
 
 </html>
