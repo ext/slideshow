@@ -2,50 +2,77 @@ body {
 	background:	#ffc;
 }
 
-img { 
+img {
 	border:		1px solid black;
 }
 
-.slide { 
+.slide {
 	float:		left;
 }
 
-.space {
+.spacer {
 	clear:		both;
 	height:		1px;
 }
 
-#log { 
+#log {
 	font-family:	monospace;
 	background:	white;
 	padding:	5px;
 }
 
-#motd { 
+#motd {
 	border:		3px solid red;
 	text-align:	center;
 	padding:	1em;
 }
 
+.notice {
+	border:		3px solid red;
+	text-align: center;
+	padding:	1em;
+}
+
 #install {
-	width:		500px;
+
+	font-size:	0.9em;
 }
 
 #install .field_description {
 	display:	block;
-	width:		300px;
+
 	text-align:	right;
-	float:		left;
 	font-size:	0.7em;
 }
 
 #install label {
+	clear:		both;
 	display:	block;
-	width:		300px;
+	width:		350px;
 	text-align:	right;
 	float:		left;
+	margin-right: 10px;
+
 }
 
 #install input {
-	float:		right;
+	float:		left;
+}
+
+#install .field_notice {
+	color:		red;
+	float:		left;
+	font-size:	0.7em;
+}
+
+#install button {
+	clear:		both;
+}
+
+#install ul.step .current_step {
+	color:		red;
+}
+
+#install pre.summary {
+	background:	white;
 }

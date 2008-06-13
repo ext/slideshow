@@ -17,21 +17,8 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 ?>
-<?
-function connect(){
-  global $Database;
-  mysql_connect($Database['Host'], $Database['Username'], $Database['Password'])
-	or die("Could not connect to database: " . mysql_error());
-  mysql_select_db($Database['Name']);
-}
+  <h1>Slideshow &gt; Welcome</h1>
 
-function disconnect(){
-  mysql_close();
-}
+  <p>Slideshow is an application for showing text and images in a loop on monitors and projectors. It is not meant for situations where interactive control is required, but for when the content is continuously looping for a long time. The content is updated through a webgui. The application is split into two packages, the backend and frontend. The backend is written in C++ and OpenGL and the frontend uses PHP and MySQL. Currently the frontend is very GNU/Linux specific and will not run on any other platform. It is however meant to be as platform independent as possible, as long as it handles OpenGL.</p>
 
-function q($query){
-  $res = mysql_query($query) or
-	die("Mysql error: ".mysql_error()."\n<br/>Executing \"$query\"\n");
-  return $res;
-}
-?>
+  <p>Proceed to <a href="/index.php/install/step/0"> installation</a>.</p>
