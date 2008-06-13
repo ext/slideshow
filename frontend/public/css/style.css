@@ -65,6 +65,10 @@ img {
 	font-size:	0.7em;
 }
 
+#install .field_notice .ok {
+	color:		green;
+}
+
 #install button {
 	clear:		both;
 }

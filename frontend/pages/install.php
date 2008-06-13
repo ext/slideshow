@@ -49,7 +49,7 @@ class Install extends Module {
 			'Apparence' => array(
 				'Background' => '',
 				'Font' => '',
-				'Resolution' => '800x600'
+				'Resolution' => array(800, 600)
 			),
 
 			'Database' => array(
@@ -160,9 +160,14 @@ class Install extends Module {
 	 		break;
 
 	 	case 5:
-	 		$ret['json'] = $this->_prettify( json_encode( $_SESSION['config'] ) );
+	 		$ret['json'] = $this->_configuration_as_json();
 
 	 		break;
+
+	 	case 6:
+	 		if ( file_exists('../settings.json') ){
+	 			$this->redirect("/index.php/install/complete");
+	 		}
 	 }
 
 
@@ -249,9 +254,60 @@ class Install extends Module {
 			}
 
 			break;
+
+		case 5:
+			$database_host = $_SESSION['config']['Database']['Hostname'];
+			$database_name = $_SESSION['config']['Database']['Name'];
+			$database_username = $_SESSION['config']['Database']['Username'];
+			$database_password = $_SESSION['config']['Database']['Password'];
+
+			mysql_connect($database_host, $database_username, $database_password);
+
+			mysql_query("SOURCE ../maintenance/install.sql");
+
+			$basepath = $_SESSION['config']['BasePath'];
+			$imagepath = $basepath . '/' . $_SESSION['config']['Path']['Image'];
+			$videopath = $basepath . '/' . $_SESSION['config']['Path']['Video'];
+			$temppath = $basepath . '/' . $_SESSION['config']['Path']['Temp'];
+
+			if ( !file_exists($imagepath)){
+				mkdir( $imagepath );
+			}
+
+			if ( !file_exists($videopath)){
+				mkdir( $videopath );
+			}
+
+			if ( !file_exists($temppath)){
+				mkdir( $temppath );
+			}
+
+			if ( is_writable( '..' ) ){
+				$file = fopen('../settings.json');
+				fwrite($file, $this->_configuration_as_json());
+				fclose($file);
+				$this->redirect("/index.php/install/complete");
+			} else {
+				$this->redirect("/index.php/install/step/6");
+			}
 		}
 
 		return array();
+	}
+
+	function complete(){
+		Module::set_template('install_complete.tmpl');
+		return array();
+	}
+
+	function download(){
+		session_start();
+		Module::set_template('download_config.tmpl', true);
+		return array('data' => $this->_configuration_as_json());
+	}
+
+	function _configuration_as_json(){
+		return $this->_prettify( json_encode( $_SESSION['config'] ) );
 	}
 
 	function _prettify($json){
@@ -268,7 +324,7 @@ class Install extends Module {
 
 			// Remove any escaped forward slashes since JSON handles them anyway.
 			// It is not correct to escape them anyway and makes reading it harder.
-			if ( $in_string && $json[$i] == '/' && $json[$i-1] == '\\' ){
+			if ( $in_string && $json[$i] == '\\' && $json[$i+1] == '/' ){
 				continue;
 			}
 
@@ -324,6 +380,8 @@ class Install extends Module {
 
 			}
 		}
+
+		$pretty .= "\n";
 
 		return $pretty;
 	}

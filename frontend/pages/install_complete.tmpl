@@ -17,21 +17,6 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 ?>
-<?
-function connect(){
-  global $Database;
-  mysql_connect($Database['Hostname'], $Database['Username'], $Database['Password'])
-	or die("Could not connect to database: " . mysql_error());
-  mysql_select_db($Database['Name']);
-}
+		<h1>Slideshow &gt; Install &gt; Complete</h1>
 
-function disconnect(){
-  mysql_close();
-}
-
-function q($query){
-  $res = mysql_query($query) or
-	die("Mysql error: ".mysql_error()."\n<br/>Executing \"$query\"\n");
-  return $res;
-}
-?>
+		<p>Congratulations! You have successfully installed Slideshow PHP Frontend! <a href="/">Proceed</a>.</p>

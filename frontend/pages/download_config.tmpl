@@ -16,22 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
-?>
-<?
-function connect(){
-  global $Database;
-  mysql_connect($Database['Hostname'], $Database['Username'], $Database['Password'])
-	or die("Could not connect to database: " . mysql_error());
-  mysql_select_db($Database['Name']);
-}
 
-function disconnect(){
-  mysql_close();
-}
+Header( "Content-Type: application/json" );
+Header( "Content-Length:" . strlen( $data ) );
+Header( "Content-Disposition: attatchment; filename=settings.json" );
 
-function q($query){
-  $res = mysql_query($query) or
-	die("Mysql error: ".mysql_error()."\n<br/>Executing \"$query\"\n");
-  return $res;
-}
+echo $data;
 ?>

@@ -27,6 +27,7 @@ class Module {
 
   function Module(){
 	$this->_template = '';
+	$this->_custom_view = false;
   }
 
   function factory( $module ){
@@ -34,8 +35,13 @@ class Module {
 	return new $module;
   }
 
-  function set_template( $template ){
+  function set_template( $template, $custom_view = false ){
 	$this->_template = $template;
+	$this->_custom_view = $custom_view;
+  }
+
+  function has_custom_view(){
+  	return $this->_custom_view;
   }
 
   function index(){

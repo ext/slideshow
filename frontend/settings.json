@@ -1,34 +1,33 @@
 {
-        "BasePath" : "/home/slideshow",
+	"BasePath": "/home/ext/slideshow",
 
-        "Path" : {
-                "Image" : "image",
-                "Video" : "video",
-                "Temp" : "tmp",
-                "Build" : ""
-        },
+	"Path": {
+		"Image": "image",
+		"Video": "video",
+		"Temp": "tmp"
+	},
 
-        "Files" : {
-                "Binary" : "slideshow",
-                "Log" : {
-                        "Base" : "slideshow.log",
-                        "Debug" : "slideshow.debug.log",
-			"Activity" : "activity.log"
-                },
-                "PID" : "slideshow.pid",
-		"convert" : "/usr/bin/convert",
-		"background" : "/home/slideshow/background.png",
-		"font" : "/home/slideshow/eurostile.ttf"
-        },
+	"Files": {
+		"BinaryPath": "/home/ext/workspace/code/trunk/Projects/Slideshow/trunk/build/slideshow",
+		"Log": {
+			"Base": "slideshow.log",
+			"Debug": "slideshow.debug.log",
+			"Activity": "activity.log"
+		},
+		"PID": "slideshow.pid",
+		"convert": "/usr/bin/convert"
+	},
 
-        "Database" : {
-                "Username" : "slideshow",
-                "Password" : "sd87f6gs8d7f6g8sd76fg8sdfgysdfi67g",
-                "Host" : "localhost",
-                "Name" : "slideshow"
-        },
+	"Apparence": {
+		"Background": "",
+		"Font": "",
+		"Resolution": [800,600]
+	},
 
-        "Settings" : {
-                "Resolution" : [800, 600]
-        }
+	"Database": {
+		"Username": "slideshow",
+		"Password": "sd87f6gs8d7f6g8sd76fg8sdfgysdfi67g",
+		"Hostname": "localhost",
+		"Name": "slideshow"
+	}
 }

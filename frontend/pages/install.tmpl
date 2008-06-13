@@ -208,6 +208,12 @@ function write_availability( $var, $ok = 'Available', $fail = 'Unavailable' ){
   		<pre class="summary">
 <?=$json?>
 		</pre>
+		<p>Proceed to <a href="/index.php/install/submit/5">Summary</a>.</p>
+<?
+	break;
+	case 6:
+?>
+		<p>To finalize the installation you need to download the <a href="/index.php/install/download">configuration</a> and put it in the root directory (<?=$path?>). <a href="/index.php/install/step/6">Retry</a>.</p>
 <?
 	break;
 }
