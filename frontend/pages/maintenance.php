@@ -33,37 +33,47 @@ class Maintenance extends Module {
 		disconnect();
 	}
 
-  function index(){
-	Module::set_template('maintenance.tmpl');
+	function index(){
+		global $settings;
 
-	$show_debug = false;
-	if ( isset($_GET['show_debug']) ){
-	  $show_debug = true;
+		Module::set_template('maintenance.tmpl');
+
+		$show_debug = isset($_GET['show_debug']);
+
+		$ret =  array(
+			'log' => array(),
+			'activity' => array(),
+			'status' => $this->_get_daemon_status(),
+			'show_debug' => $show_debug
+		);
+
+		try {
+			$activity_log = $settings->activity_log();
+			$ret['activity'] = $activity_log->read_lines(25);
+		} catch ( Exception $e ){}
+
+		try {
+			$log = $settings->log();
+			if ( $show_debug ){
+				$log = $settings->debug_log();
+			}
+
+			$ret['log'] = $log->read_lines(25);
+		} catch ( Exception $e ){}
+
+		return $ret;
 	}
 
-	global $BasePath, $Files;
-
-	$activity_log = $BasePath . "/" . $Files['Log']['Activity'];
-	$activity = explode("\n", `tail $activity_log`);
-
-	return array(
-		 'log' => get_log(25, $show_debug),
-		 'activity' => $activity,
-		 'status' => $this->_get_daemon_status(),
-		 'show_debug' => $show_debug
-		 );
-  }
-
   function forcestart(){
-	global $Files;
+	global $settings;
 
-	$pid_file = $Files['PID'];
+	$pid = $settings->pid();
 
-	$pid = (int)`cat $pid_file`;
-	posix_kill($pid, 9);
+	if ( $pid > 0 ){
+		posix_kill($pid, 9);
+		unlink($settings->pid_file());
+	}
 
-	unlink($pid_file);
-	unlink($Files['Log']['Base']);
 	$this->start();
   }
 
@@ -72,11 +82,11 @@ class Maintenance extends Module {
 	  throw new exception("Deamon is not stopped, cannot start.");
 	}
 
-	global $BasePath, $Path, $Files, $Database, $Settings;
+	global $settings;
 
-	$binary = "$Path[Build]/$Files[Binary]";
-	$resolution_x = $Settings['Resolution'][0];
-	$resolution_y = $Settings['Resolution'][1];
+	$binary = $settings->binary();
+	$resolution_x = $Apparence['Resolution'][0];
+	$resolution_y = $Apparence['Resolution'][1];
 
 	if ( !file_exists($binary) ){
 	  throw new exception("Could not find binary \"$binary\" or did not have permission to execute it");
@@ -115,26 +125,30 @@ class Maintenance extends Module {
   //   1: Daemon started
   //   2: Daemon crashed
   function _get_daemon_status(){
-	global $Files, $BasePath;
+	global $settings;
 
-	$pid_file = $BasePath."/".$Files['PID'];
+	$pid = $settings->pid();
 
-	if ( !file_exists( $pid_file) ){
+	// If $pid is zero the process isn't available.
+	if ( $pid == 0 ){
 	  return 0;
 	}
 
-	$pid = (int)`cat $pid_file`;
+	// Check if the process accepts signals
+	///@todo Not portable
 	if ( posix_kill($pid, 0) ){
 	  return 1;
 	}
 
+	// The process does not exist or is in a unresponsive state,
+	// either way, it is malfunctioning.
 	return 2;
   }
 
   function coredump(){
-	global $BasePath;
+	global $settings;
 
-	$filename = "$BasePath/core";
+	$filename = $settings->base_path() . '/core';
 	$filesize = filesize($filename);
 
 	header("Pragma: public");

@@ -23,14 +23,19 @@ require_once("../core/path.inc.php");
 require_once("../db_functions.inc.php");
 require_once("../thumb_functions.inc.php");
 require_once("../core/module.inc.php");
+require_once("../models/settings.php");
 
 $path = new Path();
-if ( !file_exists('../settings.json') ){
-  if ( $path->module() != 'install'){
-  	$path = new Path( 'install', 'welcome' );
-  }
-} else {
-  require_once("../settings.inc.php");
+$settings = NULL;
+
+try {
+	$settings = new Settings();
+} catch ( Exception $e ){
+	if ( $path->module() != 'install'){
+		$path = new Path( 'install', 'welcome' );
+	}
+
+	$settings = new Settings('../settings.json.default');
 }
 
 $page = Module::factory( $path->module() );
