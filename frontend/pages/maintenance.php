@@ -77,37 +77,53 @@ class Maintenance extends Module {
 	$this->start();
   }
 
-  function start(){
-	if ( $this->_get_daemon_status() != 0 ){
-	  throw new exception("Deamon is not stopped, cannot start.");
+	function start(){
+		global $settings;
+
+		if ( $this->_get_daemon_status() != 0 ){
+			throw new exception("Deamon is not stopped, cannot start.");
+		}
+
+		$binary = $settings->binary();
+
+		if ( !(file_exists($binary) && is_executable($binary)) ){
+			throw new exception("Could not find binary `$binary' or did not have permission to execute it");
+		}
+
+		$resolution = $settings->resolution_as_string();
+		$db_hostname = $settings->database_hostname();
+		$db_username = $settings->database_username();
+		$db_password = $settings->database_password();
+		$db_name = $settings->database_name();
+		$logfile = $settings->log_file();
+
+		$cmd = "ulimit -c unlimited; DISPLAY=\":0\" $binary --daemon --fullscreen --db_user $db_username --db_pass $db_password --db_name $db_name --resolution $resolution >> $logfile 2>&1";
+
+		$old_wd = getcwd();
+		chdir( $settings->base_path() );
+
+		$stdout = array();
+		$ret = 0;
+		exec($cmd, $stdout, $ret);
+
+		chdir( $old_wd );
+
+		if ( $ret != 0 ){
+			switch ( $ret ) {
+			case 1:
+				throw new exception( "A connection to the X server could not be made, check permissions." );
+				break;
+
+			default:
+				$lines = implode('\n', $stdout);
+				throw new exception( $lines );
+			}
+		}
+
+		usleep(1000*200);
+
+		Module::redirect('/index.php/maintenance', array("show_debug"));
 	}
-
-	global $settings;
-
-	$binary = $settings->binary();
-	$resolution_x = $Apparence['Resolution'][0];
-	$resolution_y = $Apparence['Resolution'][1];
-
-	if ( !file_exists($binary) ){
-	  throw new exception("Could not find binary \"$binary\" or did not have permission to execute it");
-	}
-
-	$cmd = "ulimit -c unlimited; DISPLAY=\":0\" $binary --daemon --fullscreen --db_user {$Database['Username']} --db_pass {$Database['Password']} --db_name {$Database['Name']} --resolution {$resolution_x}x{$resolution_y} >> {$Files['Log']['Base']} 2>&1";
-	chdir($BasePath);
-
-	$stdout = array();
-	$ret = 0;
-	exec($cmd, $stdout, $ret);
-
-	if ( $ret != 0 ){
-	  $lines = implode('\n', $stdout);
-	  throw new exception( $lines );
-	}
-
-	usleep(1000*200);
-
-	Module::redirect('/index.php/maintenance', array("show_debug"));
-  }
 
   function stop(){
 	if ( $this->_get_daemon_status() != 1 ){
@@ -115,7 +131,7 @@ class Maintenance extends Module {
 	}
 
 	$this->send_signal("Quit");
-	usleep(1000*200);
+	usleep(1000*400);
 
 	Module::redirect('/index.php/maintenance', array("show_debug"));
   }

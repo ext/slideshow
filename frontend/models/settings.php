@@ -27,8 +27,6 @@ class Settings {
 
 		$json_string = file_get_contents($filename);
 		$this->_data = json_decode( $json_string, true );
-
-		echo $this->base_path();
 	}
 
 	function store(){
@@ -78,7 +76,11 @@ class Settings {
 	}
 
 	function log(){
-		return new Log( $this->base_path() . '/' . $this->_data['Files']['Log']['Base'] );
+		return new Log( $this->log_file() );
+	}
+
+	function log_file(){
+		return $this->base_path() . '/' . $this->_data['Files']['Log']['Base'];
 	}
 
 	function set_log($new_path){
@@ -86,7 +88,11 @@ class Settings {
 	}
 
 	function debug_log(){
-		return new Log( $this->base_path() . '/' . $this->_data['Files']['Log']['Debug'] );
+		return new Log( $this->debug_log_file() );
+	}
+
+	function debug_log_file(){
+		return $this->base_path() . '/' . $this->_data['Files']['Log']['Debug'];
 	}
 
 	function set_debug_log($new_path){
@@ -94,7 +100,11 @@ class Settings {
 	}
 
 	function activity_log(){
-		return new Log( $this->base_path() . '/' .  $this->_data['Files']['Log']['Activity'] );
+		return new Log( $this->activity_log_file() );
+	}
+
+	function activity_log_file(){
+		return $this->base_path() . '/' .  $this->_data['Files']['Log']['Activity'];
 	}
 
 	function set_activity_log($new_path){
@@ -113,11 +123,81 @@ class Settings {
 	}
 
 	function pid_file(){
-		return $this->_data['Files']['PID'];
+		return $this->base_path() . '/' . $this->_data['Files']['PID'];
 	}
 
 	function set_pid_file($new_path){
 		$this->_data['Files']['PID'] = $new_path;
+	}
+
+	function resolution(){
+		return $this->_data['Apparence']['Resolution'];
+	}
+
+	function resolution_as_string(){
+		return sprintf("%dx%d", $this->_data['Apparence']['Resolution'][0], $this->_data['Apparence']['Resolution'][1]);
+	}
+
+	function set_resolution(){
+		$nr_of_arguments = func_num_args();
+		if ( $nr_of_arguments == 0 || $nr_of_arguments > 2 ){
+			throw new Exception('Wrong number of arguments');
+		}
+
+		$args = func_get_args();
+
+		if ( $nr_of_arguments == 1 ){
+			if ( is_string($args[0]) ){
+				$this->_data['Apparence']['Resolution'] = sscanf("%dx%d", $args[0]);
+				return;
+			}
+			if ( is_array($args[0]) ){
+				if ( count($args[0]) != 2 ){
+					throw new Exception('Array count is not two!');
+				}
+				$this->_data['Apparence']['Resolution'] = $args[0];
+				return;
+			}
+			throw new Exception('Wrong argument type, must be string or array, got ' . gettype($args[0]));
+		}
+
+		if ( !( is_integer($args[0]) && is_integer($args[1]) )){
+			throw new Exception('Wrong argument type, must be integers.');
+		}
+
+		$this->_data['Apparence']['Resolution'] = array($args[1], $args[2]);
+	}
+
+	function database_hostname(){
+		return $this->_data['Database']['Hostname'];
+	}
+
+	function set_database_hostname($new_value){
+		$this->_data['Database']['Hostname'] = $new_value;
+	}
+
+	function database_password(){
+		return $this->_data['Database']['Password'];
+	}
+
+	function set_database_password($new_value){
+		$this->_data['Database']['Password'] = $new_value;
+	}
+
+	function database_username(){
+		return $this->_data['Database']['Username'];
+	}
+
+	function set_database_username($new_value){
+		$this->_data['Database']['Username'] = $new_value;
+	}
+
+	function database_name(){
+		return $this->_data['Database']['Name'];
+	}
+
+	function set_database_name($new_value){
+		$this->_data['Database']['Name'] = $new_value;
 	}
 
 	function as_json(){
