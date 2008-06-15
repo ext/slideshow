@@ -86,7 +86,6 @@ class Install extends Module {
 	 		$ret['have_mysql'] = extension_loaded( 'mysql' );
 	 		$ret['have_json'] = extension_loaded( 'json' );
 	 		$ret['have_gd'] = extension_loaded( 'gd' );
-	 		//$ret['have_mysql'] = extension_loaded( 'mysql' );
 
 	 		// Try to find ImageMagick (test derived from phpBB)
 	 		$exe = (DIRECTORY_SEPARATOR == '\\') ? '.exe' : '';
@@ -116,6 +115,11 @@ class Install extends Module {
 
 	 			$_SESSION['config']['Files']['convert'] = $imagick_path . "convert$exe";
 	 		}
+
+			$ret['requirements_ok'] = false;
+			if ( $ret['have_mysql'] && $ret['have_json'] && $ret['have_gd'] && $ret['have_imagick'] ){
+				$ret['requirements_ok'] = true;
+			}
 
 	 		break;
 
