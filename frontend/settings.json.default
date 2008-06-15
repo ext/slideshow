@@ -1,5 +1,5 @@
 {
-	"BasePath": "/home/ext/slideshow",
+	"BasePath": "",
 
 	"Path": {
 		"Image": "image",
@@ -8,7 +8,7 @@
 	},
 
 	"Files": {
-		"BinaryPath": "/home/ext/workspace/code/trunk/Projects/Slideshow/trunk/build/slideshow",
+		"BinaryPath": "",
 		"Log": {
 			"Base": "slideshow.log",
 			"Debug": "slideshow.debug.log",
@@ -16,7 +16,7 @@
 		},
 		"PID": "slideshow.pid",
 		"MOTD": "motd",
-		"convert": "/usr/bin/convert"
+		"convert": ""
 	},
 
 	"Apparence": {
@@ -26,9 +26,9 @@
 	},
 
 	"Database": {
-		"Username": "slideshow",
-		"Password": "sd87f6gs8d7f6g8sd76fg8sdfgysdfi67g",
+		"Username": "",
+		"Password": "",
 		"Hostname": "localhost",
-		"Name": "slideshow"
+		"Name": ""
 	}
 }

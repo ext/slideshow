@@ -20,6 +20,9 @@
 <?
 function connect(){
 	global $settings;
+
+	throw new Exception("bajs");
+
 	mysql_connect($settings->database_hostname(), $settings->database_username(), $settings->database_password())
 		or die("Could not connect to database: " . mysql_error());
 	mysql_select_db($settings->database_name());

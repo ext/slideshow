@@ -31,6 +31,7 @@ class Module {
   }
 
   function factory( $module ){
+    echo $module, '<br/>';
 	require_once("../pages/$module.php");
 	return new $module;
   }
