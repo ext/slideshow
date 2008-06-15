@@ -72,7 +72,7 @@ class Settings {
 	}
 
 	function set_binary($new_path){
-		$this->_data['Files']['Binary'] = $new_path;
+		$this->_data['Files']['BinaryPath'] = $new_path;
 	}
 
 	function log(){

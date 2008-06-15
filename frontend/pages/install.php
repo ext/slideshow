@@ -26,39 +26,7 @@ class Install extends Module {
   	session_start();
 
 	if ( !isset( $_SESSION['config'] ) ){
-		$_SESSION['config'] = array(
-			'BasePath' => '',
-
-			'Path' => array(
-				'Image' => 'image',
-				'Video' => 'video',
-				'Temp' => 'tmp'
-			),
-
-			'Files' => array(
-				'BinaryPath' => '',
-				'Log' => array (
-					'Base' => 'slideshow.log',
-					'Debug' => 'slideshow.debug.log',
-					'Activity' => 'activity.log'
-  				),
-				'PID' => 'slideshow.pid',
-				'convert' => ''
-			),
-
-			'Apparence' => array(
-				'Background' => '',
-				'Font' => '',
-				'Resolution' => array(800, 600)
-			),
-
-			'Database' => array(
-				'Username' => '',
-				'Password' => '',
-				'Hostname' => 'localhost',
-				'Name' => ''
-			)
-		);
+		$_SESSION['config'] = new Settings('../settings.json.default');
   	}
 
 	Module::set_template('welcome.tmpl');
@@ -113,7 +81,7 @@ class Install extends Module {
 	 			$ret['have_imagick'] = true;
 	 			$ret['imagick_path'] = $imagick_path;
 
-	 			$_SESSION['config']['Files']['convert'] = $imagick_path . "convert$exe";
+	 			$_SESSION['config']->set_convert_binary($imagick_path . "convert$exe");
 	 		}
 
 			$ret['requirements_ok'] = false;
@@ -124,8 +92,8 @@ class Install extends Module {
 	 		break;
 
 	 	case 2:
-	 		$ret['basepath'] = $_SESSION['config']['BasePath'];
-	 		$ret['binpath'] = $_SESSION['config']['Files']['BinaryPath'];
+			$ret['basepath'] = $_SESSION['config']->base_path();
+			$ret['binpath'] = $_SESSION['config']->binary();
 
 	 		// This is a bit ugly but to suppres error messages it assumes paths are valid
 	 		$ret['basepath_found'] = isset($_GET['basepath_found']) ? $_GET['basepath_found'] : true;
@@ -135,10 +103,10 @@ class Install extends Module {
 	 		break;
 
 	 	case 3:
-	 		$ret['database_host'] = $_SESSION['config']['Database']['Hostname'];
-	 		$ret['database_name'] = $_SESSION['config']['Database']['Name'];
-	 		$ret['database_username'] = $_SESSION['config']['Database']['Username'];
-	 		$ret['database_password'] = $_SESSION['config']['Database']['Password'];
+			$ret['database_host'] = $_SESSION['config']->database_hostname();
+	 		$ret['database_name'] = $_SESSION['config']->database_name();
+	 		$ret['database_username'] = $_SESSION['config']->database_username();
+	 		$ret['database_password'] = $_SESSION['config']->database_password();
 
 	 		if ( isset( $_GET['connection_failed'] ) ){
 	 			$ret['connection_failed'] = stripslashes( $_GET['connection_failed'] );
@@ -147,9 +115,9 @@ class Install extends Module {
 	 		break;
 
 	 	case 4:
-	 		$ret['resolution'] = sprintf("%dx%d", $_SESSION['config']['Apparence']['Resolution'][0], $_SESSION['config']['Apparence']['Resolution'][1]);
-	 		$ret['background'] = $_SESSION['config']['Apparence']['Background'];
-	 		$ret['font'] = $_SESSION['config']['Apparence']['Font'];
+			$ret['resolution'] = $_SESSION['config']->resolution_as_string();
+	 		$ret['background'] = $_SESSION['config']->background();
+	 		$ret['font'] = $_SESSION['config']->font();
 
 			if ( isset( $_GET['valid_resolution'] ) ){
 	 			$ret['valid_resolution'] =  $_GET['valid_resolution'];
@@ -164,7 +132,7 @@ class Install extends Module {
 	 		break;
 
 	 	case 5:
-	 		$ret['json'] = $this->_configuration_as_json();
+	 		$ret['json'] = $_SESSION['config']->as_json();
 
 	 		break;
 
@@ -184,12 +152,12 @@ class Install extends Module {
 		switch ( $n ){
 		case 2:
 			$basepath = $_POST['basepath'];
-			$_SESSION['config']['BasePath'] = $basepath;
+			$_SESSION['config']->set_base_path($basepath);
 			$basepath_found = file_exists($basepath) && is_dir($basepath);
 			$basepath_writable = is_writable($basepath);
 
 			$binpath = $_POST['binpath'];
-			$_SESSION['config']['Files']['BinaryPath'] = $binpath;
+			$_SESSION['config']->set_binary($binpath);
 			$binpath_found = file_exists($binpath) && is_executable($binpath);
 
 			if ( $basepath_found && $basepath_writable && $binpath_found ){
@@ -206,10 +174,10 @@ class Install extends Module {
 			$database_username = $_POST['database_username'];
 			$database_password = $_POST['database_password'];
 
-			$_SESSION['config']['Database']['Hostname'] = $database_host;
-			$_SESSION['config']['Database']['Name'] = $database_name;
-			$_SESSION['config']['Database']['Username'] = $database_username;
-			$_SESSION['config']['Database']['Password'] = $database_password;
+			$_SESSION['config']->set_database_hostname($database_host);
+			$_SESSION['config']->set_database_name($database_name);
+			$_SESSION['config']->set_database_username($database_username);
+			$_SESSION['config']->set_database_password($database_password);
 
 			$connection_ok = @mysql_connect($database_host, $database_username, $database_password) !== false;
 
@@ -231,9 +199,9 @@ class Install extends Module {
 			$background = trim($_POST['background']);
 			$font = trim($_POST['font']);
 
-			$_SESSION['config']['Apparence']['Resolution'] = $resolution;
-			$_SESSION['config']['Apparence']['Background'] = $background;
-			$_SESSION['config']['Apparence']['Font'] = $font;
+			$_SESSION['config']->set_resolution($resolution);
+			$_SESSION['config']->set_background($background);
+			$_SESSION['config']->set_font($font);
 
 			$valid_resolution = count($resolution) == 2;
 
@@ -260,19 +228,23 @@ class Install extends Module {
 			break;
 
 		case 5:
-			$database_host = $_SESSION['config']['Database']['Hostname'];
-			$database_name = $_SESSION['config']['Database']['Name'];
-			$database_username = $_SESSION['config']['Database']['Username'];
-			$database_password = $_SESSION['config']['Database']['Password'];
+			$database_host = $_SESSION['config']->database_hostname();
+	 		$database_name = $_SESSION['config']->database_name();
+	 		$database_username = $_SESSION['config']->database_username();
+	 		$database_password = $_SESSION['config']->database_password();
 
 			mysql_connect($database_host, $database_username, $database_password);
 
-			mysql_query("SOURCE ../maintenance/install.sql");
+			//mysql_query("SOURCE ../maintenance/install.sql");
+			exec("mysql -u '$database_username' --password='$database_password' $database_name < ../maintenance/install.sql 2>&1", $stdout, $ret);
+			if ( $ret != 0 ){
+			  print_r($stdout);
+			  die();
+			}
 
-			$basepath = $_SESSION['config']['BasePath'];
-			$imagepath = $basepath . '/' . $_SESSION['config']['Path']['Image'];
-			$videopath = $basepath . '/' . $_SESSION['config']['Path']['Video'];
-			$temppath = $basepath . '/' . $_SESSION['config']['Path']['Temp'];
+			$imagepath = $_SESSION['config']->image_path();
+			$videopath = $_SESSION['config']->video_path();
+			$temppath = $_SESSION['config']->temp_path();
 
 			if ( !file_exists($imagepath)){
 				mkdir( $imagepath );
@@ -288,7 +260,7 @@ class Install extends Module {
 
 			if ( is_writable( '..' ) ){
 				$file = fopen('../settings.json');
-				fwrite($file, $this->_configuration_as_json());
+				fwrite($file, $_SESSION['config']->as_json());
 				fclose($file);
 				$this->redirect("/index.php/install/complete");
 			} else {
@@ -307,7 +279,7 @@ class Install extends Module {
 	function download(){
 		session_start();
 		Module::set_template('download_config.tmpl', true);
-		return array('data' => $this->_configuration_as_json());
+		return array('data' => $_SESSION['config']->as_json());
 	}
 };
 
