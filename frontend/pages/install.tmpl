@@ -18,7 +18,7 @@
  */
 
 function write_availability( $var, $ok = 'Available', $fail = 'Unavailable' ){
-	echo '<span class="ok">', $var ? $ok : $fail, '</span>';
+	echo '<span class="', $var ? 'ok' : 'fail', '">', $var ? $ok : $fail, '</span>';
 }
 
 ?>
