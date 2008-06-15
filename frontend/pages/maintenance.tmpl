@@ -2,17 +2,17 @@
 /**
  * This file is part of Slideshow.
  * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
- * 
+ *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Slideshow is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -28,27 +28,51 @@
 <? if ( $status == 2 ){ ?>
   <p>The slideshow daemon crashed. Please follow these steps: </p>
   <ol>
-    <li>Download the <a href="/index.php/maintenance/coredump">coredump</a>.</li>
-    <li>
-      File a ticket at <a href="http://sidvind.com:8000/slideshow">http://sidvind.com:8000/slideshow</a>.
-      <ul>
-        <li>Include the latest entries from the log with debug entries.</li>
-        <li>Attach the coredump.</li>
-        <li>(You can skip most of the fields in ticket properties)</li>
-      </ul>
-    </li>
-    <li>Go bug <a href="mailto:ext@sidvind.com">ext</a> about it.</li>
-    <li><a href="/index.php/maintenance/forcestart">Force restart</a>.</li>
+	<li>Download the <a href="/index.php/maintenance/coredump">coredump</a>.</li>
+	<li>
+	  File a ticket at <a href="http://sidvind.com:8000/slideshow">http://sidvind.com:8000/slideshow</a>.
+	  <ul>
+		<li>Include the latest entries from the log with debug entries.</li>
+		<li>Attach the coredump.</li>
+		<li>(You can skip most of the fields in ticket properties)</li>
+	  </ul>
+	</li>
+	<li>Go bug <a href="mailto:ext@sidvind.com">ext</a> about it.</li>
+	<li><a href="/index.php/maintenance/forcestart">Force restart</a>.</li>
   </ol>
 <? } ?>
+
+  <h2>Menu</h2>
+
+  <ul>
+<? if ( $status == 0 ) { ?>
+	<li><a href="/index.php/maintenance/start<?=$show_debug?"?show_debug":""?>">Start daemon</a></li>
+<? } ?>
+<? if ( $status == 1 ) { ?>
+	<li><a href="/index.php/maintenance/stop<?=$show_debug?"?show_debug":""?>">Stop daemon</a></li>
+<? } ?>
+	<li><a href="/index.php/maintenance/ping<?=$show_debug?"?show_debug":""?>">Ping daemon</a></li>
+	<li><a href="/index.php/maintenance/kill_mplayer">Kill mplayer</a></li>
+  </ul>
+
+  <h2>Debug</h2>
+
+  <ul>
+<? if ( !$show_debug ) { ?>
+	<li><a href="/index.php/maintenance?show_debug">Show debug entries</a></li>
+<? } else { ?>
+	<li><a href="/index.php/maintenance">Hide debug entries</a></li>
+<? } ?>
+	<li><a href="/index.php/maintenance/debug_dumpqueue<?=$show_debug?"?show_debug":""?>">Dump queue</a></li>
+  </ul>
 
   <h2>Log</h2>
 
   <div id="log">
 <? foreach ( $log as $item ){ ?>
-    <div class="logitem log_<?=$item['severity']?>">
-      <?=$item['content']?>
-    </div>
+	<div class="logitem log_<?=$item['severity']?>">
+	  <?=$item['content']?>
+	</div>
 <? } ?>
   </div>
 
@@ -56,32 +80,8 @@
 
   <div id="log">
 <? foreach ( $activity as $item ){ ?>
-    <div class="logitem">
-      <?=$item?>
-    </div>
+	<div class="logitem">
+	  <?=$item['content']?>
+	</div>
 <? } ?>
   </div>
-
-  <h2>Menu</h2>
-
-  <ul>
-<? if ( $status == 0 ) { ?>
-    <li><a href="/index.php/maintenance/start<?=$show_debug?"?show_debug":""?>">Start daemon</a></li>
-<? } ?>
-<? if ( $status == 1 ) { ?>
-    <li><a href="/index.php/maintenance/stop<?=$show_debug?"?show_debug":""?>">Stop daemon</a></li>
-<? } ?>
-    <li><a href="/index.php/maintenance/ping<?=$show_debug?"?show_debug":""?>">Ping daemon</a></li>
-    <li><a href="/index.php/maintenance/kill_mplayer">Kill mplayer</a></li>
-  </ul>
-
-  <h2>Debug</h2>
-
-  <ul>
-<? if ( !$show_debug ) { ?>
-    <li><a href="/index.php/maintenance?show_debug">Show debug entries</a></li>
-<? } else { ?>
-    <li><a href="/index.php/maintenance">Hide debug entries</a></li>
-<? } ?>
-    <li><a href="/index.php/maintenance/debug_dumpqueue<?=$show_debug?"?show_debug":""?>">Dump queue</a></li>
-  </ul>

@@ -19,19 +19,19 @@
 ?>
 <?
 function connect(){
-  global $Database;
-  mysql_connect($Database['Hostname'], $Database['Username'], $Database['Password'])
-	or die("Could not connect to database: " . mysql_error());
-  mysql_select_db($Database['Name']);
+	global $settings;
+	mysql_connect($settings->database_hostname(), $settings->database_username(), $settings->database_password())
+		or die("Could not connect to database: " . mysql_error());
+	mysql_select_db($settings->database_name());
 }
 
 function disconnect(){
-  mysql_close();
+	mysql_close();
 }
 
 function q($query){
-  $res = mysql_query($query) or
-	die("Mysql error: ".mysql_error()."\n<br/>Executing \"$query\"\n");
-  return $res;
+	$res = mysql_query($query) or
+		die("Mysql error: ".mysql_error()."\n<br/>Executing \"$query\"\n");
+	return $res;
 }
 ?>

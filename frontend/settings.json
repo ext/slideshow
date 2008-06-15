@@ -15,6 +15,7 @@
 			"Activity": "activity.log"
 		},
 		"PID": "slideshow.pid",
+		"MOTD": "motd",
 		"convert": "/usr/bin/convert"
 	},
 

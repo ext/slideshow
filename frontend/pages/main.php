@@ -27,31 +27,26 @@ class Main extends Module {
 		connect();
 	}
 
-	function __descturuct(){
+	function __destruct(){
 		disconnect();
 	}
 
-  function index(){
-	Module::set_template('main.tmpl');
+	function index(){
+		global $settings;
 
-	$ret = array();
+		Module::set_template('main.tmpl');
 
-	$ret['slides'] = get_slides();
+		$ret = array(
+			'slides' => get_slides()
+		);
 
-	global $BasePath;
-	$motd_file = "$BasePath/motd";
+		$motd = $settings->motd();
+		if ( strlen(trim($motd)) > 0 ){
+			$ret['motd'] = $motd;
+		}
 
-	if ( file_exists($motd_file) ){
-	  $file = fopen("$BasePath/motd", "r");
-	  $content = str_replace("\n", "<br/>\n", fread($file, filesize($motd_file)));
-
-	  if ( strlen($content) > 0 ){
-	$ret['motd'] = $content;
-	  }
+		return $ret;
 	}
-
-	return $ret;
-  }
 };
 
 ?>

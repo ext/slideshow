@@ -19,7 +19,6 @@
 ?>
 <?
 
-require_once('../settings.inc.php');
 require_once('../db_functions.inc.php');
 require_once('../core/module.inc.php');
 

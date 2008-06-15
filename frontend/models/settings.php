@@ -130,6 +130,54 @@ class Settings {
 		$this->_data['Files']['PID'] = $new_path;
 	}
 
+	function motd(){
+		if ( !( is_readable($this->motd_file()) && filesize($this->motd_file()) > 0 ) ){
+			return "";
+		}
+
+		return file_get_contents( $this->motd_file() );
+	}
+
+	function motd_file(){
+		return $this->base_path() . '/' . $this->_data['Files']['MOTD'];
+	}
+
+	function set_motd($text){
+		$file = fopen( $this->motd_file() );
+		fwrite($text);
+		fclose($file);
+	}
+
+	function set_motd_file($new_path){
+		$this->_data['Files']['MOTD'] = $new_path;
+	}
+
+	function convert_binary(){
+		return $this->_data['Files']['convert'];
+	}
+
+	function set_convert_binary($new_path){
+		$this->_data['Files']['convert'] = $new_path;
+	}
+
+	function background(){
+		return $this->_data['Apparence']['Background'];
+	}
+
+	///@todo The new background should be copied into basepath
+	function set_background($new_path){
+		$this->_data['Apparence']['Background'] = trim($new_path);
+	}
+
+	function font(){
+		return $this->_data['Apparence']['Font'];
+	}
+
+	///@todo The new font should be copied into basepath
+	function set_font($new_path){
+		$this->_data['Apparence']['Font'] = trim($new_path);
+	}
+
 	function resolution(){
 		return $this->_data['Apparence']['Resolution'];
 	}

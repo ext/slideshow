@@ -19,8 +19,13 @@
 
 class Log {
 	function __construct( $filename ){
-		if ( !( file_exists($filename) && is_readable($filename) ) ){
-			throw new Exception("Could not open log `$filename'");
+		if ( !file_exists($filename) ){
+			if ( !is_writable( dirname($filename) ) ){
+				throw new Exception("Could not open log `$filename'");
+			}
+
+			$file = fopen($filename, "w");
+			fclose($file);
 		}
 
 		$this->_filename = $filename;
@@ -49,6 +54,12 @@ class Log {
 		}
 
 		return $log;
+	}
+
+	function write($str){
+		$file = fopen($this->_filename, "a");
+		fwrite($file, $str);
+		fclose($file);
 	}
 };
 

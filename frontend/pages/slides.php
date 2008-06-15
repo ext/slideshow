@@ -19,7 +19,6 @@
 ?>
 <?
 
-require_once('../settings.inc.php');
 require_once('../common.inc.php');
 require_once('../db_functions.inc.php');
 require_once('../core/module.inc.php');
@@ -40,53 +39,54 @@ class Slides extends Module {
 		 );
   }
 
-  function upload(){
-	Module::set_template('slides_upload.tmpl');
+	function upload(){
+		global $settings;
 
-	$image = NULL;
+		Module::set_template('slides_upload.tmpl');
 
-	$title_orig = post("title");
-	$content_orig = post("content");
+		$image = NULL;
 
-	$title = htmlentities($title_orig, ENT_NOQUOTES, "utf-8" );
-	$content = htmlentities($content_orig, ENT_NOQUOTES, "utf-8" );
-	$align = post("align", 1);
+		$title_orig = post("title");
+		$content_orig = post("content");
 
-	if ( isset($_POST['submit']) ){
-	  if ( $_POST['submit'] == 'Preview' ){
-	$image = '/index.php/slides/preview?title='.urlencode($title).'&content='.urlencode($content)."&align=$align";
-	  }
-	  if ( $_POST['submit'] == 'Upload' ){
-	global $Path;
+		$title = htmlentities($title_orig, ENT_NOQUOTES, "utf-8" );
+		$content = htmlentities($content_orig, ENT_NOQUOTES, "utf-8" );
+		$align = post("align", 1);
 
-	$title = $this->_utf_hack($title_orig);
-	$content = explode("\n", $this->_utf_hack($content_orig));
+		if ( isset($_POST['submit']) ){
+			if ( $_POST['submit'] == 'Preview' ){
+				$image = '/index.php/slides/preview?title='.urlencode($title).'&content='.urlencode($content)."&align=$align";
+			}
 
-	$filename = md5(uniqid());
-	$fullpath = "$Path[Image]/$filename.png";
+			if ( $_POST['submit'] == 'Upload' ){
+				$title = $this->_utf_hack($title_orig);
+				$content = explode("\n", $this->_utf_hack($content_orig));
 
-	$this->_create_image($title, $content, $align, $fullpath);
-	q("INSERT INTO files (fullpath) VALUES ('$fullpath')");
-	$this->send_signal("Reload");
+				$filename = md5(uniqid());
+				$fullpath = $settings->image_path() . "/$filename.png";
 
-	Module::log("Added slide titled '$title'");
-	Module::redirect("/index.php");
-	exit();
-	  }
+				$this->_create_image($title, $content, $align, $fullpath);
+				q("INSERT INTO files (fullpath) VALUES ('$fullpath')");
+				$this->send_signal("Reload");
+
+				Module::log("Added slide titled '$title'");
+				Module::redirect("/index.php");
+				exit();
+			}
+		}
+
+		return array(
+			'image' => $image,
+			'title' => $title,
+			'content' => $content,
+			'align' => $align
+		);
 	}
 
-	return array(
-		 'image' => $image,
-		 'title' => $title,
-		 'content' => $content,
-		 'align' => $align
-		 );
-  }
-
   function submit_image(){
-	global $Path, $Settings, $Files;
+	global $settings;
 
-	$convert = $Files['convert'];
+	$convert = $settings->convert_binary();
 
 	if ( !file_exists($convert) ){
 	  throw new Exception("Could not find ImageMagick 'convert' executable.");
@@ -94,7 +94,7 @@ class Slides extends Module {
 
 	$name = $_FILES['filename']['name'];
 	$hash = md5(uniqid());
-	$fullpath = "{$Path['Image']}/{$hash}_$name";
+	$fullpath = "{$settings->image_path()}/{$hash}_$name";
 
 	$uploaded = $_FILES['filename']['tmp_name'];
 
@@ -102,13 +102,11 @@ class Slides extends Module {
 	  die("Handling file that was not uploaded");
 	}
 
-	$resolution = $Settings['Resolution'];
-	$resolution_x = $resolution[0];
-	$resolution_y = $resolution[1];
+	$resolution = $settings->resolution_as_string();
 
 	move_uploaded_file($uploaded, $fullpath);
 
-	$cmd = "$convert ".escapeshellarg($fullpath)." -resize {$resolution_x}x{$resolution_y} -background black -gravity center -extent {$resolution_x}x{$resolution_y} ".escapeshellarg($fullpath)." 2>&1 ";
+	$cmd = "$convert ".escapeshellarg($fullpath)." -resize $resolution -background black -gravity center -extent $resolution ".escapeshellarg($fullpath)." 2>&1 ";
 
 	passthru($cmd, $rc);
 
@@ -147,32 +145,37 @@ class Slides extends Module {
   }
 
   function _create_image($title, $content, $alignment, $filename = NULL){
+	global $settings;
 
+	$resolution = $settings->resolution();
 
-	global $Settings, $Files;
+	$bgfile = $settings->background();
 
-	$resolution_x = $Settings['Resolution'][0];
-	$resolution_y = $Settings['Resolution'][1];
+	$im = false;
+	if ( !empty($bgfile) && is_readable($bgfile)  ){
+		///@todo This only accepts PNG's
+		$im = @imagecreatefrompng($bgfile);
+	}
 
-	$bgfile = $Files['background'];
-	//die("$bgfile\n");
-	$im = @imagecreatefrompng($bgfile);
 	if ( !$im ){
-	  $im  = imagecreatetruecolor($resolution_x, $resolution_y);
+	  $im  = imagecreatetruecolor($resolution[0], $resolution[1]);
 	  $black  = imagecolorallocate($im, 0, 0, 0);
 	  $white  = imagecolorallocate($im, 255, 255, 255);
-	  imagefilledrectangle($im, 0, 0, $resolution_x, $resolution_y, $black);
+	  imagefilledrectangle($im, 0, 0, $resolution[0], $resolution[1], $black);
 	} else {
 	  $black  = imagecolorallocate($im, 0, 0, 0);
 	  $white  = imagecolorallocate($im, 255, 255, 255);
 	}
 
-	//$font = "/usr/share/fonts/ttf-bitstream-vera/Vera.ttf";
-	$font = $Files['font'];
+	$font = $settings->font();
+
+	if ( !(empty($font) && is_readable($font) ) ){
+		$font = "/usr/share/fonts/ttf-bitstream-vera/Vera.ttf";
+	}
 
 	///@note Magic numbers
-	$title_size = 82;
-	$content_size = 42;
+	$title_size = 28;
+	$content_size = 12;
 
 	// 1 is alignment (center)
 	// 100 is y-coordinate
@@ -191,8 +194,10 @@ class Slides extends Module {
   }
 
   function _render_string_aligned($im, $alignment, $y, $size, $font, $color, $string){
-	global $Settings;
-	$width = $Settings['Resolution'][0];
+	global $settings;
+
+	$resolution = $settings->resolution();
+	$width = $resolution[0];
 	$margin = 60;
 
 	$line_spacing = (int)($size * 1.5);
@@ -249,26 +254,27 @@ class Slides extends Module {
 	imagefttext( $im, $size, 0, $width - $margin - $x, $y, $color, $font, $string );
   }
 
-  function delete(){
-	$id = (int)$_GET['id'];
-	if ( array_key_exists('confirm', $_GET) === true ){
-	  q("DELETE FROM files WHERE id = $id");
-	  $this->send_signal("Reload");
-	  Module::log("Removed slide with id $id");
-	  Module::redirect('/index.php');
-	  return;
+	function delete(){
+		$id = (int)$_GET['id'];
+
+		if ( array_key_exists('confirm', $_GET) === true ){
+			q("DELETE FROM files WHERE id = $id");
+			$this->send_signal("Reload");
+			Module::log("Removed slide with id $id");
+			Module::redirect('/index.php');
+			return;
+		}
+
+		$row = mysql_fetch_assoc(q("SELECT id, fullpath FROM files WHERE id = $id"));
+
+		Module::set_template('slides_delete.tmpl');
+
+		return array(
+			'id' => $id,
+			'fullpath' => $row['fullpath'],
+			'filename' => basename($row['fullpath'])
+		);
 	}
-
-	$row = mysql_fetch_assoc(q("SELECT id, fullpath FROM files WHERE id = $id"));
-
-	Module::set_template('slides_delete.tmpl');
-
-	return array(
-		 'id' => $id,
-		 'fullpath' => $row['fullpath'],
-		 'filename' => basename($row['fullpath'])
-		 );
-  }
 };
 
   ?>

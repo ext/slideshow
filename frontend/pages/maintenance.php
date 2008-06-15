@@ -19,9 +19,7 @@
 ?>
 <?
 
-require_once('../settings.inc.php');
 require_once('../core/module.inc.php');
-require_once('../log_functions.inc.php');
 require_once ("../dbus/dbus_session.php");
 
 class Maintenance extends Module {

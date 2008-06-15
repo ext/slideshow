@@ -88,15 +88,13 @@ class Module {
 	exit();
   }
 
-  function log($msg){
-	global $BasePath, $Files;
+	function log($msg){
+		global $settings;
 
-	$user = $_SERVER['PHP_AUTH_USER'];
-	$file = fopen($BasePath . "/" . $Files['Log']['Activity'], 'a');
+		$user = $_SERVER['PHP_AUTH_USER'];
 
-	fwrite($file, "$user $msg\n");
-	fclose($file);
-  }
+		$settings->activity_log()->write("$user $msg\n");
+	}
 
   function render(){
 	if ( $this->_template == '' ){
