@@ -170,7 +170,7 @@ class Slides extends Module {
 	$font = $settings->font();
 
 	if ( !(empty($font) && is_readable($font) ) ){
-		$font = "/usr/share/fonts/ttf-bitstream-vera/Vera.ttf";
+		$font = "../Vera.ttf";
 	}
 
 	///@note Magic numbers
