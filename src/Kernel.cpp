@@ -64,6 +64,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 	_width(800),
 	_height(600),
 	_frames(0),
+	_bin_id(1),
 	_fullscreen(false),
 	_daemon(false),
 	_transition_time(3.0f),
@@ -76,10 +77,10 @@ Kernel::Kernel(int argc, const char* argv[]):
 	_db_name(NULL),
 	_logfile("slideshow.log"){
 
-	parse_argv(argc, argv);
-
 	initTime();
 	Log::initialize(_logfile, "slideshow.debug.log");
+
+	parse_argv(argc, argv);
 
 	///@todo HACK! Attempt to connect to an xserver.
 	Display* dpy = XOpenDisplay(NULL);
@@ -112,6 +113,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 	_ipc = new DBus(this, 50);
 
 	_browser = new MySQLBrowser(_db_username, _db_password, _db_name);
+	_browser->change_bin(_bin_id);
 	_browser->reload();
 
 	_state = SWITCH;
@@ -174,7 +176,7 @@ void Kernel::run(){
 }
 
 void Kernel::parse_argv(int argc, const char* argv[]){
-	for ( int i = 0; i < argc; i++ ){
+	for ( int i = 1; i < argc; i++ ){
 		if ( strcmp(argv[i], "--fullscreen") == 0 ){
 			_fullscreen = true;
 			continue;
@@ -216,6 +218,15 @@ void Kernel::parse_argv(int argc, const char* argv[]){
 			sscanf(argv[i], "%dx%d", &_width, &_height);
 			continue;
 		}
+
+		if ( strcmp(argv[i], "--bin-id") == 0 ){
+			i++;
+
+			sscanf(argv[i], "%d", &_bin_id);
+			continue;
+		}
+
+		Log::message(Log::Warning, "Unknown argument: %s\n", argv[i]);
 	}
 }
 

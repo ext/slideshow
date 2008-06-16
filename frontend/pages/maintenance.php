@@ -94,8 +94,9 @@ class Maintenance extends Module {
 		$db_password = $settings->database_password();
 		$db_name = $settings->database_name();
 		$logfile = $settings->log_file();
+		$bin_id = $settings->current_bin();
 
-		$cmd = "ulimit -c unlimited; echo '$db_password' | DISPLAY=\":0\" $binary --daemon --fullscreen --db_user $db_username --db_name $db_name --resolution $resolution >> $logfile 2>&1";
+		$cmd = "ulimit -c unlimited; echo '$db_password' | DISPLAY=\":0\" $binary --daemon --fullscreen --db_user $db_username --db_name $db_name --resolution $resolution --bin-id $bin_id >> $logfile 2>&1";
 
 		$old_wd = getcwd();
 		chdir( $settings->base_path() );

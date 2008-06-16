@@ -106,15 +106,10 @@ class BinCollection implements Iterator {
 		$this->collection = array();
 
 		$bin = array();
-		$prevbin_id = -1;
-		$bin_name = '';
+		$prevbin_id = 0;
+		$bin_name = 'Unsorted';
 		while ( ( $row = mysql_fetch_assoc($result) ) ){
 			$binid = $row['bin_id'];
-
-			if ( $prevbin_id == -1 ){
-				$prevbin_id = $binid;
-				$bin_name = $row['name'];
-			}
 
 			if ( $binid != $prevbin_id ){
 				$this->collection[] = new Bin( $bin, $prevbin_id, $bin_name );

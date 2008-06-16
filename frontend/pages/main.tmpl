@@ -31,6 +31,7 @@
 	<ul>
 		<li><a href="/index.php/slides/upload">New slide</a></li>
 		<li><a href="/index.php/video">Play video</a></li>
+		<li><a href="/index.php/bins">Manage bins</a></li>
 		<li><a href="/index.php/maintenance">Maintenance</a></li>
 	</ul>
 
@@ -38,7 +39,7 @@
 
 <?
 foreach ( $collection as $bin ){ ?>
-	<h3><?=$bin->name()?><? if ( $bin->id() == $active_bin){ ?> (active)<? } else { ?> (<a href="/index.php/slides/activate_bin/<?=$bin->id()?>">set as active</a>)<? } ?></h3>
+	<h3><?=$bin->name()?><? if ( $bin->id() == 0 ){ continue; } if ( $bin->id() == $active_bin){ ?> (active)<? } else { ?> (<a href="/index.php/slides/activate_bin/<?=$bin->id()?>">set as active</a>)<? } ?></h3>
 <?	foreach ( $bin as $slide ){ ?>
 	<div class="slide">
 		<a href="<?=$slide->image_url()?>">

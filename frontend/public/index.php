@@ -35,7 +35,7 @@ try {
 		$path = new Path( 'install', 'welcome' );
 	}
 
-	$settings = new Settings('../settings.json.default');
+	$settings = new Settings('../settings.json.default', true);
 }
 
 try {
@@ -72,6 +72,7 @@ if ( $page->has_custom_view() ){
 <?
 
 $page->render();
+$settings->persist();
 
 ?>
 

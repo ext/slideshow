@@ -20,13 +20,19 @@
 require_once('log.php');
 
 class Settings {
-	function __construct($filename = '../settings.json'){
+	private $filename;
+	private $readonly;
+	private $data;
+
+	function __construct($filename = '../settings.json', $readonly = false){
 		if ( !file_exists($filename) ){
 			throw new Exception($filename . " not found!");
 		}
 
-		$json_string = file_get_contents($filename);
-		$this->_data = json_decode( $json_string, true );
+		$this->filename = realpath($filename);
+		$this->readonly = $readonly;
+		$json_string = file_get_contents($this->filename);
+		$this->data = json_decode( $json_string, true );
 	}
 
 	function store(){
@@ -36,27 +42,27 @@ class Settings {
 	}
 
 	function base_path(){
-		return $this->_data['BasePath'];
+		return $this->data['BasePath'];
 	}
 
 	function set_base_path($new_path){
-		$this->_data['BasePath'] = $new_path;
+		$this->data['BasePath'] = $new_path;
 	}
 
 	function image_path(){
-		return $this->base_path() . '/' . $this->_data['Path']['Image'];
+		return $this->base_path() . '/' . $this->data['Path']['Image'];
 	}
 
 	function set_image_path($new_path){
-		$this->_data['Path']['Image'] = $new_path;
+		$this->data['Path']['Image'] = $new_path;
 	}
 
 	function video_path(){
-		return $this->base_path() . '/' . $this->_data['Path']['Video'];
+		return $this->base_path() . '/' . $this->data['Path']['Video'];
 	}
 
 	function set_video_path($new_path){
-		$this->_data['Path']['Video'] = $new_path;
+		$this->data['Path']['Video'] = $new_path;
 	}
 
 	function temp_path(){
@@ -64,15 +70,15 @@ class Settings {
 	}
 
 	function set_temp_path($new_path){
-		$this->_data['Path']['Temp'] = $new_path;
+		$this->data['Path']['Temp'] = $new_path;
 	}
 
 	function binary(){
-		return $this->_data['Files']['BinaryPath'];
+		return $this->data['Files']['BinaryPath'];
 	}
 
 	function set_binary($new_path){
-		$this->_data['Files']['Binary'] = $new_path;
+		$this->data['Files']['Binary'] = $new_path;
 	}
 
 	function log(){
@@ -80,11 +86,11 @@ class Settings {
 	}
 
 	function log_file(){
-		return $this->base_path() . '/' . $this->_data['Files']['Log']['Base'];
+		return $this->base_path() . '/' . $this->data['Files']['Log']['Base'];
 	}
 
 	function set_log($new_path){
-		$this->_data['Files']['Log']['Base'] = $new_path;
+		$this->data['Files']['Log']['Base'] = $new_path;
 	}
 
 	function debug_log(){
@@ -92,11 +98,11 @@ class Settings {
 	}
 
 	function debug_log_file(){
-		return $this->base_path() . '/' . $this->_data['Files']['Log']['Debug'];
+		return $this->base_path() . '/' . $this->data['Files']['Log']['Debug'];
 	}
 
 	function set_debug_log($new_path){
-		$this->_data['Files']['Log']['Debug'] = $new_path;
+		$this->data['Files']['Log']['Debug'] = $new_path;
 	}
 
 	function activity_log(){
@@ -104,11 +110,11 @@ class Settings {
 	}
 
 	function activity_log_file(){
-		return $this->base_path() . '/' .  $this->_data['Files']['Log']['Activity'];
+		return $this->base_path() . '/' .  $this->data['Files']['Log']['Activity'];
 	}
 
 	function set_activity_log($new_path){
-		$this->_data['Files']['Log']['Activity'] = $new_path;
+		$this->data['Files']['Log']['Activity'] = $new_path;
 	}
 
 	function pid(){
@@ -123,11 +129,11 @@ class Settings {
 	}
 
 	function pid_file(){
-		return $this->base_path() . '/' . $this->_data['Files']['PID'];
+		return $this->base_path() . '/' . $this->data['Files']['PID'];
 	}
 
 	function set_pid_file($new_path){
-		$this->_data['Files']['PID'] = $new_path;
+		$this->data['Files']['PID'] = $new_path;
 	}
 
 	function motd(){
@@ -139,7 +145,7 @@ class Settings {
 	}
 
 	function motd_file(){
-		return $this->base_path() . '/' . $this->_data['Files']['MOTD'];
+		return $this->base_path() . '/' . $this->data['Files']['MOTD'];
 	}
 
 	function set_motd($text){
@@ -149,41 +155,41 @@ class Settings {
 	}
 
 	function set_motd_file($new_path){
-		$this->_data['Files']['MOTD'] = $new_path;
+		$this->data['Files']['MOTD'] = $new_path;
 	}
 
 	function convert_binary(){
-		return $this->_data['Files']['convert'];
+		return $this->data['Files']['convert'];
 	}
 
 	function set_convert_binary($new_path){
-		$this->_data['Files']['convert'] = $new_path;
+		$this->data['Files']['convert'] = $new_path;
 	}
 
 	function background(){
-		return $this->_data['Apparence']['Background'];
+		return $this->data['Apparence']['Background'];
 	}
 
 	///@todo The new background should be copied into basepath
 	function set_background($new_path){
-		$this->_data['Apparence']['Background'] = trim($new_path);
+		$this->data['Apparence']['Background'] = trim($new_path);
 	}
 
 	function font(){
-		return $this->_data['Apparence']['Font'];
+		return $this->data['Apparence']['Font'];
 	}
 
 	///@todo The new font should be copied into basepath
 	function set_font($new_path){
-		$this->_data['Apparence']['Font'] = trim($new_path);
+		$this->data['Apparence']['Font'] = trim($new_path);
 	}
 
 	function resolution(){
-		return $this->_data['Apparence']['Resolution'];
+		return $this->data['Apparence']['Resolution'];
 	}
 
 	function resolution_as_string(){
-		return sprintf("%dx%d", $this->_data['Apparence']['Resolution'][0], $this->_data['Apparence']['Resolution'][1]);
+		return sprintf("%dx%d", $this->data['Apparence']['Resolution'][0], $this->data['Apparence']['Resolution'][1]);
 	}
 
 	function set_resolution(){
@@ -196,14 +202,14 @@ class Settings {
 
 		if ( $nr_of_arguments == 1 ){
 			if ( is_string($args[0]) ){
-				$this->_data['Apparence']['Resolution'] = sscanf("%dx%d", $args[0]);
+				$this->data['Apparence']['Resolution'] = sscanf("%dx%d", $args[0]);
 				return;
 			}
 			if ( is_array($args[0]) ){
 				if ( count($args[0]) != 2 ){
 					throw new Exception('Array count is not two!');
 				}
-				$this->_data['Apparence']['Resolution'] = $args[0];
+				$this->data['Apparence']['Resolution'] = $args[0];
 				return;
 			}
 			throw new Exception('Wrong argument type, must be string or array, got ' . gettype($args[0]));
@@ -213,43 +219,61 @@ class Settings {
 			throw new Exception('Wrong argument type, must be integers.');
 		}
 
-		$this->_data['Apparence']['Resolution'] = array($args[1], $args[2]);
+		$this->data['Apparence']['Resolution'] = array($args[1], $args[2]);
 	}
 
 	function database_hostname(){
-		return $this->_data['Database']['Hostname'];
+		return $this->data['Database']['Hostname'];
 	}
 
 	function set_database_hostname($new_value){
-		$this->_data['Database']['Hostname'] = $new_value;
+		$this->data['Database']['Hostname'] = $new_value;
 	}
 
 	function database_password(){
-		return $this->_data['Database']['Password'];
+		return $this->data['Database']['Password'];
 	}
 
 	function set_database_password($new_value){
-		$this->_data['Database']['Password'] = $new_value;
+		$this->data['Database']['Password'] = $new_value;
 	}
 
 	function database_username(){
-		return $this->_data['Database']['Username'];
+		return $this->data['Database']['Username'];
 	}
 
 	function set_database_username($new_value){
-		$this->_data['Database']['Username'] = $new_value;
+		$this->data['Database']['Username'] = $new_value;
 	}
 
 	function database_name(){
-		return $this->_data['Database']['Name'];
+		return $this->data['Database']['Name'];
 	}
 
 	function set_database_name($new_value){
-		$this->_data['Database']['Name'] = $new_value;
+		$this->data['Database']['Name'] = $new_value;
+	}
+
+	function current_bin(){
+		return isset( $this->data['Runtime']['Bin'] ) ? $this->data['Runtime']['Bin'] : 1;
+	}
+
+	function set_current_bin($n){
+		return $this->data['Runtime']['Bin'] = $n;
 	}
 
 	function as_json(){
-		return $this->_prettify( json_encode( $this->_data) );
+		return $this->_prettify( json_encode( $this->data) );
+	}
+
+	function persist(){
+		if ( $this->readonly ){
+			return;
+		}
+
+		$file = fopen($this->filename, 'w');
+		fwrite($file, $this->as_json());
+		fclose($file);
 	}
 
 	function _prettify($json){

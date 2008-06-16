@@ -16,13 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
-?>
-<?
 
-require_once('../core/module.inc.php');
 require_once('../models/bin_collection.php');
 
-class Main extends Module {
+class Bins extends Module {
 	function __construct(){
 		connect();
 	}
@@ -32,21 +29,10 @@ class Main extends Module {
 	}
 
 	function index(){
-		global $settings;
+		Module::set_template('bins.tmpl');
 
-		Module::set_template('main.tmpl');
-		$ret = array(
-			'collection' => new BinCollection(),
-			'active_bin' => $settings->current_bin()
+		return array(
+			'collection' => new BinCollection()
 		);
-
-		$motd = $settings->motd();
-		if ( strlen(trim($motd)) > 0 ){
-			$ret['motd'] = $motd;
-		}
-
-		return $ret;
 	}
-};
-
-?>
+}

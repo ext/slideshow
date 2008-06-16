@@ -55,6 +55,7 @@ class Kernel {
 		int _width;
 		int _height;
 		int _frames;
+		unsigned int _bin_id;
 		bool _fullscreen;
 		bool _daemon;
 		double _transition_time;

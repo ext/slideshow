@@ -291,6 +291,9 @@ class Slides extends Module {
 	}
 
 	function activate_bin( $id ){
+		global $settings;
+
+		$settings->set_current_bin( $id );
 		$this->send_signal("ChangeBin", "u", array($id));
 		Module::log("Changing active bin to id $id");
 		Module::redirect('/index.php');

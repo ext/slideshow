@@ -30,5 +30,9 @@
 		"Password": "sd87f6gs8d7f6g8sd76fg8sdfgysdfi67g",
 		"Hostname": "localhost",
 		"Name": "slideshow"
+	},
+
+	"Runtime": {
+		"Bin": "1"
 	}
 }

@@ -99,6 +99,9 @@ class Module {
 	  }
 	}
 
+	global $settings;
+	$settings->persist();
+
 	header("Location: $location");
 	exit();
   }
