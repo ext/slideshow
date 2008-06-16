@@ -16,33 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
-?>
-  <h1>Slideshow</h1>
 
-<? if ( isset($motd) ){ ?>
-  <h2>MOTD</h2>
-  <div id="motd">
-    <?=$motd?>
-  </div>
-<? } ?>
-
-  <h2>Menu</h2>
-
-  <ul>
-    <li><a href="/index.php/slides/upload">New slide</a></li>
-    <li><a href="/index.php/video">Play video</a></li>
-    <li><a href="/index.php/maintenance">Maintenance</a></li>
-  </ul>
-
-  <h2>Current slides</h2>
-
-<? foreach ( $slides as $item ){ ?>
-  <div class="slide">
-    <a href="/image/<?=$item['name']?>">
-      <img src="/image/<?=$item['name']?>" alt="" width="200" height="200" />
-    </a><br/>
-    [<a href="/index.php/slides/delete?id=<?=$item['id']?>">Delete</a>]
-  </div>
-<? } ?>
-
-  <br style="clear: both;" />
+class kind_error extends Module {
+	function display($code){
+		Module::set_template('kind_error.tmpl');
+		return array();
+	}
+}
