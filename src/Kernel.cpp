@@ -1,17 +1,17 @@
 /**
  * This file is part of Slideshow.
  * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
- * 
+ *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Slideshow is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -20,6 +20,7 @@
 #include "Graphics.h"
 #include "OS.h"
 #include "Log.h"
+#include "Exceptions.h"
 #include "transitions/fade.h"
 #include "browsers/mysqlbrowser.h"
 #include "IPC/dbus.h"
@@ -36,6 +37,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include <X11/Xlib.h>
 
 #ifdef LINUX
 #include <sys/time.h>
@@ -58,7 +60,7 @@ void quit_signal(int){
 	*daemon_running = false;
 }
 
-Kernel::Kernel(int argc, char* argv[]):
+Kernel::Kernel(int argc, const char* argv[]):
 	_width(800),
 	_height(600),
 	_frames(0),
@@ -78,32 +80,40 @@ Kernel::Kernel(int argc, char* argv[]):
 
 	initTime();
 	Log::initialize(_logfile, "slideshow.debug.log");
-	
+
+	///@todo HACK! Attempt to connect to an xserver.
+	Display* dpy = XOpenDisplay(NULL);
+	if( !dpy ) {
+		throw NoXConnection("Could not connect to an X server\n");
+	}
+	XCloseDisplay(dpy);
+
+
 	if ( _daemon ){
 		Log::message(Log::Verbose, "Kernel: Starting slideshow daemon\n");
-		
+
 		Portable::daemonize(application_name);
-		
+
 		if ( signal(SIGQUIT, quit_signal) == SIG_ERR ){
 			Log::message(Log::Fatal, "Kernel: Could not initialize signal handler!\n");
 			exit(3);
 		}
-		
+
 		///@ hack
 		daemon_running = &_running;
 	} else {
 		Log::message(Log::Verbose, "Kernel: Starting slideshow\n");
 		print_licence_statement();
 	}
-	
+
 	_graphics = new Graphics(_width, _height, _fullscreen);
 	_graphics->set_transition(new FadeTransition);
-	
+
 	_ipc = new DBus(this, 50);
-	
+
 	_browser = new MySQLBrowser(_db_username, _db_password, _db_name);
 	_browser->reload();
-	
+
 	_state = SWITCH;
 }
 
@@ -111,25 +121,25 @@ Kernel::~Kernel(){
 	if ( _daemon ){
 		Portable::daemon_stop(application_name);
 	}
-	
+
 	delete _browser;
 	delete _graphics;
 	delete _ipc;
-	
+
 	free( _db_username );
 	free( _db_password );
 	free( _db_name );
-	
+
 	_browser = NULL;
 	_graphics = NULL;
 	_ipc = NULL;
-	
+
 	Log::deinitialize();
 }
 
 void Kernel::print_licence_statement(){
-    printf("Slideshow  Copyright (C) 2008 David Sveningsson <ext@sidvind.com>\n");
-    printf("This program comes with ABSOLUTELY NO WARRANTY.\n");
+	printf("Slideshow  Copyright (C) 2008 David Sveningsson <ext@sidvind.com>\n");
+	printf("This program comes with ABSOLUTELY NO WARRANTY.\n");
 	printf("This is free software, and you are welcome to redistribute it\n");
 	printf("under certain conditions; see COPYING or <http://www.gnu.org/licenses/>\n");
 	printf("for details.\n");
@@ -137,15 +147,15 @@ void Kernel::print_licence_statement(){
 
 void Kernel::run(){
 	_running = true;
-	
+
 	_last_switch = getTime();
 	_transition_start = 0.0f;
-	
+
 	while ( _running ){
 		OS::poll_events(_running);
-		
+
 		double t = getTime();
-		
+
 		// Simple statemachine
 		switch ( _state ){
 			case VIEW:
@@ -155,7 +165,7 @@ void Kernel::run(){
 			case TRANSITION:
 				transition_state(t);
 				break;
-				
+
 			case SWITCH:
 				switch_state(t);
 				break;
@@ -163,7 +173,7 @@ void Kernel::run(){
 	}
 }
 
-void Kernel::parse_argv(int argc, char* argv[]){
+void Kernel::parse_argv(int argc, const char* argv[]){
 	for ( int i = 0; i < argc; i++ ){
 		if ( strcmp(argv[i], "--fullscreen") == 0 ){
 			_fullscreen = true;
@@ -175,34 +185,34 @@ void Kernel::parse_argv(int argc, char* argv[]){
 		}
 		if ( strcmp(argv[i], "--db_user") == 0 ){
 			i++;
-			
+
 			const char* user = argv[i];
 			_db_username = (char*)malloc(strlen(user)+1);
 			strcpy(_db_username, user);
-			
+
 			continue;
 		}
 		if ( strcmp(argv[i], "--db_pass") == 0 ){
 			i++;
-			
+
 			const char* pass = argv[i];
 			_db_password = (char*)malloc(strlen(pass)+1);
 			strcpy(_db_password, pass);
-			
+
 			continue;
 		}
 		if ( strcmp(argv[i], "--db_name") == 0 ){
 			i++;
-			
+
 			const char* name = argv[i];
 			_db_name = (char*)malloc(strlen(name)+1);
 			strcpy(_db_name, name);
-			
+
 			continue;
 		}
 		if ( strcmp(argv[i], "--resolution") == 0 ){
 			i++;
-			
+
 			sscanf(argv[i], "%dx%d", &_width, &_height);
 			continue;
 		}
@@ -214,11 +224,11 @@ void Kernel::view_state(double t){
 		_state = SWITCH;
 		return;
 	}
-	
+
 	if ( _ipc ){
 		_ipc->poll();
 	}
-	
+
 	// Sleep for a while
 	wait( 0.1f );
 }
@@ -228,9 +238,9 @@ void Kernel::view_state(double t){
 void Kernel::transition_state(double t){
 	double s = (t - _transition_start) / _transition_time;
 
-	_frames++;	
+	_frames++;
 	_graphics->render( s );
-	
+
 	// If the transition is complete the state changes to VIEW
 	if ( s > 1.0f ){
 		if ( !_daemon ){
@@ -244,22 +254,22 @@ void Kernel::transition_state(double t){
 
 void Kernel::switch_state(double t){
 	const char* filename = _browser->get_next_file();
-	
+
 	if ( !filename ){
 		Log::message(Log::Warning, "Kernel: Queue is empty\n", filename);
 		//wait( _switch_time * 0.9f );
 		return;
 	}
-	
+
 	Log::message(Log::Debug, "Kernel: Switching to image \"%s\"\n", filename);
-	
+
 	try {
 		_graphics->load_image( filename );
 	} catch ( ... ) {
 		Log::message(Log::Warning, "Kernel: Failed to load image '%s'\n", filename);
 		return;
 	}
-	
+
 	_state = TRANSITION;
 	_frames = 0;
 	_transition_start = getTime();
@@ -267,14 +277,14 @@ void Kernel::switch_state(double t){
 
 void Kernel::play_video(const char* fullpath){
 	Log::message(Log::Verbose, "Kernel: Playing video \"%s\"\n", fullpath);
-	
+
 	int status;
-	
+
 	if ( fork() == 0 ){
 		execlp("mplayer", "", "-fs", "-really-quiet", fullpath, NULL);
 		exit(0);
 	}
-	
+
 	::wait(&status);
 }
 
