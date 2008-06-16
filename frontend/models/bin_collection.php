@@ -17,6 +17,40 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+class Slide {
+	private $id;
+	private $name;
+	private $fullpath;
+	private $active;
+
+	function __construct( $row ){
+		$this->id = $row['id'];
+		$this->name = basename($row['fullpath']);
+		$this->fullpath = $row['fullpath'];
+		$this->active = $row['active'];
+	}
+
+	function id(){
+		return $this->id;
+	}
+
+	function name(){
+		return $this->name;
+	}
+
+	function image_url(){
+		return '/image/' . $this->name();
+	}
+
+	function fullpath(){
+		return $this->fullpath;
+	}
+
+	function active(){
+		return $this->active != 0;
+	}
+}
+
 class Bin implements Iterator {
 	private $slides;
 	private $id;
@@ -67,7 +101,7 @@ class BinCollection implements Iterator {
 	private $current = 0;
 
 	function __construct( ){
-		$result = q("SELECT id, fullpath, bin FROM files ORDER BY bin, id");
+		$result = q("SELECT id, fullpath, bin, active FROM files ORDER BY bin, id");
 
 		$this->collection = array();
 
@@ -75,13 +109,7 @@ class BinCollection implements Iterator {
 		$prevbin_id = 0;
 		while ( ( $row = mysql_fetch_assoc($result) ) ){
 			$binid = $row['bin'];
-			$item = array(
-				'id' => $row['id'],
-				'fullpath' => $row['fullpath'],
-				'name' => basename($row['fullpath'])
-			);
-
-			$bin[] = $item;
+			$bin[] = new Slide( $row );
 
 			if ( $binid != $prevbin_id ){
 				$this->collection[] = new Bin( $bin, $prevbin_id, '' );

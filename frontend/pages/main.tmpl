@@ -41,12 +41,13 @@ foreach ( $collection as $bin ){ ?>
 	<h3>Bin <?=$bin->id()+1?><? if ( $bin->id() == $active_bin){ ?> (active)<? } ?></h3>
 <?	foreach ( $bin as $slide ){ ?>
 	<div class="slide">
-	<a href="/image/<?=$slide['name']?>">
-	  <img src="/image/<?=$slide['name']?>" alt="" width="200" height="200" />
-	</a><br/>
-	[<a href="/index.php/slides/delete?id=<?=$slide['id']?>">Delete</a>]
-  </div>
-<? }
-} ?>
+		<a href="<?=$slide->image_url()?>">
+			<img src="<?=$slide->image_url()?>" alt="" width="200" height="200" />
+		</a><br/>
+		[<a href="/index.php/slides/delete?id=<?=$slide->id()?>">Delete</a>]
+	</div>
+<? } ?>
 
-  <br style="clear: both;" />
+	<p><br style="clear: both;" /></p>
+
+<? } ?>
