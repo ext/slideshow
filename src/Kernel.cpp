@@ -297,6 +297,11 @@ void Kernel::reload_browser(){
 	_browser->reload();
 }
 
+void Kernel::change_bin(unsigned int id){
+	_browser->change_bin(id);
+	_browser->reload();
+}
+
 void Kernel::ipc_quit(){
 	delete _ipc;
 	_ipc = NULL;

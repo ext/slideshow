@@ -101,25 +101,32 @@ class BinCollection implements Iterator {
 	private $current = 0;
 
 	function __construct( ){
-		$result = q("SELECT id, fullpath, bin, active FROM files ORDER BY bin, id");
+		$result = q('SELECT files.id, fullpath, bin_id, active, name FROM files, bins WHERE files.bin_id = bins.id ORDER by bin_id');
 
 		$this->collection = array();
 
 		$bin = array();
-		$prevbin_id = 0;
+		$prevbin_id = -1;
+		$bin_name = '';
 		while ( ( $row = mysql_fetch_assoc($result) ) ){
-			$binid = $row['bin'];
+			$binid = $row['bin_id'];
+
+			if ( $prevbin_id == -1 ){
+				$prevbin_id = $binid;
+				$bin_name = $row['name'];
+			}
 
 			if ( $binid != $prevbin_id ){
-				$this->collection[] = new Bin( $bin, $prevbin_id, '' );
+				$this->collection[] = new Bin( $bin, $prevbin_id, $bin_name );
 				$bin = array();
 				$prevbin_id = $binid;
+				$bin_name = $row['name'];
 			}
 
 			$bin[] = new Slide( $row );
 		}
 
-		$this->collection[] = new Bin( $bin, $prevbin_id, '' );
+		$this->collection[] = new Bin( $bin, $prevbin_id, $bin_name );
 	}
 
 	function nr_of_bins(){

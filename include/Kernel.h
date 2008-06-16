@@ -35,6 +35,7 @@ class Kernel {
 		void reload_browser();
 		void ipc_quit();
 		void play_video(const char* fullpath);
+		void change_bin(unsigned int id);
 
 		void debug_dumpqueue();
 

@@ -37,7 +37,7 @@ class Main extends Module {
 		Module::set_template('main.tmpl');
 		$ret = array(
 			'collection' => new BinCollection(),
-			'active_bin' => 0
+			'active_bin' => 1
 		);
 
 		$motd = $settings->motd();

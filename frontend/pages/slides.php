@@ -289,6 +289,12 @@ class Slides extends Module {
 		Module::log("Activated slide with id $id");
 		Module::redirect('/index.php');
 	}
+
+	function activate_bin( $id ){
+		$this->send_signal("ChangeBin", "u", array($id));
+		Module::log("Changing active bin to id $id");
+		Module::redirect('/index.php');
+	}
 };
 
   ?>
