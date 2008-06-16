@@ -32,7 +32,7 @@ class Bins extends Module {
 		Module::set_template('bins.tmpl');
 
 		return array(
-			'collection' => new BinCollection()
+			'collection' => new BinCollection,
 		);
 	}
 

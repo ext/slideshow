@@ -101,7 +101,18 @@ class BinCollection implements Iterator {
 	private $current = 0;
 
 	function __construct( ){
-		$result = q('SELECT files.id, fullpath, bin_id, active, name FROM files, bins WHERE files.bin_id = bins.id ORDER by bin_id');
+		$result = q('
+			SELECT files.id, fullpath, bins.id as bid, bin_id, active, name
+				FROM files
+				LEFT JOIN bins
+					ON files.bin_id = bins.id
+			UNION
+			SELECT files.id, fullpath, bins.id as bid, bin_id, active, name
+				FROM files
+				RIGHT JOIN bins
+					ON files.bin_id = bins.id
+			ORDER BY bid, bin_id, id'
+		);
 
 		$this->collection = array();
 
@@ -109,7 +120,7 @@ class BinCollection implements Iterator {
 		$prevbin_id = 0;
 		$bin_name = 'Unsorted';
 		while ( ( $row = mysql_fetch_assoc($result) ) ){
-			$binid = $row['bin_id'];
+			$binid = $row['bin_id'] != NULL ? $row['bin_id'] : $row['bid'];
 
 			if ( $binid != $prevbin_id ){
 				$this->collection[] = new Bin( $bin, $prevbin_id, $bin_name );
@@ -118,7 +129,9 @@ class BinCollection implements Iterator {
 				$bin_name = $row['name'];
 			}
 
-			$bin[] = new Slide( $row );
+			if ( $row['id'] != NULL ){
+				$bin[] = new Slide( $row );
+			}
 		}
 
 		$this->collection[] = new Bin( $bin, $prevbin_id, $bin_name );

@@ -298,6 +298,14 @@ class Slides extends Module {
 		Module::log("Changing active bin to id $id");
 		Module::redirect('/index.php');
 	}
+
+	function move( $id ){
+		$bin = (int)$_POST['to_bin'];
+		q("UPDATE files SET bin_id = $bin WHERE id = " . (int)$id);
+		$this->send_signal("Reload");
+		Module::log("Moving slide $id to bin $bin");
+		Module::redirect('/index.php');
+	}
 };
 
   ?>

@@ -35,9 +35,17 @@ class Main extends Module {
 		global $settings;
 
 		Module::set_template('main.tmpl');
+
+		$available_bins = array( 0 => 'Unsorted' );
+		$ret = q('SELECT id, name FROM bins');
+		while ( ( $row = mysql_fetch_assoc($ret) ) ){
+			$available_bins[ $row['id'] ] = $row['name'];
+		}
+
 		$ret = array(
 			'collection' => new BinCollection(),
-			'active_bin' => $settings->current_bin()
+			'active_bin' => $settings->current_bin(),
+			'available_bins' => $available_bins
 		);
 
 		$motd = $settings->motd();

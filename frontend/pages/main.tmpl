@@ -37,16 +37,24 @@
 
 	<h2>Current slides</h2>
 
-<?
-foreach ( $collection as $bin ){ ?>
-	<h3><?=$bin->name()?><? if ( $bin->id() == 0 ){ continue; } if ( $bin->id() == $active_bin){ ?> (active)<? } else { ?> (<a href="/index.php/slides/activate_bin/<?=$bin->id()?>">set as active</a>)<? } ?></h3>
+<? foreach ( $collection as $bin ){ ?>
+	<h3><?=$bin->name()?><? if ( $bin->id() != 0 ){ if ( $bin->id() == $active_bin){ ?> (active)<? } else { ?> (<a href="/index.php/slides/activate_bin/<?=$bin->id()?>">set as active</a>)<? }} ?></h3>
 <?	foreach ( $bin as $slide ){ ?>
 	<div class="slide">
 		<a href="<?=$slide->image_url()?>">
 			<img src="<?=$slide->image_url()?>" alt="" width="200" height="200" />
 		</a><br/>
-		[<a href="/index.php/slides/delete?id=<?=$slide->id()?>">Delete</a>]
-		<? if ( $slide->active() ){ ?>[<a href="/index.php/slides/deactivate/<?=$slide->id()?>">Deactive</a>]<? } else { ?>[<a href="/index.php/slides/activate/<?=$slide->id()?>">Active</a>]<? } ?>
+		<div class="menu">
+			[<a href="/index.php/slides/delete?id=<?=$slide->id()?>">Delete</a>]
+			<? if ( $slide->active() ){ ?>[<a href="/index.php/slides/deactivate/<?=$slide->id()?>">Deactive</a>]<? } else { ?>[<a href="/index.php/slides/activate/<?=$slide->id()?>">Active</a>]<? } ?>
+
+			<form action="/index.php/slides/move/<?=$slide->id()?>" method="post">
+				<select name="to_bin"><? foreach( $available_bins as $id => $name ){ ?>
+					<option value="<?=$id?>"<? if ( $id == $bin->id() ){ ?>selected="selected"<? } ?>><?=$name?></option>
+				<? } ?></select>
+				<input type="submit" value="Move" />
+			</form>
+		</div>
 
 	</div>
 <? } ?>
