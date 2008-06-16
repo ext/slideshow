@@ -38,8 +38,13 @@ try {
 	$settings = new Settings('../settings.json.default');
 }
 
-$page = Module::factory( $path->module() );
-$page->execute( $path->section(), $path->argv() );
+try {
+	$page = Module::factory( $path->module() );
+	$page->execute( $path->section(), $path->argv() );
+} catch ( FileNotFound $e ){
+	$page = Module::factory( 'kind_error' );
+	$page->execute( 'display', array(404) );
+}
 
 if ( $page->has_custom_view() ){
 	$page->render();

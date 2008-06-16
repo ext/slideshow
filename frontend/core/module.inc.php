@@ -20,6 +20,7 @@
 <?
 
 require_once ("../dbus/dbus_session.php");
+require_once ('file_not_found.inc.php');
 
 class Module {
   private $_template;
@@ -34,10 +35,11 @@ class Module {
 		$fullpath = "../pages/$module.php";
 
 		if ( !file_exists($fullpath) ){
-			new Exception("404");
+			throw new FileNotFound();
 		}
-	require_once();
-	return new $module;
+
+		require_once($fullpath);
+		return new $module;
 	}
 
   function set_template( $template, $custom_view = false ){
@@ -53,21 +55,29 @@ class Module {
 	echo "Module::default";
   }
 
-  function execute( $section, array $argv ){
-	try {
-	  $this->_data = call_user_func_array( array( $this, $section ), $argv );
+	function execute( $section, array $argv ){
+		try {
+			$functor = array( $this, $section );
 
-	  if ( !is_array($this->_data) ){
-	  	throw new Exception("Call did not return an array: " . print_r($this->_data, true));
-	  }
-	} catch ( Exception $e ){
-	  $this->set_template( "exception.tmpl" );
-	  $this->_data = array(
-			   "Message" => $e->getMessage(),
-			   "Stack" => $e->getTrace()
-			   );
+			if ( !is_callable($functor) ){
+				throw new FileNotFound();
+			}
+
+			$this->_data = call_user_func_array( $functor, $argv );
+
+			if ( !is_array($this->_data) ){
+				throw new Exception("Call did not return an array: " . print_r($this->_data, true));
+			}
+		} catch ( FileNotFound $e ){
+			throw $e;
+		} catch ( Exception $e ){
+			$this->set_template( "exception.tmpl" );
+			$this->_data = array(
+				"Message" => $e->getMessage(),
+				"Stack" => $e->getTrace()
+			);
+		}
 	}
-  }
 
   function redirect($location, array $keep = NULL){
 	if ( $keep != NULL){
