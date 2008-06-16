@@ -16,39 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
+?>
+	<h1><a href="/index.php/">Slideshow</a> &gt; <a href="/index.php/bins">Manage bins</a> &gt; Rename '<?=$name?>'</h1>
 
-require_once('../models/bin_collection.php');
+	<form action="/index.php/bins/perform_rename" method="post">
+		<input type="hidden" name="id" value="<?=$id?>" />
+		<input type="text" name="name" value="<?=$name?>" />
+		<input type="submit" value="Rename" />
+	</form>
 
-class Bins extends Module {
-	function __construct(){
-		connect();
-	}
-
-	function __destruct(){
-		disconnect();
-	}
-
-	function index(){
-		Module::set_template('bins.tmpl');
-
-		return array(
-			'collection' => new BinCollection()
-		);
-	}
-
-	function rename( $id ){
-		Module::set_template('bins_rename.tmpl');
-
-		$ret = r('SELECT name FROM bins WHERE id = ' . (int)$id);
-
-		return array(
-			'id' => $id,
-			'name' => $ret['name']
-		);
-	}
-
-	function perform_rename(){
-		q('UPDATE bins SET name = \'' . mysql_real_escape_string($_POST['name']) . '\' WHERE id = ' . (int)$_POST['id']);
-		Module::redirect('/index.php/bins');
-	}
-}
