@@ -70,8 +70,8 @@ $page->render();
 
 ?>
 
-	<hr>
-	Inloggad som <?=$_SERVER['PHP_AUTH_USER'];?> (<a href="/logout.php">Logout</a>)
+	<hr/>
+	<p>Inloggad som <?=$_SERVER['PHP_AUTH_USER'];?> (<a href="/logout.php">Logout</a>)</p>
 </body>
 
 </html>
