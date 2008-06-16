@@ -1,3 +1,4 @@
+<?
 /**
  * This file is part of Slideshow.
  * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
@@ -15,18 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
+?>
+		<h1>Slideshow &gt; Install &gt; Complete</h1>
 
-#include "Kernel.h"
-#include "Exceptions.h"
-
-int main( int argc, const char* argv[] ){
-	try {
-		Kernel kernel(argc, argv);
-		kernel.run();
-	} catch ( NoXConnection &e ){
-		fprintf(stderr, e.what());
-		return 1;
-	}
-
-	return 0;
-}
+		<p>Congratulations! You have successfully installed Slideshow PHP Frontend! <a href="/">Proceed</a>.</p>

@@ -1,3 +1,4 @@
+<?
 /**
  * This file is part of Slideshow.
  * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
@@ -15,18 +16,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
+?>
+  <h1>Slideshow &gt; Welcome</h1>
 
-#include "Kernel.h"
-#include "Exceptions.h"
+  <p>Slideshow is an application for showing text and images in a loop on monitors and projectors. It is not meant for situations where interactive control is required, but for when the content is continuously looping for a long time. The content is updated through a webgui. The application is split into two packages, the backend and frontend. The backend is written in C++ and OpenGL and the frontend uses PHP and MySQL. Currently the frontend is very GNU/Linux specific and will not run on any other platform. It is however meant to be as platform independent as possible, as long as it handles OpenGL.</p>
 
-int main( int argc, const char* argv[] ){
-	try {
-		Kernel kernel(argc, argv);
-		kernel.run();
-	} catch ( NoXConnection &e ){
-		fprintf(stderr, e.what());
-		return 1;
-	}
-
-	return 0;
-}
+  <p>Proceed to <a href="/index.php/install/step/0"> installation</a>.</p>

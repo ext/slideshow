@@ -19,8 +19,6 @@
 ?>
 <?
 
-require_once("../settings.inc.php");
-
 function video_thumbnail($filename){
   global $video_dir, $tmp_dir;
 
