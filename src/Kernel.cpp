@@ -257,7 +257,8 @@ void Kernel::switch_state(double t){
 
 	if ( !filename ){
 		Log::message(Log::Warning, "Kernel: Queue is empty\n", filename);
-		//wait( _switch_time * 0.9f );
+		_state = VIEW;
+		_last_switch = t;
 		return;
 	}
 
