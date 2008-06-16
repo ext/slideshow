@@ -18,7 +18,7 @@
  */
 
 function write_availability( $var, $ok = 'Available', $fail = 'Unavailable' ){
-	echo '<span class="ok">', $var ? $ok : $fail, '</span>';
+	echo '<span class="', $var ? 'ok' : 'fail', '">', $var ? $ok : $fail, '</span>';
 }
 
 ?>
@@ -94,7 +94,7 @@ function write_availability( $var, $ok = 'Available', $fail = 'Unavailable' ){
 			</fieldset>
 		</form>
 
-		<p><a href="/index.php/install/step/1">Retry</a>. Proceed to <a href="/index.php/install/step/2">Path configuration</a>.</p>
+		<p><? if ( !$requirements_ok ){ ?><a href="/index.php/install/step/1">Retry</a>.<? } else { ?>Proceed to <a href="/index.php/install/step/2">Path configuration</a>.<? } ?></p>
 <?
 	break;
 	case 2:

@@ -78,7 +78,7 @@ class Settings {
 	}
 
 	function set_binary($new_path){
-		$this->data['Files']['Binary'] = $new_path;
+		$this->data['Files']['BinaryPath'] = $new_path;
 	}
 
 	function log(){
@@ -266,12 +266,16 @@ class Settings {
 		return $this->_prettify( json_encode( $this->data) );
 	}
 
-	function persist(){
-		if ( $this->readonly ){
+	function persist( $filename = NULL ){
+		if ( $filename == NULL && $this->readonly ){
 			return;
 		}
 
-		$file = fopen($this->filename, 'w');
+		if ( $filename == NULL ){
+		  $filename = $this->filename;
+		}
+
+		$file = fopen($filename, 'w');
 		fwrite($file, $this->as_json());
 		fclose($file);
 	}

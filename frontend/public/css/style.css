@@ -73,6 +73,10 @@ img {
 	color:		green;
 }
 
+#install .field_notice .fail {
+	color:		red;
+}
+
 #install button {
 	clear:		both;
 }
