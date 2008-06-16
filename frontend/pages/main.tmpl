@@ -45,7 +45,11 @@ foreach ( $collection as $bin ){ ?>
 			<img src="<?=$slide->image_url()?>" alt="" width="200" height="200" />
 		</a><br/>
 		[<a href="/index.php/slides/delete?id=<?=$slide->id()?>">Delete</a>]
-		<? if ( $slide->active() ){ ?>[<a href="/index.php/slides/deactive/<?=$slide->id()?>">Deactive</a>]<? } ?>
+		<? if ( $slide->active() ){ ?>
+		[<a href="/index.php/slides/deactivate/<?=$slide->id()?>">Deactive</a>]
+		<? } else { ?>
+		[<a href="/index.php/slides/activate/<?=$slide->id()?>">Active</a>]
+		<? } ?>
 	</div>
 <? } ?>
 

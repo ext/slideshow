@@ -109,18 +109,17 @@ class BinCollection implements Iterator {
 		$prevbin_id = 0;
 		while ( ( $row = mysql_fetch_assoc($result) ) ){
 			$binid = $row['bin'];
-			$bin[] = new Slide( $row );
 
 			if ( $binid != $prevbin_id ){
 				$this->collection[] = new Bin( $bin, $prevbin_id, '' );
 				$bin = array();
 				$prevbin_id = $binid;
 			}
+
+			$bin[] = new Slide( $row );
 		}
 
-		if ( count( $bin ) > 0 ){
-			$this->collection[] = new Bin( $bin, $prevbin_id, '' );
-		}
+		$this->collection[] = new Bin( $bin, $prevbin_id, '' );
 	}
 
 	function nr_of_bins(){

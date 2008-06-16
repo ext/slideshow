@@ -128,7 +128,7 @@ struct st_mysql_res* MySQLBrowser::query(const char* str, ...){
 void MySQLBrowser::reload(){
 	clear_fields();
 
-	MYSQL_RES *res = query("SELECT fullpath FROM files WHERE bin = 0 ORDER BY id");
+	MYSQL_RES *res = query("SELECT fullpath FROM files WHERE bin = 0 AND active = true ORDER BY id");
 	MYSQL_ROW row;
 
 	_nr_of_fields = mysql_num_rows(res);

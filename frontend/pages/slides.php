@@ -282,6 +282,13 @@ class Slides extends Module {
 		Module::log("Deactivated slide with id $id");
 		Module::redirect('/index.php');
 	}
+
+	function activate( $id ){
+		q('UPDATE files SET active = true WHERE id = ' . (int)$id );
+		$this->send_signal("Reload");
+		Module::log("Activated slide with id $id");
+		Module::redirect('/index.php');
+	}
 };
 
   ?>
