@@ -8,7 +8,7 @@
 	},
 
 	"Files": {
-		"BinaryPath": "/home/ext/workspace/code/trunk/Projects/Slideshow/trunk/build/slideshow",
+		"BinaryPath": "/home/ext/workspace/code/trunk/Projects/Slideshow/branches/slide_bins/build/slideshow",
 		"Log": {
 			"Base": "slideshow.log",
 			"Debug": "slideshow.debug.log",

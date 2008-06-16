@@ -20,7 +20,7 @@
 <?
 
 require_once('../core/module.inc.php');
-require_once('../slides.inc.php');
+require_once('../models/bin_collection.php');
 
 class Main extends Module {
 	function __construct(){
@@ -35,9 +35,9 @@ class Main extends Module {
 		global $settings;
 
 		Module::set_template('main.tmpl');
-
 		$ret = array(
-			'slides' => get_slides()
+			'collection' => new BinCollection(),
+			'active_bin' => 0
 		);
 
 		$motd = $settings->motd();
