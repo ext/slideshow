@@ -30,10 +30,15 @@ class Module {
 	$this->_custom_view = false;
   }
 
-  function factory( $module ){
-	require_once("../pages/$module.php");
+	function factory( $module ){
+		$fullpath = "../pages/$module.php";
+
+		if ( !file_exists($fullpath) ){
+			new Exception("404");
+		}
+	require_once();
 	return new $module;
-  }
+	}
 
   function set_template( $template, $custom_view = false ){
 	$this->_template = $template;

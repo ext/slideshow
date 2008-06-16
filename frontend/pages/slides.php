@@ -275,6 +275,13 @@ class Slides extends Module {
 			'filename' => basename($row['fullpath'])
 		);
 	}
+
+	function deactivate( $id ){
+		q('UPDATE files SET active = false WHERE id = ' . (int)$id );
+		$this->send_signal("Reload");
+		Module::log("Deactivated slide with id $id");
+		Module::redirect('/index.php');
+	}
 };
 
   ?>
