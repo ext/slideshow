@@ -1,0 +1,34 @@
+{
+	"BasePath": "",
+
+	"Path": {
+		"Image": "image",
+		"Video": "video",
+		"Temp": "tmp"
+	},
+
+	"Files": {
+		"BinaryPath": "",
+		"Log": {
+			"Base": "slideshow.log",
+			"Debug": "slideshow.debug.log",
+			"Activity": "activity.log"
+		},
+		"PID": "slideshow.pid",
+		"MOTD": "motd",
+		"convert": ""
+	},
+
+	"Apparence": {
+		"Background": "",
+		"Font": "",
+		"Resolution": [800,600]
+	},
+
+	"Database": {
+		"Username": "",
+		"Password": "",
+		"Hostname": "localhost",
+		"Name": ""
+	}
+}
