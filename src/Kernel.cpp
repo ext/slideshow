@@ -64,10 +64,11 @@ Kernel::Kernel(int argc, const char* argv[]):
 	_width(800),
 	_height(600),
 	_frames(0),
+	_bin_id(1),
 	_fullscreen(false),
 	_daemon(false),
-	_transition_time(5.0f),
-	_switch_time(15.0f),
+	_transition_time(3.0f),
+	_switch_time(5.0f),
 	_graphics(NULL),
 	_browser(NULL),
 	_ipc(NULL),
@@ -76,10 +77,10 @@ Kernel::Kernel(int argc, const char* argv[]):
 	_db_name(NULL),
 	_logfile("slideshow.log"){
 
-	parse_argv(argc, argv);
-
 	initTime();
 	Log::initialize(_logfile, "slideshow.debug.log");
+
+	parse_argv(argc, argv);
 
 	///@todo HACK! Attempt to connect to an xserver.
 	Display* dpy = XOpenDisplay(NULL);
@@ -87,7 +88,6 @@ Kernel::Kernel(int argc, const char* argv[]):
 		throw NoXConnection("Could not connect to an X server\n");
 	}
 	XCloseDisplay(dpy);
-
 
 	if ( _daemon ){
 		Log::message(Log::Verbose, "Kernel: Starting slideshow daemon\n");
@@ -112,6 +112,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 	_ipc = new DBus(this, 50);
 
 	_browser = new MySQLBrowser(_db_username, _db_password, _db_name);
+	_browser->change_bin(_bin_id);
 	_browser->reload();
 
 	_state = SWITCH;
@@ -174,7 +175,7 @@ void Kernel::run(){
 }
 
 void Kernel::parse_argv(int argc, const char* argv[]){
-	for ( int i = 0; i < argc; i++ ){
+	for ( int i = 1; i < argc; i++ ){
 		if ( strcmp(argv[i], "--fullscreen") == 0 ){
 			_fullscreen = true;
 			continue;
@@ -216,6 +217,15 @@ void Kernel::parse_argv(int argc, const char* argv[]){
 			sscanf(argv[i], "%dx%d", &_width, &_height);
 			continue;
 		}
+
+		if ( strcmp(argv[i], "--bin-id") == 0 ){
+			i++;
+
+			sscanf(argv[i], "%d", &_bin_id);
+			continue;
+		}
+
+		Log::message(Log::Warning, "Unknown argument: %s\n", argv[i]);
 	}
 }
 
@@ -257,7 +267,8 @@ void Kernel::switch_state(double t){
 
 	if ( !filename ){
 		Log::message(Log::Warning, "Kernel: Queue is empty\n", filename);
-		//wait( _switch_time * 0.9f );
+		_state = VIEW;
+		_last_switch = t;
 		return;
 	}
 
@@ -293,6 +304,11 @@ void Kernel::quit(){
 }
 
 void Kernel::reload_browser(){
+	_browser->reload();
+}
+
+void Kernel::change_bin(unsigned int id){
+	_browser->change_bin(id);
 	_browser->reload();
 }
 

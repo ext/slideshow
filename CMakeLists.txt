@@ -50,19 +50,21 @@ include(FindDBus)
 set( MYSQL_FIND_REQUIRED TRUE )
 include(FindMySQL)
 
+set( PORTABLE_FIND_REQUIRED TRUE )
+include(FindPortable)
+
 include_directories(
 	include
-	vendor/libportable/include
 	${DBUS_INCLUDE_PATH}
 	${OPENGL_INCLUDE_PATH}
 	${FREEIMAGE_INCLUDE_PATH}
 	${MYSQL_INCLUDE_PATH}
+	${PORTABLE_INCLUDE_PATH}
 )
 
 set( CMAKE_CXX_FLAGS_DEBUG "-Wall -g" )
 set( CMAKE_CXX_FLAGS_RELEASE "-Wall -g -O2" )
 
-add_subdirectory( vendor/libportable )
 add_subdirectory( src/browsers )
 add_subdirectory( src/IPC )
 add_subdirectory( src/transitions )
@@ -85,11 +87,12 @@ target_link_libraries( slideshow
 	Browsers
 	IPC
 	Transitions
-	libportable
 	${SLIDESHOW_LIBS}
 	${X11_LIBRARIES}
 	${DBUS_LIBRARY}
 	${OPENGL_LIBRARIES}
 	${FREEIMAGE_LIBRARY}
 	${MYSQL_LIBRARY}
+	${PORTABLE_LIBRARY}
 )
+

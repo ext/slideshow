@@ -35,6 +35,7 @@ class Kernel {
 		void reload_browser();
 		void ipc_quit();
 		void play_video(const char* fullpath);
+		void change_bin(unsigned int id);
 
 		void debug_dumpqueue();
 
@@ -54,6 +55,7 @@ class Kernel {
 		int _width;
 		int _height;
 		int _frames;
+		unsigned int _bin_id;
 		bool _fullscreen;
 		bool _daemon;
 		double _transition_time;

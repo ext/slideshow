@@ -124,15 +124,7 @@ void OS::init_view(int width, int height, bool fullscreen){
 
 	default_cursor = XCreateFontCursor(dpy, XC_left_ptr);
 
-	/*XGrabPointer(dpy, win,
-			 True,
-			 0,
-			 GrabModeAsync, GrabModeAsync,
-			 win,
-			 cursor,
-			 CurrentTime);*/
-
-	XDefineCursor(dpy, win, no_cursor);
+    XDefineCursor(dpy, win, no_cursor);
 
 	if ( fullscreen ){
 		XEvent xev;
@@ -157,6 +149,8 @@ void OS::swap_gl_buffers(){
 }
 
 void OS::cleanup(){
+  XDefineCursor(dpy, win, default_cursor);
+  glXDestroyContext(dpy, ctx);
   XDefineCursor(dpy, win, default_cursor);
   glXDestroyContext(dpy, ctx);
 
