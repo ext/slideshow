@@ -35,7 +35,7 @@ try {
 		$path = new Path( 'install', 'welcome' );
 	}
 
-	$settings = new Settings('../settings.json.default', true);
+	$settings = new Settings('../settings.json.default');
 }
 
 try {
@@ -72,12 +72,14 @@ if ( $page->has_custom_view() ){
 <?
 
 $page->render();
-$settings->persist();
 
-?>
-
-	<hr/>
-	<p>Inloggad som <?=$_SERVER['PHP_AUTH_USER'];?> (<a href="/logout.php">Logout</a>)</p>
+// Usually the site is protected with http basic auth but sometimes it is not,
+// during the installation for instance. Therefore we cannot rely on PHP_AUTH_USER
+// being set.
+if ( isset($_SERVER['PHP_AUTH_USER']) ){ ?>
+	<hr>
+	Inloggad som <?=$_SERVER['PHP_AUTH_USER'];?> (<a href="/logout.php">Logout</a>)
+<? } ?>
 </body>
 
 </html>
