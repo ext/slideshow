@@ -47,6 +47,25 @@ class Bins extends Module {
 		);
 	}
 
+	function delete( $id ){
+		if ( array_key_exists('confirm', $_GET) === true ){
+			q("UPDATE files SET bin_id = 0 WHERE bin_id = $id");
+			q("DELETE FROM bins WHERE id = $id");
+			$this->send_signal("Reload");
+			Module::log("Removed bin with id $id");
+			Module::redirect('/index.php/bins');
+		}
+
+		Module::set_template('bins_delete.tmpl');
+
+		$ret = r('SELECT name FROM bins WHERE id = ' . (int)$id);
+
+		return array(
+			'id' => $id,
+			'name' => $ret['name']
+		);
+	}
+
 	function perform_rename(){
 		q('UPDATE bins SET name = \'' . mysql_real_escape_string($_POST['name']) . '\' WHERE id = ' . (int)$_POST['id']);
 		Module::redirect('/index.php/bins');
