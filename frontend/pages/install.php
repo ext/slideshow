@@ -26,7 +26,7 @@ class Install extends Module {
   	session_start();
 
 	if ( !isset( $_SESSION['config'] ) ){
-		$_SESSION['config'] = new Settings('../settings.json.default');
+	  $_SESSION['config'] = new Settings('../settings.json.default', true);
   	}
 
 	Module::set_template('welcome.tmpl');
@@ -44,16 +44,17 @@ class Install extends Module {
   	}
 
 	$ret = array(
-		 'path' => realpath('..'),
+		 'path' => realpath('..') . '/settings.json',
 		 'step' => $n
 		 );
 
 	 switch ( $n ){
 	 	case 1:
-	 		$ret['writable_config'] = is_writable( '..' );
+	 		$ret['writable_config'] = is_writable( '../settings.json' );
 	 		$ret['have_mysql'] = extension_loaded( 'mysql' );
 	 		$ret['have_json'] = extension_loaded( 'json' );
 	 		$ret['have_gd'] = extension_loaded( 'gd' );
+	 		//$ret['have_mysql'] = extension_loaded( 'mysql' );
 
 	 		// Try to find ImageMagick (test derived from phpBB)
 	 		$exe = (DIRECTORY_SEPARATOR == '\\') ? '.exe' : '';
@@ -84,16 +85,13 @@ class Install extends Module {
 	 			$_SESSION['config']->set_convert_binary($imagick_path . "convert$exe");
 	 		}
 
-			$ret['requirements_ok'] = false;
-			if ( $ret['have_mysql'] && $ret['have_json'] && $ret['have_gd'] && $ret['have_imagick'] ){
-				$ret['requirements_ok'] = true;
-			}
+			$ret['requirements_ok'] = $ret['writable_config'] && $ret['have_mysql'] && $ret['have_gd'] && $ret['have_json'] && $ret['have_imagick'];
 
 	 		break;
 
 	 	case 2:
-			$ret['basepath'] = $_SESSION['config']->base_path();
-			$ret['binpath'] = $_SESSION['config']->binary();
+		  $ret['basepath'] = $_SESSION['config']->base_path();
+		  $ret['binpath'] = $_SESSION['config']->binary();
 
 	 		// This is a bit ugly but to suppres error messages it assumes paths are valid
 	 		$ret['basepath_found'] = isset($_GET['basepath_found']) ? $_GET['basepath_found'] : true;
@@ -103,10 +101,10 @@ class Install extends Module {
 	 		break;
 
 	 	case 3:
-			$ret['database_host'] = $_SESSION['config']->database_hostname();
-	 		$ret['database_name'] = $_SESSION['config']->database_name();
-	 		$ret['database_username'] = $_SESSION['config']->database_username();
-	 		$ret['database_password'] = $_SESSION['config']->database_password();
+		  $ret['database_host'] = $_SESSION['config']->database_hostname();
+		  $ret['database_name'] = $_SESSION['config']->database_name();
+		  $ret['database_username'] = $_SESSION['config']->database_username();
+		    $ret['database_password'] = $_SESSION['config']->database_password();
 
 	 		if ( isset( $_GET['connection_failed'] ) ){
 	 			$ret['connection_failed'] = stripslashes( $_GET['connection_failed'] );
@@ -115,9 +113,9 @@ class Install extends Module {
 	 		break;
 
 	 	case 4:
-			$ret['resolution'] = $_SESSION['config']->resolution_as_string();
-	 		$ret['background'] = $_SESSION['config']->background();
-	 		$ret['font'] = $_SESSION['config']->font();
+		  $ret['resolution'] = $_SESSION['config']->resolution_as_string();
+		  $ret['background'] = $_SESSION['config']->background();
+		  $ret['font'] = $_SESSION['config']->font();
 
 			if ( isset( $_GET['valid_resolution'] ) ){
 	 			$ret['valid_resolution'] =  $_GET['valid_resolution'];
@@ -229,17 +227,20 @@ class Install extends Module {
 
 		case 5:
 			$database_host = $_SESSION['config']->database_hostname();
-	 		$database_name = $_SESSION['config']->database_name();
-	 		$database_username = $_SESSION['config']->database_username();
-	 		$database_password = $_SESSION['config']->database_password();
+			$database_name = $_SESSION['config']->database_name();
+			$database_username = $_SESSION['config']->database_username();
+			$database_password = $_SESSION['config']->database_password();
 
 			mysql_connect($database_host, $database_username, $database_password);
 
 			//mysql_query("SOURCE ../maintenance/install.sql");
-			exec("mysql -u '$database_username' --password='$database_password' $database_name < ../maintenance/install.sql 2>&1", $stdout, $ret);
+			///@todo Not portable
+			$cmd = "mysql -u $database_username --password='$database_password' $database_name < ../maintenance/install.sql 2>&1";
+			exec($cmd, $stdout, $ret);
 			if ( $ret != 0 ){
-			  print_r($stdout);
-			  die();
+			  echo $cmd, '<br/>';
+				print_r($stdout);
+				die();
 			}
 
 			$imagepath = $_SESSION['config']->image_path();
@@ -258,14 +259,8 @@ class Install extends Module {
 				mkdir( $temppath );
 			}
 
-			if ( is_writable( '..' ) ){
-				$file = fopen('../settings.json');
-				fwrite($file, $_SESSION['config']->as_json());
-				fclose($file);
-				$this->redirect("/index.php/install/complete");
-			} else {
-				$this->redirect("/index.php/install/step/6");
-			}
+			$_SESSION['config']->persist('../settings.json');
+			$this->redirect("/index.php/install/complete");
 		}
 
 		return array();
@@ -279,7 +274,7 @@ class Install extends Module {
 	function download(){
 		session_start();
 		Module::set_template('download_config.tmpl', true);
-		return array('data' => $_SESSION['config']->as_json());
+		return array('data' => $this->_configuration_as_json());
 	}
 };
 

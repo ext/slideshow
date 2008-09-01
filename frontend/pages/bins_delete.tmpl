@@ -17,44 +17,6 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 ?>
-<?
+	<h1><a href="/index.php/">Slideshow</a> &gt; <a href="/index.php/bins">Manage bins</a> &gt; Delete '<?=$name?>'?</h1>
 
-require_once('../core/module.inc.php');
-require_once('../models/bin_collection.php');
-
-class Main extends Module {
-	function __construct(){
-		connect();
-	}
-
-	function __destruct(){
-		disconnect();
-	}
-
-	function index(){
-		global $settings;
-
-		Module::set_template('main.tmpl');
-
-		$available_bins = array( 0 => 'Unsorted' );
-		$ret = q('SELECT id, name FROM bins');
-		while ( ( $row = mysql_fetch_assoc($ret) ) ){
-			$available_bins[ $row['id'] ] = $row['name'];
-		}
-
-		$ret = array(
-			'collection' => new BinCollection(),
-			'active_bin' => $settings->current_bin(),
-			'available_bins' => $available_bins
-		);
-
-		$motd = $settings->motd();
-		if ( strlen(trim($motd)) > 0 ){
-			$ret['motd'] = $motd;
-		}
-
-		return $ret;
-	}
-};
-
-?>
+	Are you want to delete the bin '<b><?=$name?></b>' and move all slides to 'Unsorted'? . <a href="/index.php/bins/delete/<?=$id?>?confirm">yes</a> / <a href="/index.php/bins">no</a>

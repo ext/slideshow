@@ -20,7 +20,6 @@
 <?
 function connect(){
 	global $settings;
-
 	mysql_connect($settings->database_hostname(), $settings->database_username(), $settings->database_password())
 		or die("Could not connect to database: " . mysql_error());
 	mysql_select_db($settings->database_name());
@@ -35,4 +34,18 @@ function q($query){
 		die("Mysql error: ".mysql_error()."\n<br/>Executing \"$query\"\n");
 	return $res;
 }
+
+function rw($res){
+	return mysql_fetch_assoc($res);
+}
+
+function r($query) {
+	$res = q($query);
+	if( mysql_num_rows($res) > 0 ){
+		return rw($res);
+	} else {
+		return false;
+	}
+}
+
 ?>

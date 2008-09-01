@@ -275,6 +275,37 @@ class Slides extends Module {
 			'filename' => basename($row['fullpath'])
 		);
 	}
+
+	function deactivate( $id ){
+		q('UPDATE files SET active = false WHERE id = ' . (int)$id );
+		$this->send_signal("Reload");
+		Module::log("Deactivated slide with id $id");
+		Module::redirect('/index.php');
+	}
+
+	function activate( $id ){
+		q('UPDATE files SET active = true WHERE id = ' . (int)$id );
+		$this->send_signal("Reload");
+		Module::log("Activated slide with id $id");
+		Module::redirect('/index.php');
+	}
+
+	function activate_bin( $id ){
+		global $settings;
+
+		$settings->set_current_bin( $id );
+		$this->send_signal("ChangeBin", "u", array($id));
+		Module::log("Changing active bin to id $id");
+		Module::redirect('/index.php');
+	}
+
+	function move( $id ){
+		$bin = (int)$_POST['to_bin'];
+		q("UPDATE files SET bin_id = $bin WHERE id = " . (int)$id);
+		$this->send_signal("Reload");
+		Module::log("Moving slide $id to bin $bin");
+		Module::redirect('/index.php');
+	}
 };
 
   ?>
