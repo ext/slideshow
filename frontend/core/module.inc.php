@@ -109,7 +109,10 @@ class Module {
 	function log($msg){
 		global $settings;
 
-		$user = $_SERVER['PHP_AUTH_USER'];
+		$user = 'anon';
+		if ( isset($_SERVER['PHP_AUTH_USER']) ){
+			$user = $_SERVER['PHP_AUTH_USER'];
+		}
 
 		$settings->activity_log()->write("$user $msg\n");
 	}
