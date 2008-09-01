@@ -8,6 +8,7 @@ CREATE TABLE `bins` (
   `name` text,
   UNIQUE KEY `id` (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+INSERT INTO `bins` VALUES (1, 'Default');
 
 --
 -- Table structure for table `files`
