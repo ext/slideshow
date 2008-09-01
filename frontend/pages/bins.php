@@ -51,4 +51,9 @@ class Bins extends Module {
 		q('UPDATE bins SET name = \'' . mysql_real_escape_string($_POST['name']) . '\' WHERE id = ' . (int)$_POST['id']);
 		Module::redirect('/index.php/bins');
 	}
+
+	function create(){
+		q('INSERT INTO bins (name) VALUES (\'' . mysql_real_escape_string($_POST['name']) . '\')');
+		Module::redirect('/index.php/bins');
+	}
 }
