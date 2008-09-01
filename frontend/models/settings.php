@@ -19,6 +19,9 @@
 
 require_once('log.php');
 
+class InvalidSettings extends Exception {}
+class CorruptSettings extends Exception {}
+
 class Settings {
 	private $filename;
 	private $readonly;
@@ -26,13 +29,22 @@ class Settings {
 
 	function __construct($filename = '../settings.json', $readonly = false){
 		if ( !file_exists($filename) ){
-			throw new Exception($filename . " not found!");
+			throw new InvalidSettings($filename . " not found!");
 		}
 
 		$this->filename = realpath($filename);
 		$this->readonly = $readonly;
 		$json_string = file_get_contents($this->filename);
 		$this->data = json_decode( $json_string, true );
+
+		if ( ! is_array($this->data) ){
+			$test = trim($this->data);
+			if ( empty($test) ){
+				throw new InvalidSettings("Empty settings");
+			}
+
+			throw new CorruptSettings();
+		}
 	}
 
 	function store(){
@@ -300,7 +312,7 @@ class Settings {
 
 			$pretty .=  $json[$i];
 
-			if ( $json[$i] == '"' && $json[$i-1] != '\\' ){
+			if ( $i > 0 && $json[$i] == '"' && $json[$i-1] != '\\' ){
 				$in_string = !$in_string;
 				continue;
 			}

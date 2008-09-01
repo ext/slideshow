@@ -44,13 +44,13 @@ class Install extends Module {
   	}
 
 	$ret = array(
-		 'path' => realpath('..'),
+		 'path' => realpath('..') . '/settings.json',
 		 'step' => $n
 		 );
 
 	 switch ( $n ){
 	 	case 1:
-	 		$ret['writable_config'] = is_writable( '..' );
+	 		$ret['writable_config'] = is_writable( '../settings.json' );
 	 		$ret['have_mysql'] = extension_loaded( 'mysql' );
 	 		$ret['have_json'] = extension_loaded( 'json' );
 	 		$ret['have_gd'] = extension_loaded( 'gd' );
@@ -85,7 +85,7 @@ class Install extends Module {
 	 			$_SESSION['config']->set_convert_binary($imagick_path . "convert$exe");
 	 		}
 
-			$ret['requirements_ok'] = $ret['have_mysql'] && $ret['have_gd'] && $ret['have_json'] && $ret['have_imagick'];
+			$ret['requirements_ok'] = $ret['writable_config'] && $ret['have_mysql'] && $ret['have_gd'] && $ret['have_json'] && $ret['have_imagick'];
 
 	 		break;
 
@@ -259,12 +259,8 @@ class Install extends Module {
 				mkdir( $temppath );
 			}
 
-			if ( is_writable( '..' ) ){
-				$_SESSION['config']->persist('../settings.json');
-				$this->redirect("/index.php/install/complete");
-			} else {
-				$this->redirect("/index.php/install/step/6");
-			}
+			$_SESSION['config']->persist('../settings.json');
+			$this->redirect("/index.php/install/complete");
 		}
 
 		return array();

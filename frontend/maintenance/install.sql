@@ -2,6 +2,7 @@
 -- Table structure for table `bins`
 --
 
+DROP TABLE IF EXISTS `bins`;
 CREATE TABLE `bins` (
   `id` int(11) NOT NULL auto_increment,
   `name` text,
