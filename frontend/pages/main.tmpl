@@ -17,9 +17,6 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 ?>
-	<div id="header">
-		<h1>Slideshow</h1>
-	</div>
 
 <? if ( isset($motd) ){ ?>
 	<h2>MOTD</h2>
@@ -28,18 +25,12 @@
 	</div>
 <? } ?>
 
-	<div id="menu">
-		<h2>Menu</h2>
-		<ul>
-			<li class="first bajs"><a href="/index.php/">Main</a></li>
-			<li><a href="/index.php/slides/upload">New slide</a></li>
-			<li><a href="/index.php/video">Play video</a></li>
-			<li><a href="/index.php/bins">Manage bins</a></li>
-			<li class="last"><a href="/index.php/maintenance">Maintenance</a></li>
-		</ul>
-	</div>
-
 	<div id="content">
+	
+		<div id="breadcrumb">
+			<h2><a href="/index.php/">Slideshow</a></h2>
+		</div>
+		
 		<h2>Current slides</h2>
 	
 <? foreach ( $collection as $bin ){ ?>

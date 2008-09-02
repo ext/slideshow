@@ -90,6 +90,15 @@ img {
 	background:	white;
 }
 
+#breadcrumb {
+	font-size: 0.3em;
+	color: #aaa;
+}
+
+#breadcrumb a {
+	color: #aaa;
+}
+
 #menu {
 	font: normal 10px verdana,'Bitstream Vera Sans',helvetica,arial,sans-serif;
 

@@ -74,7 +74,20 @@ if ( $page->has_custom_view() ){
 </head>
 
 <body>
+	<div id="header">
+		<h1>Slideshow</h1>
+	</div>
 
+	<div id="menu">
+		<h2>Menu</h2>
+		<ul>
+			<li class="first<? if ( $path->module() == 'main' ){ ?> bajs<? } ?>"><a href="/index.php/">Main</a></li>
+			<li<? if ( $path->module() == 'slides' ){ ?> class="bajs"<? } ?>><a href="/index.php/slides/upload">New slide</a></li>
+			<li<? if ( $path->module() == 'video' ){ ?> class="bajs"<? } ?>><a href="/index.php/video">Play video</a></li>
+			<li<? if ( $path->module() == 'bins' ){ ?> class="bajs"<? } ?>><a href="/index.php/bins">Manage bins</a></li>
+			<li class="last<? if ( $path->module() == 'maintenance' ){ ?> bajs<? } ?>"><a href="/index.php/maintenance">Maintenance</a></li>
+		</ul>
+	</div>
 <?
 
 $page->render();
