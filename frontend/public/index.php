@@ -100,9 +100,9 @@ if ( isset($_SERVER['PHP_AUTH_USER']) ){ ?>
 	Inloggad som <?=$_SERVER['PHP_AUTH_USER'];?> (<a href="/logout.php">Logout</a>)
 <? } ?>
 
-<div id="footer">
-	Powered by <a href="http://sidvind.com:8000/slideshow">Slideshow <?=$version[0]?>.<?=$version[1]?>.<?=$version[2]?></a>
-</div>
+	<div id="footer">
+		Powered by <a href="http://sidvind.com:8000/slideshow">Slideshow <?=$version[0]?>.<?=$version[1]?>.<?=$version[2]?></a>
+	</div>
 
 </body>
 
