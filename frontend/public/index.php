@@ -19,6 +19,8 @@
 ?>
 <?
 
+$version = array(0, 2, 0);
+
 require_once("../core/path.inc.php");
 require_once("../db_functions.inc.php");
 require_once("../thumb_functions.inc.php");
@@ -84,6 +86,11 @@ if ( isset($_SERVER['PHP_AUTH_USER']) ){ ?>
 	<hr>
 	Inloggad som <?=$_SERVER['PHP_AUTH_USER'];?> (<a href="/logout.php">Logout</a>)
 <? } ?>
+
+<div id="footer">
+	Powered by <a href="http://sidvind.com:8000/slideshow">Slideshow <?=$version[0]?>.<?=$version[1]?>.<?=$version[2]?></a>
+</div>
+
 </body>
 
 </html>

@@ -8,6 +8,7 @@ img {
 
 .slide {
 	float:		left;
+	width:		210px;
 }
 
 .spacer {
@@ -104,14 +105,22 @@ img {
 	border: 1px solid black;
 }
 
+#menu :hover, #menu :active {
+	color: #00f;
+}
+
+#menu .bajs :link, #menu .bajs :visited {
+	border-bottom: 1px solid white;
+}
+
+#menu a {
+	color: #000;
+}
+
 #menu .first {
 	padding-left: 10px;
 }
 
-#menu active:link, #menu active:visited {
-	border-bottom: 1px solid white;
-	background: red;
-}
 
 #menu ul {
 	list-style: none;
@@ -139,6 +148,31 @@ img {
 	border-left: 1px solid black;
 	border-right: 1px solid black;
 	border-bottom: 1px solid black;
+}
+
+.bin {
+	margin-top: 10px;
+	margin-bottom: 10px;
+	border: 1px solid #ccc;
+	padding: 0px 10px 10px 10px;
+}
+
+.bin .title {
+	margin: 0 0 0 10px;
+	padding: 0 10px;
+	background: white;
+	position: relative; top: -10px;
+	display: inline;
+}
+	
+#footer {
+	margin-top: 1em;
+	font-size: 0.5em;
+	color: #888;
+}
+
+#footer a {
+	color: #888;
 }
 
 h1 {
