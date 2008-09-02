@@ -19,11 +19,12 @@
 ?>
 <?
 
-require_once("../core/path.inc.php");
-require_once("../db_functions.inc.php");
-require_once("../thumb_functions.inc.php");
-require_once("../core/module.inc.php");
-require_once("../models/settings.php");
+require_once('../version.php');
+require_once('../core/path.inc.php');
+require_once('../db_functions.inc.php');
+require_once('../thumb_functions.inc.php');
+require_once('../core/module.inc.php');
+require_once('../models/settings.php');
 
 $path = new Path();
 $settings = NULL;
@@ -62,7 +63,8 @@ if ( $page->has_custom_view() ){
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<link rel="stylesheet" href="/css/style.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="/css/common.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="/css/main.css" type="text/css" media="screen" />
 	<title>Slideshow</title>
 <?
   //@note hack to get the maintenance page refresh
@@ -72,7 +74,20 @@ if ( $page->has_custom_view() ){
 </head>
 
 <body>
+	<div id="header">
+		<h1>Slideshow</h1>
+	</div>
 
+	<div id="menu">
+		<h2>Menu</h2>
+		<ul>
+			<li class="first<? if ( $path->module() == 'main' ){ ?> bajs<? } ?>"><a href="/index.php/">Main</a></li>
+			<li<? if ( $path->module() == 'slides' ){ ?> class="bajs"<? } ?>><a href="/index.php/slides/upload">Slides</a></li>
+			<li<? if ( $path->module() == 'video' ){ ?> class="bajs"<? } ?>><a href="/index.php/video">Video</a></li>
+			<li<? if ( $path->module() == 'bins' ){ ?> class="bajs"<? } ?>><a href="/index.php/bins">Bins</a></li>
+			<li class="last<? if ( $path->module() == 'maintenance' ){ ?> bajs<? } ?>"><a href="/index.php/maintenance">Maintenance</a></li>
+		</ul>
+	</div>
 <?
 
 $page->render();
@@ -84,6 +99,11 @@ if ( isset($_SERVER['PHP_AUTH_USER']) ){ ?>
 	<hr>
 	Inloggad som <?=$_SERVER['PHP_AUTH_USER'];?> (<a href="/logout.php">Logout</a>)
 <? } ?>
+
+	<div id="footer">
+		Powered by <a href="http://sidvind.com:8000/slideshow">Slideshow <?=version_as_string()?></a>
+	</div>
+
 </body>
 
 </html>

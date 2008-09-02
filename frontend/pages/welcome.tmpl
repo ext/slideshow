@@ -17,8 +17,34 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 ?>
-  <h1>Slideshow &gt; Welcome</h1>
+<?
+require_once('../version.php');
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 
-  <p>Slideshow is an application for showing text and images in a loop on monitors and projectors. It is not meant for situations where interactive control is required, but for when the content is continuously looping for a long time. The content is updated through a webgui. The application is split into two packages, the backend and frontend. The backend is written in C++ and OpenGL and the frontend uses PHP and MySQL. Currently the frontend is very GNU/Linux specific and will not run on any other platform. It is however meant to be as platform independent as possible, as long as it handles OpenGL.</p>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" href="/css/common.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="/css/install.css" type="text/css" media="screen" />
+	<title>Slideshow</title>
+</head>
 
-  <p>Proceed to <a href="/index.php/install/step/0"> installation</a>.</p>
+<body>
+	<div id="content">
+		
+		<h1>Welcome</h1>
+		
+		<p>Slideshow is an application for showing text and images in a loop on monitors and projectors. It is not meant for situations where interactive control is required, but for when the content is continuously looping for a long time. The content is updated through a webgui. The application is split into two packages, the backend and frontend. The backend is written in C++ and OpenGL and the frontend uses PHP and MySQL. Currently the frontend is very GNU/Linux specific and will not run on any other platform. It is however meant to be as platform independent as possible, as long as it handles OpenGL.</p>
+		<p>Proceed to <a href="/index.php/install/step/0"> installation</a>.</p>
+  		
+	</div>
+
+	<div id="footer">
+		Powered by <a href="http://sidvind.com:8000/slideshow">Slideshow <?=version_as_string()?></a>
+	</div>
+	
+</body>
+
+</html>

@@ -1,0 +1,24 @@
+body {
+	background:	#ffc;
+}
+
+#footer {
+	margin-top: 1em;
+	font-size: 0.5em;
+	color: #888;
+}
+
+#footer a {
+	color: #888;
+}
+
+.spacer {
+	clear:		both;
+	height:		1px;
+}
+
+.notice {
+	border:		3px solid red;
+	text-align: center;
+	padding:	1em;
+}
