@@ -34,8 +34,6 @@ class Main extends Module {
 	function index(){
 		global $settings;
 
-		Module::set_template('main.tmpl');
-
 		$available_bins = array( 0 => 'Unsorted' );
 		$ret = q('SELECT id, name FROM bins');
 		while ( ( $row = mysql_fetch_assoc($ret) ) ){

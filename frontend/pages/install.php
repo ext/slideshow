@@ -29,14 +29,10 @@ class Install extends Module {
 	  $_SESSION['config'] = new Settings('../settings.json.default', true);
   	}
 
-	Module::set_template('welcome.tmpl', true);
-
 	return array();
   }
 
   function step( $n ){
-  	Module::set_template('install.tmpl', true);
-
   	session_start();
   	if ( !isset( $_SESSION['config'] ) ){
   		$this->redirect('/index.php/install/welcome');
@@ -270,13 +266,11 @@ class Install extends Module {
 	}
 
 	function complete(){
-		Module::set_template('install_complete.tmpl', true);
 		return array();
 	}
 
 	function download(){
 		session_start();
-		Module::set_template('download_config.tmpl', true);
 		return array('data' => $this->_configuration_as_json());
 	}
 };

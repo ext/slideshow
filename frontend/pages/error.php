@@ -17,9 +17,8 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class kind_error extends Module {
+class error extends Module {
 	function display($code){
-		Module::set_template('kind_error.tmpl');
 		return array();
 	}
 }
