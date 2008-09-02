@@ -108,6 +108,7 @@ class Slides extends Module {
 
 	$cmd = "$convert ".escapeshellarg($fullpath)." -resize $resolution -background black -gravity center -extent $resolution ".escapeshellarg($fullpath)." 2>&1 ";
 
+	$rc = 0;
 	passthru($cmd, $rc);
 
 	if ( $rc != 0 ){

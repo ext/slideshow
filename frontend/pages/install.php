@@ -236,8 +236,11 @@ class Install extends Module {
 			//mysql_query("SOURCE ../maintenance/install.sql");
 			///@todo Not portable
 			$cmd = "mysql -u $database_username --password='$database_password' $database_name < ../maintenance/install.sql 2>&1";
-			exec($cmd, $stdout, $ret);
-			if ( $ret != 0 ){
+
+			$stdout = array();
+			$rc = 0;
+			exec($cmd, $stdout, $rc);
+			if ( $rc != 0 ){
 			  echo $cmd, '<br/>';
 				print_r($stdout);
 				die();
