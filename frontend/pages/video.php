@@ -32,7 +32,6 @@ class Video extends Module {
 	}
 
   function index(){
-	Module::set_template('video.tmpl');
 	global $Path;
 
 	$files = array();

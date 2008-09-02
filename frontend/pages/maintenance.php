@@ -34,8 +34,6 @@ class Maintenance extends Module {
 	function index(){
 		global $settings;
 
-		Module::set_template('maintenance.tmpl');
-
 		$show_debug = isset($_GET['show_debug']);
 
 		$ret =  array(

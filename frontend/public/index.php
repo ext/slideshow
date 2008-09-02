@@ -47,7 +47,7 @@ try {
 	$page = Module::factory( $path->module() );
 	$page->execute( $path->section(), $path->argv() );
 } catch ( FileNotFound $e ){
-	$page = Module::factory( 'kind_error' );
+	$page = Module::factory( 'error' );
 	$page->execute( 'display', array(404) );
 }
 
