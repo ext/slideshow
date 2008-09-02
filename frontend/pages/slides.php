@@ -32,17 +32,8 @@ class Slides extends Module {
 		disconnect();
 	}
 
-  function index(){
-	Module::set_template('slides.tmpl');
-
-	return array(
-		 );
-  }
-
 	function upload(){
 		global $settings;
-
-		Module::set_template('slides_upload.tmpl');
 
 		$image = NULL;
 
@@ -267,8 +258,6 @@ class Slides extends Module {
 		}
 
 		$row = mysql_fetch_assoc(q("SELECT id, fullpath FROM files WHERE id = $id"));
-
-		Module::set_template('slides_delete.tmpl');
 
 		return array(
 			'id' => $id,

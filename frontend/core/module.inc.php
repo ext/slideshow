@@ -23,13 +23,10 @@ require_once ("../dbus/dbus_session.php");
 require_once ('file_not_found.inc.php');
 
 class Module {
-  private $_template;
-  private $_data;
-
-  function Module(){
-	$this->_template = '';
-	$this->_custom_view = false;
-  }
+	private $_template = '';
+	private $_data = array();
+	private $_name = 'undefined';
+	private $_custom_view = false;
 
 	function factory( $module ){
 		$fullpath = "../pages/$module.php";
@@ -39,7 +36,11 @@ class Module {
 		}
 
 		require_once($fullpath);
-		return new $module;
+
+		$m = new $module;
+		$m->_name = $module;
+
+		return $m;
 	}
 
   function set_template( $template, $custom_view = false ){
@@ -56,6 +57,10 @@ class Module {
   }
 
 	function execute( $section, array $argv ){
+
+		// We set the template to correspond to the section being executed.
+		$this->set_template($this->_name . '/' . $section . '.tmpl');
+
 		try {
 			$functor = array( $this, $section );
 
@@ -117,14 +122,14 @@ class Module {
 		$settings->activity_log()->write("$user $msg\n");
 	}
 
-  function render(){
-	if ( $this->_template == '' ){
-	  throw new Exception('No template specified for module \''.get_class($this).'\'');
-	}
+	function render(){
+		if ( !file_exists("../pages/$this->_template") ){
+			throw new Exception("The template '$this->_template' could not be found!");
+		}
 
-	extract($this->_data);
-	require("../pages/$this->_template");
-  }
+		extract($this->_data);
+		require("../pages/$this->_template");
+	}
 
   function send_signal($name, $signature = NULL, $payload = NULL){
 	$dbus = new direct_dbus_session("unix:///var/run/dbus/system_bus_socket", "../dbus/", false);

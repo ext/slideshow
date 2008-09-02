@@ -29,16 +29,12 @@ class Bins extends Module {
 	}
 
 	function index(){
-		Module::set_template('bins.tmpl');
-
 		return array(
 			'collection' => new BinCollection,
 		);
 	}
 
 	function rename( $id ){
-		Module::set_template('bins_rename.tmpl');
-
 		$ret = r('SELECT name FROM bins WHERE id = ' . (int)$id);
 
 		return array(
@@ -55,8 +51,6 @@ class Bins extends Module {
 			Module::log("Removed bin with id $id");
 			Module::redirect('/index.php/bins');
 		}
-
-		Module::set_template('bins_delete.tmpl');
 
 		$ret = r('SELECT name FROM bins WHERE id = ' . (int)$id);
 
