@@ -82,9 +82,9 @@ if ( $page->has_custom_view() ){
 		<h2>Menu</h2>
 		<ul>
 			<li class="first<? if ( $path->module() == 'main' ){ ?> bajs<? } ?>"><a href="/index.php/">Main</a></li>
-			<li<? if ( $path->module() == 'slides' ){ ?> class="bajs"<? } ?>><a href="/index.php/slides/upload">New slide</a></li>
-			<li<? if ( $path->module() == 'video' ){ ?> class="bajs"<? } ?>><a href="/index.php/video">Play video</a></li>
-			<li<? if ( $path->module() == 'bins' ){ ?> class="bajs"<? } ?>><a href="/index.php/bins">Manage bins</a></li>
+			<li<? if ( $path->module() == 'slides' ){ ?> class="bajs"<? } ?>><a href="/index.php/slides/upload">Slides</a></li>
+			<li<? if ( $path->module() == 'video' ){ ?> class="bajs"<? } ?>><a href="/index.php/video">Video</a></li>
+			<li<? if ( $path->module() == 'bins' ){ ?> class="bajs"<? } ?>><a href="/index.php/bins">Bins</a></li>
 			<li class="last<? if ( $path->module() == 'maintenance' ){ ?> bajs<? } ?>"><a href="/index.php/maintenance">Maintenance</a></li>
 		</ul>
 	</div>
