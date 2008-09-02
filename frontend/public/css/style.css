@@ -88,3 +88,63 @@ img {
 #install pre.summary {
 	background:	white;
 }
+
+#menu {
+	font: normal 10px verdana,'Bitstream Vera Sans',helvetica,arial,sans-serif;
+
+	padding: .2em 0;
+	border-bottom: 1px solid black;
+}
+
+#menu :link, #menu :visited {
+	padding: .20em 20px;
+	margin: 0;
+	text-decoration: none;
+	background: white;
+	border: 1px solid black;
+}
+
+#menu .first {
+	padding-left: 10px;
+}
+
+#menu active:link, #menu active:visited {
+	border-bottom: 1px solid white;
+	background: red;
+}
+
+#menu ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	text-align: left;
+}
+
+#menu li {
+	display: inline;
+	padding: 0;
+	margin: 0;
+	white-space: nowrap;
+}
+
+#menu h2 {
+	display: none;
+}
+
+#content {
+	clear:both;
+	background: white;
+	margin: 0;
+	padding: 10px;
+	border-left: 1px solid black;
+	border-right: 1px solid black;
+	border-bottom: 1px solid black;
+}
+
+h1 {
+	margin: 0;
+}
+
+h2 { 
+	margin: 0;
+}
