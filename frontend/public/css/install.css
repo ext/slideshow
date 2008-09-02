@@ -1,0 +1,51 @@
+#install {
+
+	font-size:	0.9em;
+}
+
+#install .field_description {
+	display:	block;
+
+	text-align:	right;
+	font-size:	0.7em;
+}
+
+#install label {
+	clear:		both;
+	display:	block;
+	width:		350px;
+	text-align:	right;
+	float:		left;
+	margin-right: 10px;
+
+}
+
+#install input {
+	float:		left;
+}
+
+#install .field_notice {
+	color:		red;
+	float:		left;
+	font-size:	0.7em;
+}
+
+#install .field_notice .ok {
+	color:		green;
+}
+
+#install .field_notice .fail {
+	color:		red;
+}
+
+#install button {
+	clear:		both;
+}
+
+#install ul.step .current_step {
+	color:		red;
+}
+
+#install pre.summary {
+	background:	white;
+}

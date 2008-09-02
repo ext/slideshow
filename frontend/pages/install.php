@@ -29,13 +29,13 @@ class Install extends Module {
 	  $_SESSION['config'] = new Settings('../settings.json.default', true);
   	}
 
-	Module::set_template('welcome.tmpl');
+	Module::set_template('welcome.tmpl', true);
 
 	return array();
   }
 
   function step( $n ){
-  	Module::set_template('install.tmpl');
+  	Module::set_template('install.tmpl', true);
 
   	session_start();
   	if ( !isset( $_SESSION['config'] ) ){
@@ -270,7 +270,7 @@ class Install extends Module {
 	}
 
 	function complete(){
-		Module::set_template('install_complete.tmpl');
+		Module::set_template('install_complete.tmpl', true);
 		return array();
 	}
 

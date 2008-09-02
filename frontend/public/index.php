@@ -19,13 +19,12 @@
 ?>
 <?
 
-$version = array(0, 2, 0);
-
-require_once("../core/path.inc.php");
-require_once("../db_functions.inc.php");
-require_once("../thumb_functions.inc.php");
-require_once("../core/module.inc.php");
-require_once("../models/settings.php");
+require_once('../version.php');
+require_once('../core/path.inc.php');
+require_once('../db_functions.inc.php');
+require_once('../thumb_functions.inc.php');
+require_once('../core/module.inc.php');
+require_once('../models/settings.php');
 
 $path = new Path();
 $settings = NULL;
@@ -64,7 +63,8 @@ if ( $page->has_custom_view() ){
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<link rel="stylesheet" href="/css/style.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="/css/common.css" type="text/css" media="screen" />
+	<link rel="stylesheet" href="/css/main.css" type="text/css" media="screen" />
 	<title>Slideshow</title>
 <?
   //@note hack to get the maintenance page refresh
@@ -101,7 +101,7 @@ if ( isset($_SERVER['PHP_AUTH_USER']) ){ ?>
 <? } ?>
 
 	<div id="footer">
-		Powered by <a href="http://sidvind.com:8000/slideshow">Slideshow <?=$version[0]?>.<?=$version[1]?>.<?=$version[2]?></a>
+		Powered by <a href="http://sidvind.com:8000/slideshow">Slideshow <?=version_as_string()?></a>
 	</div>
 
 </body>
