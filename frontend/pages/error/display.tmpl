@@ -19,7 +19,12 @@
 ?>
 
 	<div id="content">
-	
-		<h1>File not found</h1>
+
+<? if ( $code == UPLOAD_ERROR ){ ?>
+		<h1>Upload error</h1>
+		<p><?=$message?></p>
+<? } else { ?>
+		<h1>File not found</h1><br/>
+<? } ?>
   		
 	</div>

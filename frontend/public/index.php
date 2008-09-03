@@ -24,6 +24,7 @@ require_once('../core/path.inc.php');
 require_once('../db_functions.inc.php');
 require_once('../thumb_functions.inc.php');
 require_once('../core/module.inc.php');
+require_once('../core/page_exception.php');
 require_once('../models/settings.php');
 
 $path = new Path();
@@ -46,9 +47,9 @@ try {
 try {
 	$page = Module::factory( $path->module() );
 	$page->execute( $path->section(), $path->argv() );
-} catch ( FileNotFound $e ){
+} catch ( Exception $e ){
 	$page = Module::factory( 'error' );
-	$page->execute( 'display', array(404) );
+	$page->execute( 'display', array($e) );
 }
 
 if ( $page->has_custom_view() ){

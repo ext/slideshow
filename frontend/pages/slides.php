@@ -22,6 +22,13 @@
 require_once('../common.inc.php');
 require_once('../db_functions.inc.php');
 require_once('../core/module.inc.php');
+require_once('../core/page_exception.php');
+
+class UploadException extends PageException {
+	public function __construct($message){
+		parent::__construct($message, UPLOAD_ERROR);
+	}
+}
 
 class Slides extends Module {
 	function __construct(){
@@ -94,9 +101,9 @@ class Slides extends Module {
 			);
 
 			if ( isset($error_string[$error_code]) ){
-		        throw new Exception($error_string[$error_code]);
+		        throw new UploadException($error_string[$error_code]);
 			} else {
-		        throw new Exception("Unknown error uploading file.");
+		        throw new UploadException("Unknown error uploading file.");
 			}
 		}
 

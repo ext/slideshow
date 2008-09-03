@@ -18,7 +18,10 @@
  */
 
 class error extends Module {
-	function display($code){
-		return array();
+	function display($exception){
+		return array(
+			'message' => $exception->getMessage(),
+			'code' => $exception->getCode(),
+		);
 	}
 }
