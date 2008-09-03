@@ -17,11 +17,12 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class error extends Module {
-	function display($exception){
-		return array(
-			'message' => $exception->getMessage(),
-			'code' => $exception->getCode(),
-		);
-	}
+class PageException extends Exception {
+
 }
+
+define('UPLOAD_ERROR', 1);
+define('EXECUTABLE_ERROR', 2);
+define('FILE_NOT_FOUND', 404);
+
+?>

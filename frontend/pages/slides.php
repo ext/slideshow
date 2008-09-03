@@ -22,6 +22,13 @@
 require_once('../common.inc.php');
 require_once('../db_functions.inc.php');
 require_once('../core/module.inc.php');
+require_once('../core/page_exception.php');
+
+class UploadException extends PageException {
+	public function __construct($message){
+		parent::__construct($message, UPLOAD_ERROR);
+	}
+}
 
 class Slides extends Module {
 	function __construct(){
@@ -57,6 +64,8 @@ class Slides extends Module {
 				$fullpath = $settings->image_path() . "/$filename.png";
 
 				$this->_create_image($title, $content, $align, $fullpath);
+				$this->_convert($fullpath, $fullpath . '.thumb.jpg', "200x200");
+
 				q("INSERT INTO files (fullpath) VALUES ('$fullpath')");
 				$this->send_signal("Reload");
 
@@ -74,7 +83,30 @@ class Slides extends Module {
 		);
 	}
 
-  function submit_image(){
+	function submit_image(){
+		$upload_ok = $_FILES['filename']['error'] === UPLOAD_ERR_OK;
+
+		if ( !$upload_ok ){
+
+			$error_code = $_FILES['filename']['error'];
+
+			$error_string = array(
+			    UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini.',
+			    UPLOAD_ERR_FORM_SIZE => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.',
+			    UPLOAD_ERR_PARTIAL => 'The uploaded file was only partially uploaded.',
+			    UPLOAD_ERR_NO_FILE => 'No file was uploaded.',
+			    UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder.',
+			    UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk.',
+			    UPLOAD_ERR_EXTENSION => 'File upload stopped by extension.',
+			);
+
+			if ( isset($error_string[$error_code]) ){
+		        throw new UploadException($error_string[$error_code]);
+			} else {
+		        throw new UploadException("Unknown error uploading file.");
+			}
+		}
+
 	global $settings;
 
 	$convert = $settings->convert_binary();
@@ -97,14 +129,8 @@ class Slides extends Module {
 
 	move_uploaded_file($uploaded, $fullpath);
 
-	$cmd = "$convert ".escapeshellarg($fullpath)." -resize $resolution -background black -gravity center -extent $resolution ".escapeshellarg($fullpath)." 2>&1 ";
-
-	$rc = 0;
-	passthru($cmd, $rc);
-
-	if ( $rc != 0 ){
-	  die("\n<br/>$cmd\n");
-	}
+	$this->_convert($fullpath, $fullpath, $resolution);
+	$this->_convert($fullpath, $fullpath . '.thumb.jpg', "200x200");
 
 	q("INSERT INTO files (fullpath) VALUES ('$fullpath')");
 	$this->send_signal("Reload");
@@ -184,6 +210,21 @@ class Slides extends Module {
 
 	imagepng($im, $filename);
   }
+
+	function _convert($src, $dst, $resolution){
+		global $settings;
+
+		$convert = $settings->convert_binary();
+
+		$cmd = "$convert ".escapeshellarg($src)." -resize $resolution -background black -gravity center -extent $resolution ".escapeshellarg($dst)." 2>&1 ";
+
+		$rc = 0;
+		passthru($cmd, $rc);
+
+		if ( $rc != 0 ){
+			die("\n<br/>$cmd\n");
+		}
+	}
 
   function _render_string_aligned($im, $alignment, $y, $size, $font, $color, $string){
 	global $settings;

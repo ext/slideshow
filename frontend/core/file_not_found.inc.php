@@ -17,8 +17,10 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class FileNotFound extends Exception {
+require_once('page_exception.php');
+
+class FileNotFound extends PageException {
 	function __construct(){
-		parent::__construct("404", 404);
+		parent::__construct("File not found", 404);
 	}
 }

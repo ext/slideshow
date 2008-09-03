@@ -57,30 +57,19 @@ class Module {
   }
 
 	function execute( $section, array $argv ){
-
 		// We set the template to correspond to the section being executed.
 		$this->set_template($this->_name . '/' . $section . '.tmpl');
 
-		try {
-			$functor = array( $this, $section );
+		$functor = array( $this, $section );
 
-			if ( !is_callable($functor) ){
-				throw new FileNotFound();
-			}
+		if ( !is_callable($functor) ){
+			throw new FileNotFound();
+		}
 
-			$this->_data = call_user_func_array( $functor, $argv );
+		$this->_data = call_user_func_array( $functor, $argv );
 
-			if ( !is_array($this->_data) ){
-				throw new Exception("Call did not return an array: " . print_r($this->_data, true));
-			}
-		} catch ( FileNotFound $e ){
-			throw $e;
-		} catch ( Exception $e ){
-			$this->set_template( "exception.tmpl" );
-			$this->_data = array(
-				"Message" => $e->getMessage(),
-				"Stack" => $e->getTrace()
-			);
+		if ( !is_array($this->_data) ){
+			throw new Exception("Call did not return an array: " . print_r($this->_data, true));
 		}
 	}
 
