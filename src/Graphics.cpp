@@ -1,18 +1,18 @@
 /**
  * This file is part of Slideshow.
  * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
- * 
+ *
  * Slideshow is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
  * Slideshow is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -62,10 +62,10 @@ Graphics::Graphics(int width, int height, bool fullscreen):
 	_transition(NULL),
 	texture_0(0),
 	texture_1(0){
-	
+
 	OS::init_view(width, height, fullscreen);
 	Log::message(Log::Verbose, "Graphics: Using resoultion %dx%d\n", width, height);
-	
+
 	FreeImage_Initialise();
     FreeImage_SetOutputMessage(FreeImageErrorHandler);
 
@@ -73,28 +73,28 @@ Graphics::Graphics(int width, int height, bool fullscreen):
     glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST );
 	glClearColor(1, 0, 0, 1);
 	glColor4f(1, 1, 1, 1);
-	
+
 	glDisable( GL_DEPTH_TEST );
 	glDisable( GL_LIGHTING );
 	glDisable(GL_ALPHA_TEST);
-	
+
 	glEnable( GL_TEXTURE_2D );
 	glEnable(GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+
 	glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
     glOrtho(0, 1, 0, 1, -1.0, 1.0);
     glScalef(1, -1, 1);
     glTranslated(0, -1, 0);
-    
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    
+
     glGenTextures(1, &texture_0);
     glGenTextures(1, &texture_1);
-    
+
     glClear( GL_COLOR_BUFFER_BIT );
 }
 
@@ -102,19 +102,19 @@ Graphics::~Graphics(){
 	glDeleteTextures(1, &texture_0);
 	glDeleteTextures(1, &texture_1);
 	set_transition(NULL);
-	
+
 	OS::cleanup();
 }
 
 void Graphics::render(float state){
 	_transition->render(texture_0, texture_1, state);
-	
+
 	OS::swap_gl_buffers();
 }
 
 void Graphics::load_image(const char* name){
 	swap_textures();
-	
+
     FIBITMAP* dib = GenericLoader(name, 0);
 
     if( !dib ){
