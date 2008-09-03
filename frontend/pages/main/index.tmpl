@@ -39,7 +39,11 @@
 <?	foreach ( $bin as $slide ){ ?>
 			<div class="slide">
 				<a href="<?=$slide->image_url()?>">
-					<img src="<?=$slide->image_url()?>" alt="" width="200" height="200" />
+<? if ( $slide->active() ){ ?>
+					<img src="<?=$slide->image_url()?>.thumb.jpg" alt="" />
+<? } else { ?> 
+					<img style="background:url('<?=$slide->image_url()?>.thumb.jpg');" src="/css/disabled.png" alt="" />
+<? } ?>
 				</a><br/>
 				<div class="menu">
 					[<a href="/index.php/slides/delete?id=<?=$slide->id()?>">Delete</a>]

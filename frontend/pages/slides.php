@@ -57,6 +57,8 @@ class Slides extends Module {
 				$fullpath = $settings->image_path() . "/$filename.png";
 
 				$this->_create_image($title, $content, $align, $fullpath);
+				$this->_convert($fullpath, $fullpath . '.thumb.jpg', "200x200");
+
 				q("INSERT INTO files (fullpath) VALUES ('$fullpath')");
 				$this->send_signal("Reload");
 
@@ -97,14 +99,8 @@ class Slides extends Module {
 
 	move_uploaded_file($uploaded, $fullpath);
 
-	$cmd = "$convert ".escapeshellarg($fullpath)." -resize $resolution -background black -gravity center -extent $resolution ".escapeshellarg($fullpath)." 2>&1 ";
-
-	$rc = 0;
-	passthru($cmd, $rc);
-
-	if ( $rc != 0 ){
-	  die("\n<br/>$cmd\n");
-	}
+	$this->_convert($fullpath, $fullpath, $resolution);
+	$this->_convert($fullpath, $fullpath . '.thumb.jpg', "200x200");
 
 	q("INSERT INTO files (fullpath) VALUES ('$fullpath')");
 	$this->send_signal("Reload");
@@ -184,6 +180,21 @@ class Slides extends Module {
 
 	imagepng($im, $filename);
   }
+
+	function _convert($src, $dst, $resolution){
+		global $settings;
+
+		$convert = $settings->convert_binary();
+
+		$cmd = "$convert ".escapeshellarg($src)." -resize $resolution -background black -gravity center -extent $resolution ".escapeshellarg($dst)." 2>&1 ";
+
+		$rc = 0;
+		passthru($cmd, $rc);
+
+		if ( $rc != 0 ){
+			die("\n<br/>$cmd\n");
+		}
+	}
 
   function _render_string_aligned($im, $alignment, $y, $size, $font, $color, $string){
 	global $settings;
