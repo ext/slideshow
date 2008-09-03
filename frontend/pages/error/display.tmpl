@@ -23,8 +23,14 @@
 <? if ( $code == UPLOAD_ERROR ){ ?>
 		<h1>Upload error</h1>
 		<p><?=$message?></p>
-<? } else { ?>
+<? } else if ( $code == EXECUTABLE_ERROR ){ ?>
+		<h1>Daemon error</h1>
+		<p><?=$message?></p>
+<? } else if ( $code == FILE_NOT_FOUND ){ ?>
 		<h1>File not found</h1><br/>
+<? } else { ?>
+		<h1>Unknown error</h1>
+		<p><?=$message?></p>
 <? } ?>
   		
 	</div>

@@ -22,6 +22,12 @@
 require_once('../core/module.inc.php');
 require_once ("../dbus/dbus_session.php");
 
+class ExecutableException extends PageException {
+	public function __construct($message){
+		parent::__construct($message, EXECUTABLE_ERROR);
+	}
+}
+
 class Maintenance extends Module {
 	function __construct(){
 		connect();
@@ -77,13 +83,13 @@ class Maintenance extends Module {
 		global $settings;
 
 		if ( $this->_get_daemon_status() != 0 ){
-			throw new exception("Deamon is not stopped, cannot start.");
+			throw new ExecutableException("Deamon is not stopped, cannot start.");
 		}
 
 		$binary = $settings->binary();
 
 		if ( !(file_exists($binary) && is_executable($binary)) ){
-			throw new exception("Could not find binary `$binary' or did not have permission to execute it");
+			throw new ExecutableException("Could not find binary `$binary' or did not have permission to execute it");
 		}
 
 		$resolution = $settings->resolution_as_string();
@@ -108,12 +114,12 @@ class Maintenance extends Module {
 		if ( $ret != 0 ){
 			switch ( $ret ) {
 			case 1:
-				throw new exception( "A connection to the X server could not be made, check permissions." );
+				throw new ExecutableException( "A connection to the X server could not be made, check permissions." );
 				break;
 
 			default:
 				$lines = implode('\n', $stdout);
-				throw new exception( $lines );
+				throw new ExecutableException( $lines );
 			}
 		}
 
