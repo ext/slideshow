@@ -47,7 +47,7 @@ img {
 	border: 1px solid black;
 }
 
-#menu :hover, #menu :active {
+#menu li :hover, #menu li :active {
 	color: #00f;
 }
 
@@ -80,6 +80,16 @@ img {
 
 #menu h2 {
 	display: none;
+}
+
+.daemonstatus {
+	font: normal 10px verdana,'Bitstream Vera Sans',helvetica,arial,sans-serif;
+	float: right;
+	padding: .20em 20px .10em 20px;
+	margin: 0;
+	white-space: nowrap;
+	background: white;
+	border: 1px solid black;
 }
 
 #content {
