@@ -21,6 +21,7 @@
 
 require_once('../core/module.inc.php');
 require_once ("../dbus/dbus_session.php");
+require_once ("../daemonlib/daemonlib.php");
 
 class ExecutableException extends PageException {
 	public function __construct($message){
@@ -29,8 +30,13 @@ class ExecutableException extends PageException {
 }
 
 class Maintenance extends Module {
+	private $deamon;
+
 	function __construct(){
+		global $settings;
+
 		connect();
+		$this->daemon = new SlideshowInst( $settings->pid_file() );
 	}
 
 	function __descturuct(){
@@ -45,7 +51,7 @@ class Maintenance extends Module {
 		$ret =  array(
 			'log' => array(),
 			'activity' => array(),
-			'status' => $this->_get_daemon_status(),
+			'status' => $this->daemon->get_status(),
 			'show_debug' => $show_debug
 		);
 
@@ -82,7 +88,7 @@ class Maintenance extends Module {
 	function start(){
 		global $settings;
 
-		if ( $this->_get_daemon_status() != 0 ){
+		if ( $this->daemon->get_status() != SlideshowInst::StatusStopped ){
 			throw new ExecutableException("Deamon is not stopped, cannot start.");
 		}
 
@@ -129,7 +135,7 @@ class Maintenance extends Module {
 	}
 
   function stop(){
-	if ( $this->_get_daemon_status() != 1 ){
+	if ( $this->daemon->get_status() != SlideshowInst::StatusRunning ){
 	  throw new exception("Deamon is not started, cannot stop.");
 	}
 
@@ -137,31 +143,6 @@ class Maintenance extends Module {
 	usleep(1000*400);
 
 	Module::redirect('/index.php/maintenance', array("show_debug"));
-  }
-
-  // Returns:
-  //   0: Daemon stopped
-  //   1: Daemon started
-  //   2: Daemon crashed
-  function _get_daemon_status(){
-	global $settings;
-
-	$pid = $settings->pid();
-
-	// If $pid is zero the process isn't available.
-	if ( $pid == 0 ){
-	  return 0;
-	}
-
-	// Check if the process accepts signals
-	///@todo Not portable
-	if ( posix_kill($pid, 0) ){
-	  return 1;
-	}
-
-	// The process does not exist or is in a unresponsive state,
-	// either way, it is malfunctioning.
-	return 2;
   }
 
   function coredump(){
