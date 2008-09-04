@@ -19,15 +19,27 @@
 ?>
 <?
 
+require_once ('daemonargs.php');
+require_once ('../dbus/dbus_session.php');
+
 class SlideshowInst {
 	private $pid;
+	private $pidfile;
+	private $binary;
 
 	const StatusStopped = 0;
 	const StatusRunning = 1;
 	const StatusCrashed = 2;
 
-	public function __construct($pidfile){
+	public function __construct($binaryfile, $pidfile){
 		$this->pid = 0;
+		$this->pidfile = $pidfile;
+		$this->binary = $binaryfile;
+
+		// This is required if we are going to start the executable.
+		if ( !(file_exists($binaryfile) && is_executable($binaryfile)) ){
+			throw new ExecutableException("Could not find binary `$binaryfile' or did not have permission to execute it");
+		}
 
 		if ( file_exists($pidfile) ){
 			///@todo Not portable
@@ -35,7 +47,7 @@ class SlideshowInst {
 		}
 	}
 
-	function get_status(){
+	public function get_status(){
 		// If $pid is zero the process isn't available.
 		if ( $this->pid == 0 ){
 			return SlideshowInst::StatusStopped;
@@ -50,5 +62,73 @@ class SlideshowInst {
 		// The process does not exist or is in a unresponsive state,
 		// either way, it is malfunctioning.
 		return SlideshowInst::StatusCrashed;
+	}
+
+	function start($arguments, $force = false){
+		if ( !($arguments instanceof DaemonArguments) ){
+			die("Argument 1 is not an instance of DaemonArguments");
+		}
+
+		if ( !$force && $this->get_status() == SlideshowInst::StatusRunning ){
+			throw new ExecutableException("Deamon is not stopped, cannot start.");
+		}
+
+		if ( $force && $this->pid > 0 ){
+			posix_kill($this->pid, 9);
+			unlink($this->pidfile);
+		}
+
+		$cmd = 	"ulimit -c unlimited; echo '{$arguments->password()}' | DISPLAY=\":0\" $this->binary {$arguments->as_string()} >> {$arguments->logfile()} 2>&1";
+
+		$old_wd = getcwd();
+		chdir( $arguments->basepath() );
+
+		$stdout = array();
+		$ret = 0;
+		exec($cmd, $stdout, $ret);
+
+		chdir( $old_wd );
+
+		if ( $ret != 0 ){
+			switch ( $ret ) {
+			case 1:
+				throw new ExecutableException( "A connection to the X server could not be made, check permissions." );
+				break;
+
+			default:
+				$lines = implode('\n', $stdout);
+				throw new ExecutableException( $lines );
+			}
+		}
+
+		usleep(1000*200);
+	}
+
+	function stop(){
+		if ( $this->get_status() != SlideshowInst::StatusRunning ){
+		  throw new exception("Deamon is not started, cannot stop.");
+		}
+
+		$this->send_signal("Quit");
+		usleep(1000*400);
+	}
+
+	public function ping(){
+		$this->send_signal("Ping");
+		usleep(1000*200);
+	}
+
+	function debug_dumpqueue(){
+		$this->send_signal("Debug_DumpQueue");
+		usleep(1000*200);
+	}
+
+	private function send_signal($name, $signature = NULL, $payload = NULL){
+		$dbus = new direct_dbus_session("unix:///var/run/dbus/system_bus_socket", "../dbus/", false);
+		$dbus->dclass_connect();
+
+		$dbus->dclass_send_signal("/com/slideshow/dbus/ping", "com.slideshow.dbus.Signal", $name, NULL, $signature, $payload);
+
+		$dbus->dclass_disconnect();
 	}
 }

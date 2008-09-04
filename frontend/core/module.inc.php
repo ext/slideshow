@@ -19,7 +19,6 @@
 ?>
 <?
 
-require_once ("../dbus/dbus_session.php");
 require_once ('file_not_found.inc.php');
 
 class Module {
@@ -119,15 +118,6 @@ class Module {
 		extract($this->_data);
 		require("../pages/$this->_template");
 	}
-
-  function send_signal($name, $signature = NULL, $payload = NULL){
-	$dbus = new direct_dbus_session("unix:///var/run/dbus/system_bus_socket", "../dbus/", false);
-	$dbus->dclass_connect();
-
-	$dbus->dclass_send_signal("/com/slideshow/dbus/ping", "com.slideshow.dbus.Signal", $name, NULL, $signature, $payload);
-
-	$dbus->dclass_disconnect();
-  }
 };
 
 ?>

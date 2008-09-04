@@ -36,7 +36,7 @@ class Maintenance extends Module {
 		global $settings;
 
 		connect();
-		$this->daemon = new SlideshowInst( $settings->pid_file() );
+		$this->daemon = new SlideshowInst( $settings->binary(), $settings->pid_file() );
 	}
 
 	function __descturuct(){
@@ -72,118 +72,73 @@ class Maintenance extends Module {
 		return $ret;
 	}
 
-  function forcestart(){
-	global $settings;
-
-	$pid = $settings->pid();
-
-	if ( $pid > 0 ){
-		posix_kill($pid, 9);
-		unlink($settings->pid_file());
-	}
-
-	$this->start();
-  }
-
-	function start(){
+	private function _get_arguments_from_settings(){
 		global $settings;
 
-		if ( $this->daemon->get_status() != SlideshowInst::StatusStopped ){
-			throw new ExecutableException("Deamon is not stopped, cannot start.");
-		}
+		$arguments = new DaemonArguments;
 
-		$binary = $settings->binary();
+		$arguments->set_database_settings($settings->database_hostname(), $settings->database_name(), $settings->database_username(), $settings->database_password());
+		$arguments->set_resolution($settings->resolution_as_string());
+		$arguments->set_logfile($settings->log_file());
+		$arguments->set_bin_id($settings->current_bin());
+		$arguments->set_basepath($settings->base_path());
 
-		if ( !(file_exists($binary) && is_executable($binary)) ){
-			throw new ExecutableException("Could not find binary `$binary' or did not have permission to execute it");
-		}
+		return $arguments;
+	}
 
-		$resolution = $settings->resolution_as_string();
-		$db_hostname = $settings->database_hostname();
-		$db_username = $settings->database_username();
-		$db_password = $settings->database_password();
-		$db_name = $settings->database_name();
-		$logfile = $settings->log_file();
-		$bin_id = $settings->current_bin();
-
-		$cmd = "ulimit -c unlimited; echo '$db_password' | DISPLAY=\":0\" $binary --daemon --fullscreen --db_user $db_username --db_name $db_name --resolution $resolution --bin-id $bin_id >> $logfile 2>&1";
-
-		$old_wd = getcwd();
-		chdir( $settings->base_path() );
-
-		$stdout = array();
-		$ret = 0;
-		exec($cmd, $stdout, $ret);
-
-		chdir( $old_wd );
-
-		if ( $ret != 0 ){
-			switch ( $ret ) {
-			case 1:
-				throw new ExecutableException( "A connection to the X server could not be made, check permissions." );
-				break;
-
-			default:
-				$lines = implode('\n', $stdout);
-				throw new ExecutableException( $lines );
-			}
-		}
-
-		usleep(1000*200);
-
+	function forcestart(){
+  		$arguments = $this->_get_arguments_from_settings();
+		$this->daemon->start($arguments, true);
 		Module::redirect('/index.php/maintenance', array("show_debug"));
 	}
 
-  function stop(){
-	if ( $this->daemon->get_status() != SlideshowInst::StatusRunning ){
-	  throw new exception("Deamon is not started, cannot stop.");
+	function start(){
+		$arguments = $this->_get_arguments_from_settings();
+		$this->daemon->start($arguments);
+		Module::redirect('/index.php/maintenance', array("show_debug"));
 	}
 
-	$this->send_signal("Quit");
-	usleep(1000*400);
+	function stop(){
+		$this->daemon->stop();
+		Module::redirect('/index.php/maintenance', array("show_debug"));
+	}
 
-	Module::redirect('/index.php/maintenance', array("show_debug"));
-  }
+	function coredump(){
+		global $settings;
 
-  function coredump(){
-	global $settings;
+		$filename = $settings->base_path() . '/core';
+		$filesize = filesize($filename);
 
-	$filename = $settings->base_path() . '/core';
-	$filesize = filesize($filename);
+		header("Pragma: public");
+		header("Expires: 0");
+		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+		header("Cache-Control: private",false);
+		header("Content-Transfer-Encoding: binary");
+		header("Content-Type: application/octet-stream");
+		header("Content-Length: " . $filesize);
+		header("Content-Disposition: attachment; filename=\"core\";" );
 
-	header("Pragma: public");
-	header("Expires: 0");
-	header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-	header("Cache-Control: private",false);
-	header("Content-Transfer-Encoding: binary");
-	header("Content-Type: application/octet-stream");
-	header("Content-Length: " . $filesize);
-	header("Content-Disposition: attachment; filename=\"core\";" );
+		$file = fopen($filename, "rb");
 
-	$file = fopen($filename, "rb");
+		echo fread($file, $filesize);
 
-	echo fread($file, $filesize);
+		fclose($file);
+	}
 
-	fclose($file);
-  }
+	function kill_mplayer(){
+		`killall mplayer`;
+		Module::redirect("index.php/maintenance");
+	}
 
-  function kill_mplayer(){
-	`killall mplayer`;
-	Module::redirect("index.php/maintenance");
-  }
+	function ping(){
+		$this->daemon->ping();
+		Module::redirect('/index.php/maintenance', array("show_debug"));
+	}
 
-  function ping(){
-	$this->send_signal("Ping");
-	usleep(1000*200);
-	Module::redirect('/index.php/maintenance', array("show_debug"));
-  }
-
-  function debug_dumpqueue(){
-	$this->send_signal("Debug_DumpQueue");
-	usleep(1000*200);
-	Module::redirect('/index.php/maintenance', array("show_debug"));
-  }
-
+	function debug_dumpqueue(){
+		$this->daemon->ping();
+		Module::redirect('/index.php/maintenance', array("show_debug"));
+	}
 };
 
 ?>
