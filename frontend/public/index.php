@@ -26,9 +26,11 @@ require_once('../thumb_functions.inc.php');
 require_once('../core/module.inc.php');
 require_once('../core/page_exception.php');
 require_once('../models/settings.php');
+require_once('../daemonlib/daemonlib.php');
 
 $path = new Path();
 $settings = NULL;
+$daemon = NULL;
 
 try {
 	$settings = new Settings();
@@ -43,6 +45,8 @@ try {
 } catch ( Exception $e ){
 	die($e->message());
 }
+
+$daemon = new SlideshowInst($settings->binary(), $settings->pid_file());
 
 try {
 	$page = Module::factory( $path->module() );
@@ -80,7 +84,7 @@ if ( $page->has_custom_view() ){
 	</div>
 
 	<div id="bar">
-		<span class="daemonstatus">Status: Foo</span>
+		<span class="daemonstatus">Status: <?=$daemon->get_status_string()?></span>
 
 		<div id="menu">
 			<h2>Menu</h2>

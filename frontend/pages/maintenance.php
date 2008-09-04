@@ -20,8 +20,6 @@
 <?
 
 require_once('../core/module.inc.php');
-require_once ("../dbus/dbus_session.php");
-require_once ("../daemonlib/daemonlib.php");
 
 class ExecutableException extends PageException {
 	public function __construct($message){
@@ -30,13 +28,8 @@ class ExecutableException extends PageException {
 }
 
 class Maintenance extends Module {
-	private $deamon;
-
 	function __construct(){
-		global $settings;
-
 		connect();
-		$this->daemon = new SlideshowInst( $settings->binary(), $settings->pid_file() );
 	}
 
 	function __descturuct(){
@@ -44,14 +37,14 @@ class Maintenance extends Module {
 	}
 
 	function index(){
-		global $settings;
+		global $settings, $daemon;
 
 		$show_debug = isset($_GET['show_debug']);
 
 		$ret =  array(
 			'log' => array(),
 			'activity' => array(),
-			'status' => $this->daemon->get_status(),
+			'status' => $daemon->get_status(),
 			'show_debug' => $show_debug
 		);
 
@@ -87,19 +80,22 @@ class Maintenance extends Module {
 	}
 
 	function forcestart(){
+		global $daemon;
   		$arguments = $this->_get_arguments_from_settings();
-		$this->daemon->start($arguments, true);
+		$daemon->start($arguments, true);
 		Module::redirect('/index.php/maintenance', array("show_debug"));
 	}
 
 	function start(){
+		global $daemon;
 		$arguments = $this->_get_arguments_from_settings();
-		$this->daemon->start($arguments);
+		$daemon->start($arguments);
 		Module::redirect('/index.php/maintenance', array("show_debug"));
 	}
 
 	function stop(){
-		$this->daemon->stop();
+		global $daemon;
+		$daemon->stop();
 		Module::redirect('/index.php/maintenance', array("show_debug"));
 	}
 
@@ -131,12 +127,14 @@ class Maintenance extends Module {
 	}
 
 	function ping(){
-		$this->daemon->ping();
+		global $daemon;
+		$daemon->ping();
 		Module::redirect('/index.php/maintenance', array("show_debug"));
 	}
 
 	function debug_dumpqueue(){
-		$this->daemon->ping();
+		global $daemon;
+		$daemon->ping();
 		Module::redirect('/index.php/maintenance', array("show_debug"));
 	}
 };

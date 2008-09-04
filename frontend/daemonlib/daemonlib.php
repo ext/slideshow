@@ -64,6 +64,16 @@ class SlideshowInst {
 		return SlideshowInst::StatusCrashed;
 	}
 
+	public function get_status_string(){
+		$names = array(
+			'Stopped',
+			'Running',
+			'Crashed'
+		);
+
+		return $names[$this->get_status()];
+	}
+
 	function start($arguments, $force = false){
 		if ( !($arguments instanceof DaemonArguments) ){
 			die("Argument 1 is not an instance of DaemonArguments");

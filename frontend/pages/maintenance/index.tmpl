@@ -22,12 +22,6 @@
 		<div id="breadcrumb">
 			<h2><a href="/index.php/">Slideshow</a> &gt; Maintenance</h2>
 		</div>
-		
-  		Status: <? switch ( $status ){
-			case 0: echo 'Stopped'; break;
-			case 1: echo 'Running'; break;
-			case 2: echo 'Crashed'; break;
-		} ?><br/>
 
 <? if ( $status == 2 ){ ?>
 		<p>The slideshow daemon crashed. Please follow these steps: </p>
