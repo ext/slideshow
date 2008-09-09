@@ -30,12 +30,13 @@ static char extract_short_option(const char* arg){
 static void display_help(const char* const argv[], const struct option* longopts){
 	const struct option* optp = longopts;
 
-	printf("Usage: %s\n", argv[0]);
+	printf("Usage: %s [options]\n", argv[0]);
+	printf("Options:\n");
 
 	while ( optp->name ){
 		int n = 0;
 		if ( optp->symbol != 0 ){
-			n = printf("  --%s, -%c", optp->name, optp->symbol);
+			n = printf("  -%c, --%s", optp->symbol, optp->name);
 		} else {
 			n = printf("  --%s", optp->name);
 		}
