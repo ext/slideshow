@@ -65,7 +65,7 @@ int getopt_long(int argc, const char* const argv[], const struct option* longopt
 		}
 
 		if ( is_help_option(arg) ){
-			display_help(longopts);
+			display_help(argv, longopts);
 			return -2;
 		}
 
