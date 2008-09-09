@@ -58,6 +58,7 @@ class Kernel {
 		unsigned int _bin_id;
 		bool _fullscreen;
 		bool _daemon;
+		bool _verbose;
 		double _transition_time;
 		double _switch_time;
 		double _last_switch;

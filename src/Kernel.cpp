@@ -26,6 +26,7 @@
 #include "transitions/fade.h"
 #include "browsers/mysqlbrowser.h"
 #include "IPC/dbus.h"
+#include "argument_parser.h"
 #include <portable/Time.h>
 #include <portable/Process.h>
 
@@ -69,6 +70,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 	_bin_id(1),
 	_fullscreen(false),
 	_daemon(false),
+	_verbose(false),
 	_transition_time(3.0f),
 	_switch_time(5.0f),
 	_graphics(NULL),
@@ -177,66 +179,39 @@ void Kernel::run(){
 }
 
 void Kernel::parse_argv(int argc, const char* argv[]){
-	for ( int i = 1; i < argc; i++ ){
-		if ( strcmp(argv[i], "--fullscreen") == 0 ){
-			_fullscreen = true;
-			continue;
-		}
-		if ( strcmp(argv[i], "--daemon") == 0 ){
-			_daemon = true;
-			continue;
-		}
-		if ( strcmp(argv[i], "--db_user") == 0 ){
-			i++;
+	int c;
+	int index = 1;
 
-			const char* user = argv[i];
-			_db_username = (char*)malloc(strlen(user)+1);
-			strcpy(_db_username, user);
+	while (1) {
+		static struct option long_options[] ={
+			{"verbose", 'v', "Spam spam",
+					no_argument, &_verbose, 1},
+			{"fullscreen", 'f',	"Start in fullscreen mode",
+					no_argument, &_fullscreen, 1},
+			{"extra-super-duper-long-argument", 'e', "This grants the invoker the mega super-über-duper-ultra-power-mode!",
+					no_argument, 0, 0},
+			{"daemon", 'd', "Run in background",
+					no_argument, &_daemon, 1},
 
-			continue;
-		}
-		if ( strcmp(argv[i], "--db_pass") == 0 ){
-			i++;
+			{"db_user", 0, "",
+					"%s", _db_username, 0},
+			{"db_pass", 0, "",
+					"%s", _db_password, 0},
+			{"db_name", 0, "",
+					"%s", _db_name, 0},
+			{"resolution", 0, "",
+					"%dx%d", 0, 'r'},
+			{"bin-id",  0, "", "%s", 0, 0},
+			{0, 0, 0, 0, 0, 0}
+		};
 
-			const char* pass = argv[i];
-			_db_password = (char*)malloc(strlen(pass)+1);
-			strcpy(_db_password, pass);
+		c = getopt_long (argc, argv, long_options, &index);
 
-			continue;
-		}
-		if ( strcmp(argv[i], "--db_name") == 0 ){
-			i++;
-
-			const char* name = argv[i];
-			_db_name = (char*)malloc(strlen(name)+1);
-			strcpy(_db_name, name);
-
-			continue;
-		}
-		if ( strcmp(argv[i], "--resolution") == 0 ){
-			i++;
-
-			sscanf(argv[i], "%dx%d", &_width, &_height);
-			continue;
-		}
-
-		if ( strcmp(argv[i], "--bin-id") == 0 ){
-			i++;
-
-			sscanf(argv[i], "%d", &_bin_id);
-			continue;
-		}
-
-		if ( strcmp(argv[i], "--help") == 0 ){
-		  i++;
-		  
-		  printf("\nUsage: slideshow --db_name name --db_user user --db_pass password [--resolution] [--bin-id]\n");
-		  Kernel::quit();
-		  break;
-
-		}
-		Log::message(Log::Warning, "Unknown argument: %s\n", argv[i]);
+		if ( c < 0 )
+			break;
 	}
+
+	exit(0);
 }
 
 void Kernel::view_state(double t){
