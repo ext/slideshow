@@ -1,4 +1,5 @@
 
+
 /**
  * This file is part of Slideshow.
  * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
@@ -81,8 +82,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 	initTime();
 	Log::initialize(_logfile, "slideshow.debug.log");
 
-	// What about only parsing CLI args when not runnig as a daemon?
-	// parse_argv(argc, argv);
+	parse_argv(argc, argv);
 
 	///@todo HACK! Attempt to connect to an xserver.
 	Display* dpy = XOpenDisplay(NULL);
@@ -106,8 +106,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 	} else {
 		Log::message(Log::Verbose, "Kernel: Starting slideshow\n");
 		print_licence_statement();
-		parse_argv(argc, argv);
-	}
+       	}
 
 	_graphics = new Graphics(_width, _height, _fullscreen);
 	_graphics->set_transition(new FadeTransition);
