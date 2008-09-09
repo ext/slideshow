@@ -1,3 +1,4 @@
+
 /**
  * This file is part of Slideshow.
  * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
@@ -80,7 +81,8 @@ Kernel::Kernel(int argc, const char* argv[]):
 	initTime();
 	Log::initialize(_logfile, "slideshow.debug.log");
 
-	parse_argv(argc, argv);
+	// What about only parsing CLI args when not runnig as a daemon?
+	// parse_argv(argc, argv);
 
 	///@todo HACK! Attempt to connect to an xserver.
 	Display* dpy = XOpenDisplay(NULL);
@@ -104,6 +106,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 	} else {
 		Log::message(Log::Verbose, "Kernel: Starting slideshow\n");
 		print_licence_statement();
+		parse_argv(argc, argv);
 	}
 
 	_graphics = new Graphics(_width, _height, _fullscreen);
@@ -225,6 +228,14 @@ void Kernel::parse_argv(int argc, const char* argv[]){
 			continue;
 		}
 
+		if ( strcmp(argv[i], "--help") == 0 ){
+		  i++;
+		  
+		  printf("\nUsage: slideshow --db_name name --db_user user --db_pass password [--resolution] [--bin-id]\n");
+		  Kernel::quit();
+		  break;
+
+		}
 		Log::message(Log::Warning, "Unknown argument: %s\n", argv[i]);
 	}
 }
