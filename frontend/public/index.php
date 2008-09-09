@@ -70,6 +70,8 @@ if ( $page->has_custom_view() ){
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<link rel="stylesheet" href="/css/common.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="/css/main.css" type="text/css" media="screen" />
+	<script src="/js/prototype.js" type="text/javascript"></script>
+	<script src="/js/scriptaculous.js" type="text/javascript"></script>
 	<title>Slideshow</title>
 <?
   //@note hack to get the maintenance page refresh

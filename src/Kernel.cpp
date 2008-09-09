@@ -32,7 +32,7 @@
 #include <cstring>
 #include <ctype.h>
 
-#include <syscall.h>
+//#include <syscall.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>

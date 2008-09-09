@@ -3,8 +3,10 @@ img {
 }
 
 .slide {
-	float:		left;
-	width:		210px;
+	float: left;
+	width:		200px;
+	margin-right: 10px;
+	cursor:		move;
 }
 
 #log {
@@ -20,6 +22,7 @@ img {
 }
 
 .slide .menu {
+	display: inline;
 	font-size:	0.8em;
 }
 
@@ -115,6 +118,10 @@ img {
 	background: white;
 	position: relative; top: -10px;
 	display: inline;
+}
+
+.bin.hover {
+	background: #ccc;
 }
 
 h1 {

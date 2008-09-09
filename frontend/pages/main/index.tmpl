@@ -17,7 +17,7 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 ?>
-
+	
 <? if ( isset($motd) ){ ?>
 	<h2>MOTD</h2>
 	<div id="motd">
@@ -34,18 +34,18 @@
 		<h2>Current slides</h2>
 	
 <? foreach ( $collection as $bin ){ ?>
-		<div class="bin">
+		<div class="bin" id="bin_<?=$bin->id()?>">
 			<span class="title"><?=$bin->name()?><? if ( $bin->id() != 0 ){ if ( $bin->id() == $active_bin){ ?> (active)<? } else { ?> (<a href="/index.php/slides/activate_bin/<?=$bin->id()?>">set as active</a>)<? }} ?></span><br/>
 <?	foreach ( $bin as $slide ){ ?>
-			<div class="slide">
-				<a href="<?=$slide->image_url()?>">
+			<!--<span class="slide" id="slide_<?=$slide->id()?>">-->
+				<!-- <a href="<?=$slide->image_url()?>"> -->
 <? if ( $slide->active() ){ ?>
-					<img src="<?=$slide->image_url()?>.thumb.jpg" alt="" />
+					<img class="slide" src="<?=$slide->image_url()?>.thumb.jpg" alt="" />
 <? } else { ?> 
 					<img style="background:url('<?=$slide->image_url()?>.thumb.jpg');" src="/css/disabled.png" alt="" />
 <? } ?>
-				</a><br/>
-				<div class="menu">
+				<!-- </a> -->
+				<!--<div class="menu">
 					[<a href="/index.php/slides/delete?id=<?=$slide->id()?>">Delete</a>]
 					<? if ( $slide->active() ){ ?>[<a href="/index.php/slides/deactivate/<?=$slide->id()?>">Deactive</a>]<? } else { ?>[<a href="/index.php/slides/activate/<?=$slide->id()?>">Active</a>]<? } ?>
 		
@@ -57,11 +57,27 @@
 						</select>
 						<input type="submit" value="Move" />
 					</form>
-				</div>
-			</div>
+				</div> -->
+			<!--</span>-->
 <? } ?>
 			<br style="clear: both;" />
 		</div>
 
 <? } ?>
 	</div>
+
+	<script type="text/javascript">
+		bins = [<? foreach ( $collection as $bin ){ echo "'bin_{$bin->id()}', "; } ?> null];
+	
+<? foreach ( $collection as $bin ){ ?>
+		Sortable.create("bin_<?=$bin->id()?>", {
+			tag: 'img',
+			overlap: 'horizontal',
+			constraint: false,
+			dropOnEmpty: true,
+			containment: bins, 
+			hoverclass: 'hover'
+		});
+<? } ?>
+
+	</script>
