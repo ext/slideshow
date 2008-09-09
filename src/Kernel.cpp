@@ -182,34 +182,36 @@ void Kernel::parse_argv(int argc, const char* argv[]){
 	int c;
 	int index = 1;
 
+	options_set_description("Slideshow is an application for showing text and images in a loop on monitors and projectors.");
+
 	while (1) {
 		static struct option long_options[] ={
-			{"verbose", 'v', "Spam spam",
+			{"verbose", 'v', "Explain what is being done",
 					no_argument, &_verbose, 1},
 			{"fullscreen", 'f',	"Start in fullscreen mode",
 					no_argument, &_fullscreen, 1},
-			{"extra-super-duper-long-argument", 'e', "This grants the invoker the mega super-über-duper-ultra-power-mode!",
-					no_argument, 0, 0},
 			{"daemon", 'd', "Run in background",
 					no_argument, &_daemon, 1},
 
-			{"db_user", 0, "",
+			{"db_user", 0, "Database username",
 					"%s", _db_username, 0},
-			{"db_pass", 0, "",
+			{"db_pass", 0, "Database password",
 					"%s", _db_password, 0},
-			{"db_name", 0, "",
+			{"db_name", 0, "Database name",
 					"%s", _db_name, 0},
-			{"resolution", 0, "",
+			{"resolution", 'r', "Resolution",
 					"%dx%d", 0, 'r'},
-			{"bin-id",  0, "", "%s", 0, 0},
+			{"container-id", 'c', "ID of the container to display", "%d", 0, 0},
 			{0, 0, 0, 0, 0, 0}
 		};
 
-		c = getopt_long (argc, argv, long_options, &index);
+		c = options_parse (argc, argv, long_options, &index);
 
 		if ( c < 0 )
 			break;
 	}
+
+	options_terminate();
 
 	exit(0);
 }
