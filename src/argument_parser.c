@@ -27,8 +27,11 @@ static char extract_short_option(const char* arg){
 	return arg[1];
 }
 
-static void display_help(const struct option* longopts){
+static void display_help(const char* const argv[], const struct option* longopts){
 	const struct option* optp = longopts;
+
+	printf("Usage: %s\n", argv[0]);
+
 	while ( optp->name ){
 		int n = 0;
 		if ( optp->symbol != 0 ){
