@@ -84,7 +84,9 @@ Kernel::Kernel(int argc, const char* argv[]):
 	initTime();
 	Log::initialize(_logfile, "slideshow.debug.log");
 
-	parse_argv(argc, argv);
+	if ( !parse_argv(argc, argv) ){
+		exit(4);
+	}
 
 	///@todo HACK! Attempt to connect to an xserver.
 	Display* dpy = XOpenDisplay(NULL);
@@ -178,9 +180,9 @@ void Kernel::run(){
 	}
 }
 
-void Kernel::parse_argv(int argc, const char* argv[]){
+bool Kernel::parse_argv(int argc, const char* argv[]){
 	int c;
-	int index = 1;
+	int index = 0;
 
 	options_set_description("Slideshow is an application for showing text and images in a loop on monitors and projectors.");
 
@@ -194,11 +196,11 @@ void Kernel::parse_argv(int argc, const char* argv[]){
 					no_argument, &_daemon, 1},
 
 			{"db_user", 0, "Database username",
-					"%s", _db_username, 0},
+					"%s", _db_username, 1},
 			{"db_pass", 0, "Database password",
-					"%s", _db_password, 0},
+					"%s", _db_password, 2},
 			{"db_name", 0, "Database name",
-					"%s", _db_name, 0},
+					"%s", _db_name, 3},
 			{"resolution", 'r', "Resolution",
 					"%dx%d", 0, 'r'},
 			{"container-id", 'c', "ID of the container to display", "%d", 0, 0},
@@ -207,13 +209,40 @@ void Kernel::parse_argv(int argc, const char* argv[]){
 
 		c = options_parse (argc, argv, long_options, &index);
 
-		if ( c < 0 )
+		if ( c == -1 )
 			break;
+
+		if ( c == -2 ){
+			return false;
+		}
+
+		switch ( c ){
+			case 'r':
+				sscanf(argv[index], "%dx%d", &_width, &_height);
+				break;
+
+			case 1:
+				_db_username = (char*)malloc(strlen(argv[index])+1);
+				strcpy(_db_username, argv[index]);
+				break;
+
+			case 2:
+				_db_password = (char*)malloc(strlen(argv[index])+1);
+				strcpy(_db_password, argv[index]);
+				break;
+
+			case 3:
+				_db_name = (char*)malloc(strlen(argv[index])+1);
+				strcpy(_db_name, argv[index]);
+				break;
+
+			default:
+				printf("Unhandled option '%c' (%d)\n", c, c);
+		}
 	}
 
 	options_terminate();
-
-	exit(0);
+	return true;
 }
 
 void Kernel::view_state(double t){

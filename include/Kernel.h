@@ -29,7 +29,6 @@ class Kernel {
 		~Kernel();
 
 		void run();
-		void parse_argv(int argc, const char* argv[]);
 
 		void quit();
 		void reload_browser();
@@ -51,6 +50,7 @@ class Kernel {
 		void switch_state(double t);
 
 		void print_licence_statement();
+		bool parse_argv(int argc, const char* argv[]);
 
 		int _width;
 		int _height;
