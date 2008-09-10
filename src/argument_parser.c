@@ -79,9 +79,152 @@ void option_finalize(option_set_t* option){
 	}
 }
 
+static int is_argument(const char* arg){
+	return arg[0] == '-';
+}
+
+static int is_terminator(const char* arg){
+	return arg[1] == '-' && arg[2] == '\0';
+}
+
+static int is_long_option(const char* arg){
+	return arg[1] == '-';
+}
+
+static int is_help_option(const char* arg){
+	return ( arg[1] == 'h' && arg[2] == '\0' ) || ( strcmp(arg, "--help") == 0 );
+}
+
+static const char* extract_long_option(const char* arg){
+	return &arg[2];
+}
+
+static char extract_short_option(const char* arg){
+	return arg[1];
+}
+
+static int format_argument_count(const char* fmt){
+	int n = 0;
+	const char* ch = fmt;
+
+	while ( *ch ){
+		if ( ch[0] == '%' && ch[1] != '%' ){
+			n++;
+		}
+		ch++;
+	}
+
+	return n;
+}
+
 int option_parse(option_set_t* option){
-	option_display_help(option);
-	return 0;
+	int argc = option->argc;
+	const char* const* argv = option->argv;
+
+	int i = 1;
+
+	while ( i < argc ){
+		const char* arg = argv[i];
+
+		// Something was not an argument, either the commandline is malformed
+		// or something that was not meant to be parsed was passed, a filename
+		// for instance.
+		if ( !is_argument(arg) ){
+			return i - 1; // Do not count as successful parse.
+		}
+
+		// The -- characters will terminate the parsing but will count as a
+		// successful parse.
+		if ( is_terminator(arg) ){
+			return i;
+		}
+
+		// The --help option was passed, display help (and exit).
+		if ( is_help_option(arg) ){
+			option_display_help(option);
+		}
+
+		const argument_node_t* node = option->argument;
+		const argument_t* option = 0;
+		if ( is_long_option(arg) ){
+			const char* name = extract_long_option(arg);
+
+			for ( ; node; node = node->next ){
+				if ( strcmp(name, node->argument->name) == 0 ){
+					option = node->argument;
+					break;
+				}
+			}
+		} else {
+			const char flag = extract_short_option(arg);
+
+			for ( ; node; node = node->next ){
+				if ( flag == node->argument->flag ){
+					option = node->argument;
+					break;
+				}
+			}
+		}
+
+		if ( !option ){
+			printf("%s: unrecognized option '%s'\n", argv[0], arg);
+			printf("Try `%s --help' for more information.\n", argv[0]);
+			return -2;
+		}
+
+		if ( option->type != arg_flag ){
+			i++;
+			if ( i == argc ){
+				printf("%s: missing argument to option '%s'\n", argv[0], arg);
+				printf("Try `%s --help' for more information.\n", argv[0]);
+				return -2;
+			}
+		}
+
+		switch ( option->type ){
+			case arg_flag:
+			{
+				argument_flag_t* real_option = (argument_flag_t*)option;
+				*(real_option->dst) = real_option->value;
+				break;
+			}
+
+			case arg_string:
+			{
+				argument_string_t* real_option = (argument_string_t*)option;
+				free(*(real_option->dst));
+				*(real_option->dst) = (char*)malloc(strlen(argv[i]) );
+				strcpy(*(real_option->dst), argv[i]);
+				break;
+			}
+
+			case arg_int:
+			{
+				argument_int_t* real_option = (argument_int_t*)option;
+				sscanf(argv[i], "%d", real_option->dst);
+				break;
+			}
+
+			case arg_fmt:
+			{
+				argument_format_t* real_option = (argument_format_t*)option;
+				int n = format_argument_count(real_option->fmt);
+				int r = vsscanf(argv[i], real_option->fmt, real_option->dst);
+
+				if ( n != r ){
+					printf("%s: invalid argument to option '%s'\n", argv[0], arg);
+					printf("Try `%s --help' for more information.\n", argv[0]);
+					return -2;
+				}
+
+				break;
+			}
+		}
+
+		i++;
+	}
+
+	return i;
 }
 
 void option_set_description(option_set_t* option, const char* description){
@@ -175,134 +318,6 @@ void option_add_format(option_set_t* option, const char* name, char flag, const 
 }
 
 /*
-static char* description = 0;
-
-static int is_argument(const char* arg){
-	return arg[0] == '-';
-}
-
-static int is_terminator(const char* arg){
-	return arg[1] == '-' && arg[2] == '\0';
-}
-
-static int is_long_option(const char* arg){
-	return arg[1] == '-';
-}
-
-static int is_help_option(const char* arg){
-	return ( arg[1] == 'h' && arg[2] == '\0' ) || ( strcmp(arg, "--help") == 0 );
-}
-
-static const char* extract_long_option(const char* arg){
-	return &arg[2];
-}
-
-static char extract_short_option(const char* arg){
-	return arg[1];
-}
-
-static int format_argument_count(const char* fmt){
-	int n = 0;
-	const char* ch = fmt;
-
-	while ( *ch ){
-		if ( ch[0] == '%' && ch[1] != '%' ){
-			n++;
-		}
-		ch++;
-	}
-
-	return n;
-}
-
-static char* format_argument_modify(const char* fmt){
-	// Size of format string + number of asterisks to insert + %n and null terminator
-	char* buf = (char*)malloc(strlen(fmt) + format_argument_count(fmt) + 3);
-
-	const char* ch = fmt;
-	int i = 0;
-	while ( *ch ){
-		if ( ch[0] == '%' ){
-			buf[i++] = '%';
-
-			if ( ch[1] == '%' ){
-				buf[i++] = '%';
-				ch++;
-			} else {
-				buf[i++] = '*';
-			}
-		} else {
-			buf[i++] = *ch;
-		}
-
-		ch++;
-	}
-
-	buf[i++] = '%';
-	buf[i++] = 'n';
-	buf[i++] = '\0';
-
-	return buf;
-}
-
-static int validate_data_format(const char* data, const char* fmt){
-	char* new_format = format_argument_modify(fmt);
-	int b = 0;
-	sscanf(data, new_format, &b);
-	free(new_format);
-
-	return b == strlen(data);
-}
-
-static void display_help(const char* const argv[], const struct option* longopts){
-	const struct option* optp = longopts;
-
-	printf("Usage: %s [options]\n", argv[0]);
-
-	if ( description ){
-		printf("%s\n\n", description);
-	}
-
-	printf("Options:\n");
-
-	while ( optp->name ){
-		int n = 0;
-		if ( optp->symbol != 0 ){
-			n = printf("  -%c, --%s", optp->symbol, optp->name);
-		} else {
-			n = printf("      --%s", optp->name);
-		}
-
-		if ( optp->format ){
-			n += printf(" %s", optp->format);
-		}
-
-		if ( n > 31 ){
-			putchar('\n');
-			n = 0;
-		}
-
-		while ( n++ < 32 ){
-			putchar(' ');
-		}
-
-		printf("%s\n", optp->description);
-
-		optp++;
-	}
-
-	exit(0);
-}
-
-void options_set_description(const char* str){
-	description = (char*)malloc(strlen(str)+1);
-	strcpy(description, str);
-}
-
-void options_terminate(){
-	free(description);
-}
-
 int options_parse(int argc, const char* const argv[], const struct option* longopts, int* longindex){
 	(*longindex)++;
 
