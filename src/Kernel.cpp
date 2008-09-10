@@ -181,9 +181,6 @@ void Kernel::run(){
 }
 
 bool Kernel::parse_argv(int argc, const char* argv[]){
-	int c;
-	int index = 0;
-
 	option_set_t options;
 	option_initialize(&options, argc, argv);
 
@@ -198,11 +195,16 @@ bool Kernel::parse_argv(int argc, const char* argv[]){
 	option_add_int(&options, "container-id", 'c', "ID of the container to display", &_bin_id);
 	option_add_format(&options, "resolution", 'r', "Resolution", "WIDTHxHEIGHT", "%dx%d", &_width, &_height);
 
-	int rc = option_parse(&options);
-
+	int n = option_parse(&options);
 	option_finalize(&options);
 
-	return rc >= 0;
+	if ( n != argc-1 ){
+		printf("%s: unrecognized option '%s'\n", argv[0], argv[n+1]);
+		printf("Try `%s --help' for more information.\n", argv[0]);
+		return false;
+	}
+
+	return true;
 }
 
 void Kernel::view_state(double t){
