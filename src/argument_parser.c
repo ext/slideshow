@@ -3,8 +3,178 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include <assert.h>
 
+#define ARGUMENT_HEAD \
+	const char* name; \
+	char flag; \
+	const char* description; \
+	int type;
+
+#define arg_flag 1
+#define arg_string 2
+#define arg_int 3
+#define arg_fmt 4
+
+typedef struct {
+	ARGUMENT_HEAD
+} argument_t;
+
+typedef struct {
+	ARGUMENT_HEAD;
+	int* dst;
+	int value;
+} argument_flag_t;
+
+typedef struct {
+	ARGUMENT_HEAD;
+	char** dst;
+} argument_string_t;
+
+typedef struct {
+	ARGUMENT_HEAD;
+	int* dst;
+} argument_int_t;
+
+typedef struct {
+	ARGUMENT_HEAD;
+	const char* format_description;
+	const char* fmt;
+	va_list dst;
+} argument_format_t;
+
+typedef struct argument_node_t {
+	argument_t* argument;
+	struct argument_node_t* next;
+} argument_node_t;
+
+void argument_free(argument_node_t* ptr){
+	free(ptr->argument);
+}
+
+argument_t* argument_allocate(size_t size, int type, const char* name, char flag, const char* description){
+	argument_t* arg = (argument_t*)malloc(size);
+	arg->name = name;
+	arg->flag = flag;
+	arg->description = description;
+	arg->type = type;
+	return arg;
+}
+
+void option_initialize(option_set_t* option, int argc, const char* const* argv){
+	option->description = 0;
+	option->argc = argc;
+	option->argv = argv;
+	option->argument = 0;
+}
+
+void option_finalize(option_set_t* option){
+	free(option->description);
+
+	argument_node_t* ptr = option->argument;
+	while ( ptr ){
+		argument_free(ptr);
+		struct argument_node_t* next = ptr->next;
+		free(ptr);
+		ptr = next;
+	}
+}
+
+int option_parse(option_set_t* option){
+	option_display_help(option);
+	return 0;
+}
+
+void option_set_description(option_set_t* option, const char* description){
+	option->description = (char*)malloc(strlen(description) + 1);
+	strcpy(option->description, description);
+}
+
+void option_display_help(option_set_t* option){
+	printf("Usage: %s [options]\n", option->argv[0]);
+
+	if ( option->description ){
+		printf("%s\n\n", option->description);
+	}
+
+	printf("Options:\n");
+
+	argument_node_t* node = option->argument;
+	while ( node ){
+		argument_t* arg = node->argument;
+
+		int n = 0;
+		if ( arg->flag != 0 ){
+			n = printf("  -%c, --%s", arg->flag, arg->name);
+		} else {
+			n = printf("      --%s", arg->name);
+		}
+
+		switch ( arg->type ){
+			case arg_string:
+				n += printf(" STRING");
+				break;
+
+			case arg_int:
+				n += printf(" INT");
+				break;
+
+			case arg_fmt:
+				n += printf(" %s", ((argument_format_t*)arg)->format_description);
+				break;
+		}
+
+		if ( n > 31 ){
+			putchar('\n');
+			n = 0;
+		}
+
+		while ( n++ < 32 ){
+			putchar(' ');
+		}
+
+		printf("%s\n", arg->description);
+
+		node = node->next;
+	}
+
+	exit(0);
+}
+
+void option_add_argument(option_set_t* option, argument_t* arg){
+	argument_node_t* node = (argument_node_t*)malloc(sizeof(argument_node_t));
+	node->argument = arg;
+	node->next = option->argument;
+	option->argument = node;
+}
+
+void option_add_flag(option_set_t* option, const char* name, char flag, const char* description, int* dst, int value){
+	argument_flag_t* arg = (argument_flag_t*)argument_allocate(sizeof(argument_flag_t), arg_flag,name, flag, description);
+	arg->dst = dst;
+	arg->value = value;
+	option_add_argument(option, (argument_t*)arg);
+}
+
+void option_add_string(option_set_t* option, const char* name, char flag, const char* description, char** dst){
+	argument_string_t* arg = (argument_string_t*)argument_allocate(sizeof(argument_string_t), arg_string, name, flag, description);
+	arg->dst = dst;
+	option_add_argument(option, (argument_t*)arg);
+}
+
+void option_add_int(option_set_t* option, const char* name, char flag, const char* description, int* dst){
+	argument_int_t* arg = (argument_int_t*)argument_allocate(sizeof(argument_int_t), arg_int, name, flag, description);
+	arg->dst = dst;
+	option_add_argument(option, (argument_t*)arg);
+}
+
+void option_add_format(option_set_t* option, const char* name, char flag, const char* description, const char* format_description, const char* fmt, ...){
+	argument_format_t* arg = (argument_format_t*)argument_allocate(sizeof(argument_format_t), arg_fmt, name, flag, description);
+	arg->format_description = format_description;
+	arg->fmt = fmt;
+	va_start(arg->dst, fmt);
+	option_add_argument(option, (argument_t*)arg);
+}
+
+/*
 static char* description = 0;
 
 static int is_argument(const char* arg){
@@ -202,3 +372,4 @@ int options_parse(int argc, const char* const argv[], const struct option* longo
 
 	return -1;
 }
+*/

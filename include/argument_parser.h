@@ -5,20 +5,24 @@
 extern "C" {
 #endif
 
-struct option {
-	const char* name;
-	char symbol;
-	const char* description;
-	const char* format;
-	void* flag;
-	int val;
-};
+typedef struct option_set_t {
+	char* description;
+	int argc;
+	const char* const* argv;
+	struct argument_node_t* argument;
+} option_set_t;
 
-static const int no_argument = 0;
+void option_initialize(option_set_t* option, int argc, const char* const* argv);
+void option_finalize(option_set_t* option);
+int option_parse(option_set_t* option);
 
-void options_set_description(const char* str);
-void options_terminate();
-int options_parse(int argc, const char* const argv[], const struct option* longopts, int* longindex);
+void option_set_description(option_set_t* option, const char* description);
+void option_display_help(option_set_t* option);
+
+void option_add_flag(option_set_t* option, const char* name, char flag, const char* description, int* dst, int value);
+void option_add_string(option_set_t* option, const char* name, char flag, const char* description, char** dst);
+void option_add_int(option_set_t* option, const char* name, char flag, const char* description, int* dst);
+void option_add_format(option_set_t* option, const char* name, char flag, const char* description, const char* format_description, const char* fmt, ...);
 
 #ifdef __cplusplus
 }

@@ -68,9 +68,9 @@ Kernel::Kernel(int argc, const char* argv[]):
 	_height(600),
 	_frames(0),
 	_bin_id(1),
-	_fullscreen(false),
-	_daemon(false),
-	_verbose(false),
+	_fullscreen(0),
+	_daemon(0),
+	_verbose(0),
 	_transition_time(3.0f),
 	_switch_time(5.0f),
 	_graphics(NULL),
@@ -184,65 +184,25 @@ bool Kernel::parse_argv(int argc, const char* argv[]){
 	int c;
 	int index = 0;
 
-	options_set_description("Slideshow is an application for showing text and images in a loop on monitors and projectors.");
+	option_set_t options;
+	option_initialize(&options, argc, argv);
 
-	while (1) {
-		static struct option long_options[] ={
-			{"verbose", 'v', "Explain what is being done",
-					no_argument, &_verbose, 1},
-			{"fullscreen", 'f',	"Start in fullscreen mode",
-					no_argument, &_fullscreen, 1},
-			{"daemon", 'd', "Run in background",
-					no_argument, &_daemon, 1},
+	option_set_description(&options, "Slideshow is an application for showing text and images in a loop on monitors and projectors.");
 
-			{"db_user", 0, "Database username",
-					"%s", _db_username, 1},
-			{"db_pass", 0, "Database password",
-					"%s", _db_password, 2},
-			{"db_name", 0, "Database name",
-					"%s", _db_name, 3},
-			{"resolution", 'r', "Resolution",
-					"%dx%d", 0, 'r'},
-			{"container-id", 'c', "ID of the container to display", "%d", 0, 0},
-			{0, 0, 0, 0, 0, 0}
-		};
+	option_add_flag(&options, "verbose", 'v', "Explain what is being done", &_verbose, 1);
+	option_add_flag(&options, "fullscreen", 'f', "Start in fullscreen mode", &_fullscreen, 1);
+	option_add_flag(&options, "daemon", 'd', "Run in background", &_daemon, 1);
+	option_add_string(&options, "db_user", 0, "Database username", &_db_username);
+	option_add_string(&options, "db_pass", 0, "Database password", &_db_password);
+	option_add_string(&options, "db_name", 0, "Database name", &_db_name);
+	option_add_int(&options, "container-id", 'c', "ID of the container to display", &_bin_id);
+	option_add_format(&options, "resolution", 'r', "Resolution", "WIDTHxHEIGHT", "%dx%d", &_width, &_height);
 
-		c = options_parse (argc, argv, long_options, &index);
+	int rc = option_parse(&options);
 
-		if ( c == -1 )
-			break;
+	option_finalize(&options);
 
-		if ( c == -2 ){
-			return false;
-		}
-
-		switch ( c ){
-			case 'r':
-				sscanf(argv[index], "%dx%d", &_width, &_height);
-				break;
-
-			case 1:
-				_db_username = (char*)malloc(strlen(argv[index])+1);
-				strcpy(_db_username, argv[index]);
-				break;
-
-			case 2:
-				_db_password = (char*)malloc(strlen(argv[index])+1);
-				strcpy(_db_password, argv[index]);
-				break;
-
-			case 3:
-				_db_name = (char*)malloc(strlen(argv[index])+1);
-				strcpy(_db_name, argv[index]);
-				break;
-
-			default:
-				printf("Unhandled option '%c' (%d)\n", c, c);
-		}
-	}
-
-	options_terminate();
-	return true;
+	return rc >= 0;
 }
 
 void Kernel::view_state(double t){
