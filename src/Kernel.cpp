@@ -71,6 +71,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 	_fullscreen(0),
 	_daemon(0),
 	_verbose(0),
+	_stdin(0),
 	_transition_time(3.0f),
 	_switch_time(5.0f),
 	_graphics(NULL),
@@ -88,6 +89,8 @@ Kernel::Kernel(int argc, const char* argv[]):
 	if ( !parse_argv(argc, argv) ){
 		exit(4);
 	}
+
+	fflush(stdout);
 
 	///@todo HACK! Attempt to connect to an xserver.
 	Display* dpy = XOpenDisplay(NULL);
@@ -118,6 +121,14 @@ Kernel::Kernel(int argc, const char* argv[]):
 
 	_ipc = new DBus(this, 50);
 
+	if ( !_db_password ){
+		if ( !_stdin ){
+			printf("Database password: \n");
+		}
+		_db_password = (char*)malloc(256);
+		scanf("%256s", _db_password);
+	}
+
 	if ( _db_host ){
 		_browser = new MySQLBrowser(_db_username, _db_password, _db_name, _db_host);
 	} else {
@@ -142,6 +153,7 @@ Kernel::~Kernel(){
 	free( _db_username );
 	free( _db_password );
 	free( _db_name );
+	free( _db_host );
 
 	_browser = NULL;
 	_graphics = NULL;
@@ -204,6 +216,7 @@ bool Kernel::parse_argv(int argc, const char* argv[]){
 	option_add_flag(&options, "verbose", 'v', "Explain what is being done", &_verbose, 1);
 	option_add_flag(&options, "fullscreen", 'f', "Start in fullscreen mode", &_fullscreen, 1);
 	option_add_flag(&options, "daemon", 'd', "Run in background", &_daemon, 1);
+	option_add_flag(&options, "stdin", 'd', "Except the input (e.g database password) to come from stdin", &_stdin, 1);
 	option_add_string(&options, "db_user", 0, "Database username", &_db_username);
 	option_add_string(&options, "db_pass", 0, "Database password", &_db_password);
 	option_add_string(&options, "db_name", 0, "Database name", &_db_name);
@@ -218,7 +231,8 @@ bool Kernel::parse_argv(int argc, const char* argv[]){
 		return false;
 	}
 
-	if ( n != argc-1 ){
+	if ( n != argc ){
+		printf("%d %d\n", n, argc);
 		printf("%s: unrecognized option '%s'\n", argv[0], argv[n+1]);
 		printf("Try `%s --help' for more information.\n", argv[0]);
 		return false;

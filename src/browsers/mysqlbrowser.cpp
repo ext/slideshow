@@ -67,14 +67,6 @@ void MySQLBrowser::set_username(const char* username){
 
 void MySQLBrowser::set_password(const char* password){
 	free(_password);
-
-	char buf[256];
-	if ( !password ){
-		printf("Database password: \n");
-		scanf("%256s", buf);
-		password = buf;
-	}
-
 	assert( password && "Must supply a mysql password using the --db_pass flag" );
 	_password = (char*)malloc( strlen(password) + 1 );
 	strcpy( _password, password);

@@ -59,6 +59,7 @@ class Kernel {
 		int _fullscreen;
 		int _daemon;
 		int _verbose;
+		int _stdin;
 		double _transition_time;
 		double _switch_time;
 		double _last_switch;
