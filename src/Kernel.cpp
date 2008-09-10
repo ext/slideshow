@@ -1,3 +1,5 @@
+
+
 /**
  * This file is part of Slideshow.
  * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
@@ -24,6 +26,7 @@
 #include "transitions/fade.h"
 #include "browsers/mysqlbrowser.h"
 #include "IPC/dbus.h"
+#include "argument_parser.h"
 #include <portable/Time.h>
 #include <portable/Process.h>
 
@@ -65,8 +68,9 @@ Kernel::Kernel(int argc, const char* argv[]):
 	_height(600),
 	_frames(0),
 	_bin_id(1),
-	_fullscreen(false),
-	_daemon(false),
+	_fullscreen(0),
+	_daemon(0),
+	_verbose(0),
 	_transition_time(3.0f),
 	_switch_time(5.0f),
 	_graphics(NULL),
@@ -75,12 +79,15 @@ Kernel::Kernel(int argc, const char* argv[]):
 	_db_username(NULL),
 	_db_password(NULL),
 	_db_name(NULL),
+	_db_host(NULL),
 	_logfile("slideshow.log"){
 
 	initTime();
 	Log::initialize(_logfile, "slideshow.debug.log");
 
-	parse_argv(argc, argv);
+	if ( !parse_argv(argc, argv) ){
+		exit(4);
+	}
 
 	///@todo HACK! Attempt to connect to an xserver.
 	Display* dpy = XOpenDisplay(NULL);
@@ -104,14 +111,19 @@ Kernel::Kernel(int argc, const char* argv[]):
 	} else {
 		Log::message(Log::Verbose, "Kernel: Starting slideshow\n");
 		print_licence_statement();
-	}
+       	}
 
 	_graphics = new Graphics(_width, _height, _fullscreen);
 	_graphics->set_transition(new FadeTransition);
 
 	_ipc = new DBus(this, 50);
 
-	_browser = new MySQLBrowser(_db_username, _db_password, _db_name);
+	if ( _db_host ){
+		_browser = new MySQLBrowser(_db_username, _db_password, _db_name, _db_host);
+	} else {
+		_browser = new MySQLBrowser(_db_username, _db_password, _db_name);
+	}
+
 	_browser->change_bin(_bin_id);
 	_browser->reload();
 
@@ -174,59 +186,45 @@ void Kernel::run(){
 	}
 }
 
-void Kernel::parse_argv(int argc, const char* argv[]){
+bool Kernel::parse_argv(int argc, const char* argv[]){
+	printf("Starting with \"");
 	for ( int i = 1; i < argc; i++ ){
-		if ( strcmp(argv[i], "--fullscreen") == 0 ){
-			_fullscreen = true;
-			continue;
+		if ( i > 1 ){
+			putchar(' ');
 		}
-		if ( strcmp(argv[i], "--daemon") == 0 ){
-			_daemon = true;
-			continue;
-		}
-		if ( strcmp(argv[i], "--db_user") == 0 ){
-			i++;
-
-			const char* user = argv[i];
-			_db_username = (char*)malloc(strlen(user)+1);
-			strcpy(_db_username, user);
-
-			continue;
-		}
-		if ( strcmp(argv[i], "--db_pass") == 0 ){
-			i++;
-
-			const char* pass = argv[i];
-			_db_password = (char*)malloc(strlen(pass)+1);
-			strcpy(_db_password, pass);
-
-			continue;
-		}
-		if ( strcmp(argv[i], "--db_name") == 0 ){
-			i++;
-
-			const char* name = argv[i];
-			_db_name = (char*)malloc(strlen(name)+1);
-			strcpy(_db_name, name);
-
-			continue;
-		}
-		if ( strcmp(argv[i], "--resolution") == 0 ){
-			i++;
-
-			sscanf(argv[i], "%dx%d", &_width, &_height);
-			continue;
-		}
-
-		if ( strcmp(argv[i], "--bin-id") == 0 ){
-			i++;
-
-			sscanf(argv[i], "%d", &_bin_id);
-			continue;
-		}
-
-		Log::message(Log::Warning, "Unknown argument: %s\n", argv[i]);
+		printf("%s", argv[i]);
 	}
+	printf("\"\n");
+
+	option_set_t options;
+	option_initialize(&options, argc, argv);
+
+	option_set_description(&options, "Slideshow is an application for showing text and images in a loop on monitors and projectors.");
+
+	option_add_flag(&options, "verbose", 'v', "Explain what is being done", &_verbose, 1);
+	option_add_flag(&options, "fullscreen", 'f', "Start in fullscreen mode", &_fullscreen, 1);
+	option_add_flag(&options, "daemon", 'd', "Run in background", &_daemon, 1);
+	option_add_string(&options, "db_user", 0, "Database username", &_db_username);
+	option_add_string(&options, "db_pass", 0, "Database password", &_db_password);
+	option_add_string(&options, "db_name", 0, "Database name", &_db_name);
+	option_add_string(&options, "db_host", 0, "Database host [localhost]", &_db_host);
+	option_add_int(&options, "collection-id", 'c', "ID of the collection to display", &_bin_id);
+	option_add_format(&options, "resolution", 'r', "Resolution", "WIDTHxHEIGHT", "%dx%d", &_width, &_height);
+
+	int n = option_parse(&options);
+	option_finalize(&options);
+
+	if ( n < 0 ){
+		return false;
+	}
+
+	if ( n != argc-1 ){
+		printf("%s: unrecognized option '%s'\n", argv[0], argv[n+1]);
+		printf("Try `%s --help' for more information.\n", argv[0]);
+		return false;
+	}
+
+	return true;
 }
 
 void Kernel::view_state(double t){

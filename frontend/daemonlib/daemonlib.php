@@ -105,9 +105,12 @@ class SlideshowInst {
 				throw new ExecutableException( "A connection to the X server could not be made, check permissions." );
 				break;
 
+			case 4:
+				throw new ExecutableException( "The arguments could not be handled, see log for details." );
+				break;
+
 			default:
-				$lines = implode('\n', $stdout);
-				throw new ExecutableException( $lines );
+				throw new ExecutableException( "Unknown error" );
 			}
 		}
 

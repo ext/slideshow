@@ -33,7 +33,7 @@ class DaemonArguments {
 	public function set_basepath($path){ $this->basepath = $path; }
 	public function set_logfile($filename){ $this->logfile = $filename; }
 	public function set_resolution($resolution){ $this->arguments .= " --resolution $resolution"; }
-	public function set_bin_id($id){ $this->arguments .= " --bin-id $id"; }
+	public function set_bin_id($id){ $this->arguments .= " --collection-id $id"; }
 
 	public function as_string(){ return $this->arguments; }
 	public function basepath(){ return $this->basepath; }

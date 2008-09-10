@@ -29,7 +29,6 @@ class Kernel {
 		~Kernel();
 
 		void run();
-		void parse_argv(int argc, const char* argv[]);
 
 		void quit();
 		void reload_browser();
@@ -51,13 +50,15 @@ class Kernel {
 		void switch_state(double t);
 
 		void print_licence_statement();
+		bool parse_argv(int argc, const char* argv[]);
 
 		int _width;
 		int _height;
 		int _frames;
-		unsigned int _bin_id;
-		bool _fullscreen;
-		bool _daemon;
+		int _bin_id;
+		int _fullscreen;
+		int _daemon;
+		int _verbose;
 		double _transition_time;
 		double _switch_time;
 		double _last_switch;
@@ -71,6 +72,7 @@ class Kernel {
 		char* _db_username;
 		char* _db_password;
 		char* _db_name;
+		char* _db_host;
 
 		const char* _logfile;
 		bool _running;

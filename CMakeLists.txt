@@ -64,12 +64,15 @@ include_directories(
 
 set( CMAKE_CXX_FLAGS_DEBUG "-Wall -g" )
 set( CMAKE_CXX_FLAGS_RELEASE "-Wall -g -O2" )
+set( CMAKE_C_FLAGS_DEBUG "-Wall -g" )
+set( CMAKE_C_FLAGS_RELEASE "-Wall -g -O2" )
 
 add_subdirectory( src/browsers )
 add_subdirectory( src/IPC )
 add_subdirectory( src/transitions )
 
 set( SLIDESHOW_SRCS
+	src/argument_parser.c
 	src/main.cpp
 	src/Kernel.cpp
 	src/Graphics.cpp
