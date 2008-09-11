@@ -70,7 +70,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 	_bin_id(1),
 	_fullscreen(0),
 	_daemon(0),
-	_verbose(0),
+	_verbose(1),
 	_stdin(0),
 	_transition_time(3.0f),
 	_switch_time(5.0f),
@@ -90,6 +90,8 @@ Kernel::Kernel(int argc, const char* argv[]):
 		exit(4);
 	}
 
+	Log::set_level( (Log::Severity)_verbose );
+
 	fflush(stdout);
 
 	///@todo HACK! Attempt to connect to an xserver.
@@ -100,7 +102,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 	XCloseDisplay(dpy);
 
 	if ( _daemon ){
-		Log::message(Log::Verbose, "Kernel: Starting slideshow daemon\n");
+		Log::message(Log::Info, "Kernel: Starting slideshow daemon\n");
 
 		Portable::daemonize(application_name);
 
@@ -112,7 +114,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 		///@ hack
 		daemon_running = &_running;
 	} else {
-		Log::message(Log::Verbose, "Kernel: Starting slideshow\n");
+		Log::message(Log::Info, "Kernel: Starting slideshow\n");
 		print_licence_statement();
        	}
 
@@ -213,10 +215,11 @@ bool Kernel::parse_argv(int argc, const char* argv[]){
 
 	option_set_description(&options, "Slideshow is an application for showing text and images in a loop on monitors and projectors.");
 
-	option_add_flag(&options, "verbose", 'v', "Explain what is being done", &_verbose, 1);
+	option_add_flag(&options, "verbose", 'v', "Explain what is being done", &_verbose, 0);
+	option_add_flag(&options, "quiet", 'q', "Explain what is being done", &_verbose, 2);
 	option_add_flag(&options, "fullscreen", 'f', "Start in fullscreen mode", &_fullscreen, 1);
 	option_add_flag(&options, "daemon", 'd', "Run in background", &_daemon, 1);
-	option_add_flag(&options, "stdin", 'd', "Except the input (e.g database password) to come from stdin", &_stdin, 1);
+	option_add_flag(&options, "stdin", 0, "Except the input (e.g database password) to come from stdin", &_stdin, 1);
 	option_add_string(&options, "db_user", 0, "Database username", &_db_username);
 	option_add_string(&options, "db_pass", 0, "Database password", &_db_password);
 	option_add_string(&options, "db_name", 0, "Database name", &_db_name);
@@ -299,7 +302,7 @@ void Kernel::switch_state(double t){
 }
 
 void Kernel::play_video(const char* fullpath){
-	Log::message(Log::Verbose, "Kernel: Playing video \"%s\"\n", fullpath);
+	Log::message(Log::Info, "Kernel: Playing video \"%s\"\n", fullpath);
 
 	int status;
 
@@ -320,6 +323,7 @@ void Kernel::reload_browser(){
 }
 
 void Kernel::change_bin(unsigned int id){
+	Log::message(Log::Verbose, "Kernel: Switching to collection %d\n", id);
 	_browser->change_bin(id);
 	_browser->reload();
 }
