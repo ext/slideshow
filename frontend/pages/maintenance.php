@@ -20,7 +20,6 @@
 <?
 
 require_once('../core/module.inc.php');
-require_once ("../dbus/dbus_session.php");
 
 class ExecutableException extends PageException {
 	public function __construct($message){
@@ -38,14 +37,14 @@ class Maintenance extends Module {
 	}
 
 	function index(){
-		global $settings;
+		global $settings, $daemon;
 
 		$show_debug = isset($_GET['show_debug']);
 
 		$ret =  array(
 			'log' => array(),
 			'activity' => array(),
-			'status' => $this->_get_daemon_status(),
+			'status' => $daemon->get_status(),
 			'show_debug' => $show_debug
 		);
 
@@ -66,143 +65,78 @@ class Maintenance extends Module {
 		return $ret;
 	}
 
-  function forcestart(){
-	global $settings;
-
-	$pid = $settings->pid();
-
-	if ( $pid > 0 ){
-		posix_kill($pid, 9);
-		unlink($settings->pid_file());
-	}
-
-	$this->start();
-  }
-
-	function start(){
+	private function _get_arguments_from_settings(){
 		global $settings;
 
-		if ( $this->_get_daemon_status() != 0 ){
-			throw new ExecutableException("Deamon is not stopped, cannot start.");
-		}
+		$arguments = new DaemonArguments;
 
-		$binary = $settings->binary();
+		$arguments->set_database_settings($settings->database_hostname(), $settings->database_name(), $settings->database_username(), $settings->database_password());
+		$arguments->set_resolution($settings->resolution_as_string());
+		$arguments->set_logfile($settings->log_file());
+		$arguments->set_bin_id($settings->current_bin());
+		$arguments->set_basepath($settings->base_path());
 
-		if ( !(file_exists($binary) && is_executable($binary)) ){
-			throw new ExecutableException("Could not find binary `$binary' or did not have permission to execute it");
-		}
+		return $arguments;
+	}
 
-		$resolution = $settings->resolution_as_string();
-		$db_hostname = $settings->database_hostname();
-		$db_username = $settings->database_username();
-		$db_password = $settings->database_password();
-		$db_name = $settings->database_name();
-		$logfile = $settings->log_file();
-		$bin_id = $settings->current_bin();
-
-		$cmd = "ulimit -c unlimited; echo '$db_password' | DISPLAY=\":0\" $binary --daemon --fullscreen --db_user $db_username --db_name $db_name --resolution $resolution --bin-id $bin_id >> $logfile 2>&1";
-
-		$old_wd = getcwd();
-		chdir( $settings->base_path() );
-
-		$stdout = array();
-		$ret = 0;
-		exec($cmd, $stdout, $ret);
-
-		chdir( $old_wd );
-
-		if ( $ret != 0 ){
-			switch ( $ret ) {
-			case 1:
-				throw new ExecutableException( "A connection to the X server could not be made, check permissions." );
-				break;
-
-			default:
-				$lines = implode('\n', $stdout);
-				throw new ExecutableException( $lines );
-			}
-		}
-
-		usleep(1000*200);
-
+	function forcestart(){
+		global $daemon;
+  		$arguments = $this->_get_arguments_from_settings();
+		$daemon->start($arguments, true);
 		Module::redirect('/index.php/maintenance', array("show_debug"));
 	}
 
-  function stop(){
-	if ( $this->_get_daemon_status() != 1 ){
-	  throw new exception("Deamon is not started, cannot stop.");
+	function start(){
+		global $daemon;
+		$arguments = $this->_get_arguments_from_settings();
+		$daemon->start($arguments);
+		Module::redirect('/index.php/maintenance', array("show_debug"));
 	}
 
-	$this->send_signal("Quit");
-	usleep(1000*400);
-
-	Module::redirect('/index.php/maintenance', array("show_debug"));
-  }
-
-  // Returns:
-  //   0: Daemon stopped
-  //   1: Daemon started
-  //   2: Daemon crashed
-  function _get_daemon_status(){
-	global $settings;
-
-	$pid = $settings->pid();
-
-	// If $pid is zero the process isn't available.
-	if ( $pid == 0 ){
-	  return 0;
+	function stop(){
+		global $daemon;
+		$daemon->stop();
+		Module::redirect('/index.php/maintenance', array("show_debug"));
 	}
 
-	// Check if the process accepts signals
-	///@todo Not portable
-	if ( posix_kill($pid, 0) ){
-	  return 1;
+	function coredump(){
+		global $settings;
+
+		$filename = $settings->base_path() . '/core';
+		$filesize = filesize($filename);
+
+		header("Pragma: public");
+		header("Expires: 0");
+		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+		header("Cache-Control: private",false);
+		header("Content-Transfer-Encoding: binary");
+		header("Content-Type: application/octet-stream");
+		header("Content-Length: " . $filesize);
+		header("Content-Disposition: attachment; filename=\"core\";" );
+
+		$file = fopen($filename, "rb");
+
+		echo fread($file, $filesize);
+
+		fclose($file);
 	}
 
-	// The process does not exist or is in a unresponsive state,
-	// either way, it is malfunctioning.
-	return 2;
-  }
+	function kill_mplayer(){
+		`killall mplayer`;
+		Module::redirect("index.php/maintenance");
+	}
 
-  function coredump(){
-	global $settings;
+	function ping(){
+		global $daemon;
+		$daemon->ping();
+		Module::redirect('/index.php/maintenance', array("show_debug"));
+	}
 
-	$filename = $settings->base_path() . '/core';
-	$filesize = filesize($filename);
-
-	header("Pragma: public");
-	header("Expires: 0");
-	header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-	header("Cache-Control: private",false);
-	header("Content-Transfer-Encoding: binary");
-	header("Content-Type: application/octet-stream");
-	header("Content-Length: " . $filesize);
-	header("Content-Disposition: attachment; filename=\"core\";" );
-
-	$file = fopen($filename, "rb");
-
-	echo fread($file, $filesize);
-
-	fclose($file);
-  }
-
-  function kill_mplayer(){
-	`killall mplayer`;
-	Module::redirect("index.php/maintenance");
-  }
-
-  function ping(){
-	$this->send_signal("Ping");
-	usleep(1000*200);
-	Module::redirect('/index.php/maintenance', array("show_debug"));
-  }
-
-  function debug_dumpqueue(){
-	$this->send_signal("Debug_DumpQueue");
-	usleep(1000*200);
-	Module::redirect('/index.php/maintenance', array("show_debug"));
-  }
-
+	function debug_dumpqueue(){
+		global $daemon;
+		$daemon->ping();
+		Module::redirect('/index.php/maintenance', array("show_debug"));
+	}
 };
 
 ?>

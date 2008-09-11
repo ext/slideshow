@@ -17,7 +17,7 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 ?>
-
+	
 <? if ( isset($motd) ){ ?>
 	<h2>MOTD</h2>
 	<div id="motd">
@@ -34,34 +34,73 @@
 		<h2>Current slides</h2>
 	
 <? foreach ( $collection as $bin ){ ?>
-		<div class="bin">
+		<div class="binwrapper">
 			<span class="title"><?=$bin->name()?><? if ( $bin->id() != 0 ){ if ( $bin->id() == $active_bin){ ?> (active)<? } else { ?> (<a href="/index.php/slides/activate_bin/<?=$bin->id()?>">set as active</a>)<? }} ?></span><br/>
+			<div class="bin" id="bin_<?=$bin->id()?>">
 <?	foreach ( $bin as $slide ){ ?>
-			<div class="slide">
-				<a href="<?=$slide->image_url()?>">
+				<div class="slide" id="slide_<?=$slide->id()?>">
 <? if ( $slide->active() ){ ?>
-					<img src="<?=$slide->image_url()?>.thumb.jpg" alt="" />
-<? } else { ?> 
-					<img style="background:url('<?=$slide->image_url()?>.thumb.jpg');" src="/css/disabled.png" alt="" />
+					<img class="slide" src="<?=$slide->image_url()?>.thumb.jpg" alt="" />
+<? } else { ?>
+					<img class="slide" style="background:url('<?=$slide->image_url()?>.thumb.jpg');" src="/css/disabled.png" alt="" />
 <? } ?>
-				</a><br/>
-				<div class="menu">
-					[<a href="/index.php/slides/delete?id=<?=$slide->id()?>">Delete</a>]
-					<? if ( $slide->active() ){ ?>[<a href="/index.php/slides/deactivate/<?=$slide->id()?>">Deactive</a>]<? } else { ?>[<a href="/index.php/slides/activate/<?=$slide->id()?>">Active</a>]<? } ?>
-		
-					<form action="/index.php/slides/move/<?=$slide->id()?>" method="post">
-						<select name="to_bin">
+					<div class="menu">
+						<span class="zoom"><a href="<?=$slide->image_url()?>">Full</a></span>
+						<span class="edit"><a href="/index.php/slides/edit/<?=$slide->id()?>">Edit</a></span>
+<? if ( $slide->active() ){ ?>
+						<span class="hide"><a href="/index.php/slides/deactivate/<?=$slide->id()?>">Hide</a></span>
+<? } else { ?>
+						<span class="show"><a href="/index.php/slides/activate/<?=$slide->id()?>">Show</a></span>
+<? } ?>
+						<span class="delete"><a href="/index.php/slides/delete?id=<?=$slide->id()?>">Delete</a></span>
+						
+						<noscript>
+							<form action="/index.php/slides/move/<?=$slide->id()?>" method="post">
+								<select name="to_bin">
 <? foreach( $available_bins as $id => $name ){ ?>
-							<option value="<?=$id?>"<? if ( $id == $bin->id() ){ ?> selected="selected"<? } ?>><?=$name?></option>
+									<option value="<?=$id?>"<? if ( $id == $bin->id() ){ ?> selected="selected"<? } ?>><?=$name?></option>
 <? } ?>
-						</select>
-						<input type="submit" value="Move" />
-					</form>
+						        </select>
+						        <input type="submit" value="Move" />
+							</form>
+						</noscript>
+					</div>
 				</div>
-			</div>
 <? } ?>
+			</div>
 			<br style="clear: both;" />
 		</div>
-
+<? /* These br's is to force linebreaks in non-graphics browsers like links */ ?>
+		<br style="display:none" />
+		<br style="display:none" />
+		
 <? } ?>
 	</div>
+
+	<script type="text/javascript">
+		bins = [<? $first = true; foreach ( $collection as $i => $bin ){ echo $i > 0 ? ", " : "", "\"#bin_{$bin->id()}\""; } ?>];
+	
+<? foreach ( $collection as $bin ){ ?>
+		$("#bin_<?=$bin->id()?>").sortable({
+			connectWith: bins,
+			placeholder: 'slide_placeholder',
+			opacity: 0.5,
+			scrollSensitivity: 50,
+			scrollSpeed: 5,
+			tolerance: "pointer",
+			revert: true,
+			
+			update: function($e, $ui){
+				console.log("%o %o", $e, $ui);
+				console.log("%s: %s", $(this).attr('id'), $(this).sortable('toArray'));
+				 $.ajax({
+					type: "POST",
+					url: "/index.php/slides/moveajax",
+					data: "bin=" + $(this).attr('id') + "&slides=" + $(this).sortable('toArray'),
+				 });
+								
+			}
+		});
+<? } ?>
+
+	</script>

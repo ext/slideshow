@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <time.h>
 
+Log::Severity Log::_level = Debug;
 FILE* Log::_file = NULL;
 FILE* Log::_dfile = NULL;
 
@@ -59,9 +60,9 @@ void Log::message(Severity severity, const char* fmt, ...){
 	char* line;
 	vasprintf(&line, fmt, arg);
 
-	if ( severity != Debug ){
-		fprintf(_file, "(%s) [%s] %s", severity_string(severity), timestring(buf, 255), line);
-		fflush(_file);
+	if ( severity >= _level ){
+		fprintf(stdout, "(%s) [%s] %s", severity_string(severity), timestring(buf, 255), line);
+		fflush(stdout);
 	}
 
 	fprintf(_dfile, "(%s) [%s] %s", severity_string(severity), timestring(buf, 255), line);
@@ -95,6 +96,7 @@ const char* Log::severity_string(Severity severity){
 	switch ( severity ){
 		case Debug: return "DD";
 		case Verbose: return "--";
+		case Info: return "  ";
 		case Warning: return "WW";
 		case Fatal: return "!!";
 	}

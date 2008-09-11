@@ -29,10 +29,12 @@ class Log {
 		enum Severity {
 			Debug,
 			Verbose,
+			Info,
 			Warning,
 			Fatal
 		};
 
+		static void set_level(Severity level){ _level = level; }
 		static void message(Severity severity, const char* fmt, ...);
 
 	private:
@@ -41,6 +43,7 @@ class Log {
 		static char *timestring(char *buffer, int bufferlen);
 		static const char* severity_string(Severity severity);
 
+		static Severity _level;
 		static FILE* _file;
 		static FILE* _dfile;
 };
