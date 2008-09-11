@@ -39,16 +39,19 @@
 			<div class="bin" id="bin_<?=$bin->id()?>">
 <?	foreach ( $bin as $slide ){ ?>
 				<div class="slide" id="slide_<?=$slide->id()?>">
-					<!--<a href="<?=$slide->image_url()?>">-->
 <? if ( $slide->active() ){ ?>
-						<img class="slide" src="<?=$slide->image_url()?>.thumb.jpg" alt="" />
-<? } else { ?> 
-						<img style="background:url('<?=$slide->image_url()?>.thumb.jpg');" src="/css/disabled.png" alt="" />
+					<img class="slide" src="<?=$slide->image_url()?>.thumb.jpg" alt="" />
+<? } else { ?>
+					<img class="slide" style="background:url('<?=$slide->image_url()?>.thumb.jpg');" src="/css/disabled.png" alt="" />
 <? } ?>
-					<!--</a>-->
 					<div class="menu">
-						<!--<span class="move">Move</span>-->
-						<span class="zoom"><a href="<?=$slide->image_url()?>">Fullsize</a></span>
+						<span class="zoom"><a href="<?=$slide->image_url()?>">Full</a></span>
+						<span class="edit"><a href="/index.php/slides/edit/<?=$slide->id()?>">Edit</a></span>
+<? if ( $slide->active() ){ ?>
+						<span class="hide"><a href="/index.php/slides/deactivate/<?=$slide->id()?>">Hide</a></span>
+<? } else { ?>
+						<span class="show"><a href="/index.php/slides/activate/<?=$slide->id()?>">Show</a></span>
+<? } ?>
 						<span class="delete"><a href="/index.php/slides/delete?id=<?=$slide->id()?>">Delete</a></span>
 					</div>
 				</div>
@@ -68,10 +71,10 @@
 			connectWith: bins,
 			placeholder: 'slide_placeholder',
 			opacity: 0.5,
-			/*handle: ".move",*/
 			scrollSensitivity: 50,
 			scrollSpeed: 5,
-			/*cursor: "move"*/
+			tolerance: "pointer",
+			revert: true,
 			
 			stop: function(){
 			}

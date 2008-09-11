@@ -122,13 +122,14 @@
 img {
 	border:		1px solid black;
 	margin-bottom: 5px;
+	cursor:		move;
 }
 
 .slide .menu {
 	padding: 5px;
-	font-size:	0.8em;
 	width: 191px;
 	border:1px solid #aaa;
+	font-size: 0.7em;
 }
 
 .slide .menu a {
@@ -140,20 +141,29 @@ img {
 	text-decoration: underline;
 }
 
-.slide .move {
-	cursor:		move;
+.slide .zoom {
+	padding: 2px 0px 2px 16px;
+	background: transparent url('/icon/zoom.png') no-repeat center left;
 }
 
-.slide .move:before {
-	content: url('/icon/arrow_out.png');
+.slide .edit {
+	padding: 2px 0px 2px 16px;
+	background: transparent url('/icon/page_white_edit.png') no-repeat center left;
 }
 
-.slide .zoom:before {
-	content: url('/icon/zoom.png');
+.slide .hide {
+	padding: 2px 0px 2px 16px;
+	background: transparent url('/icon/picture_empty.png') no-repeat center left;
 }
 
-.slide .delete:before {
-	content: url('/icon/delete.png');
+.slide .show {
+	padding: 2px 0px 2px 16px;
+	background: transparent url('/icon/picture.png') no-repeat center left;
+}
+
+.slide .delete {
+	padding: 2px 0px 2px 16px;
+	background: transparent url('/icon/delete.png') no-repeat center left;
 }
 
 .slide_placeholder {
