@@ -53,13 +53,27 @@
 						<span class="show"><a href="/index.php/slides/activate/<?=$slide->id()?>">Show</a></span>
 <? } ?>
 						<span class="delete"><a href="/index.php/slides/delete?id=<?=$slide->id()?>">Delete</a></span>
+						
+						<noscript>
+							<form action="/index.php/slides/move/<?=$slide->id()?>" method="post">
+								<select name="to_bin">
+<? foreach( $available_bins as $id => $name ){ ?>
+									<option value="<?=$id?>"<? if ( $id == $bin->id() ){ ?> selected="selected"<? } ?>><?=$name?></option>
+<? } ?>
+						        </select>
+						        <input type="submit" value="Move" />
+							</form>
+						</noscript>
 					</div>
 				</div>
 <? } ?>
 			</div>
 			<br style="clear: both;" />
 		</div>
-
+<? /* These br's is to force linebreaks in non-graphics browsers like links */ ?>
+		<br style="display:none" />
+		<br style="display:none" />
+		
 <? } ?>
 	</div>
 
