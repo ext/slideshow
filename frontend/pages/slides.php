@@ -308,24 +308,27 @@ class Slides extends Module {
 	}
 
 	function deactivate( $id ){
+		global $daemon;
 		q('UPDATE files SET active = false WHERE id = ' . (int)$id );
-		$this->send_signal("Reload");
+		$daemon->reload_queue();
 		Module::log("Deactivated slide with id $id");
 		Module::redirect('/index.php');
 	}
 
 	function activate( $id ){
+		global $daemon;
 		q('UPDATE files SET active = true WHERE id = ' . (int)$id );
-		$this->send_signal("Reload");
+		$daemon->reload_queue();
 		Module::log("Activated slide with id $id");
 		Module::redirect('/index.php');
 	}
 
 	function activate_bin( $id ){
-		global $settings;
+		global $settings, $daemon;
 
-		$settings->set_current_bin( $id );
-		$this->send_signal("ChangeBin", "u", array($id));
+		$settings->set_current_bin($id);
+		$daemon->change_bin($id);
+
 		Module::log("Changing active bin to id $id");
 		Module::redirect('/index.php');
 	}

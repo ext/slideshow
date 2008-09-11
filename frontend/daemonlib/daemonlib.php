@@ -126,14 +126,22 @@ class SlideshowInst {
 		usleep(1000*400);
 	}
 
+	public function reload_queue(){
+		$this->send_signal("Reload");
+	}
+
 	public function ping(){
 		$this->send_signal("Ping");
 		usleep(1000*200);
 	}
 
-	function debug_dumpqueue(){
+	public function debug_dumpqueue(){
 		$this->send_signal("Debug_DumpQueue");
 		usleep(1000*200);
+	}
+
+	public function change_bin($id){
+		$this->send_signal("ChangeBin", "u", array($id));
 	}
 
 	private function send_signal($name, $signature = NULL, $payload = NULL){
