@@ -23,7 +23,7 @@ class DaemonArguments {
 	private $password = false;
 	private $logfile = false;
 	private $basepath = false;
-	private $arguments = "--daemon --fullscreen --stdin";
+	private $arguments = "--daemon --fullscreen --stdin --verbose";
 
 	public function set_database_settings($host, $name, $username, $password){
 		$this->arguments .= " --db_host $host --db_name $name --db_user $username";

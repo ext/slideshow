@@ -34,32 +34,26 @@
 		<h2>Current slides</h2>
 	
 <? foreach ( $collection as $bin ){ ?>
-		<div class="bin" id="bin_<?=$bin->id()?>">
+		<div class="binwrapper">
 			<span class="title"><?=$bin->name()?><? if ( $bin->id() != 0 ){ if ( $bin->id() == $active_bin){ ?> (active)<? } else { ?> (<a href="/index.php/slides/activate_bin/<?=$bin->id()?>">set as active</a>)<? }} ?></span><br/>
+			<div class="bin" id="bin_<?=$bin->id()?>">
 <?	foreach ( $bin as $slide ){ ?>
-			<!--<span class="slide" id="slide_<?=$slide->id()?>">-->
-				<!-- <a href="<?=$slide->image_url()?>"> -->
+				<div class="slide" id="slide_<?=$slide->id()?>">
+					<!--<a href="<?=$slide->image_url()?>">-->
 <? if ( $slide->active() ){ ?>
-					<img class="slide" src="<?=$slide->image_url()?>.thumb.jpg" alt="" />
+						<img class="slide" src="<?=$slide->image_url()?>.thumb.jpg" alt="" />
 <? } else { ?> 
-					<img style="background:url('<?=$slide->image_url()?>.thumb.jpg');" src="/css/disabled.png" alt="" />
+						<img style="background:url('<?=$slide->image_url()?>.thumb.jpg');" src="/css/disabled.png" alt="" />
 <? } ?>
-				<!-- </a> -->
-				<!--<div class="menu">
-					[<a href="/index.php/slides/delete?id=<?=$slide->id()?>">Delete</a>]
-					<? if ( $slide->active() ){ ?>[<a href="/index.php/slides/deactivate/<?=$slide->id()?>">Deactive</a>]<? } else { ?>[<a href="/index.php/slides/activate/<?=$slide->id()?>">Active</a>]<? } ?>
-		
-					<form action="/index.php/slides/move/<?=$slide->id()?>" method="post">
-						<select name="to_bin">
-<? foreach( $available_bins as $id => $name ){ ?>
-							<option value="<?=$id?>"<? if ( $id == $bin->id() ){ ?> selected="selected"<? } ?>><?=$name?></option>
+					<!--</a>-->
+					<div class="menu">
+						<!--<span class="move">Move</span>-->
+						<span class="zoom"><a href="<?=$slide->image_url()?>">Fullsize</a></span>
+						<span class="delete"><a href="/index.php/slides/delete?id=<?=$slide->id()?>">Delete</a></span>
+					</div>
+				</div>
 <? } ?>
-						</select>
-						<input type="submit" value="Move" />
-					</form>
-				</div> -->
-			<!--</span>-->
-<? } ?>
+			</div>
 			<br style="clear: both;" />
 		</div>
 
@@ -67,16 +61,20 @@
 	</div>
 
 	<script type="text/javascript">
-		bins = [<? foreach ( $collection as $bin ){ echo "'bin_{$bin->id()}', "; } ?> null];
+		bins = [<? $first = true; foreach ( $collection as $i => $bin ){ echo $i > 0 ? ", " : "", "\"#bin_{$bin->id()}\""; } ?>];
 	
 <? foreach ( $collection as $bin ){ ?>
-		Sortable.create("bin_<?=$bin->id()?>", {
-			tag: 'img',
-			overlap: 'horizontal',
-			constraint: false,
-			dropOnEmpty: true,
-			containment: bins, 
-			hoverclass: 'hover'
+		$("#bin_<?=$bin->id()?>").sortable({
+			connectWith: bins,
+			placeholder: 'slide_placeholder',
+			opacity: 0.5,
+			/*handle: ".move",*/
+			scrollSensitivity: 50,
+			scrollSpeed: 5,
+			/*cursor: "move"*/
+			
+			stop: function(){
+			}
 		});
 <? } ?>
 

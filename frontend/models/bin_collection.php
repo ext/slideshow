@@ -92,7 +92,7 @@ class Bin implements Iterator {
 	}
 
 	public function key(){
-		return true;
+		return $this->current;
 	}
 }
 
@@ -158,7 +158,7 @@ class BinCollection implements Iterator {
 	}
 
 	public function key(){
-		return true;
+		return $this->current;
 	}
 };
 
