@@ -337,6 +337,24 @@ class Slides extends Module {
 		Module::log("Moving slide $id to bin $bin");
 		Module::redirect('/index.php');
 	}
+
+	function moveajax(){
+		$this->custom_view();
+
+		$bin = (int)substr($_POST['bin'], 4);
+
+		$slides = array();
+		$data = explode(',', $_POST['slides']);
+		foreach ($data as $str){
+			$slides[] = (int)substr($str, 6);
+		}
+
+		q("START TRANSACTION");
+		foreach ($slides as $i => $slide){
+			q("UPDATE files SET bin_id = $bin, sortorder = $i WHERE id = $slide");
+		}
+		q("COMMIT");
+	}
 };
 
   ?>

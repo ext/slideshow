@@ -47,9 +47,13 @@ class Module {
 	$this->_custom_view = $custom_view;
   }
 
-  function has_custom_view(){
-  	return $this->_custom_view;
-  }
+	function custom_view(){
+		$this->_custom_view = true;
+	}
+
+	function has_custom_view(){
+		return $this->_custom_view;
+	}
 
   function index(){
 	echo "Module::default";
@@ -67,7 +71,7 @@ class Module {
 
 		$this->_data = call_user_func_array( $functor, $argv );
 
-		if ( !is_array($this->_data) ){
+		if ( !$this->_custom_view && !is_array($this->_data) ){
 			throw new Exception("Call did not return an array: " . print_r($this->_data, true));
 		}
 	}

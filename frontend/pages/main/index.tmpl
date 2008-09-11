@@ -76,7 +76,15 @@
 			tolerance: "pointer",
 			revert: true,
 			
-			stop: function(){
+			update: function($e, $ui){
+				console.log("%o %o", $e, $ui);
+				console.log("%s: %s", $(this).attr('id'), $(this).sortable('toArray'));
+				 $.ajax({
+					type: "POST",
+					url: "/index.php/slides/moveajax",
+					data: "bin=" + $(this).attr('id') + "&slides=" + $(this).sortable('toArray'),
+				 });
+								
 			}
 		});
 <? } ?>

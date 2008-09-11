@@ -102,16 +102,16 @@ class BinCollection implements Iterator {
 
 	function __construct( ){
 		$result = q('
-			SELECT files.id, fullpath, bins.id as bid, bin_id, active, name
+			SELECT files.id, fullpath, bins.id as bid, bin_id, active, name, sortorder
 				FROM files
 				LEFT JOIN bins
 					ON files.bin_id = bins.id
 			UNION
-			SELECT files.id, fullpath, bins.id as bid, bin_id, active, name
+			SELECT files.id, fullpath, bins.id as bid, bin_id, active, name, sortorder
 				FROM files
 				RIGHT JOIN bins
 					ON files.bin_id = bins.id
-			ORDER BY bid, bin_id, id'
+			ORDER BY bid, bin_id, sortorder, id'
 		);
 
 		$this->collection = array();

@@ -57,7 +57,6 @@ try {
 }
 
 if ( $page->has_custom_view() ){
-	$page->render();
 	exit();
 }
 
