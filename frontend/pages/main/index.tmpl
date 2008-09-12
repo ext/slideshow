@@ -111,7 +111,7 @@
 				 $.ajax({
 					type: "POST",
 					url: "/index.php/slides/moveajax",
-					data: "bin=" + $(this).attr('id') + "&slides=" + $(this).sortable('toArray'),
+					data: "bin=" + $(this).attr('id') + "&slides=" + $(this).sortable('toArray')
 				 });
 <? if ( $id == $active_bin ){ ?>
 				var n = $(this).sortable('toArray').length;
