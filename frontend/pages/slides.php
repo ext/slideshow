@@ -340,14 +340,16 @@ class Slides extends Module {
 	}
 
 	function move( $id ){
+		global $daemon;
 		$bin = (int)$_POST['to_bin'];
 		q("UPDATE files SET bin_id = $bin WHERE id = " . (int)$id);
-		$this->send_signal("Reload");
+		$daemon->reload_queue();
 		Module::log("Moving slide $id to bin $bin");
 		Module::redirect('/index.php');
 	}
 
 	function moveajax(){
+		global $daemon;
 		$this->custom_view();
 
 		$bin = (int)substr($_POST['bin'], 4);
@@ -363,6 +365,9 @@ class Slides extends Module {
 			q("UPDATE files SET bin_id = $bin, sortorder = $i WHERE id = $slide");
 		}
 		q("COMMIT");
+
+		$daemon->reload_queue();
+		Module::log("Reordering bin $bin: $_POST[slides]");
 	}
 };
 
