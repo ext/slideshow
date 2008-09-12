@@ -108,7 +108,7 @@ class Bin implements Iterator {
 	}
 }
 
-class BinCollection implements Iterator {
+class BinCollection implements Iterator, ArrayAccess {
 	private $collection;
 	private $current = 0;
 
@@ -171,6 +171,22 @@ class BinCollection implements Iterator {
 
 	public function key(){
 		return $this->current;
+	}
+
+	public function offsetExists($offset) {
+		return isset( $this->collection[$offset] );
+	}
+
+	public function offsetGet($offset) {
+		return $this->collection[$offset];
+	}
+
+	public function offsetSet($offset, $value) {
+		return false;
+	}
+
+	public function offsetUnset($offset) {
+		return false;
 	}
 };
 
