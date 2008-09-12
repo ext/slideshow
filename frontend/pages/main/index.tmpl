@@ -32,7 +32,13 @@
 		</div>
 		
 		<h2>Current slides</h2>
-	
+<? if ( $collection[$active_bin]->nr_of_slides() == 0 ){ ?>
+
+		<div class="notice">
+			The current active queue is empty. You can create some slides and move them into the active queue.
+		</div>
+		
+<? } ?>
 <? foreach ( $collection as $bin ){ ?>
 		<div class="binwrapper">
 			<span class="title"><?=$bin->name()?><? if ( $bin->id() != 0 ){ if ( $bin->id() == $active_bin){ ?> (active)<? } else { ?> (<a href="/index.php/slides/activate_bin/<?=$bin->id()?>">set as active</a>)<? }} ?></span><br/>
@@ -93,8 +99,8 @@
 			revert: true,
 			
 			update: function($e, $ui){
-				console.log("%o %o", $e, $ui);
-				console.log("%s: %s", $(this).attr('id'), $(this).sortable('toArray'));
+				/*console.log("%o %o", $e, $ui);
+				console.log("%s: %s", $(this).attr('id'), $(this).sortable('toArray'));*/
 				 $.ajax({
 					type: "POST",
 					url: "/index.php/slides/moveajax",
