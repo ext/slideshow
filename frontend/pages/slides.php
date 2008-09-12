@@ -66,8 +66,10 @@ class Slides extends Module {
 				$this->_create_image($title, $content, $align, $fullpath);
 				$this->_convert($fullpath, $fullpath . '.thumb.jpg', "200x200");
 
-				q("INSERT INTO files (fullpath) VALUES ('$fullpath')");
-				$this->send_signal("Reload");
+				q("INSERT INTO files (fullpath, type, title, content) VALUES ('$fullpath', 'text', '" . mysql_real_escape_string($title_orig) . "', '" . mysql_real_escape_string($content_orig) . "')");
+
+				global $daemon;
+				$daemon->reload_queue();
 
 				Module::log("Added slide titled '$title'");
 				Module::redirect("/index.php");
@@ -132,8 +134,10 @@ class Slides extends Module {
 	$this->_convert($fullpath, $fullpath, $resolution);
 	$this->_convert($fullpath, $fullpath . '.thumb.jpg', "200x200");
 
-	q("INSERT INTO files (fullpath) VALUES ('$fullpath')");
-	$this->send_signal("Reload");
+	q("INSERT INTO files (fullpath, type, title) VALUES ('$fullpath', 'image', '" . mysql_real_escape_string($name) . "')");
+
+	global $daemon;
+	$daemon->reload_queue();
 
 	Module::log("Uploaded $name");
 	Module::redirect('/index.php');
@@ -288,11 +292,13 @@ class Slides extends Module {
   }
 
 	function delete(){
+		global $daemon;
+
 		$id = (int)$_GET['id'];
 
 		if ( array_key_exists('confirm', $_GET) === true ){
 			q("DELETE FROM files WHERE id = $id");
-			$this->send_signal("Reload");
+			$daemon->reload_queue();
 			Module::log("Removed slide with id $id");
 			Module::redirect('/index.php');
 			return;
@@ -334,14 +340,16 @@ class Slides extends Module {
 	}
 
 	function move( $id ){
+		global $daemon;
 		$bin = (int)$_POST['to_bin'];
 		q("UPDATE files SET bin_id = $bin WHERE id = " . (int)$id);
-		$this->send_signal("Reload");
+		$daemon->reload_queue();
 		Module::log("Moving slide $id to bin $bin");
 		Module::redirect('/index.php');
 	}
 
 	function moveajax(){
+		global $daemon;
 		$this->custom_view();
 
 		$bin = (int)substr($_POST['bin'], 4);
@@ -357,6 +365,9 @@ class Slides extends Module {
 			q("UPDATE files SET bin_id = $bin, sortorder = $i WHERE id = $slide");
 		}
 		q("COMMIT");
+
+		$daemon->reload_queue();
+		Module::log("Reordering bin $bin: $_POST[slides]");
 	}
 };
 

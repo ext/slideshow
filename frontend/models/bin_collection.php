@@ -22,12 +22,16 @@ class Slide {
 	private $name;
 	private $fullpath;
 	private $active;
+	private $type;
+	private $title;
 
 	function __construct( $row ){
 		$this->id = $row['id'];
 		$this->name = basename($row['fullpath']);
 		$this->fullpath = $row['fullpath'];
 		$this->active = $row['active'];
+		$this->type = $row['type'];
+		$this->title = $row['title'];
 	}
 
 	function id(){
@@ -48,6 +52,14 @@ class Slide {
 
 	function active(){
 		return $this->active != 0;
+	}
+
+	function type(){
+		return $this->type;
+	}
+
+	function title(){
+		return $this->title;
 	}
 }
 
@@ -102,12 +114,12 @@ class BinCollection implements Iterator {
 
 	function __construct( ){
 		$result = q('
-			SELECT files.id, fullpath, bins.id as bid, bin_id, active, name, sortorder
+			SELECT files.id, fullpath, bins.id as bid, bin_id, active, name, sortorder, type, title
 				FROM files
 				LEFT JOIN bins
 					ON files.bin_id = bins.id
 			UNION
-			SELECT files.id, fullpath, bins.id as bid, bin_id, active, name, sortorder
+			SELECT files.id, fullpath, bins.id as bid, bin_id, active, name, sortorder, type, title
 				FROM files
 				RIGHT JOIN bins
 					ON files.bin_id = bins.id

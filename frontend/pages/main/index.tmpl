@@ -40,13 +40,15 @@
 <?	foreach ( $bin as $slide ){ ?>
 				<div class="slide" id="slide_<?=$slide->id()?>">
 <? if ( $slide->active() ){ ?>
-					<img class="slide" src="<?=$slide->image_url()?>.thumb.jpg" alt="" />
+					<img class="slide" src="<?=$slide->image_url()?>.thumb.jpg" title="<?=$slide->title()?>" alt="<?=$slide->title()?>" />
 <? } else { ?>
-					<img class="slide" style="background:url('<?=$slide->image_url()?>.thumb.jpg');" src="/css/disabled.png" alt="" />
+					<img class="slide" style="background:url('<?=$slide->image_url()?>.thumb.jpg');" src="/css/disabled.png" title="<?=$slide->title()?>" alt="<?=$slide->title()?>" />
 <? } ?>
 					<div class="menu">
 						<span class="zoom"><a href="<?=$slide->image_url()?>">Full</a></span>
+<? if ( $slide->type() == 'text' ){ ?>
 						<span class="edit"><a href="/index.php/slides/edit/<?=$slide->id()?>">Edit</a></span>
+<? } ?>
 <? if ( $slide->active() ){ ?>
 						<span class="hide"><a href="/index.php/slides/deactivate/<?=$slide->id()?>">Hide</a></span>
 <? } else { ?>

@@ -22,16 +22,36 @@
 #menu {
 	font: normal 10px verdana,'Bitstream Vera Sans',helvetica,arial,sans-serif;
 
-	padding: .2em 0;
+	padding: .25em 0;
 	border-bottom: 1px solid black;
 }
 
 #menu :link, #menu :visited {
-	padding: .20em 20px;
+	padding: .25em 14px .25em 30px;
 	margin: 0;
 	text-decoration: none;
 	background: white;
 	border: 1px solid black;
+}
+
+#menu .menu_main {
+	background: white url('/icon/images.png') no-repeat 10% 50%;
+}
+
+#menu .menu_slide {
+	background: white url('/icon/picture_add.png') no-repeat 10% 50%;
+}
+
+#menu .menu_video {
+	background: white url('/icon/film.png') no-repeat 10% 50%;
+}
+
+#menu .menu_bins {
+	background: white url('/icon/folder.png') no-repeat 10% 50%;
+}
+
+#menu .menu_maintenance {
+	background: white url('/icon/wrench.png') no-repeat 10% 50%;
 }
 
 #menu li :hover, #menu li :active {
@@ -72,7 +92,7 @@
 .daemonstatus {
 	font: normal 10px verdana,'Bitstream Vera Sans',helvetica,arial,sans-serif;
 	float: right;
-	padding: .20em 20px .10em 20px;
+	padding: .25em 20px .10em 20px;
 	margin: 0;
 	white-space: nowrap;
 	background: white;
