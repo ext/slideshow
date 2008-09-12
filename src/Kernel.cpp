@@ -18,30 +18,44 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Internal
 #include "Kernel.h"
 #include "Graphics.h"
 #include "OS.h"
 #include "Log.h"
 #include "Exceptions.h"
+
+// Transitions
 #include "transitions/dummy.h"
 #include "transitions/fade.h"
+
+// Browsers
 #include "browsers/mysqlbrowser.h"
+
+// IPC
 #include "IPC/dbus.h"
+
+// Argument parser
 #include "argument_parser.h"
+
+// FSM
 #include "state/State.h"
 #include "state/InitialState.h"
 #include "state/SwitchState.h"
 #include "state/TransitionState.h"
 #include "state/ViewState.h"
+
+// libportable
 #include <portable/Time.h>
 #include <portable/Process.h>
 
+// libc
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
 #include <ctype.h>
 
-//#include <syscall.h>
+// Platform
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -56,12 +70,8 @@
 #include <windows.h>
 #endif
 
-#ifndef NULL
-#define NULL 0
-#endif
-
 bool* daemon_running = NULL;
-const char* application_name = "slideshow";
+static const char* const application_name = "slideshow";
 
 void quit_signal(int){
 	Log::message(Log::Verbose, "Caught SIGQUIT\n");
