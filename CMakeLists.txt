@@ -72,6 +72,10 @@ add_subdirectory( src/IPC )
 add_subdirectory( src/transitions )
 
 set( SLIDESHOW_SRCS
+	src/state/InitialState.cpp
+	src/state/SwitchState.cpp
+	src/state/TransitionState.cpp
+	src/state/ViewState.cpp
 	src/argument_parser.c
 	src/main.cpp
 	src/Kernel.cpp

@@ -23,10 +23,16 @@
 #include "OS.h"
 #include "Log.h"
 #include "Exceptions.h"
+#include "transitions/dummy.h"
 #include "transitions/fade.h"
 #include "browsers/mysqlbrowser.h"
 #include "IPC/dbus.h"
 #include "argument_parser.h"
+#include "state/State.h"
+#include "state/InitialState.h"
+#include "state/SwitchState.h"
+#include "state/TransitionState.h"
+#include "state/ViewState.h"
 #include <portable/Time.h>
 #include <portable/Process.h>
 
@@ -140,7 +146,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 	_browser->change_bin(_bin_id);
 	_browser->reload();
 
-	_state = SWITCH;
+	_state = new InitialState(_browser, _graphics, _ipc);
 }
 
 Kernel::~Kernel(){
@@ -180,23 +186,7 @@ void Kernel::run(){
 
 	while ( _running ){
 		OS::poll_events(_running);
-
-		double t = getTime();
-
-		// Simple statemachine
-		switch ( _state ){
-			case VIEW:
-				view_state(t);
-				break;
-
-			case TRANSITION:
-				transition_state(t);
-				break;
-
-			case SWITCH:
-				switch_state(t);
-				break;
-		}
+		_state = _state->action();
 	}
 }
 
@@ -242,63 +232,6 @@ bool Kernel::parse_argv(int argc, const char* argv[]){
 	}
 
 	return true;
-}
-
-void Kernel::view_state(double t){
-	if ( t - _last_switch > _switch_time ){
-		_state = SWITCH;
-		return;
-	}
-
-	if ( _ipc ){
-		_ipc->poll();
-	}
-
-	// Sleep for a while
-	wait( 0.1f );
-}
-
-// The transition state calculates how long of the
-// transition has come and calls the renderer
-void Kernel::transition_state(double t){
-	double s = (t - _transition_start) / _transition_time;
-
-	_frames++;
-	_graphics->render( s );
-
-	// If the transition is complete the state changes to VIEW
-	if ( s > 1.0f ){
-		if ( !_daemon ){
-			printf("Frames: %d\nFPS: %f\n\n", _frames, (float)_frames/_transition_time);
-		}
-
-		_state = VIEW;
-		_last_switch = t;
-	}
-}
-
-void Kernel::switch_state(double t){
-	const char* filename = _browser->get_next_file();
-
-	if ( !filename ){
-		Log::message(Log::Warning, "Kernel: Queue is empty\n", filename);
-		_state = VIEW;
-		_last_switch = t;
-		return;
-	}
-
-	Log::message(Log::Debug, "Kernel: Switching to image \"%s\"\n", filename);
-
-	try {
-		_graphics->load_image( filename );
-	} catch ( ... ) {
-		Log::message(Log::Warning, "Kernel: Failed to load image '%s'\n", filename);
-		return;
-	}
-
-	_state = TRANSITION;
-	_frames = 0;
-	_transition_start = getTime();
 }
 
 void Kernel::play_video(const char* fullpath){

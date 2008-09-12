@@ -115,34 +115,52 @@ void Graphics::render(float state){
 void Graphics::load_image(const char* name){
 	swap_textures();
 
-    FIBITMAP* dib = GenericLoader(name, 0);
+	BYTE black[] = {
+		0, 0, 0
+	};
+	BYTE *pixels = black;
+	FIBITMAP* dib_resized = NULL;
 
-    if( !dib ){
-    	//@todo Is this safe?
-    	char buf[512];
-    	snprintf(buf, 512, "Failed to load image (%s)", name);
-        throw std::runtime_error(buf);
-    }
+	int width = 1;
+	int height = 1;
 
-    FreeImage_FlipVertical(dib);
+	glBindTexture(GL_TEXTURE_2D, texture_0);
 
-    glBindTexture(GL_TEXTURE_2D, texture_0);
+	if ( name ){
+		FIBITMAP* dib = GenericLoader(name, 0);
 
-    FIBITMAP* dib32 = FreeImage_ConvertTo24Bits(dib);
-    FIBITMAP* dib_resized = FreeImage_Rescale(dib32, 1024, 1024, FILTER_BILINEAR);
+		if( !dib ){
+			//@todo Is this safe?
+			char buf[512];
+			snprintf(buf, 512, "Failed to load image (%s)", name);
+			throw std::runtime_error(buf);
+		}
 
-    BYTE *pixels = (BYTE*)FreeImage_GetBits(dib_resized);
+		FreeImage_FlipVertical(dib);
+
+		FIBITMAP* dib32 = FreeImage_ConvertTo24Bits(dib);
+
+		width = 1024;
+		height = 1024;
+
+		dib_resized = FreeImage_Rescale(dib32, width, height, FILTER_BILINEAR);
+
+		pixels = (BYTE*)FreeImage_GetBits(dib_resized);
+
+		FreeImage_Unload(dib);
+		FreeImage_Unload(dib32);
+	}
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1024, 1024, 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, pixels);
 
-    FreeImage_Unload(dib);
-    FreeImage_Unload(dib32);
-    FreeImage_Unload(dib_resized);
+    if ( name ){
+    	FreeImage_Unload(dib_resized);
+    }
 }
 
 void Graphics::swap_textures(){

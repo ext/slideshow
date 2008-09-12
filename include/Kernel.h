@@ -22,6 +22,7 @@
 class Graphics;
 class Browser;
 class IPC;
+class State;
 
 class Kernel {
 	public:
@@ -39,12 +40,6 @@ class Kernel {
 		void debug_dumpqueue();
 
 	private:
-		enum State {
-			VIEW,
-			TRANSITION,
-			SWITCH
-		};
-
 		void view_state(double t);
 		void transition_state(double t);
 		void switch_state(double t);
@@ -64,7 +59,7 @@ class Kernel {
 		double _switch_time;
 		double _last_switch;
 		double _transition_start;
-		State _state;
+		State* _state;
 
 		Graphics* _graphics;
 		Browser* _browser;
