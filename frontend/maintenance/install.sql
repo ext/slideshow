@@ -21,5 +21,8 @@ CREATE TABLE `files` (
   `bin_id` int(11) NOT NULL default '0',
   `sortorder` int(11) NOT NULL default '0',
   `active` tinyint(1) NOT NULL default '1',
+  `type` enum('image','text') NOT NULL,
+  `title` text,
+  `content` text,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
