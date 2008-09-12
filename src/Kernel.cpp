@@ -147,6 +147,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 	_browser->reload();
 
 	TransitionState::set_transition_time(_transition_time);
+	ViewState::set_view_time(_switch_time);
 	_state = new InitialState(_browser, _graphics, _ipc);
 }
 
