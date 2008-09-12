@@ -23,7 +23,7 @@
 
 class Log {
 	public:
-		static void initialize(const char* filename, const char* debugfilename);
+		static void initialize(const char* filename);
 		static void deinitialize();
 
 		enum Severity {

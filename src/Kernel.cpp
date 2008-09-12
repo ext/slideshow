@@ -23,6 +23,7 @@
 #include "Graphics.h"
 #include "OS.h"
 #include "Log.h"
+#include "ErrorCodes.h"
 #include "Exceptions.h"
 
 // Transitions
@@ -100,10 +101,10 @@ Kernel::Kernel(int argc, const char* argv[]):
 	_logfile("slideshow.log"){
 
 	initTime();
-	Log::initialize(_logfile, "slideshow.debug.log");
+	Log::initialize(_logfile);
 
 	if ( !parse_argv(argc, argv) ){
-		exit(4);
+		exit(ARGUMENT_ERROR);
 	}
 
 	Log::set_level( (Log::Severity)_verbose );

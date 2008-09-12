@@ -21,37 +21,23 @@
 #include <cstdlib>
 #include <time.h>
 
-Log::Severity Log::_level = Debug;
+Log::Severity Log::_level = Info;
 FILE* Log::_file = NULL;
-FILE* Log::_dfile = NULL;
 
-void Log::initialize(const char* filename, const char* debugfilename){
+void Log::initialize(const char* filename){
 	_file = fopen(filename, "a");
-	_dfile = fopen(debugfilename, "a");
 
 	if ( !_file ){
 		fprintf(stderr, "Failed to open logfile '%s' ! Fatal error!\n", filename);
-		exit(1);
-	}
-
-	if ( !_dfile ){
-		fprintf(stderr, "Failed to open logfile '%s' ! Fatal error!\n", debugfilename);
 		exit(1);
 	}
 }
 
 void Log::deinitialize(){
 	fclose(_file);
-	fclose(_dfile);
 }
 
 void Log::message(Severity severity, const char* fmt, ...){
-#ifdef _NDEBUG
-	if ( severity == Debug ){
-		return;
-	}
-#endif
-
 	va_list arg;
 	va_start(arg, fmt);
 
@@ -65,8 +51,8 @@ void Log::message(Severity severity, const char* fmt, ...){
 		fflush(stdout);
 	}
 
-	fprintf(_dfile, "(%s) [%s] %s", severity_string(severity), timestring(buf, 255), line);
-	fflush(_dfile);
+	fprintf(_file, "(%s) [%s] %s", severity_string(severity), timestring(buf, 255), line);
+	fflush(_file);
 
 	if ( severity == Fatal ){
 		vfprintf(stderr, fmt, arg);
