@@ -31,7 +31,7 @@
 				<li class="first<? if ( $path->module() == 'main' ){ ?> bajs<? } ?>"><a class="menu_main" href="/index.php/">Main</a></li>
 				<li<? if ( $path->module() == 'slides' ){ ?> class="bajs"<? } ?> ><a class="menu_slide" href="/index.php/slides/upload">Slides</a></li>
 				<li<? if ( $path->module() == 'video' ){ ?> class="bajs"<? } ?>><a class="menu_video" href="/index.php/video">Video</a></li>
-				<li<? if ( $path->module() == 'bins' ){ ?> class="bajs"<? } ?>><a class="menu_bins" href="/index.php/bins">Collections</a></li>
+				<li<? if ( $path->module() == 'bins' ){ ?> class="bajs"<? } ?>><a class="menu_bins" href="/index.php/bins">Queues</a></li>
 				<li class="last<? if ( $path->module() == 'maintenance' ){ ?> bajs<? } ?>"><a class="menu_maintenance" href="/index.php/maintenance">Maintenance</a></li>
 			</ul>
 		</div>
