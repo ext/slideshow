@@ -22,27 +22,30 @@
 require_once('../core/module.inc.php');
 
 class Install extends Module {
-  function welcome(){
-  	session_start();
+	public function __construct(){
+		$this->set_template('install');
+	}
 
-	if ( !isset( $_SESSION['config'] ) ){
-	  $_SESSION['config'] = new Settings('../settings.json.default', true);
-  	}
+	function welcome(){
+		session_start();
 
-	return array();
-  }
+		if ( !isset( $_SESSION['config'] ) ){
+			$_SESSION['config'] = new Settings('../settings.json.default', true);
+		}
+	}
 
-  function step( $n ){
-  	session_start();
-  	if ( !isset( $_SESSION['config'] ) ){
-  		$this->redirect('/index.php/install/welcome');
-  		return;
-  	}
+	function step( $n ){
+		session_start();
 
-	$ret = array(
-		 'path' => realpath('..') . '/settings.json',
-		 'step' => $n
-		 );
+		if ( !isset( $_SESSION['config'] ) ){
+			$this->redirect('/index.php/install/welcome');
+			return;
+		}
+
+		$ret = array(
+			'path' => realpath('..') . '/settings.json',
+			'step' => $n
+		);
 
 	 switch ( $n ){
 	 	case 1:

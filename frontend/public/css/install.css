@@ -1,16 +1,16 @@
-#install {
+#content {
 
 	font-size:	0.9em;
 }
 
-#install .field_description {
+#content .field_description {
 	display:	block;
 
 	text-align:	right;
 	font-size:	0.7em;
 }
 
-#install label {
+#content label {
 	clear:		both;
 	display:	block;
 	width:		350px;
@@ -20,32 +20,32 @@
 
 }
 
-#install input {
+#content input {
 	float:		left;
 }
 
-#install .field_notice {
+#content .field_notice {
 	color:		red;
 	float:		left;
 	font-size:	0.7em;
 }
 
-#install .field_notice .ok {
+#content .field_notice .ok {
 	color:		green;
 }
 
-#install .field_notice .fail {
+#content .field_notice .fail {
 	color:		red;
 }
 
-#install button {
+#content button {
 	clear:		both;
 }
 
-#install ul.step .current_step {
+#content ul.step .current_step {
 	color:		red;
 }
 
-#install pre.summary {
+#content pre.summary {
 	background:	white;
 }

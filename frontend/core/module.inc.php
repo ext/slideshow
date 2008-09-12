@@ -22,10 +22,10 @@
 require_once ('file_not_found.inc.php');
 
 class Module {
-	private $_template = '';
+	private $_view = '';
+	private $_template = 'main';
 	private $_data = array();
 	private $_name = 'undefined';
-	private $_custom_view = false;
 
 	function factory( $module ){
 		$fullpath = "../pages/$module.php";
@@ -42,26 +42,24 @@ class Module {
 		return $m;
 	}
 
-  function set_template( $template, $custom_view = false ){
-	$this->_template = $template;
-	$this->_custom_view = $custom_view;
-  }
-
-	function custom_view(){
-		$this->_custom_view = true;
+	private function set_view( $name, $section ){
+		$this->_view = '../pages/' . $name . '/' . $section . '.tmpl';
 	}
 
-	function has_custom_view(){
-		return $this->_custom_view;
+	private function view(){
+		return $this->_view;
 	}
 
-  function index(){
-	echo "Module::default";
-  }
+	public function set_template($template){
+		$this->_template = $template;
+	}
+
+	private function template(){
+		return "../templates/$this->_template.php";
+	}
 
 	function execute( $section, array $argv ){
-		// We set the template to correspond to the section being executed.
-		$this->set_template($this->_name . '/' . $section . '.tmpl');
+		$this->set_view($this->_name, $section);
 
 		$functor = array( $this, $section );
 
@@ -70,10 +68,6 @@ class Module {
 		}
 
 		$this->_data = call_user_func_array( $functor, $argv );
-
-		if ( !$this->_custom_view && !is_array($this->_data) ){
-			throw new Exception("Call did not return an array: " . print_r($this->_data, true));
-		}
 	}
 
   function redirect($location, array $keep = NULL){
@@ -115,12 +109,29 @@ class Module {
 	}
 
 	function render(){
-		if ( !file_exists("../pages/$this->_template") ){
-			throw new Exception("The template '$this->_template' could not be found!");
+		if ( !file_exists($this->template()) ){
+			throw new Exception("Fatal: template \"{$this->template()}\" not found.");
 		}
 
-		extract($this->_data);
-		require("../pages/$this->_template");
+		extract(array(
+			"page" => $this,
+			"path" => $GLOBALS['path'],
+			"daemon" => $GLOBALS['daemon']
+		));
+
+		require($this->template());
+	}
+
+	function render_content(){
+		if ( !file_exists($this->view()) ){
+			return;
+		}
+
+		if ( is_array($this->_data) ){
+			extract($this->_data);
+		}
+
+		require("../pages/$this->_view");
 	}
 };
 

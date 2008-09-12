@@ -350,7 +350,6 @@ class Slides extends Module {
 
 	function moveajax(){
 		global $daemon;
-		$this->custom_view();
 
 		$bin = (int)substr($_POST['bin'], 4);
 
@@ -368,6 +367,8 @@ class Slides extends Module {
 
 		$daemon->reload_queue();
 		Module::log("Reordering bin $bin: $_POST[slides]");
+
+		$this->set_template("empty");
 	}
 };
 
