@@ -32,13 +32,21 @@
 		</div>
 		
 		<h2>Current slides</h2>
-<? if ( $collection[$active_bin]->nr_of_slides() == 0 ){ ?>
 
-		<div class="notice">
-			The current active queue is empty. You can create some slides and move them into the active queue.
-		</div>
-		
+		<div id="empty_notice" class="notice" style="display: <? echo $collection[$active_bin]->nr_of_slides() == 0 ? "block" : "none"; ?>">
+			<script type="text/javascript">
+				document.write("\n\t\t\tThe current active queue is empty. You can create some slides and move them into the active queue.");
+			</script>
+			<noscript>
+<? if ( $collection[$active_bin]->nr_of_slides() == 0 ) { ?>
+				The current active queue is empty. You can create some slides and move them into the active queue.
 <? } ?>
+			</noscript>
+		</div>
+<? /* These br's is to force linebreaks in non-graphics browsers like links */ ?>
+		<br style="display:none" />
+		<br style="display:none" />
+		
 <? foreach ( $collection as $bin ){ ?>
 		<div class="binwrapper">
 			<span class="title"><?=$bin->name()?><? if ( $bin->id() != 0 ){ if ( $bin->id() == $active_bin){ ?> (active)<? } else { ?> (<a href="/index.php/slides/activate_bin/<?=$bin->id()?>">set as active</a>)<? }} ?></span><br/>
@@ -86,9 +94,10 @@
 	</div>
 
 	<script type="text/javascript">
-		bins = [<? $first = true; foreach ( $collection as $i => $bin ){ echo $i > 0 ? ", " : "", "\"#bin_{$bin->id()}\""; } ?>];
-	
-<? foreach ( $collection as $bin ){ ?>
+		var bins = [<? $first = true; foreach ( $collection as $i => $bin ){ echo $i > 0 ? ", " : "", "\"#bin_{$bin->id()}\""; } ?>];
+		var notice_visible = <? echo $collection[$active_bin]->nr_of_slides() == 0 ? "true" : "false"; ?>;
+		
+<? foreach ( $collection as $id => $bin ){ ?>
 		$("#bin_<?=$bin->id()?>").sortable({
 			connectWith: bins,
 			placeholder: 'slide_placeholder',
@@ -99,14 +108,22 @@
 			revert: true,
 			
 			update: function($e, $ui){
-				/*console.log("%o %o", $e, $ui);
-				console.log("%s: %s", $(this).attr('id'), $(this).sortable('toArray'));*/
 				 $.ajax({
 					type: "POST",
 					url: "/index.php/slides/moveajax",
 					data: "bin=" + $(this).attr('id') + "&slides=" + $(this).sortable('toArray'),
 				 });
-								
+<? if ( $id == $active_bin ){ ?>
+				var n = $(this).sortable('toArray').length;
+				if ( notice_visible && n > 0 ){
+					notice_visible = false;
+					$("#empty_notice").fadeOut("slow");
+				}
+				if ( !notice_visible && n == 0 ){
+					notice_visible = true;
+					$("#empty_notice").fadeIn("slow");
+				}
+<? } ?>
 			}
 		});
 <? } ?>
