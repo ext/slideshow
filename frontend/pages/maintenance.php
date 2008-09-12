@@ -134,7 +134,7 @@ class Maintenance extends Module {
 
 	function debug_dumpqueue(){
 		global $daemon;
-		$daemon->ping();
+		$daemon->debug_dumpqueue();
 		Module::redirect('/index.php/maintenance', array("show_debug"));
 	}
 };
