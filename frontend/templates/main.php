@@ -9,7 +9,7 @@
 	<script src="/js/jquery-1.2.6.js" type="text/javascript"></script>
 	<script src="/js/ui.core.js" type="text/javascript"></script>
 	<script src="/js/ui.sortable.js" type="text/javascript"></script>
-	<title>Slideshow</title>
+	<title><?=$settings->title();?></title>
 <?
   //@note hack to get the maintenance page refresh
   if ( $path->module() == 'maintenance' ) { ?>
@@ -19,7 +19,7 @@
 
 <body>
 	<div id="header">
-		<h1>Slideshow</h1>
+		<h1><?=$settings->title();?></h1>
 	</div>
 
 	<div id="bar">

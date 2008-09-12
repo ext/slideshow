@@ -116,7 +116,8 @@ class Module {
 		extract(array(
 			"page" => $this,
 			"path" => $GLOBALS['path'],
-			"daemon" => $GLOBALS['daemon']
+			"daemon" => $GLOBALS['daemon'],
+			"settings" => $GLOBALS['settings']
 		));
 
 		require($this->template());

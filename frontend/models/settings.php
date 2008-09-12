@@ -274,6 +274,10 @@ class Settings {
 		return $this->data['Runtime']['Bin'] = $n;
 	}
 
+	function title(){
+		return $this->data['Slideshow']['Title'];
+	}
+
 	function as_json(){
 		return $this->_prettify( json_encode( $this->data) );
 	}
