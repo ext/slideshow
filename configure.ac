@@ -27,10 +27,24 @@ PKG_CHECK_MODULES(dbus, [dbus-1, dbus-glib-1],
 		enable_dbus=yes
 	],
 	[
-		AC_MSG_ERROR([D-Bus requirements not met.])
+		AC_MSG_ERROR([Required D-Bus not found.])
 	])
 
 AC_SUBST(dbus_CFLAGS)
 AC_SUBST(dbus_LIBS)
+
+dnl #######################################################################
+dnl # Check for D-Bus support
+dnl #######################################################################
+PKG_CHECK_MODULES(libportable, [libportable],
+	[
+		AC_DEFINE(HAVE_DBUS, 1, [Define if libportable is available])
+	],
+	[
+		AC_MSG_ERROR([Required libportable not found])
+	])
+
+AC_SUBST(libportable_CFLAGS)
+AC_SUBST(libportable_LIBS)
 
 AC_OUTPUT
