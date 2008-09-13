@@ -29,6 +29,7 @@
 // Transitions
 #include "transitions/dummy.h"
 #include "transitions/fade.h"
+#include "transitions/spin.h"
 
 // Browsers
 #include "browsers/mysqlbrowser.h"
@@ -159,7 +160,7 @@ Kernel::~Kernel(){
 
 void Kernel::init_graphics(){
 	_graphics = new Graphics(_width, _height, _fullscreen);
-	_graphics->set_transition(new FadeTransition);
+	_graphics->set_transition(new SpinTransition);
 }
 
 void Kernel::init_IPC(){

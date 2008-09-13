@@ -71,7 +71,7 @@ Graphics::Graphics(int width, int height, bool fullscreen):
 
     glShadeModel( GL_FLAT );
     glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST );
-	glClearColor(1, 0, 0, 1);
+	glClearColor(0, 0, 0, 1);
 	glColor4f(1, 1, 1, 1);
 
 	glDisable( GL_DEPTH_TEST );
@@ -88,6 +88,8 @@ Graphics::Graphics(int width, int height, bool fullscreen):
     glOrtho(0, 1, 0, 1, -1.0, 1.0);
     glScalef(1, -1, 1);
     glTranslated(0, -1, 0);
+
+    glEnable(GL_CULL_FACE);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
