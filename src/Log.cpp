@@ -131,3 +131,8 @@ const char* Log::severity_string(Severity severity){
 	}
 	return NULL;
 }
+
+void Log::flush(){
+	fflush(stdout);
+	fflush(_file);
+}

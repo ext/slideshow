@@ -115,7 +115,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 
 	print_cli_arguments(argc, argv);
 
-	fflush(stdout);
+	Log::flush();
 
 	///@todo HACK! Attempt to connect to an xserver.
 	Display* dpy = XOpenDisplay(NULL);

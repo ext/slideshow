@@ -41,6 +41,8 @@ class Log {
 		static void message_ex(const char* str);
 		static void message_ex_fmt(const char* fmt, ...);
 
+		static void flush();
+
 	private:
 		Log(){}
 
