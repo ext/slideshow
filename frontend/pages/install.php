@@ -261,8 +261,8 @@ class Install extends Module {
 				mkdir( $temppath );
 			}
 
-			$resourcepath_real = realpath('../../resources');
-			$resourcepath = $_SESSION['config']->base_path() . '/resources';
+			$resourcepath_real = realpath('../../data');
+			$resourcepath = $_SESSION['config']->base_path() . '/data';
 
 			if ( !file_exists($resourcepath)){
 				$ok = symlink($resourcepath_real, $resourcepath);
