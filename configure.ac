@@ -19,7 +19,7 @@ AC_CONFIG_FILES([
 AC_FUNC_FORK
 
 dnl #######################################################################
-dnl # Check for D-Bus support
+dnl # D-Bus
 dnl #######################################################################
 PKG_CHECK_MODULES(dbus, [dbus-1, dbus-glib-1],
 	[
@@ -34,7 +34,7 @@ AC_SUBST(dbus_CFLAGS)
 AC_SUBST(dbus_LIBS)
 
 dnl #######################################################################
-dnl # Check for D-Bus support
+dnl # libportable
 dnl #######################################################################
 PKG_CHECK_MODULES(libportable, [libportable],
 	[
@@ -46,5 +46,16 @@ PKG_CHECK_MODULES(libportable, [libportable],
 
 AC_SUBST(libportable_CFLAGS)
 AC_SUBST(libportable_LIBS)
+
+dnl #######################################################################
+dnl # OpenGL/GLX
+dnl #######################################################################
+AC_CHECK_HEADERS([GL/gl.h GL/glx.h], [HAVE_GL=yes], [HAVE_GL=no])
+if test x$HAVE_GL = xno; then
+   AC_MSG_ERROR(OpenGL development libraries not found);
+else
+   GL_LIBS="-lGL"
+   GL_CFLAGS=""
+fi
 
 AC_OUTPUT
