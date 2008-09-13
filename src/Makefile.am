@@ -13,9 +13,14 @@ slideshow_SOURCES = \
 	Log.cpp \
 	main.cpp \
 	OS_Linux.cpp
-slideshow_LDADD = state/libfsm.a
+slideshow_LDADD = \
+	browsers/libbrowser.a \
+	IPC/libipc.a \
+	state/libfsm.a \
+	transitions/libtransition.a
 slideshow_LDFLAGS = \
 	${libportable_LIBS} \
+	${dbus_LIBS} \
 	${GL_LIBS} \
 	${FREEIMAGE_LIBS} \
 	${MYSQL_LIBS} \
