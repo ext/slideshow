@@ -75,7 +75,7 @@ dnl #######################################################################
 PKG_CHECK_MODULES(X11, [x11],
 	[
 		AC_DEFINE(HAVE_X11, 1, [Define if X11 development libraries is available])
-		AC_CHECK_HEADERS([xf86vmode.h], [HAVE_VIDMODE=yes], [HAVE_VIDMODE=no])
+		AC_CHECK_HEADERS([X11/extensions/xf86vmode.h], [HAVE_VIDMODE=yes], [HAVE_VIDMODE=no])
 		if test x$HAVE_VIDMODE = xno; then
 		   AC_MSG_ERROR(xf86vidmode development libraries not found);
 		fi
