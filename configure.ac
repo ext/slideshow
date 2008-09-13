@@ -58,4 +58,15 @@ else
    GL_CFLAGS=""
 fi
 
+dnl #######################################################################
+dnl # OpenGL/GLX
+dnl #######################################################################
+AC_CHECK_HEADERS([FreeImage.h], [HAVE_FREEIMAGE=yes], [HAVE_FREEIMAGE=no])
+if test x$HAVE_FREEIMAGE = xno; then
+   AC_MSG_ERROR(FreeImage development libraries not found);
+else
+   FREEIMAGE_LIBS="-lfreeimage"
+   FREEIMAGE_CFLAGS=""
+fi
+
 AC_OUTPUT
