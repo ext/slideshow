@@ -48,6 +48,8 @@ class Kernel {
 		void print_cli_arguments(int argc, const char* argv[]);
 		bool parse_argv(int argc, const char* argv[]);
 
+		bool daemon(){ return _daemon; }
+
 		int _width;
 		int _height;
 		int _frames;

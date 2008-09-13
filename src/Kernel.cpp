@@ -106,7 +106,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 		exit(ARGUMENT_ERROR);
 	}
 
-	if ( !_daemon ){
+	if ( !daemon() ){
 		print_licence_statement();
 	}
 
@@ -126,7 +126,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 
 	Log::message(Log::Info, "Kernel: Starting slideshow\n");
 
-	if ( _daemon ){
+	if ( daemon() ){
 		Portable::daemonize(application_name);
 
 		if ( signal(SIGQUIT, quit_signal) == SIG_ERR ){
@@ -166,7 +166,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 }
 
 Kernel::~Kernel(){
-	if ( _daemon ){
+	if ( daemon() ){
 		Portable::daemon_stop(application_name);
 	}
 
