@@ -59,7 +59,7 @@ else
 fi
 
 dnl #######################################################################
-dnl # OpenGL/GLX
+dnl # FreeImage
 dnl #######################################################################
 AC_CHECK_HEADERS([FreeImage.h], [HAVE_FREEIMAGE=yes], [HAVE_FREEIMAGE=no])
 if test x$HAVE_FREEIMAGE = xno; then
@@ -68,5 +68,23 @@ else
    FREEIMAGE_LIBS="-lfreeimage"
    FREEIMAGE_CFLAGS=""
 fi
+
+dnl #######################################################################
+dnl # Xlib
+dnl #######################################################################
+PKG_CHECK_MODULES(X11, [x11],
+	[
+		AC_DEFINE(HAVE_X11, 1, [Define if X11 development libraries is available])
+		AC_CHECK_HEADERS([xf86vmode.h], [HAVE_VIDMODE=yes], [HAVE_VIDMODE=no])
+		if test x$HAVE_VIDMODE = xno; then
+		   AC_MSG_ERROR(xf86vidmode development libraries not found);
+		fi
+	],
+	[
+		AC_MSG_ERROR([Required X11 development libraries not found])
+	])
+
+AC_SUBST(X11_CFLAGS)
+AC_SUBST(X11_LIBS)
 
 AC_OUTPUT
