@@ -38,7 +38,7 @@ dnl # libportable
 dnl #######################################################################
 PKG_CHECK_MODULES(libportable, [libportable],
 	[
-		AC_DEFINE(HAVE_DBUS, 1, [Define if libportable is available])
+		AC_DEFINE(HAVE_PORTABLE, 1, [Define if libportable is available])
 	],
 	[
 		AC_MSG_ERROR([Required libportable not found])
@@ -75,10 +75,6 @@ dnl #######################################################################
 PKG_CHECK_MODULES(X11, [x11],
 	[
 		AC_DEFINE(HAVE_X11, 1, [Define if X11 development libraries is available])
-		AC_CHECK_HEADERS([X11/extensions/xf86vmode.h], [HAVE_VIDMODE=yes], [HAVE_VIDMODE=no])
-		if test x$HAVE_VIDMODE = xno; then
-		   AC_MSG_ERROR(xf86vidmode development libraries not found);
-		fi
 	],
 	[
 		AC_MSG_ERROR([Required X11 development libraries not found])
@@ -86,5 +82,16 @@ PKG_CHECK_MODULES(X11, [x11],
 
 AC_SUBST(X11_CFLAGS)
 AC_SUBST(X11_LIBS)
+
+PKG_CHECK_MODULES(xxf86vm, [xxf86vm],
+	[
+		AC_DEFINE(HAVE_VIDMODE, 1, [Define if xxf86vm development libraries is available])
+	],
+	[
+		AC_MSG_ERROR([Required xxf86vm development libraries not found])
+	])
+	
+AC_SUBST(xxf86vm_CFLAGS)
+AC_SUBST(xxf86vm_LIBS)
 
 AC_OUTPUT
