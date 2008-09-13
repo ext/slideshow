@@ -127,42 +127,13 @@ Kernel::Kernel(int argc, const char* argv[]):
 	Log::message(Log::Info, "Kernel: Starting slideshow\n");
 
 	if ( daemon() ){
-		Portable::daemonize(application_name);
-
-		if ( signal(SIGQUIT, quit_signal) == SIG_ERR ){
-			Log::message(Log::Fatal, "Kernel: Could not initialize signal handler!\n");
-			exit(3);
-		}
-
-		///@ hack
-		daemon_running = &_running;
+		start_daemon();
 	}
 
-	_graphics = new Graphics(_width, _height, _fullscreen);
-	_graphics->set_transition(new FadeTransition);
-
-	_ipc = new DBus(this, 50);
-
-	if ( !_db_password ){
-		if ( !_stdin ){
-			printf("Database password: \n");
-		}
-		_db_password = (char*)malloc(256);
-		scanf("%256s", _db_password);
-	}
-
-	if ( _db_host ){
-		_browser = new MySQLBrowser(_db_username, _db_password, _db_name, _db_host);
-	} else {
-		_browser = new MySQLBrowser(_db_username, _db_password, _db_name);
-	}
-
-	_browser->change_bin(_bin_id);
-	_browser->reload();
-
-	TransitionState::set_transition_time(_transition_time);
-	ViewState::set_view_time(_switch_time);
-	_state = new InitialState(_browser, _graphics, _ipc);
+	init_graphics();
+	init_IPC();
+	init_browser();
+	init_fsm();
 }
 
 Kernel::~Kernel(){
@@ -184,6 +155,52 @@ Kernel::~Kernel(){
 	_ipc = NULL;
 
 	Log::deinitialize();
+}
+
+void Kernel::init_graphics(){
+	_graphics = new Graphics(_width, _height, _fullscreen);
+	_graphics->set_transition(new FadeTransition);
+}
+
+void Kernel::init_IPC(){
+	_ipc = new DBus(this, 50);
+}
+
+void Kernel::init_browser(){
+	if ( !_db_password ){
+		if ( !_stdin ){
+			printf("Database password: \n");
+		}
+		_db_password = (char*)malloc(256);
+		scanf("%256s", _db_password);
+	}
+
+	if ( _db_host ){
+		_browser = new MySQLBrowser(_db_username, _db_password, _db_name, _db_host);
+	} else {
+		_browser = new MySQLBrowser(_db_username, _db_password, _db_name);
+	}
+
+	_browser->change_bin(_bin_id);
+	_browser->reload();
+}
+
+void Kernel::init_fsm(){
+	TransitionState::set_transition_time(_transition_time);
+	ViewState::set_view_time(_switch_time);
+	_state = new InitialState(_browser, _graphics, _ipc);
+}
+
+void Kernel::start_daemon(){
+	Portable::daemonize(application_name);
+
+	if ( signal(SIGQUIT, quit_signal) == SIG_ERR ){
+		Log::message(Log::Fatal, "Kernel: Could not initialize signal handler!\n");
+		exit(3);
+	}
+
+	///@ hack
+	daemon_running = &_running;
 }
 
 void Kernel::print_licence_statement(){

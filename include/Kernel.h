@@ -50,6 +50,12 @@ class Kernel {
 
 		bool daemon(){ return _daemon; }
 
+		void init_graphics();
+		void init_IPC();
+		void init_browser();
+		void init_fsm();
+		void start_daemon();
+
 		int _width;
 		int _height;
 		int _frames;
