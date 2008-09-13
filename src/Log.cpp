@@ -62,6 +62,49 @@ void Log::message(Severity severity, const char* fmt, ...){
 	va_end(arg);
 }
 
+static Log::Severity last_severity;
+
+void Log::message_begin(Severity severity){
+	last_severity = severity;
+
+	char buf[255];
+	timestring(buf, 255);
+
+	if ( severity >= _level ){
+		fprintf(stdout, "(%s) [%s] ", severity_string(severity), buf);
+		fflush(stdout);
+	}
+
+	fprintf(_file, "(%s) [%s] ", severity_string(severity), buf);
+	fflush(_file);
+}
+
+void Log::message_ex(const char* str){
+	if ( last_severity >= _level ){
+		fprintf(stdout, "%s", str);
+		fflush(stdout);
+	}
+
+	fprintf(_file, "%s", str);
+	fflush(_file);
+}
+
+void Log::message_ex_fmt(const char* fmt, ...){
+	va_list arg;
+	va_start(arg, fmt);
+
+	char* line;
+	vasprintf(&line, fmt, arg);
+
+	if ( last_severity >= _level ){
+		fprintf(stdout, "%s", line);
+		fflush(stdout);
+	}
+
+	fprintf(_file, "%s", line);
+	fflush(_file);
+}
+
 char* Log::timestring(char *buffer, int bufferlen) {
 	time_t t = time(NULL);
 	struct tm* nt;

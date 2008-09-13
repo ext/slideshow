@@ -37,6 +37,10 @@ class Log {
 		static void set_level(Severity level){ _level = level; }
 		static void message(Severity severity, const char* fmt, ...);
 
+		static void message_begin(Severity severity);
+		static void message_ex(const char* str);
+		static void message_ex_fmt(const char* fmt, ...);
+
 	private:
 		Log(){}
 

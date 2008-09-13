@@ -101,13 +101,19 @@ Kernel::Kernel(int argc, const char* argv[]):
 	_logfile("slideshow.log"){
 
 	initTime();
-	Log::initialize(_logfile);
 
 	if ( !parse_argv(argc, argv) ){
 		exit(ARGUMENT_ERROR);
 	}
 
+	if ( !_daemon ){
+		print_licence_statement();
+	}
+
+	Log::initialize(_logfile);
 	Log::set_level( (Log::Severity)_verbose );
+
+	print_cli_arguments(argc, argv);
 
 	fflush(stdout);
 
@@ -118,9 +124,9 @@ Kernel::Kernel(int argc, const char* argv[]):
 	}
 	XCloseDisplay(dpy);
 
-	if ( _daemon ){
-		Log::message(Log::Info, "Kernel: Starting slideshow daemon\n");
+	Log::message(Log::Info, "Kernel: Starting slideshow\n");
 
+	if ( _daemon ){
 		Portable::daemonize(application_name);
 
 		if ( signal(SIGQUIT, quit_signal) == SIG_ERR ){
@@ -130,10 +136,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 
 		///@ hack
 		daemon_running = &_running;
-	} else {
-		Log::message(Log::Info, "Kernel: Starting slideshow\n");
-		print_licence_statement();
-       	}
+	}
 
 	_graphics = new Graphics(_width, _height, _fullscreen);
 	_graphics->set_transition(new FadeTransition);
@@ -191,6 +194,19 @@ void Kernel::print_licence_statement(){
 	printf("for details.\n");
 }
 
+void Kernel::print_cli_arguments(int argc, const char* argv[]){
+	Log::message_begin(Log::Verbose);
+	Log::message_ex("Starting with \"");
+
+	for ( int i = 1; i < argc; i++ ){
+		if ( i > 1 ){
+			Log::message_ex(" ");
+		}
+		Log::message_ex_fmt("%s", argv[i]);
+	}
+	Log::message_ex("\n");
+}
+
 void Kernel::run(){
 	_running = true;
 
@@ -204,15 +220,6 @@ void Kernel::run(){
 }
 
 bool Kernel::parse_argv(int argc, const char* argv[]){
-	printf("Starting with \"");
-	for ( int i = 1; i < argc; i++ ){
-		if ( i > 1 ){
-			putchar(' ');
-		}
-		printf("%s", argv[i]);
-	}
-	printf("\"\n");
-
 	option_set_t options;
 	option_initialize(&options, argc, argv);
 

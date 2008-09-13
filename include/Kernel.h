@@ -45,6 +45,7 @@ class Kernel {
 		void switch_state(double t);
 
 		void print_licence_statement();
+		void print_cli_arguments(int argc, const char* argv[]);
 		bool parse_argv(int argc, const char* argv[]);
 
 		int _width;
