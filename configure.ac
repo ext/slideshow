@@ -58,6 +58,9 @@ else
    GL_CFLAGS=""
 fi
 
+AC_SUBST(GL_CFLAGS)
+AC_SUBST(GL_LIBS)
+
 dnl #######################################################################
 dnl # FreeImage
 dnl #######################################################################
@@ -68,6 +71,9 @@ else
    FREEIMAGE_LIBS="-lfreeimage"
    FREEIMAGE_CFLAGS=""
 fi
+
+AC_SUBST(FREEIMAGE_CFLAGS)
+AC_SUBST(FREEIMAGE_LIBS)
 
 dnl #######################################################################
 dnl # Xlib
@@ -88,7 +94,13 @@ PKG_CHECK_MODULES(xxf86vm, [xxf86vm],
 		AC_DEFINE(HAVE_VIDMODE, 1, [Define if xxf86vm development libraries is available])
 	],
 	[
-		AC_MSG_ERROR([Required xxf86vm development libraries not found])
+		PKG_CHECK_MODULES(xxf86vm, [xf86vidmodeproto],
+			[
+				AC_DEFINE(HAVE_VIDMODE, 1, [Define if xxf86vm development libraries is available])
+			],
+			[
+				AC_MSG_ERROR([Required xxf86vm development libraries not found])
+			])
 	])
 	
 AC_SUBST(xxf86vm_CFLAGS)

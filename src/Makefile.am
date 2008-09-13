@@ -11,3 +11,9 @@ slideshow_SOURCES = \
 	Log.cpp \
 	main.cpp \
 	OS_Linux.cpp
+slideshow_LDFLAGS = \
+	${libportable_LIBS} \
+	${GL_LIBS} \
+	${FREEIMAGE_LIBS} \
+	${X11_LIBS} \
+	${xxf86vm_LIBS}
