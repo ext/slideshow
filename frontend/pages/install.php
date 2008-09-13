@@ -261,7 +261,19 @@ class Install extends Module {
 				mkdir( $temppath );
 			}
 
+			$resourcepath_real = realpath('../../resources');
+			$resourcepath = $_SESSION['config']->base_path() . '/resources';
+
+			if ( !file_exists($resourcepath)){
+				$ok = symlink($resourcepath_real, $resourcepath);
+				if ( !$ok ){
+					echo 'Failed to create symlink from ', $resourcepath_real, ' to ', $resourcepath, '\n';
+				}
+			}
+
 			$_SESSION['config']->persist('../settings.json');
+			unset($_SESSION['config']);
+
 			$this->redirect("/index.php/install/complete");
 		}
 
