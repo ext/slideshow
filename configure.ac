@@ -21,17 +21,16 @@ AC_FUNC_FORK
 dnl #######################################################################
 dnl # Check for D-Bus support
 dnl #######################################################################
-PKG_CHECK_MODULES(DBdUS, [dbus-1 >= 0.60, dbus-glib-1 >= 0.60],
+PKG_CHECK_MODULES(dbus, [dbus-1, dbus-glib-1],
 	[
-		AC_DEFINE(HAVE_DBUS_GLIB, 1, [Define if glib bindings of D-Bus are available])
-		enable_dbus_glib=yes
+		AC_DEFINE(HAVE_DBUS, 1, [Define if D-Bus is available])
+		enable_dbus=yes
 	],
 	[
-		AC_MSG_ERROR([D-Bus requirements not met. D-Bus support not activated.])
-		enable_dbus_glib=no
+		AC_MSG_ERROR([D-Bus requirements not met.])
 	])
 
-AC_SUBST(DBUS_CFLAGS)
-AC_SUBST(DBUS_LIBS)
+AC_SUBST(dbus_CFLAGS)
+AC_SUBST(dbus_LIBS)
 
 AC_OUTPUT
