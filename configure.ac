@@ -107,4 +107,18 @@ PKG_CHECK_MODULES(xxf86vm, [xxf86vm],
 AC_SUBST(xxf86vm_CFLAGS)
 AC_SUBST(xxf86vm_LIBS)
 
+dnl #######################################################################
+dnl # MySQL
+dnl #######################################################################
+AC_CHECK_HEADERS([mysql/mysql.h],
+	[
+		AC_DEFINE(HAVE_MYSQL, 1, [Define if X11 development libraries is available])
+		MYSQL_LIBS="-lmysql"
+	],
+	[
+		AC_MSG_ERROR([Required mysql development libraries not found])
+	])
+
+AC_SUBST(MYSQL_LIBS)
+
 AC_OUTPUT

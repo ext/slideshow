@@ -18,5 +18,6 @@ slideshow_LDFLAGS = \
 	${libportable_LIBS} \
 	${GL_LIBS} \
 	${FREEIMAGE_LIBS} \
+	${MYSQL_LIBS} \
 	${X11_LIBS} \
 	${xxf86vm_LIBS}
