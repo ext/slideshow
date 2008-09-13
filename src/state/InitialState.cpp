@@ -3,8 +3,8 @@
 
 State* InitialState::action(){
 	gfx()->load_image(NULL);
-	gfx()->load_image(NULL);
-	gfx()->render(1.0);
+	gfx()->load_image("resources/splash.png");
+	gfx()->render(0.0);
 
 	return new TransitionState(this);
 }
