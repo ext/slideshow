@@ -113,7 +113,7 @@ dnl #######################################################################
 AC_CHECK_HEADERS([mysql/mysql.h],
 	[
 		AC_DEFINE(HAVE_MYSQL, 1, [Define if X11 development libraries is available])
-		MYSQL_LIBS="-lmysql"
+		MYSQL_LIBS="-lmysqlclient"
 	],
 	[
 		AC_MSG_ERROR([Required mysql development libraries not found])
