@@ -1,4 +1,4 @@
-AC_INIT([slideshow],[0.2.0])
+AC_INIT([slideshow],[0.2.0], [ext@sidvind.com])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall])
 AC_CONFIG_MACRO_DIR([m4])
@@ -16,6 +16,22 @@ AC_CONFIG_FILES([
 	src/state/Makefile
 	src/transitions/Makefile
 ])
+
+dnl #######################################################################
+dnl # Paths
+dnl #######################################################################
+
+pkgdatadir="${datadir}/${PACKAGE}"
+AC_SUBST(pkgdatadir)
+resourcedir="${pkgdatadir}/resources"
+AC_SUBST(resourcedir)
+
+AC_DEFINE_DIR([DATA_DIR], [pkgdatadir], [Data directory])
+AC_DEFINE_DIR([RESOURCE_DIR], [resourcedir], [Resource directory])
+
+dnl #######################################################################
+dnl # Check presence of functions
+dnl #######################################################################
 
 AC_FUNC_FORK
 
