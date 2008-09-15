@@ -131,6 +131,8 @@ Kernel::Kernel(int argc, const char* argv[]):
 	}
 
 	lt_dlinit();
+	lt_dladdsearchdir(PLUGIN_DIR);
+	lt_dladdsearchdir("src/transitions");
 
 	init_graphics();
 	init_IPC();
@@ -160,8 +162,7 @@ Kernel::~Kernel(){
 
 void Kernel::init_graphics(){
 	_graphics = new Graphics(_width, _height, _fullscreen);
-	//_graphics->set_transition(new SpinTransition);
-	load_transition("src/transitions/spin");
+	load_transition("fade");
 }
 
 void Kernel::init_IPC(){
