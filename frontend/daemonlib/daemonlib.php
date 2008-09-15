@@ -88,7 +88,9 @@ class SlideshowInst {
 			unlink($this->pidfile);
 		}
 
-		$cmd = 	"ulimit -c unlimited; echo '{$arguments->password()}' | DISPLAY=\":0\" $this->binary {$arguments->as_string()} >> {$arguments->logfile()} 2>&1";
+		global $settings;
+
+		$cmd = 	"ulimit -c unlimited; echo '{$arguments->password()}' | SLIDESHOW_DATA_DIR=\"{$settings->data_path()}\" DISPLAY=\":0\" $this->binary {$arguments->as_string()} >> {$arguments->logfile()} 2>&1";
 
 		$old_wd = getcwd();
 		chdir( $arguments->basepath() );

@@ -61,6 +61,14 @@ class Settings {
 		$this->data['BasePath'] = $new_path;
 	}
 
+	function data_path(){
+		return $this->data['Path']['Data'];
+	}
+
+	function set_data_path($new_path){
+		$this->data['Path']['Data'] = $new_path;
+	}
+
 	function image_path(){
 		return $this->base_path() . '/' . $this->data['Path']['Image'];
 	}

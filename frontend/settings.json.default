@@ -2,6 +2,7 @@
 	"BasePath": "",
 
 	"Path": {
+		"Data": "/usr/share/slideshow",
 		"Image": "image",
 		"Video": "video",
 		"Temp": "tmp"

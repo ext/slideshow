@@ -23,10 +23,10 @@ class DaemonArguments {
 	private $password = false;
 	private $logfile = false;
 	private $basepath = false;
-	private $arguments = "--daemon --fullscreen --stdin --verbose";
+	private $arguments = "--daemon --fullscreen --stdin-password --verbose";
 
 	public function set_database_settings($host, $name, $username, $password){
-		$this->arguments .= " --db_host $host --db_name $name --db_user $username";
+		$this->arguments .= " --browser mysql://$username@$host/$name";
 		$this->db_password = $password;
 	}
 
