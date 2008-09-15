@@ -151,8 +151,6 @@ void OS::swap_gl_buffers(){
 void OS::cleanup(){
   XDefineCursor(dpy, win, default_cursor);
   glXDestroyContext(dpy, ctx);
-  XDefineCursor(dpy, win, default_cursor);
-  glXDestroyContext(dpy, ctx);
 
   if( win && dpy ){
 	XDestroyWindow( dpy, win );
