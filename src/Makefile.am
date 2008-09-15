@@ -7,10 +7,17 @@ AM_CPPFLAGS = \
 bin_PROGRAMS = slideshow
 
 slideshow_SOURCES = \
-	argument_parser.c \
-	Graphics.cpp \
-	Kernel.cpp \
-	Log.cpp \
+	Browser.h
+	config.h
+	ErrorCodes.h
+	Exceptions.h
+	IPC.h
+	OS.h
+	Transition.h
+	argument_parser.c argument_parser.h \
+	Graphics.cpp Graphics.h \
+	Kernel.cpp Kernel.h \
+	Log.cpp Log.h\
 	main.cpp \
 	OS_Linux.cpp
 slideshow_LDADD = \

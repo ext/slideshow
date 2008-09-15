@@ -62,6 +62,15 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
 SOURCES = $(libbrowser_a_SOURCES)
 DIST_SOURCES = $(libbrowser_a_SOURCES)
 ETAGS = etags
@@ -201,8 +210,8 @@ xxf86vm_CFLAGS = @xxf86vm_CFLAGS@
 xxf86vm_LIBS = @xxf86vm_LIBS@
 noinst_LIBRARIES = libbrowser.a
 libbrowser_a_SOURCES = \
-	dummybrowser.cpp \
-	mysqlbrowser.cpp
+	dummybrowser.cpp dummybrowser.h \
+	mysqlbrowser.cpp mysqlbrowser.h
 
 all: all-am
 

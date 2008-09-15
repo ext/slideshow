@@ -62,6 +62,15 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
+	$(LDFLAGS) -o $@
 SOURCES = $(libtransition_a_SOURCES)
 DIST_SOURCES = $(libtransition_a_SOURCES)
 ETAGS = etags
@@ -201,9 +210,9 @@ xxf86vm_CFLAGS = @xxf86vm_CFLAGS@
 xxf86vm_LIBS = @xxf86vm_LIBS@
 noinst_LIBRARIES = libtransition.a
 libtransition_a_SOURCES = \
-	dummy.cpp \
-	fade.cpp \
-	spin.cpp
+	dummy.cpp dummy.h\
+	fade.cpp fade.h \
+	spin.cpp spin.h
 
 all: all-am
 
