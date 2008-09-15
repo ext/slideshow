@@ -103,6 +103,8 @@ void Log::message_ex_fmt(const char* fmt, ...){
 
 	fprintf(_file, "%s", line);
 	fflush(_file);
+
+	free(line);
 }
 
 char* Log::timestring(char *buffer, int bufferlen) {
