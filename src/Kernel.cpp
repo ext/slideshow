@@ -77,6 +77,9 @@
 bool* daemon_running = NULL;
 static const char* const application_name = "slideshow";
 
+static const int mode_normal = 0;
+static const int mode_list_transitions = 1;
+
 void quit_signal(int){
 	Log::message(Log::Verbose, "Caught SIGQUIT\n");
 	signal(SIGQUIT, quit_signal);
@@ -92,6 +95,8 @@ Kernel::Kernel(int argc, const char* argv[]):
 	_daemon(0),
 	_verbose(1),
 	_stdin(0),
+	_mode(mode_normal),
+	_transition_name(NULL),
 	_transition_time(3.0f),
 	_switch_time(5.0f),
 	_graphics(NULL),
@@ -104,6 +109,12 @@ Kernel::Kernel(int argc, const char* argv[]):
 
 	if ( !parse_argv(argc, argv) ){
 		exit(ARGUMENT_ERROR);
+	}
+
+	switch ( _mode ){
+		case mode_list_transitions:
+			printf("bajs bajs bajs\n");
+			exit(0);
 	}
 
 	if ( !daemon() ){
@@ -162,7 +173,7 @@ Kernel::~Kernel(){
 
 void Kernel::init_graphics(){
 	_graphics = new Graphics(_width, _height, _fullscreen);
-	load_transition("fade");
+	load_transition( _transition_name ? _transition_name : "fade" );
 }
 
 void Kernel::init_IPC(){
@@ -260,8 +271,10 @@ bool Kernel::parse_argv(int argc, const char* argv[]){
 	option_add_flag(&options, "quiet", 'q', "Explain what is being done", &_verbose, 2);
 	option_add_flag(&options, "fullscreen", 'f', "Start in fullscreen mode", &_fullscreen, 1);
 	option_add_flag(&options, "daemon", 'd', "Run in background", &_daemon, 1);
+	option_add_flag(&options, "list-transitions", 0, "List available transitions", &_mode, mode_list_transitions);
 	option_add_flag(&options, "stdin-password", 0, "Except the input (e.g database password) to come from stdin", &_stdin, 1);
 	option_add_string(&options, "browser", 0, "Browser connection string. provider://user[:pass]@host[:port]/name", &_browser_string);
+	option_add_string(&options, "transition", 't', "Set slide transition plugin [fade]", &_transition_name);
 	option_add_int(&options, "collection-id", 'c', "ID of the collection to display", &_bin_id);
 	option_add_format(&options, "resolution", 'r', "Resolution", "WIDTHxHEIGHT", "%dx%d", &_width, &_height);
 

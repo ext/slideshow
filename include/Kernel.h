@@ -75,6 +75,8 @@ class Kernel {
 		int _daemon;
 		int _verbose;
 		int _stdin;
+		int _mode;
+		char* _transition_name;
 		double _transition_time;
 		double _switch_time;
 		double _last_switch;
