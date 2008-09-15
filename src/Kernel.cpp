@@ -309,15 +309,21 @@ void Kernel::debug_dumpqueue(){
 }
 
 char* Kernel::real_path(const char* filename){
-	const char* datadir = getenv("SLIDESHOW_DATA_DIR");
-	if ( !datadir ){
-		datadir = DATA_DIR;
-	}
-
 	char* dst;
-	if ( asprintf(&dst, "%s/%s", datadir, filename) == -1 ){
-		Log::message(Log::Fatal, "Memory allocation failed!");
-		return NULL;
+
+	if ( filename[0] == '/' ){
+		dst = (char*)malloc(strlen(filename)+1);
+		strcpy(dst, filename);
+	} else {
+		const char* datadir = getenv("SLIDESHOW_DATA_DIR");
+		if ( !datadir ){
+			datadir = DATA_DIR;
+		}
+
+		if ( asprintf(&dst, "%s/%s", datadir, filename) == -1 ){
+			Log::message(Log::Fatal, "Memory allocation failed!");
+			return NULL;
+		}
 	}
 
 	return dst;

@@ -23,7 +23,10 @@
 #include "Transition.h"
 #include <GL/gl.h>
 #include <cstdio>
+#include <cstdlib>
 #include <stdexcept>
+
+#include <portable/string.h>
 
 #ifndef __MACH__
 #   include <FreeImage.h>
@@ -130,11 +133,7 @@ void Graphics::load_image(const char* name){
 	glBindTexture(GL_TEXTURE_2D, texture_0);
 
 	if ( name ){
-		const char* path = name;
-
-		if ( name[0] != '/' ){
-			path = Kernel::real_path(name);
-		}
+		char* path = Kernel::real_path(name);
 
 		FIBITMAP* dib = GenericLoader(path, 0);
 
@@ -142,8 +141,11 @@ void Graphics::load_image(const char* name){
 			//@todo Is this safe?
 			char buf[512];
 			snprintf(buf, 512, "Failed to load image '%s'", path);
+			free(path);
 			throw std::runtime_error(buf);
 		}
+
+		free(path);
 
 		FreeImage_FlipVertical(dib);
 
