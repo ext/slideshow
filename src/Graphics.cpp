@@ -63,9 +63,12 @@ static FIBITMAP* GenericLoader(const char* lpszPathName, int flag) {
     return NULL;
 }
 Graphics::Graphics(int width, int height, bool fullscreen):
-	_transition(NULL),
 	texture_0(0),
 	texture_1(0){
+
+	_transition.init = NULL;
+	_transition.cleanup = NULL;
+	_transition.render = NULL;
 
 	OS::init_view(width, height, fullscreen);
 	Log::message(Log::Verbose, "Graphics: Using resoultion %dx%d\n", width, height);
@@ -107,13 +110,22 @@ Graphics::Graphics(int width, int height, bool fullscreen):
 Graphics::~Graphics(){
 	glDeleteTextures(1, &texture_0);
 	glDeleteTextures(1, &texture_1);
-	set_transition(NULL);
+
+	if ( _transition.cleanup ){
+		_transition.cleanup();
+	}
 
 	OS::cleanup();
 }
 
 void Graphics::render(float state){
-	_transition->render(texture_0, texture_1, state);
+	transition_context_t context;
+
+	context.texture[0] = texture_0;
+	context.texture[1] = texture_1;
+	context.state = state;
+
+	_transition.render(&context);
 
 	OS::swap_gl_buffers();
 }
@@ -180,7 +192,14 @@ void Graphics::swap_textures(){
 	texture_1 = tmp;
 }
 
-void Graphics::set_transition(Transition* transition){
-	delete _transition;
-	_transition = transition;
+void Graphics::set_transition(transition_module_t module){
+	if ( _transition.cleanup ){
+		_transition.cleanup();
+	}
+
+	_transition = module;
+
+	if ( _transition.init ){
+		_transition.init();
+	}
 }

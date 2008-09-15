@@ -19,7 +19,7 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
-class Transition;
+#include "Transition.h"
 
 class Graphics {
 	public:
@@ -28,12 +28,13 @@ class Graphics {
 
 		void render(float state);
 		void load_image(const char* filename);
-		void set_transition(Transition* transition);
+
+		void set_transition(transition_module_t module);
 
 	private:
 		void swap_textures();
 
-		Transition* _transition;
+		transition_module_t _transition;
 		unsigned int texture_0;
 		unsigned int texture_1;
 };

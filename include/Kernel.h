@@ -59,6 +59,8 @@ class Kernel {
 		bool daemon(){ return _daemon; }
 		Browser* browser(){ return _browser; }
 
+		void load_transition(const char* name);
+
 		void init_graphics();
 		void init_IPC();
 		void init_browser();

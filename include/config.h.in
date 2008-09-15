@@ -97,6 +97,9 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* Plugin directory */
+#undef PLUGIN_DIR
+
 /* Resource directory */
 #undef RESOURCE_DIR
 

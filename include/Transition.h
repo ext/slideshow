@@ -19,12 +19,19 @@
 #ifndef TRANSITION_H
 #define TRANSITION_H
 
-class Transition {
-	public:
-		Transition(){}
-		virtual ~Transition(){}
+typedef struct {
+	unsigned int texture[2];
+	float state;
+} transition_context_t;
 
-		virtual void render(unsigned int texture_0, unsigned int texture_1, float state) = 0;
-};
+typedef void (*module_init_callback)();
+typedef void (*module_cleanup_callback)();
+typedef void (*render_callback)(transition_context_t* context);
+
+typedef struct {
+	module_init_callback init;
+	module_cleanup_callback cleanup;
+	render_callback render;
+} transition_module_t;
 
 #endif // TRANSITION_H

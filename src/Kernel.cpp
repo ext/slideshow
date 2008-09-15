@@ -24,11 +24,12 @@
 #include "Log.h"
 #include "ErrorCodes.h"
 #include "Exceptions.h"
+#include "Transition.h"
 
 // Transitions
-#include "transitions/dummy.h"
-#include "transitions/fade.h"
-#include "transitions/spin.h"
+//#include "transitions/dummy.h"
+//#include "transitions/fade.h"
+//#include "transitions/spin.h"
 
 // Browsers
 #include "browsers/mysqlbrowser.h"
@@ -63,6 +64,7 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include <X11/Xlib.h>
+#include <ltdl.h>
 
 #ifdef LINUX
 #include <sys/time.h>
@@ -128,6 +130,8 @@ Kernel::Kernel(int argc, const char* argv[]):
 		start_daemon();
 	}
 
+	lt_dlinit();
+
 	init_graphics();
 	init_IPC();
 	init_browser();
@@ -143,6 +147,8 @@ Kernel::~Kernel(){
 	delete _graphics;
 	delete _ipc;
 
+	lt_dlexit();
+
 	free( _browser_string );
 
 	_browser = NULL;
@@ -154,7 +160,8 @@ Kernel::~Kernel(){
 
 void Kernel::init_graphics(){
 	_graphics = new Graphics(_width, _height, _fullscreen);
-	_graphics->set_transition(new SpinTransition);
+	//_graphics->set_transition(new SpinTransition);
+	load_transition("src/transitions/spin");
 }
 
 void Kernel::init_IPC(){
@@ -184,6 +191,17 @@ void Kernel::init_fsm(){
 	TransitionState::set_transition_time(_transition_time);
 	ViewState::set_view_time(_switch_time);
 	_state = new InitialState(_browser, _graphics, _ipc);
+}
+
+void Kernel::load_transition(const char* name){
+	lt_dlhandle bajs = lt_dlopenext(name);
+
+	transition_module_t module;
+	module.init = (module_init_callback)lt_dlsym(bajs, "module_init");
+	module.cleanup = (module_cleanup_callback)lt_dlsym(bajs, "module_cleanup");
+	module.render = (render_callback)lt_dlsym(bajs, "render");
+
+	_graphics->set_transition(module);
 }
 
 void Kernel::start_daemon(){

@@ -24,13 +24,14 @@ slideshow_SOURCES = \
 	OS_Linux.cpp \
 	browsers/dummybrowser.cpp browsers/dummybrowser.h \
 	browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
-	
+
 slideshow_LDADD = \
 	browsers/libbrowser.a \
 	IPC/libipc.a \
 	state/libfsm.a \
 	transitions/libtransition.a
 slideshow_LDFLAGS = \
+	-lltdl \
 	${libportable_LIBS} \
 	${dbus_LIBS} \
 	${GL_LIBS} \

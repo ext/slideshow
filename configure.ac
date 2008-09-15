@@ -7,6 +7,7 @@ AC_CONFIG_HEADERS([include/config.h])
 AC_PROG_CXX
 AC_PROG_LIBTOOL
 LT_INIT
+AC_LIBTOOL_DLOPEN
 
 AC_CONFIG_FILES([
 	Makefile
@@ -24,9 +25,12 @@ pkgdatadir="${datadir}/${PACKAGE}"
 AC_SUBST(pkgdatadir)
 resourcedir="${pkgdatadir}/resources"
 AC_SUBST(resourcedir)
+plugindir="${pkgdatadir}/plugin"
+AC_SUBST(plugindir)
 
 AC_DEFINE_DIR([DATA_DIR], [pkgdatadir], [Data directory])
 AC_DEFINE_DIR([RESOURCE_DIR], [resourcedir], [Resource directory])
+AC_DEFINE_DIR([PLUGIN_DIR], [plugindir], [Plugin directory])
 
 dnl #######################################################################
 dnl # Check presence of functions
