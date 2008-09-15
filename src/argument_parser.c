@@ -193,7 +193,7 @@ int option_parse(option_set_t* option){
 			{
 				argument_string_t* real_option = (argument_string_t*)option;
 				free(*(real_option->dst));
-				*(real_option->dst) = (char*)malloc(strlen(argv[i]) );
+				*(real_option->dst) = (char*)malloc(strlen(argv[i])+1);
 				strcpy(*(real_option->dst), argv[i]);
 				break;
 			}
