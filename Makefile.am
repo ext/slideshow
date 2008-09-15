@@ -3,4 +3,4 @@ SUBDIRS = src
 
 resource_DATA = data/resources/splash.png
 
-EXTRA_DIST = ${resource_DATA}
+EXTRA_DIST = ${resource_DATA} slideshow
