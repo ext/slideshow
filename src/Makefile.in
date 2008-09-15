@@ -47,9 +47,11 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_slideshow_OBJECTS = argument_parser.$(OBJEXT) Graphics.$(OBJEXT) \
+am_slideshow_OBJECTS = argument_parser.$(OBJEXT) \
+	browser_context.$(OBJEXT) Browser.$(OBJEXT) Graphics.$(OBJEXT) \
 	Kernel.$(OBJEXT) Log.$(OBJEXT) main.$(OBJEXT) \
-	OS_Linux.$(OBJEXT)
+	OS_Linux.$(OBJEXT) dummybrowser.$(OBJEXT) \
+	mysqlbrowser.$(OBJEXT)
 slideshow_OBJECTS = $(am_slideshow_OBJECTS)
 slideshow_DEPENDENCIES = browsers/libbrowser.a IPC/libipc.a \
 	state/libfsm.a transitions/libtransition.a
@@ -224,7 +226,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 xxf86vm_CFLAGS = @xxf86vm_CFLAGS@
 xxf86vm_LIBS = @xxf86vm_LIBS@
-SUBDIRS = browsers IPC state transitions
+SUBDIRS = IPC state transitions
 AM_CPPFLAGS = \
 	${dbus_CFLAGS} \
 	-I${top_srcdir}/include
@@ -238,11 +240,15 @@ slideshow_SOURCES = \
 	${top_srcdir}/include/OS.h \
 	${top_srcdir}/include/Transition.h \
 	argument_parser.c ${top_srcdir}/include/argument_parser.h \
+	browser_context.cpp \
+	Browser.cpp ${top_srcdir}/include/Browser.h \
 	Graphics.cpp ${top_srcdir}/include/Graphics.h \
 	Kernel.cpp ${top_srcdir}/include/Kernel.h \
 	Log.cpp ${top_srcdir}/include/Log.h\
 	main.cpp \
-	OS_Linux.cpp
+	OS_Linux.cpp \
+	browsers/dummybrowser.cpp browsers/dummybrowser.h \
+	browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
 
 slideshow_LDADD = \
 	browsers/libbrowser.a \
@@ -330,12 +336,16 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Browser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Graphics.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Kernel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Log.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OS_Linux.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/argument_parser.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/browser_context.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dummybrowser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mysqlbrowser.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -378,6 +388,34 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+
+dummybrowser.o: browsers/dummybrowser.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT dummybrowser.o -MD -MP -MF $(DEPDIR)/dummybrowser.Tpo -c -o dummybrowser.o `test -f 'browsers/dummybrowser.cpp' || echo '$(srcdir)/'`browsers/dummybrowser.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/dummybrowser.Tpo $(DEPDIR)/dummybrowser.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='browsers/dummybrowser.cpp' object='dummybrowser.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o dummybrowser.o `test -f 'browsers/dummybrowser.cpp' || echo '$(srcdir)/'`browsers/dummybrowser.cpp
+
+dummybrowser.obj: browsers/dummybrowser.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT dummybrowser.obj -MD -MP -MF $(DEPDIR)/dummybrowser.Tpo -c -o dummybrowser.obj `if test -f 'browsers/dummybrowser.cpp'; then $(CYGPATH_W) 'browsers/dummybrowser.cpp'; else $(CYGPATH_W) '$(srcdir)/browsers/dummybrowser.cpp'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/dummybrowser.Tpo $(DEPDIR)/dummybrowser.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='browsers/dummybrowser.cpp' object='dummybrowser.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o dummybrowser.obj `if test -f 'browsers/dummybrowser.cpp'; then $(CYGPATH_W) 'browsers/dummybrowser.cpp'; else $(CYGPATH_W) '$(srcdir)/browsers/dummybrowser.cpp'; fi`
+
+mysqlbrowser.o: browsers/mysqlbrowser.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mysqlbrowser.o -MD -MP -MF $(DEPDIR)/mysqlbrowser.Tpo -c -o mysqlbrowser.o `test -f 'browsers/mysqlbrowser.cpp' || echo '$(srcdir)/'`browsers/mysqlbrowser.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/mysqlbrowser.Tpo $(DEPDIR)/mysqlbrowser.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='browsers/mysqlbrowser.cpp' object='mysqlbrowser.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mysqlbrowser.o `test -f 'browsers/mysqlbrowser.cpp' || echo '$(srcdir)/'`browsers/mysqlbrowser.cpp
+
+mysqlbrowser.obj: browsers/mysqlbrowser.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mysqlbrowser.obj -MD -MP -MF $(DEPDIR)/mysqlbrowser.Tpo -c -o mysqlbrowser.obj `if test -f 'browsers/mysqlbrowser.cpp'; then $(CYGPATH_W) 'browsers/mysqlbrowser.cpp'; else $(CYGPATH_W) '$(srcdir)/browsers/mysqlbrowser.cpp'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/mysqlbrowser.Tpo $(DEPDIR)/mysqlbrowser.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='browsers/mysqlbrowser.cpp' object='mysqlbrowser.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mysqlbrowser.obj `if test -f 'browsers/mysqlbrowser.cpp'; then $(CYGPATH_W) 'browsers/mysqlbrowser.cpp'; else $(CYGPATH_W) '$(srcdir)/browsers/mysqlbrowser.cpp'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo

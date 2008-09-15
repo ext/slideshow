@@ -23,7 +23,7 @@
 
 class DummyBrowser: public Browser {
 	public:
-		DummyBrowser();
+		DummyBrowser(const browser_context_t& context);
 		virtual ~DummyBrowser();
 
 		virtual const char* get_next_file();

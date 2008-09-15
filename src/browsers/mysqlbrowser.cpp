@@ -25,20 +25,25 @@
 #include <stdarg.h>
 #include <mysql/mysql.h>
 
-MySQLBrowser::MySQLBrowser(const char* username, const char* password, const char* database, const char* hostname):
-	_username(NULL),
-	_password(NULL),
-	_database(NULL),
-	_hostname(NULL),
+class MySQLBrowser_factory {
+	public:
+		MySQLBrowser_factory(){
+			Browser::register_factory(&MySQLBrowser_factory::factory, "mysql");
+		}
+
+		static Browser* factory(const browser_context_t& context){
+			return new MySQLBrowser(context);
+		}
+};
+
+MySQLBrowser_factory MySQLBrowser_factory_inst;
+
+MySQLBrowser::MySQLBrowser(const browser_context_t& context):
+	Browser(context),
 	_conn(NULL),
 	_fields(NULL),
 	_nr_of_fields(0),
 	_current_field(0){
-
-	set_username(username);
-	set_password(password);
-	set_database(database);
-	set_hostname(hostname);
 
 	connect();
 }
@@ -47,49 +52,16 @@ MySQLBrowser::~MySQLBrowser(){
 	disconnect();
 
 	clear_fields();
-
-	free(_username);
-	free(_password);
-	free(_database);
-	free(_hostname);
 }
 
 const char* MySQLBrowser::get_next_file(){
 	return get_field(_current_field++);;
 }
 
-void MySQLBrowser::set_username(const char* username){
-	free(_username);
-	assert( username && "Must supply a mysql username using the --db_user flag" );
-	_username = (char*)malloc( strlen(username) + 1 );
-	strcpy( _username, username);
-}
-
-void MySQLBrowser::set_password(const char* password){
-	free(_password);
-	assert( password && "Must supply a mysql password using the --db_pass flag" );
-	_password = (char*)malloc( strlen(password) + 1 );
-	strcpy( _password, password);
-}
-
-void MySQLBrowser::set_database(const char* database){
-	free(_database);
-	assert( database && "Must supply a mysql database using the --db_name flag" );
-	_database = (char*)malloc( strlen(database) + 1 );
-	strcpy( _database, database);
-}
-
-void MySQLBrowser::set_hostname(const char* hostname){
-	free(_hostname);
-	assert( hostname );
-	_hostname = (char*)malloc( strlen(hostname) + 1 );
-	strcpy( _hostname, hostname);
-}
-
 void MySQLBrowser::connect(){
 	_conn = mysql_init(NULL);
 
-	if (!mysql_real_connect(_conn, _hostname, _username, _password, _database, 0, NULL, 0)) {
+	if (!mysql_real_connect(_conn, hostname(), username(), password(), database(), 0, NULL, 0)) {
 		Log::message(Log::Fatal, "MySQLBrowser: Could not connect to database: %s\n", mysql_error(_conn));
 		exit(2);
 	}

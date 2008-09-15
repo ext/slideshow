@@ -18,7 +18,8 @@
 
 #include "dummybrowser.h"
 
-DummyBrowser::DummyBrowser():
+DummyBrowser::DummyBrowser(const browser_context_t& context):
+	Browser(context),
 	n(0){
 
 	_img[0] = "IMG_0298.JPG";

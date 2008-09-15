@@ -54,10 +54,6 @@ void Log::message(Severity severity, const char* fmt, ...){
 	fprintf(_file, "(%s) [%s] %s", severity_string(severity), timestring(buf, 255), line);
 	fflush(_file);
 
-	if ( severity == Fatal ){
-		vfprintf(stderr, fmt, arg);
-	}
-
 	free(line);
 	va_end(arg);
 }
