@@ -219,7 +219,7 @@ xxf86vm_LIBS = @xxf86vm_LIBS@
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = src
 resource_DATA = data/resources/splash.png
-EXTRA_DIST = ${resource_DATA}
+EXTRA_DIST = ${resource_DATA} slideshow
 all: all-recursive
 
 .SUFFIXES:
