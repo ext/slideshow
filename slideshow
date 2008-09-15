@@ -1,0 +1,3 @@
+#!/bin/sh
+
+SLIDESHOW_DATA_DIR="data" src/slideshow $*
