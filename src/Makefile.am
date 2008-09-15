@@ -7,13 +7,13 @@ AM_CPPFLAGS = \
 bin_PROGRAMS = slideshow
 
 slideshow_SOURCES = \
-	Browser.h
-	config.h
-	ErrorCodes.h
-	Exceptions.h
-	IPC.h
-	OS.h
-	Transition.h
+	Browser.h \
+	config.h \
+	ErrorCodes.h \
+	Exceptions.h \
+	IPC.h \
+	OS.h \
+	Transition.h \
 	argument_parser.c argument_parser.h \
 	Graphics.cpp Graphics.h \
 	Kernel.cpp Kernel.h \
