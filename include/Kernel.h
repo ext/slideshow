@@ -57,6 +57,7 @@ class Kernel {
 		bool parse_argv(int argc, const char* argv[]);
 
 		bool daemon(){ return _daemon; }
+		Browser* browser(){ return _browser; }
 
 		void init_graphics();
 		void init_IPC();
@@ -82,10 +83,7 @@ class Kernel {
 		Browser* _browser;
 		IPC* _ipc;
 
-		char* _db_username;
-		char* _db_password;
-		char* _db_name;
-		char* _db_host;
+		char* _browser_string;
 
 		const char* _logfile;
 		bool _running;

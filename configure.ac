@@ -11,7 +11,6 @@ LT_INIT
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
-	src/browsers/Makefile
 	src/IPC/Makefile
 	src/state/Makefile
 	src/transitions/Makefile

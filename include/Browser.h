@@ -19,6 +19,17 @@
 #ifndef BROWSER_H
 #define BROWSER_H
 
+typedef struct {
+	char* provider;
+	char* user;
+	char* pass;
+	char* host;
+	char* name;
+} browser_context_t;
+
+browser_context_t get_context(const char* string);
+void free_context(browser_context_t& context);
+
 class Browser {
 	public:
 		Browser(): _bin(1){}
@@ -29,6 +40,10 @@ class Browser {
 		virtual void dump_queue() = 0;
 
 		virtual void change_bin(unsigned int id){ _bin = id; }
+
+		typedef Browser* (*factory_callback)(const char* username, const char* password, const char* database, const char* hostname);
+		static void register_factory(factory_callback callback, const char* name);
+		static Browser* factory(const char* string);
 
 	protected:
 		unsigned int current_bin(){ return _bin; }

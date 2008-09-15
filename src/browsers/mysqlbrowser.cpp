@@ -25,6 +25,19 @@
 #include <stdarg.h>
 #include <mysql/mysql.h>
 
+class MySQLBrowser_factory {
+	public:
+		MySQLBrowser_factory(){
+			Browser::register_factory(&MySQLBrowser_factory::factory, "mysql");
+		}
+
+		static Browser* factory(const char* username, const char* password, const char* database, const char* hostname){
+			return new MySQLBrowser(username, password, database, hostname);
+		}
+};
+
+MySQLBrowser_factory MySQLBrowser_factory_inst;
+
 MySQLBrowser::MySQLBrowser(const char* username, const char* password, const char* database, const char* hostname):
 	_username(NULL),
 	_password(NULL),

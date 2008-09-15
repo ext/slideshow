@@ -95,10 +95,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 	_graphics(NULL),
 	_browser(NULL),
 	_ipc(NULL),
-	_db_username(NULL),
-	_db_password(NULL),
-	_db_name(NULL),
-	_db_host(NULL),
+	_browser_string(NULL),
 	_logfile("slideshow.log"){
 
 	initTime();
@@ -146,10 +143,7 @@ Kernel::~Kernel(){
 	delete _graphics;
 	delete _ipc;
 
-	free( _db_username );
-	free( _db_password );
-	free( _db_name );
-	free( _db_host );
+	free( _browser_string );
 
 	_browser = NULL;
 	_graphics = NULL;
@@ -168,7 +162,7 @@ void Kernel::init_IPC(){
 }
 
 void Kernel::init_browser(){
-	if ( !_db_password ){
+	/*if ( !_db_password ){
 		if ( !_stdin ){
 			printf("Database password: \n");
 		}
@@ -180,10 +174,13 @@ void Kernel::init_browser(){
 		_browser = new MySQLBrowser(_db_username, _db_password, _db_name, _db_host);
 	} else {
 		_browser = new MySQLBrowser(_db_username, _db_password, _db_name);
-	}
+	}*/
+	_browser = Browser::factory(_browser_string);
 
-	_browser->change_bin(_bin_id);
-	_browser->reload();
+	if ( browser() ){
+		browser()->change_bin(_bin_id);
+		browser()->reload();
+	}
 }
 
 void Kernel::init_fsm(){
@@ -248,10 +245,7 @@ bool Kernel::parse_argv(int argc, const char* argv[]){
 	option_add_flag(&options, "fullscreen", 'f', "Start in fullscreen mode", &_fullscreen, 1);
 	option_add_flag(&options, "daemon", 'd', "Run in background", &_daemon, 1);
 	option_add_flag(&options, "stdin", 0, "Except the input (e.g database password) to come from stdin", &_stdin, 1);
-	option_add_string(&options, "db_user", 0, "Database username", &_db_username);
-	option_add_string(&options, "db_pass", 0, "Database password", &_db_password);
-	option_add_string(&options, "db_name", 0, "Database name", &_db_name);
-	option_add_string(&options, "db_host", 0, "Database host [localhost]", &_db_host);
+	option_add_string(&options, "browser", 0, "Browser connection string. provider://user[:pass]@host[:port]/name", &_browser_string);
 	option_add_int(&options, "collection-id", 'c', "ID of the collection to display", &_bin_id);
 	option_add_format(&options, "resolution", 'r', "Resolution", "WIDTHxHEIGHT", "%dx%d", &_width, &_height);
 

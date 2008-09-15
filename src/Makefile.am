@@ -1,4 +1,4 @@
-SUBDIRS = browsers IPC state transitions
+SUBDIRS = IPC state transitions
 
 AM_CPPFLAGS = \
 	${dbus_CFLAGS} \
@@ -15,11 +15,16 @@ slideshow_SOURCES = \
 	${top_srcdir}/include/OS.h \
 	${top_srcdir}/include/Transition.h \
 	argument_parser.c ${top_srcdir}/include/argument_parser.h \
+	browser_context.cpp \
+	Browser.cpp ${top_srcdir}/include/Browser.h \
 	Graphics.cpp ${top_srcdir}/include/Graphics.h \
 	Kernel.cpp ${top_srcdir}/include/Kernel.h \
 	Log.cpp ${top_srcdir}/include/Log.h\
 	main.cpp \
-	OS_Linux.cpp
+	OS_Linux.cpp \
+	browsers/dummybrowser.cpp browsers/dummybrowser.h \
+	browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
+	
 slideshow_LDADD = \
 	browsers/libbrowser.a \
 	IPC/libipc.a \

@@ -322,7 +322,7 @@ on `(hostname || uname -n) 2>/dev/null | sed 1q`
 "
 
 # Files that config.status was made for.
-config_files="Makefile src/Makefile src/browsers/Makefile src/IPC/Makefile src/state/Makefile src/transitions/Makefile"
+config_files="Makefile src/Makefile src/IPC/Makefile src/state/Makefile src/transitions/Makefile"
 config_headers="include/config.h"
 config_commands="depfiles libtool"
 
@@ -488,7 +488,7 @@ FGREP='/bin/grep -F'
 LD='/usr/x86_64-pc-linux-gnu/bin/ld -m elf_x86_64'
 NM='/usr/bin/nm -B'
 LN_S='ln -s'
-max_cmd_len='1572864'
+max_cmd_len='3458764513820540925'
 ac_objext='o'
 exeext=''
 lt_unset='unset'
@@ -708,7 +708,6 @@ do
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
-    "src/browsers/Makefile") CONFIG_FILES="$CONFIG_FILES src/browsers/Makefile" ;;
     "src/IPC/Makefile") CONFIG_FILES="$CONFIG_FILES src/IPC/Makefile" ;;
     "src/state/Makefile") CONFIG_FILES="$CONFIG_FILES src/state/Makefile" ;;
     "src/transitions/Makefile") CONFIG_FILES="$CONFIG_FILES src/transitions/Makefile" ;;
