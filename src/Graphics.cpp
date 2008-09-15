@@ -17,6 +17,7 @@
  */
 
 #include "Graphics.h"
+#include "Kernel.h"
 #include "OS.h"
 #include "Log.h"
 #include "Transition.h"
@@ -129,12 +130,18 @@ void Graphics::load_image(const char* name){
 	glBindTexture(GL_TEXTURE_2D, texture_0);
 
 	if ( name ){
-		FIBITMAP* dib = GenericLoader(name, 0);
+		const char* path = name;
+
+		if ( name[0] != '/' ){
+			path = Kernel::real_path(name);
+		}
+
+		FIBITMAP* dib = GenericLoader(path, 0);
 
 		if( !dib ){
 			//@todo Is this safe?
 			char buf[512];
-			snprintf(buf, 512, "Failed to load image (%s)", name);
+			snprintf(buf, 512, "Failed to load image '%s'", path);
 			throw std::runtime_error(buf);
 		}
 

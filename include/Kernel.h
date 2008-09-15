@@ -39,6 +39,14 @@ class Kernel {
 
 		void debug_dumpqueue();
 
+		/**
+		 * @brief Return the real path to a resource.
+		 * Translates filename into an absolute path in either pkgdatadir (usually
+		 * /usr/share/slideshow) or in SLIDESHOW_DATA_PATH if that env. variable
+		 * is set.
+		 */
+		static char* real_path(const char* filename);
+
 	private:
 		void view_state(double t);
 		void transition_state(double t);

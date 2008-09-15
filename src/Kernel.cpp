@@ -1,5 +1,3 @@
-
-
 /**
  * This file is part of Slideshow.
  * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
@@ -19,6 +17,7 @@
  */
 
 // Internal
+#include "config.h"
 #include "Kernel.h"
 #include "Graphics.h"
 #include "OS.h"
@@ -50,6 +49,7 @@
 // libportable
 #include <portable/Time.h>
 #include <portable/Process.h>
+#include <portable/string.h>
 
 // libc
 #include <cstdlib>
@@ -306,4 +306,19 @@ void Kernel::ipc_quit(){
 
 void Kernel::debug_dumpqueue(){
 	_browser->dump_queue();
+}
+
+char* Kernel::real_path(const char* filename){
+	const char* datadir = getenv("SLIDESHOW_DATA_DIR");
+	if ( !datadir ){
+		datadir = DATA_DIR;
+	}
+
+	char* dst;
+	if ( asprintf(&dst, "%s/%s", datadir, filename) == -1 ){
+		Log::message(Log::Fatal, "Memory allocation failed!");
+		return NULL;
+	}
+
+	return dst;
 }
