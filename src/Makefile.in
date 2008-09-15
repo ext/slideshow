@@ -230,17 +230,17 @@ AM_CPPFLAGS = \
 	-I${top_srcdir}/include
 
 slideshow_SOURCES = \
-	Browser.h \
-	config.h \
-	ErrorCodes.h \
-	Exceptions.h \
-	IPC.h \
-	OS.h \
-	Transition.h \
-	argument_parser.c argument_parser.h \
-	Graphics.cpp Graphics.h \
-	Kernel.cpp Kernel.h \
-	Log.cpp Log.h\
+	${top_srcdir}/include/Browser.h \
+	${top_srcdir}/include/config.h \
+	${top_srcdir}/include/ErrorCodes.h \
+	${top_srcdir}/include/Exceptions.h \
+	${top_srcdir}/include/IPC.h \
+	${top_srcdir}/include/OS.h \
+	${top_srcdir}/include/Transition.h \
+	argument_parser.c ${top_srcdir}/include/argument_parser.h \
+	Graphics.cpp ${top_srcdir}/include/Graphics.h \
+	Kernel.cpp ${top_srcdir}/include/Kernel.h \
+	Log.cpp ${top_srcdir}/include/Log.h\
 	main.cpp \
 	OS_Linux.cpp
 

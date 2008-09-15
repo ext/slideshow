@@ -208,6 +208,9 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 xxf86vm_CFLAGS = @xxf86vm_CFLAGS@
 xxf86vm_LIBS = @xxf86vm_LIBS@
+AM_CPPFLAGS = \
+	-I${top_srcdir}/include
+
 noinst_LIBRARIES = libfsm.a
 libfsm_a_SOURCES = \
 	State.h \

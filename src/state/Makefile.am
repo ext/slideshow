@@ -1,3 +1,6 @@
+AM_CPPFLAGS = \
+	-I${top_srcdir}/include
+
 noinst_LIBRARIES = libfsm.a
 libfsm_a_SOURCES = \
 	State.h \
