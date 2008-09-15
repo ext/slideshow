@@ -27,19 +27,13 @@
 
 class MySQLBrowser: public Browser {
 	public:
-
-		MySQLBrowser(const char* username, const char* password = NULL, const char* database = "slideshow", const char* host = "localhost");
+		MySQLBrowser(const browser_context_t& context);
 		virtual ~MySQLBrowser();
 
 		virtual const char* get_next_file();
 		virtual void reload();
 
 		virtual void dump_queue();
-
-		void set_username(const char* username);
-		void set_password(const char* password);
-		void set_database(const char* database);
-		void set_hostname(const char* hostname);
 
 	private:
 		void connect();
@@ -51,10 +45,6 @@ class MySQLBrowser: public Browser {
 		void set_field(unsigned int n, const char* str);
 		const char* get_field(unsigned int n);
 
-		char* _username;
-		char* _password;
-		char* _database;
-		char* _hostname;
 		struct st_mysql *_conn;
 
 		char** _fields;

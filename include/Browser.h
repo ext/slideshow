@@ -32,8 +32,8 @@ void free_context(browser_context_t& context);
 
 class Browser {
 	public:
-		Browser(): _bin(1){}
-		virtual ~Browser(){}
+		Browser(const browser_context_t& context);
+		virtual ~Browser();
 
 		virtual const char* get_next_file() = 0;
 		virtual void reload() = 0;
@@ -41,15 +41,30 @@ class Browser {
 
 		virtual void change_bin(unsigned int id){ _bin = id; }
 
-		typedef Browser* (*factory_callback)(const char* username, const char* password, const char* database, const char* hostname);
+		void set_username(const char* username);
+		void set_password(const char* password);
+		void set_database(const char* database);
+		void set_hostname(const char* hostname);
+
+		const char* username(){ return _username; }
+		const char* password(){ return _password; }
+		const char* database(){ return _database; }
+		const char* hostname(){ return _hostname; }
+
+		typedef Browser* (*factory_callback)(const browser_context_t& context);
 		static void register_factory(factory_callback callback, const char* name);
-		static Browser* factory(const char* string);
+		static Browser* factory(const char* string, const char* password);
 
 	protected:
 		unsigned int current_bin(){ return _bin; }
 
 	private:
 		unsigned int _bin;
+
+		char* _username;
+		char* _password;
+		char* _database;
+		char* _hostname;
 };
 
 #endif // BROWSER_H

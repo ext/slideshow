@@ -1,8 +1,13 @@
 #include "SwitchState.h"
 #include "TransitionState.h"
+#include "ViewState.h"
 #include "Log.h"
 
 State* SwitchState::action(){
+	if ( !browser() ){
+		return new ViewState(this);
+	}
+
 	const char* filename = browser()->get_next_file();
 
 	if ( !filename ){
