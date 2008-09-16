@@ -105,7 +105,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 	switch ( _mode ){
 		case mode_list_transitions:
 			print_transitions();
-			exit(0);
+			throw ExitException();
 	}
 
 	if ( !daemon() ){
