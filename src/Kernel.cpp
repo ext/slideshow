@@ -265,6 +265,7 @@ void Kernel::print_transitions(){
 	if (n < 0){
 		perror("scandir");
 	} else {
+		printf("Available transitions: \n");
 		for ( int i = 0; i < n; i++ ){
 			char* path;
 			asprintf(&path, "%s/%s", pluginpath(), namelist[i]->d_name);
