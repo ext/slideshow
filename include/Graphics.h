@@ -29,12 +29,12 @@ class Graphics {
 		void render(float state);
 		void load_image(const char* filename);
 
-		void set_transition(transition_module_t module);
+		void set_transition(transition_module_t* module);
 
 	private:
 		void swap_textures();
 
-		transition_module_t _transition;
+		transition_module_t* _transition;
 		unsigned int texture_0;
 		unsigned int texture_1;
 };

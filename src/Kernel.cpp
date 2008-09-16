@@ -210,14 +210,20 @@ void Kernel::init_fsm(){
 }
 
 void Kernel::load_transition(const char* name){
-	lt_dlhandle bajs = lt_dlopenext(name);
+	struct module_context_t* context = module_open(name);
 
-	transition_module_t module;
-	module.init = (module_init_callback)lt_dlsym(bajs, "module_init");
-	module.cleanup = (module_cleanup_callback)lt_dlsym(bajs, "module_cleanup");
-	module.render = (render_callback)lt_dlsym(bajs, "render");
+	if ( !context ){
+		printf("Transition plugin not found\n");
+		return;
+	}
 
-	_graphics->set_transition(module);
+	if ( module_type(context) != TRANSITION_MODULE ){
+		printf("Plugin is not a transition module not found\n");
+		return;
+	}
+
+	transition_module_t* m = (transition_module_t*)module_get(context);
+	_graphics->set_transition(m);
 }
 
 void Kernel::start_daemon(){

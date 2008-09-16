@@ -20,14 +20,12 @@
 #include "Transition.h"
 #include <GL/gl.h>
 
-MODULE_INFO("Fade", TRANSITION_MODULE, "bajskorv");
+MODULE_INFO("Fade", TRANSITION_MODULE, "David Sveningsson");
 
 int module_init(){
-	printf("fade init\n");
 }
 
 int module_cleanup(){
-	printf("fade cleanup\n");
 }
 
 void render(transition_context_t* context){

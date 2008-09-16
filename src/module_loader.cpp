@@ -1,5 +1,7 @@
 #include "module_loader.h"
+#include "Transition.h"
 #include <ltdl.h>
+#include <cstdio>
 
 struct module_context_t {
 	lt_dlhandle handle;
@@ -55,7 +57,26 @@ void module_close(struct module_context_t* context){
 }
 
 module_t* module_get(struct module_context_t* context){
+	module_t* module = NULL;
 
+	switch ( module_type(context) ){
+		case TRANSITION_MODULE:
+		{
+			transition_module_t* m = (transition_module_t*)malloc(sizeof(transition_module_t));
+			m->render = (render_callback)lt_dlsym(context->handle, "render");
+			module = (module_t*)m;
+		}
+		break;
+
+		default:
+			printf("Unknown module, type id is %d\n", module_type(context));
+			return NULL;
+	}
+
+	module->init = (module_init_callback)lt_dlsym(context->handle, "module_init");
+	module->cleanup = (module_cleanup_callback)lt_dlsym(context->handle, "module_cleanup");
+
+	return module;
 }
 
 const char* module_get_name(const struct module_context_t* context){
@@ -65,7 +86,8 @@ const char* module_get_name(const struct module_context_t* context){
 }
 
 const char* module_get_author(const struct module_context_t* context){
-
+	void* sym = lt_dlsym(context->handle, "__module_author");
+	return *((char**)sym);
 }
 
 int module_type(const struct module_context_t* context){

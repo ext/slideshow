@@ -21,14 +21,12 @@
 #include <GL/gl.h>
 #include <math.h>
 
-MODULE_INFO("Spin", TRANSITION_MODULE, "bajskorv");
+MODULE_INFO("Spin", TRANSITION_MODULE, "David Sveningsson");
 
 int module_init(){
-	printf("spin init\n");
 }
 
 int module_cleanup(){
-	printf("spin cleanup\n");
 }
 
 void render(transition_context_t* context){
