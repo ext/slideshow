@@ -313,16 +313,16 @@ bool Kernel::parse_argv(int argc, const char* argv[]){
 
 	option_set_description(&options, "Slideshow is an application for showing text and images in a loop on monitors and projectors.");
 
-	option_add_flag(&options, "verbose", 'v', "Explain what is being done", &_verbose, 0);
-	option_add_flag(&options, "quiet", 'q', "Explain what is being done", &_verbose, 2);
-	option_add_flag(&options, "fullscreen", 'f', "Start in fullscreen mode", &_fullscreen, 1);
-	option_add_flag(&options, "daemon", 'd', "Run in background", &_daemon, 1);
-	option_add_flag(&options, "list-transitions", 0, "List available transitions", &_mode, mode_list_transitions);
-	option_add_flag(&options, "stdin-password", 0, "Except the input (e.g database password) to come from stdin", &_stdin, 1);
-	option_add_string(&options, "browser", 0, "Browser connection string. provider://user[:pass]@host[:port]/name", &_browser_string);
-	option_add_string(&options, "transition", 't', "Set slide transition plugin [fade]", &_transition_name);
-	option_add_int(&options, "collection-id", 'c', "ID of the collection to display", &_bin_id);
-	option_add_format(&options, "resolution", 'r', "Resolution", "WIDTHxHEIGHT", "%dx%d", &_width, &_height);
+	option_add_flag(&options,	"verbose",			'v', "Explain what is being done", &_verbose, 0);
+	option_add_flag(&options,	"quiet",			'q', "Explain what is being done", &_verbose, 2);
+	option_add_flag(&options,	"fullscreen",		'f', "Start in fullscreen mode", &_fullscreen, 1);
+	option_add_flag(&options,	"daemon",			'd', "Run in background", &_daemon, 1);
+	option_add_flag(&options,	"list-transitions",	 0,  "List available transitions", &_mode, mode_list_transitions);
+	option_add_flag(&options,	"stdin-password",	 0,  "Except the input (e.g database password) to come from stdin", &_stdin, 1);
+	option_add_string(&options,	"browser",			 0,  "Browser connection string. provider://user[:pass]@host[:port]/name", &_browser_string);
+	option_add_string(&options,	"transition",		't', "Set slide transition plugin [fade]", &_transition_name);
+	option_add_int(&options,	"collection-id",	'c', "ID of the collection to display", &_bin_id);
+	option_add_format(&options,	"resolution",		'r', "Resolution", "WIDTHxHEIGHT", "%dx%d", &_width, &_height);
 
 	int n = option_parse(&options);
 	option_finalize(&options);
