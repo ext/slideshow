@@ -21,6 +21,7 @@ slideshow_SOURCES = \
 	Kernel.cpp ${top_srcdir}/include/Kernel.h \
 	Log.cpp ${top_srcdir}/include/Log.h\
 	main.cpp \
+	module_loader.cpp \
 	OS_Linux.cpp \
 	browsers/dummybrowser.cpp browsers/dummybrowser.h \
 	browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h

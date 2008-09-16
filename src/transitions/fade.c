@@ -16,8 +16,11 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "module.h"
 #include "Transition.h"
 #include <GL/gl.h>
+
+MODULE_INFO("Fade", TRANSITION_MODULE, "bajskorv");
 
 int module_init(){
 	printf("fade init\n");

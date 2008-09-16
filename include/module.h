@@ -16,21 +16,14 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRANSITION_H
-#define TRANSITION_H
+#ifndef SLIDESHOW_MODULE_H
+#define SLIDESHOW_MODULE_H
 
-#include "module_loader.h"
+#define TRANSITION_MODULE 1
 
-typedef struct {
-	unsigned int texture[2];
-	float state;
-} transition_context_t;
+#define MODULE_INFO(name, type, author) \
+	const char const * __module_name = name; \
+	const int __module_type = type; \
+	const char const * __module_author = author
 
-typedef void (*render_callback)(transition_context_t* context);
-
-typedef struct {
-	MODULE_HEAD();
-	render_callback render;
-} transition_module_t;
-
-#endif // TRANSITION_H
+#endif // SLIDESHOW_MODULE_H

@@ -25,6 +25,8 @@
 #include "ErrorCodes.h"
 #include "Exceptions.h"
 #include "Transition.h"
+#include "module.h"
+#include "module_loader.h"
 
 // Transitions
 //#include "transitions/dummy.h"
@@ -65,6 +67,8 @@
 #include <signal.h>
 #include <X11/Xlib.h>
 #include <ltdl.h>
+#include <dirent.h>
+#include <fnmatch.h>
 
 #ifdef LINUX
 #include <sys/time.h>
@@ -107,13 +111,17 @@ Kernel::Kernel(int argc, const char* argv[]):
 
 	initTime();
 
+	lt_dlinit();
+	lt_dladdsearchdir(PLUGIN_DIR);
+	lt_dladdsearchdir("src/transitions");
+
 	if ( !parse_argv(argc, argv) ){
 		exit(ARGUMENT_ERROR);
 	}
 
 	switch ( _mode ){
 		case mode_list_transitions:
-			printf("bajs bajs bajs\n");
+			print_transitions();
 			exit(0);
 	}
 
@@ -140,10 +148,6 @@ Kernel::Kernel(int argc, const char* argv[]):
 	if ( daemon() ){
 		start_daemon();
 	}
-
-	lt_dlinit();
-	lt_dladdsearchdir(PLUGIN_DIR);
-	lt_dladdsearchdir("src/transitions");
 
 	init_graphics();
 	init_IPC();
@@ -249,6 +253,41 @@ void Kernel::print_cli_arguments(int argc, const char* argv[]){
 	Log::message_ex("\n");
 }
 
+static int filter(const struct dirent* el){
+	return fnmatch("*.la", el->d_name, 0) == 0;
+}
+
+void Kernel::print_transitions(){
+	struct dirent **namelist;
+	int n;
+
+	n = scandir(pluginpath(), &namelist, filter, alphasort);
+	if (n < 0){
+		perror("scandir");
+	} else {
+		for ( int i = 0; i < n; i++ ){
+			char* path;
+			asprintf(&path, "%s/%s", pluginpath(), namelist[i]->d_name);
+			free(namelist[i]);
+
+			struct module_context_t* context = module_open(path);
+
+			if ( !context ){
+				continue;
+			}
+
+			if ( module_type(context) != TRANSITION_MODULE ){
+				continue;
+			}
+
+			printf("%s\n", module_get_name(context));
+
+			module_close(context);
+		}
+		free(namelist);
+	}
+}
+
 void Kernel::run(){
 	_running = true;
 
@@ -338,16 +377,27 @@ char* Kernel::real_path(const char* filename){
 		dst = (char*)malloc(strlen(filename)+1);
 		strcpy(dst, filename);
 	} else {
-		const char* datadir = getenv("SLIDESHOW_DATA_DIR");
-		if ( !datadir ){
-			datadir = DATA_DIR;
-		}
-
-		if ( asprintf(&dst, "%s/%s", datadir, filename) == -1 ){
+		if ( asprintf(&dst, "%s/%s", datapath(), filename) == -1 ){
 			Log::message(Log::Fatal, "Memory allocation failed!");
 			return NULL;
 		}
 	}
 
 	return dst;
+}
+
+const char* Kernel::datapath(){
+	const char* path = getenv("SLIDESHOW_DATA_DIR");
+	if ( !path ){
+		path = DATA_DIR;
+	}
+	return path;
+}
+
+const char* Kernel::pluginpath(){
+	const char* path = getenv("SLIDESHOW_PLUGIN_DIR");
+	if ( !path ){
+		path = PLUGIN_DIR;
+	}
+	return path;
 }

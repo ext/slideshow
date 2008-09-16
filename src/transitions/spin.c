@@ -16,9 +16,12 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "module.h"
 #include "Transition.h"
 #include <GL/gl.h>
 #include <math.h>
+
+MODULE_INFO("Spin", TRANSITION_MODULE, "bajskorv");
 
 int module_init(){
 	printf("spin init\n");

@@ -48,12 +48,16 @@ class Kernel {
 		static char* real_path(const char* filename);
 
 	private:
+		static const char* datapath();
+		static const char* pluginpath();
+
 		void view_state(double t);
 		void transition_state(double t);
 		void switch_state(double t);
 
 		void print_licence_statement();
 		void print_cli_arguments(int argc, const char* argv[]);
+		void print_transitions();
 		bool parse_argv(int argc, const char* argv[]);
 
 		bool daemon(){ return _daemon; }
