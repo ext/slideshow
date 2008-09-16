@@ -23,11 +23,17 @@ int main( int argc, const char* argv[] ){
 	try {
 		Kernel kernel(argc, argv);
 		kernel.run();
+
 	} catch ( ExitException &e ){
 		return 0;
-	} catch ( BaseException &e ){
+
+	} catch ( FatalException &e ){
 		fprintf(stderr, "%d %s\n", e.what());
 		return e.code();
+
+	} catch ( BaseException &e ){
+		fprintf(stderr, "Uhh, unhandled exception, recovery not possible. The message was: %s\n", e.what());
+		return UNHANDLED_ERROR;
 	}
 
 	return 0;

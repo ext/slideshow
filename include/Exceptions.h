@@ -28,11 +28,22 @@
  * when you wish to catch all exceptions.
  *
  * @param message The error message.
- * @param code The error code which will be returned.
  */
 class BaseException: public std::runtime_error {
 	public:
-		BaseException(const char* message, ErrorCode code): std::runtime_error(message), _code(code){}
+		BaseException(const char* message): std::runtime_error(message){}
+};
+
+/**
+ * @brief Fatal exceptions will cause the application to terminate.
+ * The application will terminate but will try to cleanup.
+ *
+ * @param message The error message.
+ * @param code The error code which will be returned.
+ */
+class FatalException: public BaseException {
+	public:
+		FatalException(const char* message, ErrorCode code): BaseException(message), _code(code){}
 		ErrorCode code(){ return _code; }
 
 	private:
@@ -44,17 +55,17 @@ class BaseException: public std::runtime_error {
  * Throw this exception if you want to exit the application but want
  * it to shut down properly.
  */
-class ExitException: public BaseException {
+class ExitException: public FatalException {
 	public:
-		ExitException(): BaseException(NULL, NO_ERROR){}
+		ExitException(): FatalException(NULL, NO_ERROR){}
 };
 
 /**
  * @brief Xlib error.
  */
-class XlibException: public BaseException {
+class XlibException: public FatalException {
 	public:
-		XlibException(const char* message): BaseException(message, XLIB_ERROR){}
+		XlibException(const char* message): FatalException(message, XLIB_ERROR){}
 };
 
 #endif // EXCEPTIONS_H
