@@ -184,14 +184,14 @@ int option_parse(option_set_t* option){
 		switch ( option->type ){
 			case arg_flag:
 			{
-				argument_flag_t* real_option = (argument_flag_t*)option;
+				const argument_flag_t* real_option = (const argument_flag_t*)option;
 				*(real_option->dst) = real_option->value;
 				break;
 			}
 
 			case arg_string:
 			{
-				argument_string_t* real_option = (argument_string_t*)option;
+				const argument_string_t* real_option = (const argument_string_t*)option;
 				free(*(real_option->dst));
 				*(real_option->dst) = (char*)malloc(strlen(argv[i])+1);
 				strcpy(*(real_option->dst), argv[i]);
@@ -200,14 +200,14 @@ int option_parse(option_set_t* option){
 
 			case arg_int:
 			{
-				argument_int_t* real_option = (argument_int_t*)option;
+				const argument_int_t* real_option = (const argument_int_t*)option;
 				sscanf(argv[i], "%d", real_option->dst);
 				break;
 			}
 
 			case arg_fmt:
 			{
-				argument_format_t* real_option = (argument_format_t*)option;
+				const argument_format_t* real_option = (const argument_format_t*)option;
 				int n = format_argument_count(real_option->fmt);
 				int r = vsscanf(argv[i], real_option->fmt, real_option->dst);
 
