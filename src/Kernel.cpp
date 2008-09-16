@@ -66,7 +66,6 @@
 #endif
 
 bool* daemon_running = NULL;
-static const char* const application_name = "slideshow";
 
 static const int mode_normal = 0;
 static const int mode_list_transitions = 1;
@@ -141,7 +140,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 
 Kernel::~Kernel(){
 	if ( daemon() ){
-		Portable::daemon_stop(application_name);
+		Portable::daemon_stop(PACKAGE_NAME);
 	}
 
 	delete _browser;
@@ -211,7 +210,7 @@ void Kernel::load_transition(const char* name){
 }
 
 void Kernel::start_daemon(){
-	Portable::daemonize(application_name);
+	Portable::daemonize(PACKAGE_NAME);
 
 	if ( signal(SIGQUIT, quit_signal) == SIG_ERR ){
 		Log::message(Log::Fatal, "Kernel: Could not initialize signal handler!\n");
