@@ -65,6 +65,8 @@ class Kernel {
 
 		void load_transition(const char* name);
 
+		char* get_password();
+
 		void init_graphics();
 		void init_IPC();
 		void init_browser();

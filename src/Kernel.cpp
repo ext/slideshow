@@ -165,14 +165,9 @@ void Kernel::init_IPC(){
 }
 
 void Kernel::init_browser(){
-	char* password = NULL;
-	if ( _stdin  ){
-		password = (char*)malloc(256);
-		scanf("%256s", password);
-	}
+	char* password = get_password();
 
 	_browser = Browser::factory(_browser_string, password);
-
 
 	free(_browser_string);
 	free(password);
@@ -185,6 +180,17 @@ void Kernel::init_browser(){
 	} else {
 		Log::message(Log::Warning, "No browser selected, you will not see any slides\n");
 	}
+}
+
+char* Kernel::get_password(){
+	if ( !_stdin ){
+		return NULL;
+	}
+
+	char* password = (char*)malloc(256);
+	scanf("%256s", password);
+
+	return password;
 }
 
 void Kernel::init_fsm(){
