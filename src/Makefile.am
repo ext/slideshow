@@ -2,7 +2,14 @@ SUBDIRS = IPC state transitions
 
 AM_CPPFLAGS = \
 	${dbus_CFLAGS} \
-	-I${top_srcdir}/include
+	-I${top_srcdir}/include \
+	-pipe -Wall -Wextra -Wno-unused-parameter -Wnon-virtual-dtor -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
+
+if GCCPARSER
+.cpp.o:
+	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $< 2>&1 | gccparser
+	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+endif
 
 bin_PROGRAMS = slideshow
 

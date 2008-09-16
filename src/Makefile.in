@@ -231,7 +231,8 @@ xxf86vm_LIBS = @xxf86vm_LIBS@
 SUBDIRS = IPC state transitions
 AM_CPPFLAGS = \
 	${dbus_CFLAGS} \
-	-I${top_srcdir}/include
+	-I${top_srcdir}/include \
+	-pipe -Wall -Wextra -Wno-unused-parameter -Wnon-virtual-dtor -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
 
 slideshow_SOURCES = \
 	${top_srcdir}/include/Browser.h \
@@ -373,7 +374,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
-.cpp.o:
+@GCCPARSER_FALSE@.cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
 @am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
@@ -710,6 +711,10 @@ uninstall-am: uninstall-binPROGRAMS
 	tags tags-recursive uninstall uninstall-am \
 	uninstall-binPROGRAMS
 
+
+@GCCPARSER_TRUE@.cpp.o:
+@GCCPARSER_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $< 2>&1 | gccparser
+@GCCPARSER_TRUE@	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

@@ -140,4 +140,18 @@ AC_CHECK_HEADERS([mysql/mysql.h],
 
 AC_SUBST(MYSQL_LIBS)
 
+dnl #######################################################################
+dnl # gccparser
+dnl #######################################################################
+
+AC_ARG_ENABLE([gccparser],
+	[AS_HELP_STRING([--enable-gccparser], [support for gccparser])],
+	[case "${enableval}" in
+       yes) gccparser=true ;;
+       no)  gccparser=false ;;
+       *) AC_MSG_ERROR([bad value ${enableval} for --enable-gccparser]) ;;
+     esac],
+	[gccparser=false])
+AM_CONDITIONAL([GCCPARSER], [test x$gccparser == xtrue])
+
 AC_OUTPUT
