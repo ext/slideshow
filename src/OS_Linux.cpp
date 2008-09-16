@@ -65,7 +65,7 @@ void OS::init_view(int width, int height, bool fullscreen){
 	dpy = XOpenDisplay(NULL);
 
 	if( !dpy ) {
-		throw NoXConnection("Could not connect to an X server\n");
+		throw XlibException("Could not connect to an X server\n");
 	}
 
 	root = DefaultRootWindow(dpy);
@@ -74,13 +74,13 @@ void OS::init_view(int width, int height, bool fullscreen){
 	fbConfigs = glXChooseFBConfig( dpy, DefaultScreen(dpy), doubleBufferAttributes, &numReturned );
 
 	if ( !fbConfigs ) {
-		throw std::runtime_error( "No double buffered config available\n" );
+		throw XlibException( "No double buffered config available\n" );
 	}
 
 	vi = glXGetVisualFromFBConfig(dpy, fbConfigs[0]);
 
 	if( !vi ) {
-		throw std::runtime_error("No appropriate visual found\n");
+		throw XlibException("No appropriate visual found\n");
 	}
 
 	unsigned long mask = CWColormap | CWEventMask;

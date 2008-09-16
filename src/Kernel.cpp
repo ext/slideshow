@@ -122,7 +122,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 	///@todo HACK! Attempt to connect to an xserver.
 	Display* dpy = XOpenDisplay(NULL);
 	if( !dpy ) {
-		throw NoXConnection("Could not connect to an X server\n");
+		throw XlibException("Could not connect to an X server\n");
 	}
 	XCloseDisplay(dpy);
 

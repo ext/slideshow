@@ -23,9 +23,11 @@ int main( int argc, const char* argv[] ){
 	try {
 		Kernel kernel(argc, argv);
 		kernel.run();
-	} catch ( NoXConnection &e ){
-		fprintf(stderr, e.what());
-		return 1;
+	} catch ( ExitException &e ){
+		return 0;
+	} catch ( BaseException &e ){
+		fprintf(stderr, "%d %s\n", e.what());
+		return e.code();
 	}
 
 	return 0;

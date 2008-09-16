@@ -20,11 +20,41 @@
 #define EXCEPTIONS_H
 
 #include <stdexcept>
+#include "ErrorCodes.h"
 
-class NoXConnection: public std::runtime_error {
+/**
+ * @brief Base exception.
+ * You should never throw this specifically but rather catch it
+ * when you wish to catch all exceptions.
+ *
+ * @param message The error message.
+ * @param code The error code which will be returned.
+ */
+class BaseException: public std::runtime_error {
 	public:
-		NoXConnection(const char* str): std::runtime_error(str){}
-		virtual ~NoXConnection() throw(){}
+		BaseException(const char* message, ErrorCode code): std::runtime_error(message), _code(code){}
+		ErrorCode code(){ return _code; }
+
+	private:
+		ErrorCode _code;
+};
+
+/**
+ * @brief Causes the application to exit.
+ * Throw this exception if you want to exit the application but want
+ * it to shut down properly.
+ */
+class ExitException: public BaseException {
+	public:
+		ExitException(): BaseException(NULL, NO_ERROR){}
+};
+
+/**
+ * @brief Xlib error.
+ */
+class XlibException: public BaseException {
+	public:
+		XlibException(const char* message): BaseException(message, XLIB_ERROR){}
 };
 
 #endif // EXCEPTIONS_H
