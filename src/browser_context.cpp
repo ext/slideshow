@@ -20,7 +20,7 @@ static int copy_part(char* dst, const char* src, int offset, int n){
 }
 
 browser_context_t get_context(const char* string){
-	size_t part_len[5] = { 0, 0, 0, 0, 0 };
+	int part_len[5] = { 0, 0, 0, 0, 0 };
 	size_t string_len = strlen(string);
 
 	unsigned int state = state_provider;
