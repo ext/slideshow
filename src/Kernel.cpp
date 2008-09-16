@@ -175,8 +175,7 @@ void Kernel::init_browser(){
 	_browser_string = NULL;
 
 	if ( browser() ){
-		browser()->change_bin(_bin_id);
-		browser()->reload();
+		change_bin(_bin_id);
 	} else {
 		Log::message(Log::Warning, "No browser selected, you will not see any slides\n");
 	}
