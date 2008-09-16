@@ -148,8 +148,6 @@ Kernel::~Kernel(){
 
 	moduleloader_cleanup();
 
-	free( _browser_string );
-
 	_browser = NULL;
 	_graphics = NULL;
 	_ipc = NULL;
@@ -175,7 +173,11 @@ void Kernel::init_browser(){
 
 	_browser = Browser::factory(_browser_string, password);
 
+
+	free(_browser_string);
 	free(password);
+
+	_browser_string = NULL;
 
 	if ( browser() ){
 		browser()->change_bin(_bin_id);
