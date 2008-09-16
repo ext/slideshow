@@ -35,7 +35,7 @@ int main( int argc, const char* argv[] ){
 		// print the error messages before throwing the
 		// exception.
 		if ( strlen(e.what()) > 0 ){
-			fprintf(stderr, "%d %s\n", e.what());
+			fprintf(stderr, "%d %s\n", e.code(), e.what());
 		}
 		return e.code();
 
