@@ -219,8 +219,7 @@ void Kernel::start_daemon(){
 	Portable::daemonize(PACKAGE_NAME);
 
 	if ( signal(SIGQUIT, quit_signal) == SIG_ERR ){
-		Log::message(Log::Fatal, "Kernel: Could not initialize signal handler!\n");
-		exit(3);
+		throw KernelException("Could not initialize signal handler!");
 	}
 
 	///@ hack

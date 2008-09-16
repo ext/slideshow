@@ -69,6 +69,14 @@ class XlibException: public FatalException {
 };
 
 /**
+ * @brief Kernel error.
+ */
+class KernelException: public FatalException {
+	public:
+		KernelException(const char* message): FatalException(message, KERNEL_ERROR){}
+};
+
+/**
  * @brief Argument error
  */
 class ArgumentException: public FatalException {
