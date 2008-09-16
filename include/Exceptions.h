@@ -57,7 +57,7 @@ class FatalException: public BaseException {
  */
 class ExitException: public FatalException {
 	public:
-		ExitException(): FatalException(NULL, NO_ERROR){}
+		ExitException(): FatalException("", NO_ERROR){}
 };
 
 /**
@@ -66,6 +66,14 @@ class ExitException: public FatalException {
 class XlibException: public FatalException {
 	public:
 		XlibException(const char* message): FatalException(message, XLIB_ERROR){}
+};
+
+/**
+ * @brief Argument error
+ */
+class ArgumentException: public FatalException {
+	public:
+		ArgumentException(const char* message): FatalException(message, ARGUMENT_ERROR){}
 };
 
 #endif // EXCEPTIONS_H

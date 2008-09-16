@@ -18,6 +18,7 @@
 
 #include "Kernel.h"
 #include "Exceptions.h"
+#include <cstring>
 
 int main( int argc, const char* argv[] ){
 	try {
@@ -28,7 +29,14 @@ int main( int argc, const char* argv[] ){
 		return 0;
 
 	} catch ( FatalException &e ){
-		fprintf(stderr, "%d %s\n", e.what());
+
+		// Only display message if there is one available.
+		// Some exceptions like ArgumentException usually
+		// print the error messages before throwing the
+		// exception.
+		if ( strlen(e.what()) > 0 ){
+			fprintf(stderr, "%d %s\n", e.what());
+		}
 		return e.code();
 
 	} catch ( BaseException &e ){

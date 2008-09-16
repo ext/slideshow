@@ -26,7 +26,6 @@
 #include "Graphics.h"
 #include "OS.h"
 #include "Log.h"
-#include "ErrorCodes.h"
 #include "Exceptions.h"
 #include "Transition.h"
 
@@ -99,7 +98,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 	moduleloader_init();
 
 	if ( !parse_argv(argc, argv) ){
-		exit(ARGUMENT_ERROR);
+		throw ArgumentException("");
 	}
 
 	switch ( _mode ){
