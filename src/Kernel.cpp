@@ -18,6 +18,10 @@
 
 // Internal
 #include "config.h"
+
+#include "argument_parser.h"
+#include "module.h"
+#include "module_loader.h"
 #include "Kernel.h"
 #include "Graphics.h"
 #include "OS.h"
@@ -25,22 +29,9 @@
 #include "ErrorCodes.h"
 #include "Exceptions.h"
 #include "Transition.h"
-#include "module.h"
-#include "module_loader.h"
-
-// Transitions
-//#include "transitions/dummy.h"
-//#include "transitions/fade.h"
-//#include "transitions/spin.h"
-
-// Browsers
-#include "browsers/mysqlbrowser.h"
 
 // IPC
 #include "IPC/dbus.h"
-
-// Argument parser
-#include "argument_parser.h"
 
 // FSM
 #include "state/State.h"
@@ -58,20 +49,16 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
-#include <ctype.h>
 
 // Platform
-#include <unistd.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <signal.h>
 #include <X11/Xlib.h>
-#include <ltdl.h>
 #include <dirent.h>
 #include <fnmatch.h>
 
 #ifdef LINUX
-#include <sys/time.h>
+//#include <sys/time.h>
 #endif
 
 #ifdef WIN32
@@ -110,10 +97,7 @@ Kernel::Kernel(int argc, const char* argv[]):
 	_logfile("slideshow.log"){
 
 	initTime();
-
-	lt_dlinit();
-	lt_dladdsearchdir(PLUGIN_DIR);
-	lt_dladdsearchdir("src/transitions");
+	moduleloader_init();
 
 	if ( !parse_argv(argc, argv) ){
 		exit(ARGUMENT_ERROR);
@@ -164,7 +148,7 @@ Kernel::~Kernel(){
 	delete _graphics;
 	delete _ipc;
 
-	lt_dlexit();
+	moduleloader_cleanup();
 
 	free( _browser_string );
 

@@ -21,6 +21,9 @@
 
 #include "module.h"
 
+void moduleloader_init();
+void moduleloader_cleanup();
+
 typedef void (*module_init_callback)();
 typedef void (*module_cleanup_callback)();
 
