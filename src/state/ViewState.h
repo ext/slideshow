@@ -6,6 +6,7 @@
 class ViewState: public State {
 	public:
 		ViewState(State* state): State(state){}
+		virtual ~ViewState(){}
 
 		virtual State* action();
 

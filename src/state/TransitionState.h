@@ -6,6 +6,7 @@
 class TransitionState: public State {
 	public:
 		TransitionState(State* state): State(state){}
+		virtual ~TransitionState(){}
 
 		virtual State* action();
 

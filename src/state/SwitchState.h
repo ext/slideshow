@@ -6,6 +6,7 @@
 class SwitchState: public State {
 	public:
 		SwitchState(State* state): State(state){}
+		virtual ~SwitchState(){}
 
 		virtual State* action();
 };

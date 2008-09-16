@@ -11,6 +11,7 @@ class State {
 		State(Browser* browser, Graphics* gfx, IPC* ipc): _browser(browser), _gfx(gfx), _ipc(ipc){
 			_created = getTime();
 		}
+		virtual ~State(){}
 
 		State(State* state): _browser(state->_browser), _gfx(state->_gfx), _ipc(state->_ipc){
 			_created = getTime();
