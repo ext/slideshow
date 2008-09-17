@@ -34,8 +34,7 @@ slideshow_SOURCES = \
 
 slideshow_LDADD = \
 	IPC/libipc.a \
-	state/libfsm.a \
-	transitions/libtransition.a
+	state/libfsm.a
 
 slideshow_LDFLAGS = \
 	-lltdl \

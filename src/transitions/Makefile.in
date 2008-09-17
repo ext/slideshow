@@ -494,9 +494,6 @@ uninstall-am: uninstall-pluginLTLIBRARIES
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-pluginLTLIBRARIES
 
-
-#fade_la_SOURCES = transitions/fade.cpp transitions/fade.h
-#spin_la_SOURCES = transitions/spin.cpp transitions/spin.h
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
