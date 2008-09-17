@@ -34,9 +34,7 @@ slideshow_SOURCES = \
 
 slideshow_LDADD = \
 	IPC/libipc.a \
-	state/libfsm.a
-
-slideshow_LDFLAGS = \
+	state/libfsm.a \
 	-lltdl \
 	${libportable_LIBS} \
 	${dbus_LIBS} \
@@ -47,5 +45,5 @@ slideshow_LDFLAGS = \
 
 if MYSQL
 slideshow_SOURCES += browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
-slideshow_LDFLAGS += ${MYSQL_LIBS}
+slideshow_LDADD += ${MYSQL_LIBS}
 endif

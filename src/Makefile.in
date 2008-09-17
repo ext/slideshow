@@ -68,10 +68,13 @@ am_slideshow_OBJECTS = argument_parser.$(OBJEXT) \
 	module_loader.$(OBJEXT) OS_Linux.$(OBJEXT) \
 	dummybrowser.$(OBJEXT) $(am__objects_1)
 slideshow_OBJECTS = $(am_slideshow_OBJECTS)
-slideshow_DEPENDENCIES = IPC/libipc.a state/libfsm.a
-slideshow_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(slideshow_LDFLAGS) $(LDFLAGS) -o $@
+am__DEPENDENCIES_1 =
+@MYSQL_TRUE@am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
+slideshow_DEPENDENCIES = IPC/libipc.a state/libfsm.a \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -261,12 +264,9 @@ slideshow_SOURCES = ${top_srcdir}/include/Browser.h \
 	${top_srcdir}/include/Log.h main.cpp module_loader.cpp \
 	OS_Linux.cpp browsers/dummybrowser.cpp browsers/dummybrowser.h \
 	$(am__append_1)
-slideshow_LDADD = \
-	IPC/libipc.a \
-	state/libfsm.a
-
-slideshow_LDFLAGS = -lltdl ${libportable_LIBS} ${dbus_LIBS} ${GL_LIBS} \
-	${FREEIMAGE_LIBS} ${X11_LIBS} ${xxf86vm_LIBS} $(am__append_2)
+slideshow_LDADD = IPC/libipc.a state/libfsm.a -lltdl \
+	${libportable_LIBS} ${dbus_LIBS} ${GL_LIBS} ${FREEIMAGE_LIBS} \
+	${X11_LIBS} ${xxf86vm_LIBS} $(am__append_2)
 all: all-recursive
 
 .SUFFIXES:
@@ -330,7 +330,7 @@ clean-binPROGRAMS:
 	done
 slideshow$(EXEEXT): $(slideshow_OBJECTS) $(slideshow_DEPENDENCIES) 
 	@rm -f slideshow$(EXEEXT)
-	$(slideshow_LINK) $(slideshow_OBJECTS) $(slideshow_LDADD) $(LIBS)
+	$(CXXLINK) $(slideshow_OBJECTS) $(slideshow_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
