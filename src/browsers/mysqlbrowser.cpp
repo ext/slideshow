@@ -16,7 +16,7 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "mysqlbrowser.h"
+#include "Browser.h"
 #include "Log.h"
 #include <cstring>
 #include <cstdlib>
@@ -24,6 +24,33 @@
 #include <cassert>
 #include <stdarg.h>
 #include <mysql/mysql.h>
+
+class MySQLBrowser: public Browser {
+	public:
+		MySQLBrowser(const browser_context_t& context);
+		virtual ~MySQLBrowser();
+
+		virtual const char* get_next_file();
+		virtual void reload();
+
+		virtual void dump_queue();
+
+	private:
+		void connect();
+		void disconnect();
+		MYSQL_RES* query(const char* str, ...);
+
+		void clear_fields();
+		void allocate_fields(unsigned int n);
+		void set_field(unsigned int n, const char* str);
+		const char* get_field(unsigned int n);
+
+		MYSQL* _conn;
+
+		char** _fields;
+		my_ulonglong _nr_of_fields;
+		unsigned int _current_field;
+};
 
 class MySQLBrowser_factory {
 	public:
@@ -71,7 +98,7 @@ void MySQLBrowser::disconnect(){
 	mysql_close(_conn);
 }
 
-struct st_mysql_res* MySQLBrowser::query(const char* str, ...){
+MYSQL_RES* MySQLBrowser::query(const char* str, ...){
 	va_list arg;
 	va_start(arg, str);
 
