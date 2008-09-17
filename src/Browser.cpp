@@ -103,9 +103,13 @@ Browser* Browser::factory(const char* string, const char* password){
 
 	for ( iterator it = factories->begin(); it != factories->end(); ++it ){
 		if ( strcmp(context.provider, it->first) == 0){
-			return it->second(context);
+			Browser* browser = it->second(context);
+			free_context(context);
+			return browser;
 		}
 	}
+
+	free_context(context);
 
 	return NULL;
 }
