@@ -166,7 +166,7 @@ void MySQLBrowser::clear_fields(){
 void MySQLBrowser::allocate_fields(unsigned int n){
 	_fields = (char**)malloc( sizeof(char*) * n );
 
-	for ( unsigned int i = 0; i < 0; i++ ){
+	for ( unsigned int i = 0; i < n; i++ ){
 		_fields[i] = NULL;
 	}
 }
