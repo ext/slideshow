@@ -129,15 +129,23 @@ AC_SUBST(xxf86vm_LIBS)
 dnl #######################################################################
 dnl # MySQL
 dnl #######################################################################
-AC_CHECK_HEADERS([mysql/mysql.h],
-	[
-		AC_DEFINE(HAVE_MYSQL, 1, [Define if X11 development libraries is available])
-		MYSQL_LIBS="-lmysqlclient"
-	],
-	[
-		AC_MSG_ERROR([Required mysql development libraries not found])
-	])
 
+AC_ARG_WITH([mysql],
+	[AS_HELP_STRING([--with-mysql], [support for MySQL])],
+	[],
+	[with_mysql=no])
+
+AS_IF([test "x$with_mysql" != xno],
+	[AC_CHECK_HEADERS([mysql/mysql.h],
+		[
+			MYSQL_LIBS="-lmysqlclient"
+		],
+		[
+			AC_MSG_ERROR([Required MySQL development libraries not found])
+		])],
+	[])
+
+AM_CONDITIONAL([MYSQL], [test "x$with_mysql" != xno])
 AC_SUBST(MYSQL_LIBS)
 
 dnl #######################################################################

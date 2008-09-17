@@ -32,6 +32,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = slideshow$(EXEEXT)
+@MYSQL_TRUE@am__append_1 = browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
+@MYSQL_TRUE@am__append_2 = ${MYSQL_LIBS}
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -47,14 +49,27 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
+am__slideshow_SOURCES_DIST = ${top_srcdir}/include/Browser.h \
+	${top_srcdir}/include/config.h \
+	${top_srcdir}/include/ErrorCodes.h \
+	${top_srcdir}/include/Exceptions.h ${top_srcdir}/include/IPC.h \
+	${top_srcdir}/include/OS.h ${top_srcdir}/include/Transition.h \
+	argument_parser.c ${top_srcdir}/include/argument_parser.h \
+	browser_context.cpp Browser.cpp Graphics.cpp \
+	${top_srcdir}/include/Graphics.h Kernel.cpp \
+	${top_srcdir}/include/Kernel.h Log.cpp \
+	${top_srcdir}/include/Log.h main.cpp module_loader.cpp \
+	OS_Linux.cpp browsers/dummybrowser.cpp browsers/dummybrowser.h \
+	browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
+@MYSQL_TRUE@am__objects_1 = mysqlbrowser.$(OBJEXT)
 am_slideshow_OBJECTS = argument_parser.$(OBJEXT) \
 	browser_context.$(OBJEXT) Browser.$(OBJEXT) Graphics.$(OBJEXT) \
 	Kernel.$(OBJEXT) Log.$(OBJEXT) main.$(OBJEXT) \
 	module_loader.$(OBJEXT) OS_Linux.$(OBJEXT) \
-	dummybrowser.$(OBJEXT) mysqlbrowser.$(OBJEXT)
+	dummybrowser.$(OBJEXT) $(am__objects_1)
 slideshow_OBJECTS = $(am_slideshow_OBJECTS)
-slideshow_DEPENDENCIES = browsers/libbrowser.a IPC/libipc.a \
-	state/libfsm.a transitions/libtransition.a
+slideshow_DEPENDENCIES = IPC/libipc.a state/libfsm.a \
+	transitions/libtransition.a
 slideshow_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(slideshow_LDFLAGS) $(LDFLAGS) -o $@
@@ -80,7 +95,7 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(slideshow_SOURCES)
-DIST_SOURCES = $(slideshow_SOURCES)
+DIST_SOURCES = $(am__slideshow_SOURCES_DIST)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -234,42 +249,26 @@ AM_CPPFLAGS = \
 	-I${top_srcdir}/include \
 	-pipe -Wall -Wextra -Wno-unused-parameter -Wnon-virtual-dtor -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
 
-slideshow_SOURCES = \
-	${top_srcdir}/include/Browser.h \
+slideshow_SOURCES = ${top_srcdir}/include/Browser.h \
 	${top_srcdir}/include/config.h \
 	${top_srcdir}/include/ErrorCodes.h \
-	${top_srcdir}/include/Exceptions.h \
-	${top_srcdir}/include/IPC.h \
-	${top_srcdir}/include/OS.h \
-	${top_srcdir}/include/Transition.h \
+	${top_srcdir}/include/Exceptions.h ${top_srcdir}/include/IPC.h \
+	${top_srcdir}/include/OS.h ${top_srcdir}/include/Transition.h \
 	argument_parser.c ${top_srcdir}/include/argument_parser.h \
-	browser_context.cpp \
-	Browser.cpp ${top_srcdir}/include/Browser.h \
-	Graphics.cpp ${top_srcdir}/include/Graphics.h \
-	Kernel.cpp ${top_srcdir}/include/Kernel.h \
-	Log.cpp ${top_srcdir}/include/Log.h\
-	main.cpp \
-	module_loader.cpp \
-	OS_Linux.cpp \
-	browsers/dummybrowser.cpp browsers/dummybrowser.h \
-	browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
-
+	browser_context.cpp Browser.cpp \
+	${top_srcdir}/include/Browser.h Graphics.cpp \
+	${top_srcdir}/include/Graphics.h Kernel.cpp \
+	${top_srcdir}/include/Kernel.h Log.cpp \
+	${top_srcdir}/include/Log.h main.cpp module_loader.cpp \
+	OS_Linux.cpp browsers/dummybrowser.cpp browsers/dummybrowser.h \
+	$(am__append_1)
 slideshow_LDADD = \
-	browsers/libbrowser.a \
 	IPC/libipc.a \
 	state/libfsm.a \
 	transitions/libtransition.a
 
-slideshow_LDFLAGS = \
-	-lltdl \
-	${libportable_LIBS} \
-	${dbus_LIBS} \
-	${GL_LIBS} \
-	${FREEIMAGE_LIBS} \
-	${MYSQL_LIBS} \
-	${X11_LIBS} \
-	${xxf86vm_LIBS}
-
+slideshow_LDFLAGS = -lltdl ${libportable_LIBS} ${dbus_LIBS} ${GL_LIBS} \
+	${FREEIMAGE_LIBS} ${X11_LIBS} ${xxf86vm_LIBS} $(am__append_2)
 all: all-recursive
 
 .SUFFIXES:

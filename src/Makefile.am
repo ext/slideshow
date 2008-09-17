@@ -30,20 +30,23 @@ slideshow_SOURCES = \
 	main.cpp \
 	module_loader.cpp \
 	OS_Linux.cpp \
-	browsers/dummybrowser.cpp browsers/dummybrowser.h \
-	browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
+	browsers/dummybrowser.cpp browsers/dummybrowser.h
 
 slideshow_LDADD = \
-	browsers/libbrowser.a \
 	IPC/libipc.a \
 	state/libfsm.a \
 	transitions/libtransition.a
+
 slideshow_LDFLAGS = \
 	-lltdl \
 	${libportable_LIBS} \
 	${dbus_LIBS} \
 	${GL_LIBS} \
 	${FREEIMAGE_LIBS} \
-	${MYSQL_LIBS} \
 	${X11_LIBS} \
 	${xxf86vm_LIBS}
+
+if MYSQL
+slideshow_SOURCES += browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
+slideshow_LDFLAGS += ${MYSQL_LIBS}
+endif
