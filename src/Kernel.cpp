@@ -142,12 +142,14 @@ Kernel::~Kernel(){
 		Portable::daemon_stop(PACKAGE_NAME);
 	}
 
+	delete _state;
 	delete _browser;
 	delete _graphics;
 	delete _ipc;
 
 	moduleloader_cleanup();
 
+	_state = NULL;
 	_browser = NULL;
 	_graphics = NULL;
 	_ipc = NULL;
