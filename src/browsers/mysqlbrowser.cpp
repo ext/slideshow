@@ -23,6 +23,7 @@
 #include <cstdio>
 #include <cassert>
 #include <stdarg.h>
+#include <limits>
 #include <mysql/mysql.h>
 
 class MySQLBrowser: public Browser {
@@ -48,7 +49,7 @@ class MySQLBrowser: public Browser {
 		MYSQL* _conn;
 
 		char** _fields;
-		my_ulonglong _nr_of_fields;
+		unsigned int _nr_of_fields;
 		unsigned int _current_field;
 };
 
@@ -122,7 +123,13 @@ void MySQLBrowser::reload(){
 	MYSQL_RES *res = query("SELECT fullpath FROM files WHERE bin_id = %d AND active = true ORDER BY sortorder, id", current_bin());
 	MYSQL_ROW row;
 
-	_nr_of_fields = mysql_num_rows(res);
+	my_ulonglong n = mysql_num_rows(res);
+
+	if ( n > std::numeric_limits<unsigned int>::max() - 1 ){
+		Log::message(Log::Warning, "MySQLBrowser: To many results, truncating to %d\n", std::numeric_limits<unsigned int>::max() - 1);
+	}
+
+	_nr_of_fields = static_cast<unsigned int>(n);
 
 	allocate_fields( _nr_of_fields + 1 ); // The last field is set to NULL
 
