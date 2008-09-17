@@ -1,4 +1,5 @@
 #include "Browser.h"
+#include "Log.h"
 #include <map>
 #include <cstdio>
 #include <cstring>
@@ -108,6 +109,8 @@ Browser* Browser::factory(const char* string, const char* password){
 			return browser;
 		}
 	}
+
+	Log::message(Log::Warning, "Unknown database provider '%s'\n", context.provider);
 
 	free_context(context);
 
