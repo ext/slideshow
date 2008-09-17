@@ -5,3 +5,6 @@ AM_CPPFLAGS = \
 noinst_LIBRARIES = libipc.a
 libipc_a_SOURCES = \
 	dbus.cpp dbus.h
+
+libipc_a_LDFLAGS = \
+	${dbus_LIBS}
