@@ -1,10 +1,8 @@
 #include "Browser.h"
 #include "Log.h"
 #include <map>
-#include <cstdio>
 #include <cstring>
 #include <cstdlib>
-#include <cassert>
 
 typedef std::map<const char*, Browser::factory_callback> factory_map;
 typedef std::pair<const char*, Browser::factory_callback> pair;
