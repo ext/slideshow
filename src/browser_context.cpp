@@ -27,6 +27,8 @@ static const int state_pass = 2;
 static const int state_host = 3;
 static const int state_name = 4;
 
+void allocate_context(browser_contet_t& context, size_t provider, size_t user, size_t pass, size_t host, size_t name);
+
 static int extract_part(char* dst, const char* src, int offset, int n){
 	if ( n == 0 ){
 		return offset;
@@ -86,22 +88,32 @@ browser_context_t get_context(const char* string){
 	}
 
 	browser_context_t context;
-	context.provider = (char*)malloc(part_len[state_provider] + 1);
-	context.user = (char*)malloc(part_len[state_user] + 1);
-	context.pass = part_len[state_pass] > 0 ? (char*)malloc(part_len[state_pass] + 1) : NULL;
-	context.host = (char*)malloc(part_len[state_host] + 1);
-	context.name = (char*)malloc(part_len[state_name] + 1);
+
+	allocate_context(context,
+		part_len[state_provider],
+		part_len[state_user],
+		part_len[state_pass],
+		part_len[state_host],
+		part_len[state_name],
+	);
 
 	int offset = 0;
 
-	offset = extract_part(context.provider, string, offset, part_len[state_provider]); offset += 2;
-	offset = extract_part(context.user, string, offset, part_len[state_user]);
-	offset = extract_part(context.pass, string, offset, part_len[state_pass]);
-	offset = extract_part(context.host, string, offset, part_len[state_host]);
-	offset = extract_part(context.name, string, offset, part_len[state_name]);
+	offset = extract_part(context.provider, string, offset, part_len[state_provider]) + 2; // The first delimiter is 2 extra characters wide
+	offset = extract_part(context.user, 	string, offset, part_len[state_user]);
+	offset = extract_part(context.pass, 	string, offset, part_len[state_pass]);
+	offset = extract_part(context.host, 	string, offset, part_len[state_host]);
+	offset = extract_part(context.name, 	string, offset, part_len[state_name]);
 
 	return context;
+}
 
+void allocate_context(browser_contet_t& context, size_t provider, size_t user, size_t pass, size_t host, size_t name){
+	context.provider = 	provider > 0	? (char*)malloc(provider + 1) : NULL;
+	context.user = 		user > 0 		? (char*)malloc(user + 1) : NULL;
+	context.pass = 		pass > 0 		? (char*)malloc(pass + 1) : NULL;
+	context.host = 		host > 0 		? (char*)malloc(host + 1) : NULL;
+	context.name = 		name > 0 		? (char*)malloc(name + 1) : NULL;
 }
 
 void free_context(browser_context_t& context){
