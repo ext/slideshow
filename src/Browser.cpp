@@ -76,8 +76,7 @@ Browser* Browser::factory(const char* string, const char* password){
 	// If the contex doesn't contain a password and a password was passed from stdin (arg password)
 	// we set that as the password in the context.
 	if ( !context.pass && password ){
-		context.pass = (char*)malloc( strlen(password) + 1 );
-		strcpy(context.pass, password);
+		set_string(context.pass, password);
 	}
 
 	for ( iterator it = factories->begin(); it != factories->end(); ++it ){
