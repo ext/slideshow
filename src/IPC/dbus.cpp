@@ -18,8 +18,8 @@
 
 #include "dbus.h"
 #include "Log.h"
+#include "Exceptions.h"
 #include "Kernel.h"
-#include <stdexcept>
 
 static const char* dbus_rule = "type='signal',interface='com.slideshow.dbus.Signal'";
 
@@ -34,7 +34,7 @@ DBus::DBus(Kernel* kernel, int timeout):
 
 	if (!_bus) {
 		Log::message(Log::Fatal, "D-Bus: Failed to connect to the daemon: %s", _error.message);
-		throw std::runtime_error("Failed to start D-Bus");
+		throw IPCException("Failed to start D-Bus");
 	}
 
 	dbus_bus_add_match (_bus, dbus_rule, &_error);

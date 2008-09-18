@@ -84,4 +84,12 @@ class ArgumentException: public FatalException {
 		ArgumentException(const char* message): FatalException(message, ARGUMENT_ERROR){}
 };
 
+/**
+ * @brief IPC error
+ */
+class IPCException: public FatalException {
+	public:
+		IPCException(const char* message): FatalException(message, IPC_ERROR){}
+};
+
 #endif // EXCEPTIONS_H
