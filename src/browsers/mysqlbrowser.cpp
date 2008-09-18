@@ -17,10 +17,10 @@
  */
 
 #include "Browser.h"
+#include "Exceptions.h"
 #include "Log.h"
 #include <cstring>
 #include <cstdlib>
-#include <cstdio>
 #include <cassert>
 #include <stdarg.h>
 #include <limits>
@@ -91,7 +91,7 @@ void MySQLBrowser::connect(){
 
 	if (!mysql_real_connect(_conn, hostname(), username(), password(), database(), 0, NULL, 0)) {
 		Log::message(Log::Fatal, "MySQLBrowser: Could not connect to database: %s\n", mysql_error(_conn));
-		exit(2);
+		throw BrowserException("MySQLBrowser: Could not connect to database");
 	}
 }
 

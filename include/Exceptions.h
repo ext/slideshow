@@ -27,6 +27,7 @@ enum ErrorCode {
 	XLIB_ERROR,
 	KERNEL_ERROR,
 	ARGUMENT_ERROR,
+	BROWSER_ERROR,
 	IPC_ERROR,
 
 	UNHANDLED_ERROR = 99
@@ -92,6 +93,14 @@ class KernelException: public FatalException {
 class ArgumentException: public FatalException {
 	public:
 		ArgumentException(const char* message): FatalException(message, ARGUMENT_ERROR){}
+};
+
+/**
+ * @brief Browser error
+ */
+class BrowserException: public FatalException {
+	public:
+		BrowserException(const char* message): FatalException(message, BROWSER_ERROR){}
 };
 
 /**
