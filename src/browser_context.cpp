@@ -27,7 +27,7 @@ static const int state_pass = 2;
 static const int state_host = 3;
 static const int state_name = 4;
 
-void allocate_context(browser_contet_t& context, size_t provider, size_t user, size_t pass, size_t host, size_t name);
+void allocate_context(browser_context_t& context, size_t provider, size_t user, size_t pass, size_t host, size_t name);
 
 static int extract_part(char* dst, const char* src, int offset, int n){
 	if ( n == 0 ){
@@ -94,7 +94,7 @@ browser_context_t get_context(const char* string){
 		part_len[state_user],
 		part_len[state_pass],
 		part_len[state_host],
-		part_len[state_name],
+		part_len[state_name]
 	);
 
 	int offset = 0;
@@ -108,7 +108,7 @@ browser_context_t get_context(const char* string){
 	return context;
 }
 
-void allocate_context(browser_contet_t& context, size_t provider, size_t user, size_t pass, size_t host, size_t name){
+void allocate_context(browser_context_t& context, size_t provider, size_t user, size_t pass, size_t host, size_t name){
 	context.provider = 	provider > 0	? (char*)malloc(provider + 1) : NULL;
 	context.user = 		user > 0 		? (char*)malloc(user + 1) : NULL;
 	context.pass = 		pass > 0 		? (char*)malloc(pass + 1) : NULL;
