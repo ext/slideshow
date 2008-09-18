@@ -20,7 +20,17 @@
 #define EXCEPTIONS_H
 
 #include <stdexcept>
-#include "ErrorCodes.h"
+
+enum ErrorCode {
+	NO_ERROR = 0,
+
+	XLIB_ERROR,
+	KERNEL_ERROR,
+	ARGUMENT_ERROR,
+	IPC_ERROR,
+
+	UNHANDLED_ERROR = 99
+};
 
 /**
  * @brief Base exception.
