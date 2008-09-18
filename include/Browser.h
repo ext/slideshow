@@ -69,4 +69,18 @@ class Browser {
 		char* _hostname;
 };
 
+#define REGISTER_BROWSER_FACTORY(classname, name) \
+class classname ## _factory { \
+	public: \
+	classname ## _factory(){ \
+			Browser::register_factory(&classname ## _factory::factory, #name); \
+		} \
+		\
+		static Browser* factory(const browser_context_t& context){ \
+			return new classname(context); \
+		} \
+}; \
+\
+classname ## _factory classname ## _factory_inst
+
 #endif // BROWSER_H

@@ -53,18 +53,7 @@ class MySQLBrowser: public Browser {
 		unsigned int _current_field;
 };
 
-class MySQLBrowser_factory {
-	public:
-		MySQLBrowser_factory(){
-			Browser::register_factory(&MySQLBrowser_factory::factory, "mysql");
-		}
-
-		static Browser* factory(const browser_context_t& context){
-			return new MySQLBrowser(context);
-		}
-};
-
-MySQLBrowser_factory MySQLBrowser_factory_inst;
+REGISTER_BROWSER_FACTORY(MySQLBrowser, mysql);
 
 MySQLBrowser::MySQLBrowser(const browser_context_t& context):
 	Browser(context),
