@@ -59,6 +59,8 @@ class Browser {
 		unsigned int current_bin(){ return _bin; }
 
 	private:
+		void set_string(char*& dst, const char* src);
+
 		unsigned int _bin;
 
 		char* _username;

@@ -26,58 +26,38 @@ Browser::Browser(const browser_context_t& context):
 }
 
 Browser::~Browser(){
-	free(_username);
-	free(_password);
-	free(_hostname);
-	free(_database);
+	set_username(NULL);
+	set_password(NULL);
+	set_hostname(NULL);
+	set_database(NULL);
 }
 
 void Browser::set_username(const char* username){
-	free(_username);
-	_username = NULL;
-
-	if ( !username ){
-		return;
-	}
-
-	_username = (char*)malloc( strlen(username) + 1 );
-	strcpy( _username, username);
+	set_string(_username, username);
 }
 
 void Browser::set_password(const char* password){
-	free(_password);
-	_password = NULL;
-
-	if ( !password ){
-		return;
-	}
-
-	_password = (char*)malloc( strlen(password) + 1 );
-	strcpy( _password, password);
+	set_string(_password, password);
 }
 
 void Browser::set_database(const char* database){
-	free(_database);
-	_database = NULL;
-
-	if ( !database ){
-		return;
-	}
-
-	_database = (char*)malloc( strlen(database) + 1 );
-	strcpy( _database, database);
+	set_string(_database, database);
 }
 
 void Browser::set_hostname(const char* hostname){
-	free(_hostname);
-	_hostname = NULL;
+	set_string(_hostname, hostname);
+}
 
-	if ( !hostname ){
+void Browser::set_string(char*& dst, const char* src){
+	free(dst);
+	dst = NULL;
+
+	if ( !src ){
 		return;
 	}
 
-	_hostname = (char*)malloc( strlen(hostname) + 1 );
-	strcpy( _hostname, hostname);
+	dst = (char*)malloc( strlen(src) + 1 );
+	strcpy(dst, src);
 }
 
 void Browser::register_factory(factory_callback callback, const char* name){
