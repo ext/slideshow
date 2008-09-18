@@ -9,7 +9,7 @@ static const int state_pass = 2;
 static const int state_host = 3;
 static const int state_name = 4;
 
-static int copy_part(char* dst, const char* src, int offset, int n){
+static int extract_part(char* dst, const char* src, int offset, int n){
 	if ( n == 0 ){
 		return offset;
 	}
@@ -74,11 +74,11 @@ browser_context_t get_context(const char* string){
 
 	int offset = 0;
 
-	offset = copy_part(context.provider, string, offset, part_len[state_provider]); offset += 2;
-	offset = copy_part(context.user, string, offset, part_len[state_user]);
-	offset = copy_part(context.pass, string, offset, part_len[state_pass]);
-	offset = copy_part(context.host, string, offset, part_len[state_host]);
-	offset = copy_part(context.name, string, offset, part_len[state_name]);
+	offset = extract_part(context.provider, string, offset, part_len[state_provider]); offset += 2;
+	offset = extract_part(context.user, string, offset, part_len[state_user]);
+	offset = extract_part(context.pass, string, offset, part_len[state_pass]);
+	offset = extract_part(context.host, string, offset, part_len[state_host]);
+	offset = extract_part(context.name, string, offset, part_len[state_name]);
 
 	return context;
 
