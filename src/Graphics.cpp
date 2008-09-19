@@ -161,11 +161,7 @@ void Graphics::load_image(const char* name){
 		FIBITMAP* dib = GenericLoader(path);
 
 		if( !dib ){
-			//@todo Is this safe?
-			char buf[512];
-			snprintf(buf, 512, "Failed to load image '%s'", path);
-			free(path);
-			throw GraphicsException(buf);
+			throw GraphicsException("Failed to load image '%s'", path);
 		}
 
 		free(path);

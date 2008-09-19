@@ -23,6 +23,7 @@ slideshow_SOURCES = \
 	${top_srcdir}/include/Transition.h \
 	argument_parser.c ${top_srcdir}/include/argument_parser.h \
 	browser_context.cpp \
+	exception.cpp \
 	Browser.cpp ${top_srcdir}/include/Browser.h \
 	Graphics.cpp ${top_srcdir}/include/Graphics.h \
 	Kernel.cpp ${top_srcdir}/include/Kernel.h \

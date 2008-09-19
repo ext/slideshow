@@ -20,6 +20,7 @@
 #define EXCEPTIONS_H
 
 #include <stdexcept>
+#include <cstdarg>
 
 enum ErrorCode {
 	NO_ERROR = 0,
@@ -41,9 +42,18 @@ enum ErrorCode {
  *
  * @param message The error message.
  */
-class BaseException: public std::runtime_error {
+class BaseException: public std::exception {
 	public:
-		BaseException(const char* message): std::runtime_error(message){}
+		BaseException(const char* message = NULL);
+		virtual ~BaseException() throw();
+
+		virtual const char* what() const throw();
+
+	protected:
+		void set_message(const char* fmt, va_list va);
+
+	private:
+		char* _msg;
 };
 
 /**
@@ -55,7 +65,8 @@ class BaseException: public std::runtime_error {
  */
 class FatalException: public BaseException {
 	public:
-		FatalException(const char* message, ErrorCode code): BaseException(message), _code(code){}
+		FatalException(ErrorCode code, const char* message = NULL): BaseException(message), _code(code){}
+
 		ErrorCode code(){ return _code; }
 
 	private:
@@ -69,7 +80,7 @@ class FatalException: public BaseException {
  */
 class ExitException: public FatalException {
 	public:
-		ExitException(): FatalException("", NO_ERROR){}
+		ExitException(): FatalException(NO_ERROR){}
 };
 
 /**
@@ -77,7 +88,12 @@ class ExitException: public FatalException {
  */
 class XlibException: public FatalException {
 	public:
-		XlibException(const char* message): FatalException(message, XLIB_ERROR){}
+		XlibException(const char* fmt, ...): FatalException(XLIB_ERROR){
+			va_list va;
+			va_start(va, fmt);
+			set_message(fmt, va);
+			va_end(va);
+		}
 };
 
 /**
@@ -85,7 +101,12 @@ class XlibException: public FatalException {
  */
 class KernelException: public FatalException {
 	public:
-		KernelException(const char* message): FatalException(message, KERNEL_ERROR){}
+		KernelException(const char* fmt, ...): FatalException(KERNEL_ERROR){
+			va_list va;
+			va_start(va, fmt);
+			set_message(fmt, va);
+			va_end(va);
+		}
 };
 
 /**
@@ -93,7 +114,12 @@ class KernelException: public FatalException {
  */
 class ArgumentException: public FatalException {
 	public:
-		ArgumentException(const char* message): FatalException(message, ARGUMENT_ERROR){}
+		ArgumentException(const char* fmt, ...): FatalException(ARGUMENT_ERROR){
+			va_list va;
+			va_start(va, fmt);
+			set_message(fmt, va);
+			va_end(va);
+		}
 };
 
 /**
@@ -101,7 +127,12 @@ class ArgumentException: public FatalException {
  */
 class BrowserException: public FatalException {
 	public:
-		BrowserException(const char* message): FatalException(message, BROWSER_ERROR){}
+		BrowserException(const char* fmt, ...): FatalException(BROWSER_ERROR){
+			va_list va;
+			va_start(va, fmt);
+			set_message(fmt, va);
+			va_end(va);
+		}
 };
 
 /**
@@ -109,7 +140,12 @@ class BrowserException: public FatalException {
  */
 class IPCException: public FatalException {
 	public:
-		IPCException(const char* message): FatalException(message, IPC_ERROR){}
+		IPCException(const char* fmt, ...): FatalException(IPC_ERROR){
+			va_list va;
+			va_start(va, fmt);
+			set_message(fmt, va);
+			va_end(va);
+		}
 };
 
 /**
@@ -117,7 +153,12 @@ class IPCException: public FatalException {
  */
 class GraphicsException: public FatalException {
 	public:
-		GraphicsException(const char* message): FatalException(message, GRAPHICS_ERROR){}
+		GraphicsException(const char* fmt, ...): FatalException(GRAPHICS_ERROR){
+			va_list va;
+			va_start(va, fmt);
+			set_message(fmt, va);
+			va_end(va);
+		}
 };
 
 #endif // EXCEPTIONS_H
