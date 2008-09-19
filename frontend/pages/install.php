@@ -160,7 +160,7 @@ class Install extends Module {
 			if ( $basepath_found && $basepath_writable && $binpath_valid ){
 				$this->redirect("/index.php/install/step/3");
 			} else {
-				$this->redirect("/index.php/install/step/2?basepath_found=$basepath_found&basepath_writable=$basepath_writable&binpath_found=$binpath_found");
+				$this->redirect("/index.php/install/step/2?basepath_found=$basepath_found&basepath_writable=$basepath_writable&binpath_found=$binpath_valid");
 			}
 
 			break;
