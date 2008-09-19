@@ -100,7 +100,7 @@ class Module {
 	function log($msg){
 		global $settings;
 
-		$user = 'anon';
+		$user = $_SERVER['REMOTE_ADDR'];
 		if ( isset($_SERVER['PHP_AUTH_USER']) ){
 			$user = $_SERVER['PHP_AUTH_USER'];
 		}
