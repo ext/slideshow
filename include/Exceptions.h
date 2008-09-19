@@ -29,6 +29,7 @@ enum ErrorCode {
 	ARGUMENT_ERROR,
 	BROWSER_ERROR,
 	IPC_ERROR,
+	GRAPHICS_ERROR,
 
 	UNHANDLED_ERROR = 99
 };
@@ -109,6 +110,14 @@ class BrowserException: public FatalException {
 class IPCException: public FatalException {
 	public:
 		IPCException(const char* message): FatalException(message, IPC_ERROR){}
+};
+
+/**
+ * @brief Graphics error
+ */
+class GraphicsException: public FatalException {
+	public:
+		GraphicsException(const char* message): FatalException(message, GRAPHICS_ERROR){}
 };
 
 #endif // EXCEPTIONS_H

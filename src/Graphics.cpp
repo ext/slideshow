@@ -16,30 +16,23 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
+#include "Exceptions.h"
 #include "Graphics.h"
 #include "Kernel.h"
 #include "OS.h"
 #include "Log.h"
 #include "Transition.h"
 #include <GL/gl.h>
-#include <cstdio>
 #include <cstdlib>
-#include <stdexcept>
 
 #include <portable/string.h>
-
-#ifndef __MACH__
-#   include <FreeImage.h>
-#else
-#   include <FreeImage/FreeImage.h>
-#endif
+#include <FreeImage.h>
 
 static void FreeImageErrorHandler(FREE_IMAGE_FORMAT fif, const char *message) {
-	Log::message(Log::Debug, "FreeImage: An error occured while loading an image\n");
-    if(fif != FIF_UNKNOWN) {
-        Log::message(Log::Debug, "FreeImage: %s Format\n", FreeImage_GetFormatFromFIF(fif));
-    }
-    Log::message(Log::Debug, "FreeImage: %s\n", message);
+	const char* format = fif != FIF_UNKNOWN ? FreeImage_GetFormatFromFIF(fif) : "Unknown";
+	Log::message(Log::Verbose, "FreeImage: An error occured while loading an image\n");
+    Log::message(Log::Debug, "FreeImage: Format: %s Message: %s\n", format, message);
 }
 
 static FIBITMAP* GenericLoader(const char* lpszPathName, int flag) {
@@ -153,7 +146,7 @@ void Graphics::load_image(const char* name){
 			char buf[512];
 			snprintf(buf, 512, "Failed to load image '%s'", path);
 			free(path);
-			throw std::runtime_error(buf);
+			throw GraphicsException(buf);
 		}
 
 		free(path);
