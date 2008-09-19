@@ -155,9 +155,9 @@ class Install extends Module {
 
 			$binpath = $_POST['binpath'];
 			$_SESSION['config']->set_binary($binpath);
-			$binpath_found = file_exists($binpath) && is_executable($binpath);
+			$binpath_valid = (file_exists($binpath)) && (!is_dir($binpath )) && (is_executable($binpath));
 
-			if ( $basepath_found && $basepath_writable && $binpath_found ){
+			if ( $basepath_found && $basepath_writable && $binpath_valid ){
 				$this->redirect("/index.php/install/step/3");
 			} else {
 				$this->redirect("/index.php/install/step/2?basepath_found=$basepath_found&basepath_writable=$basepath_writable&binpath_found=$binpath_found");
