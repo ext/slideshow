@@ -36,24 +36,21 @@ static void FreeImageErrorHandler(FREE_IMAGE_FORMAT fif, const char *message) {
 }
 
 static FIBITMAP* GenericLoader(const char* lpszPathName, int flag = 0) {
-    FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
+    FREE_IMAGE_FORMAT fif = FreeImage_GetFileType(lpszPathName, 0);
 
-    fif = FreeImage_GetFileType(lpszPathName, 0);
-    if(fif == FIF_UNKNOWN) {
-        // no signature ?
-        // try to guess the file format from the file extension
-        fif = FreeImage_GetFIFFromFilename(lpszPathName);
+    if ( fif == FIF_UNKNOWN ) {
+    	fif = FreeImage_GetFIFFromFilename(lpszPathName);
+	}
+
+    if ( fif == FIF_UNKNOWN ) {
+    	throw GraphicsException("FreeImage: unknown format, or FreeImage does not handle it.");
     }
 
-    // check that the plugin has reading capabilities ...
-    if((fif != FIF_UNKNOWN) && FreeImage_FIFSupportsReading(fif)) {
-        // ok, let's load the file
-        FIBITMAP *dib = FreeImage_Load(fif, lpszPathName, flag);
-        // unless a bad file format, we are done !
-        return dib;
+    if ( !FreeImage_FIFSupportsReading(fif) ){
+    	throw GraphicsException("FreeImage: cannot read this format.");
     }
 
-    return NULL;
+    return FreeImage_Load(fif, lpszPathName, flag);
 }
 Graphics::Graphics(int width, int height, bool fullscreen):
 	_transition(NULL),
