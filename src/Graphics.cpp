@@ -161,8 +161,9 @@ void Graphics::load_image(const char* name){
 		FIBITMAP* dib = GenericLoader(path);
 
 		if( !dib ){
+			std::exception e = GraphicsException("Failed to load image '%s'", path);
 			free(path);
-			throw GraphicsException("Failed to load image '%s'", path);
+			throw e;
 		}
 
 		free(path);
