@@ -35,7 +35,7 @@ static void FreeImageErrorHandler(FREE_IMAGE_FORMAT fif, const char *message) {
     Log::message(Log::Debug, "FreeImage: Format: %s Message: %s\n", format, message);
 }
 
-static FIBITMAP* GenericLoader(const char* lpszPathName, int flag) {
+static FIBITMAP* GenericLoader(const char* lpszPathName, int flag = 0) {
     FREE_IMAGE_FORMAT fif = FIF_UNKNOWN;
 
     fif = FreeImage_GetFileType(lpszPathName, 0);
@@ -139,7 +139,7 @@ void Graphics::load_image(const char* name){
 	if ( name ){
 		char* path = Kernel::real_path(name);
 
-		FIBITMAP* dib = GenericLoader(path, 0);
+		FIBITMAP* dib = GenericLoader(path);
 
 		if( !dib ){
 			//@todo Is this safe?
