@@ -22,3 +22,22 @@ void BaseException::set_message(const char* fmt, va_list va){
 
 	vasprintf(&_msg, fmt, va);
 }
+
+FatalException::FatalException(ErrorCode code, const char* message): BaseException(message), _code(code){
+
+}
+
+FatalException::~FatalException() throw() {
+
+}
+
+ErrorCode FatalException::code(){
+	return _code;
+}
+
+ADD_EXCEPTION_IMPLEMENTATION(XlibException, XLIB_ERROR);
+ADD_EXCEPTION_IMPLEMENTATION(KernelException, KERNEL_ERROR);
+ADD_EXCEPTION_IMPLEMENTATION(ArgumentException, ARGUMENT_ERROR);
+ADD_EXCEPTION_IMPLEMENTATION(BrowserException, BROWSER_ERROR);
+ADD_EXCEPTION_IMPLEMENTATION(IPCException, IPC_ERROR);
+ADD_EXCEPTION_IMPLEMENTATION(GraphicsException, GRAPHICS_ERROR);

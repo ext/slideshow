@@ -65,9 +65,10 @@ class BaseException: public std::exception {
  */
 class FatalException: public BaseException {
 	public:
-		FatalException(ErrorCode code, const char* message = NULL): BaseException(message), _code(code){}
+		FatalException(ErrorCode code, const char* message = NULL);
+		virtual ~FatalException() throw();
 
-		ErrorCode code(){ return _code; }
+		ErrorCode code();
 
 	private:
 		ErrorCode _code;
@@ -81,84 +82,32 @@ class FatalException: public BaseException {
 class ExitException: public FatalException {
 	public:
 		ExitException(): FatalException(NO_ERROR){}
+		virtual ~ExitException() throw() {}
 };
 
-/**
- * @brief Xlib error.
- */
-class XlibException: public FatalException {
-	public:
-		XlibException(const char* fmt, ...): FatalException(XLIB_ERROR){
-			va_list va;
-			va_start(va, fmt);
-			set_message(fmt, va);
-			va_end(va);
-		}
-};
+#define ADD_EXCEPTION_INTERFACE(name, code) \
+class name: public FatalException { \
+	public: \
+		name(const char* fmt, ...); \
+		virtual ~name() throw();\
+}
 
-/**
- * @brief Kernel error.
- */
-class KernelException: public FatalException {
-	public:
-		KernelException(const char* fmt, ...): FatalException(KERNEL_ERROR){
-			va_list va;
-			va_start(va, fmt);
-			set_message(fmt, va);
-			va_end(va);
-		}
-};
+#define ADD_EXCEPTION_IMPLEMENTATION(name, code) \
+name::name(const char* fmt, ...): FatalException(code){ \
+	va_list va; \
+	va_start(va, fmt); \
+	set_message(fmt, va); \
+	va_end(va);\
+} \
+name::~name() throw() { \
+\
+}
 
-/**
- * @brief Argument error
- */
-class ArgumentException: public FatalException {
-	public:
-		ArgumentException(const char* fmt, ...): FatalException(ARGUMENT_ERROR){
-			va_list va;
-			va_start(va, fmt);
-			set_message(fmt, va);
-			va_end(va);
-		}
-};
-
-/**
- * @brief Browser error
- */
-class BrowserException: public FatalException {
-	public:
-		BrowserException(const char* fmt, ...): FatalException(BROWSER_ERROR){
-			va_list va;
-			va_start(va, fmt);
-			set_message(fmt, va);
-			va_end(va);
-		}
-};
-
-/**
- * @brief IPC error
- */
-class IPCException: public FatalException {
-	public:
-		IPCException(const char* fmt, ...): FatalException(IPC_ERROR){
-			va_list va;
-			va_start(va, fmt);
-			set_message(fmt, va);
-			va_end(va);
-		}
-};
-
-/**
- * @brief Graphics error
- */
-class GraphicsException: public FatalException {
-	public:
-		GraphicsException(const char* fmt, ...): FatalException(GRAPHICS_ERROR){
-			va_list va;
-			va_start(va, fmt);
-			set_message(fmt, va);
-			va_end(va);
-		}
-};
+ADD_EXCEPTION_INTERFACE(XlibException, XLIB);
+ADD_EXCEPTION_INTERFACE(KernelException, KERNEL);
+ADD_EXCEPTION_INTERFACE(ArgumentException, ARGUMENT);
+ADD_EXCEPTION_INTERFACE(BrowserException, BROWSER);
+ADD_EXCEPTION_INTERFACE(IPCException, IPC_ERROR);
+ADD_EXCEPTION_INTERFACE(GraphicsException, GRAPHICS_ERROR);
 
 #endif // EXCEPTIONS_H
