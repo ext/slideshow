@@ -60,11 +60,37 @@ Graphics::Graphics(int width, int height, bool fullscreen):
 	OS::init_view(width, height, fullscreen);
 	Log::message(Log::Verbose, "Graphics: Using resoultion %dx%d\n", width, height);
 
-	FreeImage_Initialise();
-    FreeImage_SetOutputMessage(FreeImageErrorHandler);
+	freeimage_init();
+	gl_setup();
+	gl_set_matrices();
+	gl_init_textures();
+}
 
-    glShadeModel( GL_FLAT );
-    glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST );
+Graphics::~Graphics(){
+	gl_cleanup_textures();
+	freeimage_cleanup();
+
+	if ( _transition && _transition->cleanup ){
+		_transition->cleanup();
+	}
+
+	free(_transition);
+
+	OS::cleanup();
+}
+
+void Graphics::freeimage_init(){
+	FreeImage_Initialise();
+	FreeImage_SetOutputMessage(FreeImageErrorHandler);
+}
+
+void Graphics::freeimage_cleanup(){
+	FreeImage_DeInitialise();
+}
+
+void Graphics::gl_setup(){
+	glShadeModel( GL_FLAT );
+	glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST );
 	glClearColor(0, 0, 0, 1);
 	glColor4f(1, 1, 1, 1);
 
@@ -74,37 +100,33 @@ Graphics::Graphics(int width, int height, bool fullscreen):
 
 	glEnable( GL_TEXTURE_2D );
 	glEnable(GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-
-    glOrtho(0, 1, 0, 1, -1.0, 1.0);
-    glScalef(1, -1, 1);
-    glTranslated(0, -1, 0);
-
-    glEnable(GL_CULL_FACE);
-
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    glGenTextures(1, &texture_0);
-    glGenTextures(1, &texture_1);
-
-    glClear( GL_COLOR_BUFFER_BIT );
+	glClear( GL_COLOR_BUFFER_BIT );
 }
 
-Graphics::~Graphics(){
+void Graphics::gl_set_matrices(){
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	glOrtho(0, 1, 0, 1, -1.0, 1.0);
+	glScalef(1, -1, 1);
+	glTranslated(0, -1, 0);
+
+	glEnable(GL_CULL_FACE);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+}
+
+void Graphics::gl_init_textures(){
+	glGenTextures(1, &texture_0);
+	glGenTextures(1, &texture_1);
+}
+
+void Graphics::gl_cleanup_textures(){
 	glDeleteTextures(1, &texture_0);
 	glDeleteTextures(1, &texture_1);
-
-	if ( _transition && _transition->cleanup ){
-		_transition->cleanup();
-	}
-
-	free(_transition);
-
-	OS::cleanup();
 }
 
 void Graphics::render(float state){

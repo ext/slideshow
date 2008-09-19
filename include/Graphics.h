@@ -32,6 +32,13 @@ class Graphics {
 		void set_transition(transition_module_t* module);
 
 	private:
+		void freeimage_init();
+		void freeimage_cleanup();
+		void gl_setup();
+		void gl_set_matrices();
+		void gl_init_textures();
+		void gl_cleanup_textures();
+
 		void swap_textures();
 
 		transition_module_t* _transition;
