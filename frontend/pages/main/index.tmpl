@@ -101,20 +101,17 @@
 		$("#bin_<?=$bin->id()?>").sortable({
 			connectWith: bins,
 			placeholder: 'slide_placeholder',
-			opacity: 0.5,
-			scrollSensitivity: 50,
-			scrollSpeed: 5,
 			tolerance: "pointer",
-			revert: true,
-			
+							
 			update: function($e, $ui){
-				 $.ajax({
+				var list = $(this).sortable('toArray');
+				$.ajax({
 					type: "POST",
 					url: "/index.php/slides/moveajax",
-					data: "bin=" + $(this).attr('id') + "&slides=" + $(this).sortable('toArray')
+					data: "bin=" + $(this).attr('id') + "&slides=" + list 
 				 });
 <? if ( $id == $active_bin ){ ?>
-				var n = $(this).sortable('toArray').length;
+				var n = list.length;
 				if ( notice_visible && n > 0 ){
 					notice_visible = false;
 					$("#empty_notice").fadeOut("slow");
