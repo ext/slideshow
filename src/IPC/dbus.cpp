@@ -33,7 +33,8 @@ DBus::DBus(Kernel* kernel, int timeout):
 	_bus = dbus_bus_get (DBUS_BUS_SYSTEM, &_error);
 
 	if (!_bus) {
-		throw IPCException("D-Bus: Failed to connect to the daemon: %s", _error.message);
+		Log::message(Log::Fatal, "D-Bus: %s\n", _error.message);
+		throw IPCException("D-Bus: %s", _error.message);
 	}
 
 	dbus_bus_add_match (_bus, dbus_rule, &_error);
