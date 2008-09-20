@@ -45,6 +45,7 @@ enum ErrorCode {
 class BaseException: public std::exception {
 	public:
 		BaseException(const char* message = NULL);
+		BaseException(const BaseException& e);
 		virtual ~BaseException() throw();
 
 		virtual const char* what() const throw();
@@ -66,6 +67,7 @@ class BaseException: public std::exception {
 class FatalException: public BaseException {
 	public:
 		FatalException(ErrorCode code, const char* message = NULL);
+		FatalException(const FatalException& e);
 		virtual ~FatalException() throw();
 
 		ErrorCode code();

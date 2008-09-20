@@ -3,7 +3,13 @@
 
 BaseException::BaseException(const char* message): std::exception(), _msg(NULL) {
 	if ( message ){
-		asprintf(&_msg, message);
+		asprintf(&_msg, "%s", message);
+	}
+}
+
+BaseException::BaseException(const BaseException& e): std::exception(), _msg(NULL) {
+	if ( e._msg ){
+		asprintf(&_msg, "%s", e._msg);
 	}
 }
 
@@ -25,6 +31,9 @@ void BaseException::set_message(const char* fmt, va_list va){
 
 FatalException::FatalException(ErrorCode code, const char* message): BaseException(message), _code(code){
 
+}
+
+FatalException::FatalException(const FatalException& e): BaseException(e), _code(e._code) {
 }
 
 FatalException::~FatalException() throw() {
