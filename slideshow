@@ -8,6 +8,6 @@
 #
 
 export SLIDESHOW_DATA_DIR="`pwd`/data"
-export SLIDESHOW_PLUGIN_DIR="`pwd`/src/transition"
+export SLIDESHOW_PLUGIN_DIR="`pwd`/src/transitions"
 
 exec src/slideshow $*
