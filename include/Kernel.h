@@ -19,6 +19,8 @@
 #ifndef KERNEL_H
 #define KERNEL_H
 
+#include <sys/select.h>
+
 class Graphics;
 class Browser;
 class IPC;
@@ -51,6 +53,9 @@ class Kernel {
 		static const char* datapath();
 		static const char* pluginpath();
 
+		void create_pidpath();
+		static const char* pidpath();
+
 		void view_state(double t);
 		void transition_state(double t);
 		void switch_state(double t);
@@ -71,7 +76,11 @@ class Kernel {
 		void init_IPC();
 		void init_browser();
 		void init_fsm();
-		void start_daemon();
+
+		void daemon_start();
+		void daemon_ready();
+		void daemon_poll(bool& running);
+		void daemon_stop();
 
 		int _width;
 		int _height;
@@ -97,6 +106,9 @@ class Kernel {
 
 		const char* _logfile;
 		bool _running;
+
+		int fd;
+		fd_set fds;
 };
 
 #endif // KERNEL_H

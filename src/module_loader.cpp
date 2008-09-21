@@ -18,6 +18,7 @@
 
 #include "config.h"
 #include "module_loader.h"
+#include "Log.h"
 #include "Transition.h"
 #include <ltdl.h>
 #include <cstdio>
@@ -31,10 +32,9 @@ static int errnum = 0;
 static const int MODULE_NOT_FOUND = 1;
 static const int MODULE_INVALID = 2;
 
-void moduleloader_init(){
+void moduleloader_init(const char* searchpath){
 	lt_dlinit();
-	lt_dladdsearchdir(PLUGIN_DIR);
-	lt_dladdsearchdir("src/transitions");
+	lt_dladdsearchdir(searchpath);
 }
 
 void moduleloader_cleanup(){
@@ -98,7 +98,7 @@ module_t* module_get(struct module_context_t* context){
 		break;
 
 		default:
-			printf("Unknown module, type id is %d\n", module_type(context));
+			Log::message(Log::Debug, "Unknown module, type id is %d\n", module_type(context));
 			return NULL;
 	}
 

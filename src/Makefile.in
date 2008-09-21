@@ -74,7 +74,7 @@ slideshow_DEPENDENCIES = IPC/libipc.a state/libfsm.a \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -219,6 +219,8 @@ htmldir = @htmldir@
 includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
+libdaemon_CFLAGS = @libdaemon_CFLAGS@
+libdaemon_LIBS = @libdaemon_LIBS@
 libdir = @libdir@
 libexecdir = @libexecdir@
 libportable_CFLAGS = @libportable_CFLAGS@
@@ -248,6 +250,7 @@ xxf86vm_LIBS = @xxf86vm_LIBS@
 SUBDIRS = IPC state transitions
 AM_CPPFLAGS = \
 	${dbus_CFLAGS} \
+	${libdaemon_CFLAGS} \
 	-I${top_srcdir}/include \
 	-pipe -Wall -Wextra -Wno-unused-parameter -Wnon-virtual-dtor -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
 
@@ -265,8 +268,8 @@ slideshow_SOURCES = ${top_srcdir}/include/Browser.h \
 	OS_Linux.cpp browsers/dummybrowser.cpp browsers/dummybrowser.h \
 	$(am__append_1)
 slideshow_LDADD = IPC/libipc.a state/libfsm.a -lltdl \
-	${libportable_LIBS} ${dbus_LIBS} ${GL_LIBS} ${FREEIMAGE_LIBS} \
-	${X11_LIBS} ${xxf86vm_LIBS} $(am__append_2)
+	${libportable_LIBS} ${libdaemon_LIBS} ${dbus_LIBS} ${GL_LIBS} \
+	${FREEIMAGE_LIBS} ${X11_LIBS} ${xxf86vm_LIBS} $(am__append_2)
 all: all-recursive
 
 .SUFFIXES:

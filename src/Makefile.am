@@ -2,6 +2,7 @@ SUBDIRS = IPC state transitions
 
 AM_CPPFLAGS = \
 	${dbus_CFLAGS} \
+	${libdaemon_CFLAGS} \
 	-I${top_srcdir}/include \
 	-pipe -Wall -Wextra -Wno-unused-parameter -Wnon-virtual-dtor -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
 
@@ -38,6 +39,7 @@ slideshow_LDADD = \
 	state/libfsm.a \
 	-lltdl \
 	${libportable_LIBS} \
+	${libdaemon_LIBS} \
 	${dbus_LIBS} \
 	${GL_LIBS} \
 	${FREEIMAGE_LIBS} \

@@ -136,7 +136,9 @@ void Graphics::render(float state){
 	context.texture[1] = texture_1;
 	context.state = state;
 
-	_transition->render(&context);
+	if ( _transition ){
+		_transition->render(&context);
+	}
 
 	OS::swap_gl_buffers();
 }

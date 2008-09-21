@@ -68,6 +68,20 @@ AC_SUBST(libportable_CFLAGS)
 AC_SUBST(libportable_LIBS)
 
 dnl #######################################################################
+dnl # libdaemon
+dnl #######################################################################
+PKG_CHECK_MODULES(libdaemon, [libdaemon],
+	[
+		AC_DEFINE(HAVE_LIBDAEMON, 1, [Define if libdaemon is available])
+	],
+	[
+		AC_MSG_ERROR([Required libdaemon not found])
+	])
+
+AC_SUBST(libdaemon_CFLAGS)
+AC_SUBST(libdaemon_LIBS)
+
+dnl #######################################################################
 dnl # OpenGL/GLX
 dnl #######################################################################
 AC_CHECK_HEADERS([GL/gl.h GL/glx.h], [HAVE_GL=yes], [HAVE_GL=no])
