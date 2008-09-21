@@ -1,3 +1,13 @@
 #!/bin/sh
+#
+# Startup wrapper for Slideshow
+#
+# Copyright (C) 2008, David Sveningsson <ext@sidvind.com>
+#
+# Licenced under the GNU Affero General Public License, version 3
+#
 
-SLIDESHOW_DATA_DIR="data" src/slideshow $*
+export SLIDESHOW_DATA_DIR="`pwd`/data"
+export SLIDESHOW_PLUGIN_DIR="`pwd`/src/transition"
+
+exec src/slideshow $*
