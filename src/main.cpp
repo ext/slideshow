@@ -17,13 +17,58 @@
  */
 
 #include "Kernel.h"
+#include "ForegroundApp.h"
+#include "DaemonApp.h"
+#include "Log.h"
 #include "Exceptions.h"
+#include "module_loader.h"
 #include <cstring>
+#include <portable/Time.h>
 
 int main( int argc, const char* argv[] ){
 	try {
-		Kernel kernel(argc, argv);
-		kernel.run();
+
+		// Default arguments
+		Kernel::argument_set_t arguments = {
+			Kernel::ForegroundMode, // mode
+			Log::Info, 				// loglevel
+			false,					// fullscreen
+			false,					// have_password
+			0, 						// collection_id
+			800,					// width
+			600,					// height
+			3.0f,					// transition_time;
+			5.0f,					// switch_time;
+			NULL,					// connection_string
+			NULL					// transition_string
+		};
+
+		// Parse the cli arguments, overriding the defaults
+		if ( !Kernel::parse_arguments(arguments, argc, argv) ){
+			throw ArgumentException("");
+		}
+
+		initTime();
+
+		Log::initialize("slideshow.log");
+		Log::set_level( (Log::Severity)arguments.loglevel );
+
+		Kernel* application = NULL;
+
+		switch ( arguments.mode ){
+			case Kernel::ForegroundMode: application = new ForegroundApp(arguments); break;
+			case Kernel::DaemonMode: application = new DaemonApp(arguments); break;
+			default:
+				throw KernelException("No valid mode. This should not happen, please report this to the maintainer. Modeid: %d\n", arguments.mode);
+		}
+
+		application->init();
+		application->run();
+		application->cleanup();
+
+		delete application;
+
+		Log::deinitialize();
 
 	} catch ( ExitException &e ){
 		return 0;
@@ -34,7 +79,7 @@ int main( int argc, const char* argv[] ){
 		// Some exceptions like ArgumentException usually
 		// print the error messages before throwing the
 		// exception.
-		if ( strlen(e.what()) > 0 ){
+		if ( e.what() && strlen(e.what()) > 0 ){
 			fprintf(stderr, "\nError 0x%02x:\n%s\n", e.code(), e.what());
 		}
 		return e.code();

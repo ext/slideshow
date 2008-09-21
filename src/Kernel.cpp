@@ -43,9 +43,6 @@
 #include <portable/Time.h>
 #include <portable/string.h>
 
-// libdaemon
-#include <libdaemon/daemon.h>
-
 // libc
 #include <cstdlib>
 #include <cstdio>
@@ -57,7 +54,6 @@
 #include <X11/Xlib.h>
 #include <dirent.h>
 #include <fnmatch.h>
-#include <errno.h>
 
 #ifdef LINUX
 //#include <sys/time.h>
@@ -67,97 +63,37 @@
 #include <windows.h>
 #endif
 
-bool* daemon_running = NULL;
-
-static const int mode_normal = 0;
-static const int mode_list_transitions = 1;
-
 static char* pidfile = NULL;
 
-void quit_signal(int){
-	Log::message(Log::Verbose, "Caught SIGQUIT\n");
-	signal(SIGQUIT, quit_signal);
-	*daemon_running = false;
+Kernel::Kernel(const argument_set_t& arg):
+	_arg(arg),
+	_password(NULL){
+	create_pidpath();
+	_password = get_password();
 }
 
-Kernel::Kernel(int argc, const char* argv[]):
-	_width(800),
-	_height(600),
-	_frames(0),
-	_bin_id(1),
-	_fullscreen(0),
-	_daemon(0),
-	_verbose(1),
-	_stdin(0),
-	_mode(mode_normal),
-	_transition_name(NULL),
-	_transition_time(3.0f),
-	_switch_time(5.0f),
-	_graphics(NULL),
-	_browser(NULL),
-	_ipc(NULL),
-	_browser_string(NULL),
-	_logfile("slideshow.log"){
+Kernel::~Kernel(){
 
-	initTime();
-	moduleloader_init(pluginpath());
+}
 
-	if ( !parse_argv(argc, argv) ){
-		throw ArgumentException("");
-	}
-
-	switch ( _mode ){
-		case mode_list_transitions:
-			print_transitions();
-			throw ExitException();
-	}
-
-	if ( !daemon() ){
-		print_licence_statement();
-	}
-
-	Log::initialize(_logfile);
-	Log::set_level( (Log::Severity)_verbose );
-
-	print_cli_arguments(argc, argv);
-
-	Log::flush();
-
-	///@todo HACK! Attempt to connect to an xserver.
-	/*Display* dpy = XOpenDisplay(NULL);
-	if( !dpy ) {
-		throw XlibException("Could not connect to an X server\n");
-	}
-	XCloseDisplay(dpy);*/
-
+void Kernel::init(){
 	Log::message(Log::Info, "Kernel: Starting slideshow\n");
 
-	create_pidpath();
-
-	if ( daemon() ){
-		daemon_start();
-	}
+	moduleloader_init(pluginpath());
 
 	init_graphics();
 	init_IPC();
 	init_browser();
 	init_fsm();
-
-	if ( daemon() ){
-		daemon_ready();
-	}
 }
 
-Kernel::~Kernel(){
-	if ( daemon() ){
-		daemon_stop();
-	}
-
+void Kernel::cleanup(){
 	delete _state;
 	delete _browser;
 	delete _graphics;
 	delete _ipc;
 	free(pidfile);
+	free(_password);
 
 	moduleloader_cleanup();
 
@@ -166,13 +102,11 @@ Kernel::~Kernel(){
 	_graphics = NULL;
 	_ipc = NULL;
 	pidfile = NULL;
-
-	Log::deinitialize();
 }
 
 void Kernel::init_graphics(){
-	_graphics = new Graphics(_width, _height, _fullscreen);
-	load_transition( _transition_name ? _transition_name : "fade" );
+	_graphics = new Graphics(_arg.width, _arg.height, _arg.fullscreen);
+	load_transition( _arg.transition_string ? _arg.transition_string : "fade" );
 }
 
 void Kernel::init_IPC(){
@@ -180,36 +114,31 @@ void Kernel::init_IPC(){
 }
 
 void Kernel::init_browser(){
-	char* password = get_password();
-
-	_browser = Browser::factory(_browser_string, password);
-
-	free(_browser_string);
-	free(password);
-
-	_browser_string = NULL;
+	_browser = Browser::factory(_arg.connection_string, _password);
 
 	if ( browser() ){
-		change_bin(_bin_id);
+		change_bin(_arg.collection_id);
 	} else {
 		Log::message(Log::Warning, "No browser selected, you will not see any slides\n");
 	}
 }
 
 char* Kernel::get_password(){
-	if ( !_stdin ){
+	if ( !_arg.have_password ){
 		return NULL;
 	}
 
+	Log::message(Log::Info, "Getting password\n");
 	char* password = (char*)malloc(256);
 	scanf("%256s", password);
 
+	Log::message(Log::Info, "Got %s\n", password);
 	return password;
 }
 
 void Kernel::init_fsm(){
-	TransitionState::set_transition_time(_transition_time);
-	ViewState::set_view_time(_switch_time);
+	TransitionState::set_transition_time(_arg.transition_time);
+	ViewState::set_view_time(_arg.switch_time);
 	_state = new InitialState(_browser, _graphics, _ipc);
 }
 
@@ -231,138 +160,12 @@ void Kernel::load_transition(const char* name){
 	_graphics->set_transition(m);
 }
 
-void Kernel::daemon_start(){
-    pid_t pid;
-
-    /* Reset signal handlers */
-    if (daemon_reset_sigs(-1) < 0) {
-    	throw KernelException("Kernel: failed to reset all signal handlers: %s\n", strerror(errno));
-    }
-
-    /* Unblock signals */
-    if (daemon_unblock_sigs(-1) < 0) {
-    	throw KernelException("Kernel: failed to unblock all signals: %s\n", strerror(errno));
-    }
-
-    /* Set indetification string for the daemon for both syslog and PID file */
-    daemon_pid_file_proc = &Kernel::pidpath;
-	daemon_log_ident = PACKAGE_NAME;
-
-    /* Check that the daemon is not rung twice a the same time */
-	if ((pid = daemon_pid_file_is_running()) >= 0) {
-		throw KernelException("Kernel: daemon already running on PID file %u\n", pid);
-	}
-
-	/* Prepare for return value passing from the initialization procedure of the daemon process */
-	daemon_retval_init();
-
-	/* Do the fork */
-	if ((pid = daemon_fork()) < 0) {
-
-		/* Exit on error */
-		daemon_retval_done();
-		throw KernelException("Kernel: fork failed.\n");
-
-	} else if (pid) { /* The parent */
-		int ret;
-
-		/* Wait for 20 seconds for the return value passed from the daemon process */
-		if ((ret = daemon_retval_wait(20)) < 0) {
-			throw KernelException("Kernel: could not receive return value from daemon process: %s\n", strerror(errno));
-		}
-
-		if ( ret != 0 ){
-			throw KernelException("Kernel: daemon returned %i as return value.\n", ret);
-		} else {
-			throw ExitException();
-		}
-
-	} else { /* The daemon */
-		/* Close FDs */
-		if (daemon_close_all(-1) < 0) {
-			Log::message(Log::Fatal, "Failed to close all file descriptors: %s\n", strerror(errno));
-
-			/* Send the error condition to the parent process */
-			daemon_retval_send(1);
-			daemon_stop();
-			exit(0);
-		}
-
-		/* Create the PID file */
-		if (daemon_pid_file_create() < 0) {
-			Log::message(Log::Fatal, "Could not create PID file (%s).\n", strerror(errno));
-			daemon_retval_send(2);
-			daemon_stop();
-			exit(0);
-		}
-
-		/* Initialize signal handling */
-		if (daemon_signal_init(SIGINT, SIGTERM, SIGQUIT, SIGHUP, 0) < 0) {
-			Log::message(Log::Fatal, "Could not register signal handlers (%s).\n", strerror(errno));
-			daemon_retval_send(3);
-			daemon_stop();
-			exit(0);
-		}
-	}
+void Kernel::poll(){
+	OS::poll_events(_running);
 }
 
-void Kernel::daemon_ready(){
-	/* Send OK to parent process */
-	daemon_retval_send(0);
-
-	Log::message(Log::Info, "Sucessfully started\n");
-	daemon_log(LOG_INFO, "Sucessfully started\n");
-
-	/* Prepare for select() on the signal fd */
-	FD_ZERO(&fds);
-	fd = daemon_signal_fd();
-	FD_SET(fd, &fds);
-}
-
-void Kernel::daemon_poll(bool& running){
-	fd_set fds2 = fds;
-
-	/* Wait for an incoming signal */
-	if (select(FD_SETSIZE, &fds2, 0, 0, 0) < 0) {
-
-		/* If we've been interrupted by an incoming signal, continue */
-		if (errno == EINTR)
-			return;
-
-		Log::message(Log::Warning, "select(): %s\n", strerror(errno));
-		return;
-	}
-
-	/* Check if a signal has been recieved */
-	if (FD_ISSET(fd, &fds)) {
-		int sig;
-
-		/* Get signal */
-		if ((sig = daemon_signal_next()) <= 0) {
-			Log::message(Log::Warning, "daemon_signal_next() failed: %s\n", strerror(errno));
-			return;
-		}
-
-		/* Dispatch signal */
-		switch (sig) {
-
-			case SIGINT:
-			case SIGQUIT:
-			case SIGTERM:
-				Log::message(Log::Info, "Got SIGINT, SIGQUIT or SIGTERM\n");
-				running = false;
-				break;
-		}
-	}
-}
-
-void Kernel::daemon_stop(){
-	Log::message(Log::Info, "Exiting\n");
-	daemon_log(LOG_INFO, "Exiting");
-
-	daemon_retval_send(255);
-	daemon_signal_done();
-	daemon_pid_file_remove();
+void Kernel::action(){
+	_state = _state->action();
 }
 
 void Kernel::print_licence_statement(){
@@ -422,34 +225,22 @@ void Kernel::print_transitions(){
 	}
 }
 
-void Kernel::run(){
-	_running = true;
-
-	_last_switch = getTime();
-	_transition_start = 0.0f;
-
-	while ( _running ){
-		OS::poll_events(_running);
-		_state = _state->action();
-	}
-}
-
-bool Kernel::parse_argv(int argc, const char* argv[]){
+bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 	option_set_t options;
-	option_initialize(&options, argc, argv);
 
+	option_initialize(&options, argc, argv);
 	option_set_description(&options, "Slideshow is an application for showing text and images in a loop on monitors and projectors.");
 
-	option_add_flag(&options,	"verbose",			'v', "Explain what is being done", &_verbose, 0);
-	option_add_flag(&options,	"quiet",			'q', "Explain what is being done", &_verbose, 2);
-	option_add_flag(&options,	"fullscreen",		'f', "Start in fullscreen mode", &_fullscreen, 1);
-	option_add_flag(&options,	"daemon",			'd', "Run in background", &_daemon, 1);
-	option_add_flag(&options,	"list-transitions",	 0,  "List available transitions", &_mode, mode_list_transitions);
-	option_add_flag(&options,	"stdin-password",	 0,  "Except the input (e.g database password) to come from stdin", &_stdin, 1);
-	option_add_string(&options,	"browser",			 0,  "Browser connection string. provider://user[:pass]@host[:port]/name", &_browser_string);
-	option_add_string(&options,	"transition",		't', "Set slide transition plugin [fade]", &_transition_name);
-	option_add_int(&options,	"collection-id",	'c', "ID of the collection to display", &_bin_id);
-	option_add_format(&options,	"resolution",		'r', "Resolution", "WIDTHxHEIGHT", "%dx%d", &_width, &_height);
+	option_add_flag(&options,	"verbose",			'v', "Explain what is being done", &arg.loglevel, Log::Debug);
+	option_add_flag(&options,	"quiet",			'q', "Explain what is being done", &arg.loglevel, Log::Warning);
+	option_add_flag(&options,	"fullscreen",		'f', "Start in fullscreen mode", &arg.fullscreen, true);
+	option_add_flag(&options,	"daemon",			'd', "Run in background", &arg.mode, DaemonMode);
+	option_add_flag(&options,	"list-transitions",	 0,  "List available transitions", &arg.mode, ListTransitionMode);
+	option_add_flag(&options,	"stdin-password",	 0,  "Except the input (e.g database password) to come from stdin", &arg.have_password, true);
+	option_add_string(&options,	"browser",			 0,  "Browser connection string. provider://user[:pass]@host[:port]/name", &arg.connection_string);
+	option_add_string(&options,	"transition",		't', "Set slide transition plugin [fade]", &arg.transition_string);
+	option_add_int(&options,	"collection-id",	'c', "ID of the collection to display", &arg.collection_id);
+	option_add_format(&options,	"resolution",		'r', "Resolution", "WIDTHxHEIGHT", "%dx%d", &arg.width, &arg.height);
 
 	int n = option_parse(&options);
 	option_finalize(&options);
@@ -479,6 +270,10 @@ void Kernel::play_video(const char* fullpath){
 	}
 
 	::wait(&status);
+}
+
+void Kernel::start(){
+	_running = true;
 }
 
 void Kernel::quit(){

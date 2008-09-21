@@ -65,7 +65,7 @@ void OS::init_view(int width, int height, bool fullscreen){
 	dpy = XOpenDisplay(NULL);
 
 	if( !dpy ) {
-		throw XlibException("Could not connect to an X server\n");
+		throw XlibException("Could not connect to an X server");
 	}
 
 	root = DefaultRootWindow(dpy);

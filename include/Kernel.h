@@ -28,18 +28,50 @@ class State;
 
 class Kernel {
 	public:
-		Kernel(int argc, const char* argv[]);
-		~Kernel();
+		typedef struct argument_set_t {
+			int mode;
+			int loglevel;
+			int fullscreen;
+			int have_password;
+			int collection_id;
+			int width;
+			int height;
+			float transition_time;
+			float switch_time;
+			char* connection_string;
+			char* transition_string;
+		} argument_set_t;
 
-		void run();
+		enum Mode {
+			InvalidMode,
+			ForegroundMode,
+			DaemonMode,
+			HelpMode,
+			ListTransitionMode
+		};
 
+		Kernel(const argument_set_t& arg);
+		virtual ~Kernel();
+
+		virtual void init();
+		virtual void cleanup();
+		virtual void run() = 0;
+		virtual void poll();
+		virtual void action();
+
+		bool running(){ return _running; }
+
+		void start();
 		void quit();
+
 		void reload_browser();
 		void ipc_quit();
 		void play_video(const char* fullpath);
 		void change_bin(unsigned int id);
 
 		void debug_dumpqueue();
+
+		static bool parse_arguments(argument_set_t& arg, int argc, const char* argv[]);
 
 		/**
 		 * @brief Return the real path to a resource.
@@ -49,12 +81,14 @@ class Kernel {
 		 */
 		static char* real_path(const char* filename);
 
+	protected:
+		static const char* pidpath();
+
 	private:
 		static const char* datapath();
 		static const char* pluginpath();
 
 		void create_pidpath();
-		static const char* pidpath();
 
 		void view_state(double t);
 		void transition_state(double t);
@@ -63,9 +97,7 @@ class Kernel {
 		void print_licence_statement();
 		void print_cli_arguments(int argc, const char* argv[]);
 		void print_transitions();
-		bool parse_argv(int argc, const char* argv[]);
 
-		bool daemon(){ return _daemon; }
 		Browser* browser(){ return _browser; }
 
 		void load_transition(const char* name);
@@ -77,38 +109,17 @@ class Kernel {
 		void init_browser();
 		void init_fsm();
 
-		void daemon_start();
-		void daemon_ready();
-		void daemon_poll(bool& running);
-		void daemon_stop();
+		argument_set_t _arg;
 
-		int _width;
-		int _height;
-		int _frames;
-		int _bin_id;
-		int _fullscreen;
-		int _daemon;
-		int _verbose;
-		int _stdin;
-		int _mode;
-		char* _transition_name;
-		double _transition_time;
-		double _switch_time;
-		double _last_switch;
-		double _transition_start;
+		char* _password;
+
 		State* _state;
 
 		Graphics* _graphics;
 		Browser* _browser;
 		IPC* _ipc;
 
-		char* _browser_string;
-
-		const char* _logfile;
 		bool _running;
-
-		int fd;
-		fd_set fds;
 };
 
 #endif // KERNEL_H
