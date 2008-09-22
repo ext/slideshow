@@ -19,7 +19,10 @@
 #include "Log.h"
 #include <stdarg.h>
 #include <cstdlib>
+#include <cstring>
+#include <errno.h>
 #include <time.h>
+#include <libdaemon/daemon.h>
 
 Log::Severity Log::_level = Info;
 FILE* Log::_file = NULL;
@@ -48,11 +51,9 @@ void Log::message(Severity severity, const char* fmt, ...){
 
 	if ( severity >= _level ){
 		fprintf(stdout, "(%s) [%s] %s", severity_string(severity), timestring(buf, 255), line);
-		fflush(stdout);
 	}
 
 	fprintf(_file, "(%s) [%s] %s", severity_string(severity), timestring(buf, 255), line);
-	fflush(_file);
 
 	free(line);
 	va_end(arg);
@@ -133,4 +134,8 @@ const char* Log::severity_string(Severity severity){
 void Log::flush(){
 	fflush(stdout);
 	fflush(_file);
+}
+
+int Log::fileno(){
+	return _file->_fileno;
 }

@@ -147,7 +147,7 @@ void DaemonApp::daemon_start(){
 
 	} else { /* The daemon */
 		/* Close FDs */
-		if (daemon_close_all(_writefd, -1) < 0) {
+		if (daemon_close_all(Log::fileno(), _writefd, -1) < 0) {
 			Log::message(Log::Fatal, "Failed to close all file descriptors: %s\n", strerror(errno));
 
 			/* Send the error condition to the parent process */
