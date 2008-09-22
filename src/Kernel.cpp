@@ -128,11 +128,9 @@ char* Kernel::get_password(){
 		return NULL;
 	}
 
-	Log::message(Log::Info, "Getting password\n");
 	char* password = (char*)malloc(256);
 	scanf("%256s", password);
 
-	Log::message(Log::Info, "Got %s\n", password);
 	return password;
 }
 
