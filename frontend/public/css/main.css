@@ -191,10 +191,7 @@ img {
 	border: 3px dashed #666;
 }
 
-h1 {
+h1, h2 {
 	margin: 0;
-}
-
-h2 { 
-	margin: 0;
+	text-shadow: #bbb 1px 1px 1px;
 }
