@@ -90,10 +90,23 @@ class SlideshowInst {
 
 		global $settings;
 
-		$cmd = 	"ulimit -c unlimited; echo '{$arguments->password()}' | SLIDESHOW_DATA_DIR=\"{$settings->data_path()}\" DISPLAY=\":0\" $this->binary {$arguments->as_string()} >> {$arguments->logfile()} 2>&1";
+		$core_cmd = 'ulimit -c unlimited';
+		$password_cmd = "echo '{$arguments->password()}'";
+		$env = '';
+
+		foreach ( $settings->environment() as $key => $value ){
+			$env .= "$key=\"$value\" ";
+		}
+
+		$cmd = 	$core_cmd . ';' .
+				$password_cmd . '|' .
+				$env .
+				'DISPLAY=":0" ' .
+				"$this->binary {$arguments->as_string()} 2>&1";
 
 		$old_wd = getcwd();
 		chdir( $arguments->basepath() );
+
 
 		$stdout = array();
 		$ret = 0;

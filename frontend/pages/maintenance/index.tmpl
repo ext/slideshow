@@ -44,24 +44,19 @@
 	
 		<ul>
 <? if ( $status == 0 ) { ?>
-			<li><a href="/index.php/maintenance/start<?=$show_debug?"?show_debug":""?>">Start daemon</a></li>
+			<li><a href="/index.php/maintenance/start">Start daemon</a></li>
 <? } ?>
 <? if ( $status == 1 ) { ?>
-			<li><a href="/index.php/maintenance/stop<?=$show_debug?"?show_debug":""?>">Stop daemon</a></li>
+			<li><a href="/index.php/maintenance/stop">Stop daemon</a></li>
 <? } ?>
-			<li><a href="/index.php/maintenance/ping<?=$show_debug?"?show_debug":""?>">Ping daemon</a></li>
+			<li><a href="/index.php/maintenance/ping">Ping daemon</a></li>
 			<li><a href="/index.php/maintenance/kill_mplayer">Kill mplayer</a></li>
 		</ul>
 	
 		<h2>Debug</h2>
 	
 		<ul>
-<? if ( !$show_debug ) { ?>
-			<li><a href="/index.php/maintenance?show_debug">Show debug entries</a></li>
-<? } else { ?>
-			<li><a href="/index.php/maintenance">Hide debug entries</a></li>
-<? } ?>
-			<li><a href="/index.php/maintenance/debug_dumpqueue<?=$show_debug?"?show_debug":""?>">Dump queue</a></li>
+			<li><a href="/index.php/maintenance/debug_dumpqueue">Dump queue</a></li>
 		</ul>
 	
 		<h2>Log</h2>

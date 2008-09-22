@@ -39,13 +39,10 @@ class Maintenance extends Module {
 	function index(){
 		global $settings, $daemon;
 
-		$show_debug = isset($_GET['show_debug']);
-
 		$ret =  array(
 			'log' => array(),
 			'activity' => array(),
 			'status' => $daemon->get_status(),
-			'show_debug' => $show_debug
 		);
 
 		try {
@@ -55,9 +52,6 @@ class Maintenance extends Module {
 
 		try {
 			$log = $settings->log();
-			if ( $show_debug ){
-				$log = $settings->debug_log();
-			}
 
 			$ret['log'] = $log->read_lines(25);
 		} catch ( Exception $e ){}

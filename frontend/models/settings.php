@@ -61,12 +61,8 @@ class Settings {
 		$this->data['BasePath'] = $new_path;
 	}
 
-	function data_path(){
-		return $this->data['Path']['Data'];
-	}
-
-	function set_data_path($new_path){
-		$this->data['Path']['Data'] = $new_path;
+	function environment(){
+		return isset($this->data['Env']) ? $this->data['Env'] : array();;
 	}
 
 	function image_path(){
