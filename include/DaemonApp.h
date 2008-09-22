@@ -36,6 +36,8 @@ class DaemonApp: public Kernel {
 		void daemon_poll();
 		void daemon_stop();
 
+		void pass_exception(const BaseException &e);
+
 	private:
 		int fd;
 		fd_set fds;

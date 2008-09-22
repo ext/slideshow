@@ -37,31 +37,39 @@ DaemonApp::~DaemonApp(){
 
 void DaemonApp::init(){
 	daemon_start();
+
 	try {
 		Kernel::init();
 	} catch ( FatalException& e ){
 		Log::message(Log::Fatal, "Error 0x%02x: %s\n", e.code(), e.what());
 
-		size_t size = strlen(e.what());
-		write(_writefd, &size, sizeof(size));
-		write(_writefd, e.what(), size);
-
+		pass_exception(e);
 		daemon_retval_send(e.code());
 
 		daemon_stop();
 		exit(0);
 	} catch ( BaseException& e ){
 		Log::message(Log::Fatal, "Unhandled exception: %s\n", e.what());
+
+		pass_exception(e);
 		daemon_retval_send(DAEMON_UNHANDLED_EXCEPTION);
+
 		daemon_stop();
 		exit(0);
 	}
+
 	daemon_ready();
 }
 
 void DaemonApp::cleanup(){
 	daemon_stop();
 	Kernel::cleanup();
+}
+
+void DaemonApp::pass_exception(const BaseException &e){
+	size_t size = strlen(e.what());
+	write(_writefd, &size, sizeof(size));
+	write(_writefd, e.what(), size);
 }
 
 void DaemonApp::run(){
