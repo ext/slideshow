@@ -32,7 +32,6 @@ DaemonApp::DaemonApp(const argument_set_t& arg):
 }
 
 DaemonApp::~DaemonApp(){
-	daemon_stop();
 }
 
 void DaemonApp::init(){
