@@ -41,7 +41,13 @@ void DaemonApp::init(){
 		Kernel::init();
 	} catch ( FatalException& e ){
 		Log::message(Log::Fatal, "Error 0x%02x: %s\n", e.code(), e.what());
+
+		size_t size = strlen(e.what());
+		write(_writefd, &size, sizeof(size));
+		write(_writefd, e.what(), size);
+
 		daemon_retval_send(e.code());
+
 		daemon_stop();
 		exit(0);
 	} catch ( BaseException& e ){
@@ -89,6 +95,14 @@ void DaemonApp::daemon_start(){
 		throw KernelException("Kernel: daemon already running on PID file %u\n", pid);
 	}
 
+	/* Create a pipe to write messages from child to parent */
+	int pipefd[2];
+	if ( pipe(pipefd) == -1 ){
+		throw KernelException("Kernel: failed to create pipe: %s\n", strerror(errno));
+	}
+	_readfd = pipefd[0];
+	_writefd = pipefd[1];
+
 	/* Prepare for return value passing from the initialization procedure of the daemon process */
 	daemon_retval_init();
 
@@ -100,6 +114,8 @@ void DaemonApp::daemon_start(){
 		throw KernelException("Kernel: fork failed.\n");
 
 	} else if (pid) { /* The parent */
+		close(_writefd);
+
 		int ret;
 
 		/* Wait for 20 seconds for the return value passed from the daemon process */
@@ -108,14 +124,23 @@ void DaemonApp::daemon_start(){
 		}
 
 		if ( ret != 0 ){
-			throw KernelException("Kernel: daemon returned %i as return value.\n", ret);
+			size_t size;
+			read(_readfd, &size, sizeof(size_t));
+
+			char buf[size+1];
+			read(_readfd, buf, size);
+			close(_readfd);
+			buf[size] = '\0';
+
+			throw FatalException((ErrorCode)ret, buf);
 		} else {
+			close(_readfd);
 			throw ExitException();
 		}
 
 	} else { /* The daemon */
 		/* Close FDs */
-		if (daemon_close_all(-1) < 0) {
+		if (daemon_close_all(_writefd, -1) < 0) {
 			Log::message(Log::Fatal, "Failed to close all file descriptors: %s\n", strerror(errno));
 
 			/* Send the error condition to the parent process */
@@ -195,6 +220,8 @@ void DaemonApp::daemon_poll(){
 void DaemonApp::daemon_stop(){
 	Log::message(Log::Info, "Exiting\n");
 	daemon_log(LOG_INFO, "Exiting");
+
+	close(_writefd);
 
 	daemon_retval_send(255);
 	daemon_signal_done();

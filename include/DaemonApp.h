@@ -39,6 +39,9 @@ class DaemonApp: public Kernel {
 	private:
 		int fd;
 		fd_set fds;
+
+		int _readfd;
+		int _writefd;
 };
 
 #endif // DAEMON_APP_H
