@@ -141,7 +141,19 @@ class XMLSettings {
 				$this->active_group->description = $data;
 				break;
 			case 'ITEM':
-				$this->active_item->default = $data;
+				switch ( $this->active_item->type ){
+					case 'int':
+						$this->active_item->default = (int)$data;
+						break;
+					case 'float':
+						$this->active_item->default = (float)$data;
+						break;
+					case 'resolution':
+						$this->active_item->default = sscanf($data, "%dx%d");
+						break;
+					default:
+						$this->active_item->default = $data;
+				}
 		}
 	}
 }
