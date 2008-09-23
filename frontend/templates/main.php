@@ -6,6 +6,11 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<link rel="stylesheet" href="/css/common.css" type="text/css" media="screen" />
 	<link rel="stylesheet" href="/css/main.css" type="text/css" media="screen" />
+<? if ( $page->have_extra_css() ){ ?>
+	<style type="text/css">
+<?= $page->extra_css(2); ?>
+	</style>
+<? } ?>
 	<script src="/js/jquery-1.2.6.js" type="text/javascript"></script>
 	<script src="/js/ui.core.js" type="text/javascript"></script>
 	<script src="/js/ui.sortable.js" type="text/javascript"></script>

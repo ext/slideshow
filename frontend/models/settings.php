@@ -54,11 +54,11 @@ class Settings {
 	}
 
 	function base_path(){
-		return $this->data['BasePath'];
+		return $this->data['Path']['BasePath'];
 	}
 
 	function set_base_path($new_path){
-		$this->data['BasePath'] = $new_path;
+		$this->data['Path']['BasePath'] = $new_path;
 	}
 
 	function environment(){
@@ -284,6 +284,10 @@ class Settings {
 
 	function as_json(){
 		return $this->_prettify( json_encode( $this->data) );
+	}
+
+	function as_array(){
+		return $this->data;
 	}
 
 	function persist( $filename = NULL ){

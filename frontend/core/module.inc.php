@@ -23,6 +23,7 @@ require_once ('file_not_found.inc.php');
 
 class Module {
 	private $_view = '';
+	private $_css = '';
 	private $_template = 'main';
 	private $_data = array();
 	private $_name = 'undefined';
@@ -44,10 +45,26 @@ class Module {
 
 	private function set_view( $name, $section ){
 		$this->_view = '../pages/' . $name . '/' . $section . '.tmpl';
+		$this->_css = '../pages/' . $name . '/' . $section . '.css';
 	}
 
 	private function view(){
 		return $this->_view;
+	}
+
+	private function have_extra_css(){
+		return file_exists($this->_css);
+	}
+
+	private function extra_css($indent){
+		//return str_repeat("\t", $indent) . str_replace("\n", "\n" . str_repeat("\t", $indent), file_get_contents($this->_css));
+		$lines = explode("\n", file_get_contents($this->_css));
+		$indented_lines = '';
+		$tabs = str_repeat("\t", $indent);
+		foreach( $lines as $line ){
+			$indented_lines .= $tabs . $line . "\n";
+		}
+		return $indented_lines;
 	}
 
 	public function set_template($template){

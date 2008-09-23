@@ -1,7 +1,6 @@
 {
-	"BasePath": "",
-
 	"Path": {
+		"BasePath": "",
 		"Image": "image",
 		"Video": "video",
 		"Temp": "tmp"
@@ -21,7 +20,9 @@
 	"Apparence": {
 		"Background": "",
 		"Font": "",
-		"Resolution": [800,600]
+		"Resolution": [800,600],
+		"TransitionTime": 3.0,
+		"SwitchTime": 10.0
 	},
 
 	"Database": {
