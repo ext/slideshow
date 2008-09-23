@@ -18,6 +18,7 @@
  */
 
 require_once('log.php');
+require_once('../core/json.php');
 
 class InvalidSettings extends Exception {}
 class CorruptSettings extends Exception {}
@@ -283,7 +284,7 @@ class Settings {
 	}
 
 	function as_json(){
-		return $this->_prettify( json_encode( $this->data) );
+		return pretty_json( json_encode( $this->data) );
 	}
 
 	function as_array(){
@@ -302,82 +303,6 @@ class Settings {
 		$file = fopen($filename, 'w');
 		fwrite($file, $this->as_json());
 		fclose($file);
-	}
-
-	function _prettify($json){
-		$indent = 0;
-		$no_escape = false;
-		$in_string = false;
-
-		//$json = trim($json);
-		$len = strlen($json);
-
-		$pretty = "";
-
-		for ( $i = 0; $i < $len; $i++ ){
-
-			// Remove any escaped forward slashes since JSON handles them anyway.
-			// It is not correct to escape them anyway and makes reading it harder.
-			if ( $in_string && $json[$i] == '\\' && $json[$i+1] == '/' ){
-				continue;
-			}
-
-			$pretty .=  $json[$i];
-
-			if ( $i > 0 && $json[$i] == '"' && $json[$i-1] != '\\' ){
-				$in_string = !$in_string;
-				continue;
-			}
-
-			if ( $in_string ){
-				continue;
-			}
-
-			switch ( $json[$i] ){
-			case '"':
-			case '[':
-			case ']':
-				$no_escape = !$no_escape;
-			}
-
-			if ( $no_escape ){
-				continue;
-			}
-
-			switch ( $json[$i] ){
-			case '{':
-				$indent++;
-				$pretty .= "\n" . str_repeat( "\t", $indent );
-				break;
-
-			case '}':
-				$indent--;
-
-				$pretty[strlen($pretty)-1] = "\n";
-				$pretty .= str_repeat( "\t", $indent ) . '}';
-				break;
-
-			case ',':
-				if ( $indent == 1 ){
-					$pretty .= "\n";
-				}
-
-				$pretty .= "\n" . str_repeat( "\t", $indent );
-
-
-
-				break;
-
-			case ':':
-				$pretty .= ' ';
-				break;
-
-			}
-		}
-
-		$pretty .= "\n";
-
-		return $pretty;
 	}
 };
 
