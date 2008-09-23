@@ -32,11 +32,13 @@ class Node {
 class Item {
 	public $name;
 	public $type;
-	public $default;
+	public $value;
+	public $install;
 
-	public function __construct($name, $type){
+	public function __construct($name, $type, $install){
 		$this->name = $name;
 		$this->type = $type;
+		$this->install = $install;
 	}
 }
 
@@ -50,7 +52,7 @@ class Group {
 	}
 
 	public function add_item($item){
-		$this->items[] = $item;
+		$this->items[$item->name] = $item;
 	}
 }
 
@@ -93,8 +95,28 @@ class XMLSettings {
 		xml_parser_free($xml_parser);
 	}
 
+	public function merge_settings($filename){
+		$data = json_decode(file_get_contents($filename), true );
+
+		foreach ($data as $name => $group){
+			if ( !array_key_exists($name, $this->group) ){
+				echo $name, " was not found\n";
+				continue;
+			}
+
+			foreach ($group as $itemname => $item){
+				if ( !array_key_exists($itemname, $this->group[$name]->items) ){
+					echo $itemname, " was not found in $name\n";
+					continue;
+				}
+
+				$this->group[$name]->items[$itemname]->value = $item;
+			}
+		}
+	}
+
 	public function add_group($group){
-		$this->group[] = $group;
+		$this->group[$group->name] = $group;
 	}
 
 	public function as_settings_json(){
@@ -103,7 +125,7 @@ class XMLSettings {
 		foreach ( $this->group as $g ){
 			$section = array();
 			foreach ( $g->items as $item ){
-				$section[$item->name] = $item->default != NULL ? $item->default : "";
+				$section[$item->name] = $item->value != NULL ? $item->value : "";
 			}
 			$data[$g->name] = $section;
 		}
@@ -111,8 +133,14 @@ class XMLSettings {
 		return pretty_json( json_encode($data) );
 	}
 
+	public function groups(){
+		return $this->group;
+	}
+
 	public function startElement($parser, $name, $attrs) {
 		$this->node = new Node($name, $this->node);
+
+		print_r($attrs);
 
 		switch ( $name ){
 			case 'GROUP':
@@ -120,7 +148,11 @@ class XMLSettings {
 				$this->add_group($this->active_group);
 				break;
 			case 'ITEM':
-				$this->active_item = new Item($attrs['NAME'], $attrs['TYPE']);
+				$install = false;
+				if ( isset($attrs['INSTALL']) && $attrs['INSTALL'] == 'yes' ){
+					$install = true;
+				}
+				$this->active_item = new Item($attrs['NAME'], $attrs['TYPE'], $install);
 				break;
 		}
 	}
@@ -143,16 +175,16 @@ class XMLSettings {
 			case 'ITEM':
 				switch ( $this->active_item->type ){
 					case 'int':
-						$this->active_item->default = (int)$data;
+						$this->active_item->value = (int)$data;
 						break;
 					case 'float':
-						$this->active_item->default = (float)$data;
+						$this->active_item->value = (float)$data;
 						break;
 					case 'resolution':
-						$this->active_item->default = sscanf($data, "%dx%d");
+						$this->active_item->value = sscanf($data, "%dx%d");
 						break;
 					default:
-						$this->active_item->default = $data;
+						$this->active_item->value = $data;
 				}
 		}
 	}
