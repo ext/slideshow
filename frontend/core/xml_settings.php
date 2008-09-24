@@ -117,11 +117,24 @@ class XMLSettings {
 		}
 	}
 
+	public function merge_flat_array($array){
+		foreach($array as $key => $value){
+			foreach($this->group as $name => $group){
+				foreach($group->items as $itemname => $item){
+					if ( $itemname != $key ){
+						continue;
+					}
+					$this->group[$name]->items[$itemname]->value = $value;
+				}
+			}
+		}
+	}
+
 	public function add_group($group){
 		$this->group[$group->name] = $group;
 	}
 
-	public function as_settings_json(){
+	public function as_settings_array(){
 		$data = array();
 
 		foreach ( $this->group as $g ){
@@ -132,7 +145,11 @@ class XMLSettings {
 			$data[$g->name] = $section;
 		}
 
-		return pretty_json( json_encode($data) );
+		return $data;
+	}
+
+	public function as_settings_json(){
+		return pretty_json( json_encode($this->as_settings_array()) );
 	}
 
 	public function as_array($item_filter = NULL){

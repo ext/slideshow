@@ -28,13 +28,26 @@ class Settings {
 	private $readonly;
 	private $data;
 
-	function __construct($filename = '../settings.json', $readonly = false){
+	function __construct($source = '../settings.json', $readonly = false){
+		$this->readonly = $readonly;
+
+		if ( is_array($source) ){
+			$this->from_array($source);
+		} elseif ( is_string($source) ){
+			$this->from_file($source);
+		}
+	}
+
+	private function from_array($array){
+		$this->data = $array;
+	}
+
+	private function from_file($filename){
 		if ( !file_exists($filename) ){
 			throw new InvalidSettings($filename . " not found!");
 		}
 
 		$this->filename = realpath($filename);
-		$this->readonly = $readonly;
 		$json_string = file_get_contents($this->filename);
 		$this->data = json_decode( $json_string, true );
 
@@ -46,12 +59,6 @@ class Settings {
 
 			throw new CorruptSettings();
 		}
-	}
-
-	function store(){
-		$file = fopen('../settings.json');
-		fwrite($file, $this->as_json());
-		fclose($file);
 	}
 
 	function base_path(){
@@ -103,23 +110,11 @@ class Settings {
 	}
 
 	function log_file(){
-		return $this->base_path() . '/' . $this->data['Files']['Log']['Base'];
+		return $this->base_path() . '/' . $this->data['Files']['BaseLog'];
 	}
 
 	function set_log($new_path){
-		$this->data['Files']['Log']['Base'] = $new_path;
-	}
-
-	function debug_log(){
-		return new Log( $this->debug_log_file() );
-	}
-
-	function debug_log_file(){
-		return $this->base_path() . '/' . $this->data['Files']['Log']['Debug'];
-	}
-
-	function set_debug_log($new_path){
-		$this->data['Files']['Log']['Debug'] = $new_path;
+		$this->data['Files']['BaseLog'] = $new_path;
 	}
 
 	function activity_log(){
@@ -127,11 +122,11 @@ class Settings {
 	}
 
 	function activity_log_file(){
-		return $this->base_path() . '/' .  $this->data['Files']['Log']['Activity'];
+		return $this->base_path() . '/' .  $this->data['Files']['ActivityLog'];
 	}
 
 	function set_activity_log($new_path){
-		$this->data['Files']['Log']['Activity'] = $new_path;
+		$this->data['Files']['ActivityLog'] = $new_path;
 	}
 
 	function pid(){

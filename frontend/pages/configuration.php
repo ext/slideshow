@@ -65,6 +65,21 @@ class configuration extends Module {
 			)
 		);
 	}
+
+	public function save(){
+		$xmlsettings = new XMLSettings('../settings.xml');
+		$xmlsettings->merge_flat_array($_POST);
+		$new_settings = new Settings($xmlsettings->as_settings_array());
+
+		$password = $new_settings->database_password();
+		if ( empty($password) ){
+			global $settings;
+			$new_settings->set_database_password($settings->database_password());
+		}
+
+		$new_settings->persist('../settings.json');
+		$this->redirect('/index.php');
+	}
 }
 
 ?>
