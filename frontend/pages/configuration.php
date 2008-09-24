@@ -33,6 +33,7 @@ class configuration extends Module {
 		if ( $rc == 0 ){
 			unset($resolution);
 			exec('DISPLAY=":0" xrandr | sed \'1,2d\' | awk \'{ print $1 }\'', $resolution);
+			array_unshift($resolution, '--');
 		} else {
 			$resolution = NULL;
 		}

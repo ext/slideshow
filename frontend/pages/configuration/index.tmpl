@@ -54,11 +54,11 @@
 	case 'resolution':
 			// If we have a list of available resolutions for the display we only
 			// list those, otherwise the user must manually enter the resolution.
+			$selected = isset($item->value) ? sprintf("%dx%d", $item->value[0], $item->value[1]) : NULL;
 			if ( $resolution ){?>
 					<select name="<?=$item->name?>"><?
-					$selected = sprintf("%dx%d", $item->value[0], $item->value[1]);
 					foreach ($resolution as $r){
-						if ( $r == $selected ){ ?>
+						if ( $select && $r == $selected ){ ?>
 
 						<option selected="selected"><?=$r?></option><?
 						} else { ?> 
@@ -67,9 +67,9 @@
 				} ?>
 
 					</select>
-<?			} else {
-				echo "<input type=\"text\" name=\"$item->name\" value=\"$item->value\" />";
-			}
+<?			} else { ?>
+					<input type="text" name="<?=$item->name?>" value="<? echo $selected ? $selected : "" ?>" />
+<?			}
 			break;
 			
 		default:
