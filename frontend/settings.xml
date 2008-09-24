@@ -22,12 +22,12 @@
 	</group>
 	
 	<group name="Apparence">
-		<description></description>
+		<description>If the display forces another resolution or aspect ratio than X uses (e.g some widescreen projectors) set the virtual resolution the resolution used by the display and the regular resolution to the resolution used by X.</description>
 		
 		<item name="Background" type="file" description="Background image used when creating text slides"></item>
 		<item name="Font" type="file" description="Font used when creating text slides"></item>
 		<item name="Resolution" type="resolution" description="Resolution of the daemon">800x600</item>
-		<item name="VirtualResolution" title="Virtual resolution" type="resolution" description="If the display forces another resolution (e.g some widescreen projectors) set this to that resolution"></item>
+		<item name="VirtualResolution" title="Virtual resolution" type="resolution"></item>
 		<item name="TransitionTime" title="Transition time" type="float" description="Time in sec it takes to change slide">3.0</item>
 		<item name="SwitchTime" title="Switch time" type="float" description="Time in sec each slide will be shown">10.0</item>
 	</group>
