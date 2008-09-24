@@ -33,21 +33,17 @@ $settings = NULL;
 $daemon = NULL;
 
 try {
-	$settings = new Settings();
-	$daemon = new SlideshowInst($settings->binary(), $settings->pid_file());
-} catch ( CorruptSettings $e ){
-	die("The settings file is corrupt");
-} catch ( InvalidSettings $e ){
-	if ( $path->module() != 'install'){
-		$path = new Path( 'install', 'welcome' );
+	try {
+		$settings = new Settings();
+		$daemon = new SlideshowInst($settings->binary(), $settings->pid_file());
+	} catch ( InvalidSettings $e ){
+		if ( $path->module() != 'install'){
+			$path = new Path( 'install', 'welcome' );
+		}
+
+		$settings = new Settings('../settings.json.default', true);
 	}
 
-	$settings = new Settings('../settings.json.default', true);
-} catch ( Exception $e ){
-	die($e->message());
-}
-
-try {
 	$page = Module::factory( $path->module() );
 	$page->execute( $path->section(), $path->argv() );
 } catch ( Exception $e ){
