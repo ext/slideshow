@@ -48,6 +48,9 @@
 	case 'float': ?>
 					<input type="text" name="<?=$item->name?>" value="<?=$item->value?>" />
 <?					break;
+	case 'password': ?>
+					<input type="password" name="<?=$item->name?>" value="" />
+<?					break;
 	case 'resolution':
 			// If we have a list of available resolutions for the display we only
 			// list those, otherwise the user must manually enter the resolution.
