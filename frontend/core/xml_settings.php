@@ -33,11 +33,13 @@ class Item {
 	public $name;
 	public $type;
 	public $value;
+	public $description;
 	public $install;
 
-	public function __construct($name, $type, $install){
+	public function __construct($name, $type, $description, $install){
 		$this->name = $name;
 		$this->type = $type;
+		$this->description = $description;
 		$this->install = $install;
 	}
 }
@@ -100,13 +102,11 @@ class XMLSettings {
 
 		foreach ($data as $name => $group){
 			if ( !array_key_exists($name, $this->group) ){
-				echo $name, " was not found\n";
 				continue;
 			}
 
 			foreach ($group as $itemname => $item){
 				if ( !array_key_exists($itemname, $this->group[$name]->items) ){
-					echo $itemname, " was not found in $name\n";
 					continue;
 				}
 
@@ -133,6 +133,25 @@ class XMLSettings {
 		return pretty_json( json_encode($data) );
 	}
 
+	public function as_array($item_filter = NULL){
+		$array = array();
+		foreach ( $this->group as $name => $group ){
+			$copy = new Group($name);
+			$copy->description = $group->description;
+			foreach ( $group->items as $itemname => $item ){
+				if ( $item_filter && !call_user_func($item_filter, $item) ){
+					continue;
+				}
+				$copy->add_item($item);
+			}
+			if ( count($copy) > 0 ){
+				$array[$name] = $copy;
+			}
+		}
+
+		return $array;
+	}
+
 	public function groups(){
 		return $this->group;
 	}
@@ -140,19 +159,21 @@ class XMLSettings {
 	public function startElement($parser, $name, $attrs) {
 		$this->node = new Node($name, $this->node);
 
-		print_r($attrs);
-
 		switch ( $name ){
 			case 'GROUP':
 				$this->active_group = new Group($attrs['NAME']);
 				$this->add_group($this->active_group);
 				break;
 			case 'ITEM':
+				$description = NULL;
+				if ( isset($attrs['DESCRIPTION']) ){
+					$description = $attrs['DESCRIPTION'];
+				}
 				$install = false;
 				if ( isset($attrs['INSTALL']) && $attrs['INSTALL'] == 'yes' ){
 					$install = true;
 				}
-				$this->active_item = new Item($attrs['NAME'], $attrs['TYPE'], $install);
+				$this->active_item = new Item($attrs['NAME'], $attrs['TYPE'], $description, $install);
 				break;
 		}
 	}
