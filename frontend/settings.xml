@@ -2,9 +2,9 @@
 <!DOCTYPE settings SYSTEM "settings.dtd">
 <settings>
 	<group name="Path">
-		<description>The basepath is the homedirectory of the frontend. All other paths are relative to it.</description>
+		<description>The base directory is the homedirectory of the frontend. All other paths are relative to it.</description>
 		
-		<item name="BasePath" type="directory" description="foo bar baz"></item>
+		<item name="BasePath" title="Base directory" type="directory"></item>
 		<item name="Image" type="directory">image</item>
 		<item name="Video" type="directory">video</item>
 		<item name="Temp" type="directory">tmp</item>
@@ -13,23 +13,23 @@
 	<group name="Files">
 		<description>All file paths are either relative to BasePath or an absolute path.</description>
 		
-		<item name="BinaryPath" type="file"></item>
-		<item name="BaseLog" type="file">slideshow.log</item>
-		<item name="ActivityLog" type="file">activity.log</item>
+		<item name="BinaryPath" title="Executable" type="file"></item>
+		<item name="BaseLog" title="Logfile" type="file">slideshow.log</item>
+		<item name="ActivityLog" title="Activity logfile" type="file">activity.log</item>
 		<item name="PID" type="file">slideshow.pid</item>
-		<item name="MOTD" type="file">motd</item>
-		<item name="convert" type="file"></item>
+		<item name="MOTD" type="file" description="Message of the day">motd</item>
+		<item name="convert" title="ImageMagick convert" type="file" description="ImageMagick is used to scale and convert the slides"></item>
 	</group>
 	
 	<group name="Apparence">
-		<description>Visual apperance.</description>
+		<description></description>
 		
 		<item name="Background" type="file" description="Background image used when creating text slides"></item>
 		<item name="Font" type="file" description="Font used when creating text slides"></item>
 		<item name="Resolution" type="resolution" description="Resolution of the daemon">800x600</item>
 		<item name="VirtualResolution" title="Virtual resolution" type="resolution" description="If the display forces another resolution (e.g some widescreen projectors) set this to that resolution"></item>
-		<item name="TransitionTime" type="float" description="Time in sec it takes to change slide">3.0</item>
-		<item name="SwitchTime" type="float" description="Time in sec each slide will be shown">10.0</item>
+		<item name="TransitionTime" title="Transition time" type="float" description="Time in sec it takes to change slide">3.0</item>
+		<item name="SwitchTime" title="Switch time" type="float" description="Time in sec each slide will be shown">10.0</item>
 	</group>
 	
 	<group name="Database">
@@ -42,8 +42,8 @@
 	</group>
 	
 	<group name="Slideshow">
-		<description>Bajs</description>
+		<description>These settings only affects the webGUI.</description>
 		
-		<item name="Title" type="string" description="Webgui title">Slideshow</item>
+		<item name="Title" type="string" description="WebGUI title">Slideshow</item>
 	</group>
 </settings>
