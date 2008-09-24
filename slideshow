@@ -10,4 +10,14 @@
 export SLIDESHOW_DATA_DIR="`pwd`/data"
 export SLIDESHOW_PLUGIN_DIR="`pwd`/src/transitions"
 
-exec src/slideshow $*
+case `basename $0` in
+    slideshow-gdb)
+	exec gdb --args src/slideshow $*
+	;;
+    slideshow-valgrind)
+	exec valgrind $*
+	;;
+    *)
+	exec src/slideshow $*
+	;;
+esac;
