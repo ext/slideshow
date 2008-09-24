@@ -57,12 +57,12 @@
 			$selected = isset($item->value) ? $item->value : NULL;
 			if ( $resolution ){?>
 					<select name="<?=$item->name?>"><?
-					foreach ($resolution as $r){
-						if ( $selected && $r == $selected ){ ?>
+					foreach ($resolution as $key => $value){
+						if ( $selected && $key == $selected ){ ?>
 
-						<option selected="selected"><?=$r?></option><?
+						<option value="<?=$key?>" selected="selected"><?=$value?></option><?
 						} else { ?> 
-						<option><?=$r?></option><?
+						<option value="<?=$key?>"><?=$value?></option><?
 						}
 				} ?>
 

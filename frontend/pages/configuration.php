@@ -26,16 +26,44 @@ class configuration extends Module {
 		$xmlsettings = new XMLSettings('../settings.xml');
 		$xmlsettings->merge_settings('../settings.json');
 
-		$resolution = array();
+		$temp = NULL;
 		$rc = 0;
-		exec('DISPLAY=":0" xrandr', $resolution, $rc);
+		exec('DISPLAY=":0" xrandr', $temp, $rc);
+
+		$resolution = NULL;
 
 		if ( $rc == 0 ){
-			unset($resolution);
-			exec('DISPLAY=":0" xrandr | sed \'1,2d\' | awk \'{ print $1 }\'', $resolution);
-			array_unshift($resolution, '--');
-		} else {
-			$resolution = NULL;
+			$key = array();
+			exec('DISPLAY=":0" xrandr | sed \'1,2d\' | awk \'{ print $1 }\'', $key);
+
+			array_unshift($key, '');
+			$value = $key;
+
+			$allowed_ratios = array(
+				array(4, 3), // Regular 4:3 (VGA, PAL, SVGA, etc)
+				array(3, 2), // NTSC
+				array(5, 3),
+				array(5, 4), // SXGA, QSXGA
+				array(8, 5), // Aka 16:10
+				array(16, 9), // Widescreen
+				array(17, 9)
+			);
+
+			foreach ($value as &$r){
+				if ( $r == '' ){
+					$r = '--';
+					continue;
+				}
+				$width = 0;
+				$height = 0;
+				sscanf($r, "%dx%d", $width, $height);
+				foreach ($allowed_ratios as $ratio){
+					if ( ($width/$ratio[0]) / ($height/$ratio[1]) == 1 ){
+						$r .= " ($ratio[0]:$ratio[1])";
+					}
+				}
+			}
+			$resolution = array_combine($key, $value);
 		}
 
 		return array(
