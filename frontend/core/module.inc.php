@@ -44,8 +44,8 @@ class Module {
 	}
 
 	private function set_view( $name, $section ){
-		$this->_view = '../pages/' . $name . '/' . $section . '.tmpl';
-		$this->_css = '../pages/' . $name . '/' . $section . '.css';
+		$this->_view = PAGE_URL . "/$name/$section.tmpl";
+		$this->_css = PAGE_URL . "/$name/$section.css";
 	}
 
 	private function view(){
@@ -149,7 +149,7 @@ class Module {
 			extract($this->_data);
 		}
 
-		require("../pages/$this->_view");
+		require("$this->_view");
 	}
 };
 

@@ -20,6 +20,7 @@
 <?
 
 require_once('../version.php');
+require_once('../constants.php');
 require_once('../core/path.inc.php');
 require_once('../db_functions.inc.php');
 require_once('../thumb_functions.inc.php');
