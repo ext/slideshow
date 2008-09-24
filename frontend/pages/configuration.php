@@ -17,11 +17,29 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+require('../core/xml_settings.php');
+
 class configuration extends Module {
 	public function index(){
 		global $settings;
+
+		$xmlsettings = new XMLSettings('../settings.xml');
+		$xmlsettings->merge_settings('../settings.json');
+
+		$resolution = array();
+		$rc = 0;
+		exec('DISPLAY=":0" xrandr', $resolution, $rc);
+
+		if ( $rc == 0 ){
+			unset($resolution);
+			exec('DISPLAY=":0" xrandr | sed \'1,2d\' | awk \'{ print $1 }\'', $resolution);
+		} else {
+			$resolution = NULL;
+		}
+
 		return array(
-			'settings' => $settings->as_array(),
+			'settings' => $xmlsettings->as_array(),
+			'resolution' => $resolution,
 			'help' => array(
 				'Path' => array(
 					'BasePath' => 'Base directory',
