@@ -57,10 +57,10 @@ class Module {
 	}
 
 	private function extra_css($indent){
-		//return str_repeat("\t", $indent) . str_replace("\n", "\n" . str_repeat("\t", $indent), file_get_contents($this->_css));
+		$tabs = str_repeat("\t", $indent);
+
 		$lines = explode("\n", file_get_contents($this->_css));
 		$indented_lines = '';
-		$tabs = str_repeat("\t", $indent);
 		foreach( $lines as $line ){
 			$indented_lines .= $tabs . $line . "\n";
 		}
