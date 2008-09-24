@@ -31,13 +31,15 @@ class Node {
 
 class Item {
 	public $name;
+	public $title;
 	public $type;
 	public $value;
 	public $description;
 	public $install;
 
-	public function __construct($name, $type, $description, $install){
+	public function __construct($name, $title, $type, $description, $install){
 		$this->name = $name;
+		$this->title = $title ? $title : $name;
 		$this->type = $type;
 		$this->description = $description;
 		$this->install = $install;
@@ -165,6 +167,10 @@ class XMLSettings {
 				$this->add_group($this->active_group);
 				break;
 			case 'ITEM':
+				$title = NULL;
+				if ( isset($attrs['TITLE']) ){
+					$title = $attrs['TITLE'];
+				}
 				$description = NULL;
 				if ( isset($attrs['DESCRIPTION']) ){
 					$description = $attrs['DESCRIPTION'];
@@ -173,7 +179,7 @@ class XMLSettings {
 				if ( isset($attrs['INSTALL']) && $attrs['INSTALL'] == 'yes' ){
 					$install = true;
 				}
-				$this->active_item = new Item($attrs['NAME'], $attrs['TYPE'], $description, $install);
+				$this->active_item = new Item($attrs['NAME'], $title, $attrs['TYPE'], $description, $install);
 				break;
 		}
 	}

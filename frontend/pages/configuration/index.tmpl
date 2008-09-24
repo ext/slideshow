@@ -34,7 +34,7 @@
 <? if ( $name != 'Env' ){ ?>
 <? foreach ( $group->items as $itemname => $item ){ ?>
 					<label for="<?=$itemname?>">
-						<?=$itemname?>
+						<?=$item->title?>
 						<? if ( isset($item->description) ){ ?>
 
 						<span><?=$item->description?></span><? } ?>

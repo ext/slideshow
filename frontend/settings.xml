@@ -2,7 +2,7 @@
 <!DOCTYPE settings SYSTEM "settings.dtd">
 <settings>
 	<group name="Path">
-		<description>Foo bar baz bajs</description>
+		<description>The basepath is the homedirectory of the frontend. All other paths are relative to it.</description>
 		
 		<item name="BasePath" type="directory" description="foo bar baz"></item>
 		<item name="Image" type="directory">image</item>
@@ -11,7 +11,7 @@
 	</group>
 	
 	<group name="Files">
-		<description>Lorem Ipsum</description>
+		<description>All file paths are either relative to BasePath or an absolute path.</description>
 		
 		<item name="BinaryPath" type="file"></item>
 		<item name="BaseLog" type="file">slideshow.log</item>
@@ -22,18 +22,18 @@
 	</group>
 	
 	<group name="Apparence">
-		<description>Visual stuff</description>
+		<description>Visual apperance.</description>
 		
-		<item name="Background" type="file"></item>
-		<item name="Font" type="file"></item>
-		<item name="Resolution" type="resolution">800x600</item>
-		<item name="VirtualResolution" type="resolution" description="VirtualResolution can be set if X and the display cannot agree on a common resolution, e.g some widescreen projectors. Resolution should be set to X resolution and VirtualResolution to the resolution used by the display."></item>
-		<item name="TransitionTime" type="float">3.0</item>
-		<item name="SwitchTime" type="float">10.0</item>
+		<item name="Background" type="file" description="Background image used when creating text slides"></item>
+		<item name="Font" type="file" description="Font used when creating text slides"></item>
+		<item name="Resolution" type="resolution" description="Resolution of the daemon">800x600</item>
+		<item name="VirtualResolution" title="Virtual resolution" type="resolution" description="If the display forces another resolution (e.g some widescreen projectors) set this to that resolution"></item>
+		<item name="TransitionTime" type="float" description="Time in sec it takes to change slide">3.0</item>
+		<item name="SwitchTime" type="float" description="Time in sec each slide will be shown">10.0</item>
 	</group>
 	
 	<group name="Database">
-		<description>Database stuff</description>
+		<description>Database settings. Leave the password blank unless you need to change it.</description>
 		
 		<item name="Username" type="string"></item>
 		<item name="Password" type="password"></item>
