@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE settings SYSTEM "settings.dtd">
+<settings>
+	<group name="Path">
+		<description>Foo bar baz bajs</description>
+		
+		<item name="BasePath" type="directory" description="foo bar baz"></item>
+		<item name="Image" type="directory">image</item>
+		<item name="Video" type="directory">video</item>
+		<item name="Temp" type="directory">tmp</item>
+	</group>
+	
+	<group name="Files">
+		<description>Lorem Ipsum</description>
+		
+		<item name="BinaryPath" type="file"></item>
+		<item name="BaseLog" type="file">slideshow.log</item>
+		<item name="ActivityLog" type="file">activity.log</item>
+		<item name="PID" type="file">slideshow.pid</item>
+		<item name="MOTD" type="file">motd</item>
+		<item name="convert" type="file"></item>
+	</group>
+	
+	<group name="Apparence">
+		<description>Visual stuff</description>
+		
+		<item name="Background" type="file"></item>
+		<item name="Font" type="file"></item>
+		<item name="Resolution" type="resolution">800x600</item>
+		<item name="VirtualResolution" type="resolution" description="VirtualResolution can be set if X and the display cannot agree on a common resolution, e.g some widescreen projectors. Resolution should be set to X resolution and VirtualResolution to the resolution used by the display."></item>
+		<item name="TransitionTime" type="float">3.0</item>
+		<item name="SwitchTime" type="float">10.0</item>
+	</group>
+	
+	<group name="Database">
+		<description>Database stuff</description>
+		
+		<item name="Username" type="string"></item>
+		<item name="Password" type="password"></item>
+		<item name="Hostname" type="string">localhost</item>
+		<item name="Name" type="string"></item>
+	</group>
+	
+	<group name="Slideshow">
+		<description>Bajs</description>
+		
+		<item name="Title" type="string" description="Webgui title">Slideshow</item>
+	</group>
+</settings>

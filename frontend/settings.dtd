@@ -1,0 +1,11 @@
+<!ELEMENT settings (group*)>
+
+<!ELEMENT group   (description?, item+)>
+<!ELEMENT description (#PCDATA)>
+<!ELEMENT item  (#PCDATA)>
+
+<!ATTLIST group 	name ID #REQUIRED>
+<!ATTLIST item 		name ID #REQUIRED
+					type (string|int|float|directory|file|resolution|password) #REQUIRED
+					description CDATA #IMPLIED
+					install (yes|no) "no">
