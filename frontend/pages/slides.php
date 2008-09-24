@@ -331,6 +331,7 @@ class Slides extends Module {
 		global $settings, $daemon;
 
 		$settings->set_current_bin($id);
+		$settings->persist();
 		$daemon->change_bin($id);
 
 		Module::log("Changing active bin to id $id");
