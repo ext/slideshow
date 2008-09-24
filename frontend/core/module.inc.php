@@ -111,15 +111,18 @@ class Module {
 		exit();
 	}
 
-	function log($msg){
-		global $settings;
-
+	public function get_user(){
 		$user = $_SERVER['REMOTE_ADDR'];
 		if ( isset($_SERVER['PHP_AUTH_USER']) ){
 			$user = $_SERVER['PHP_AUTH_USER'];
 		}
+		return $user;
+	}
 
-		$settings->activity_log()->write("$user $msg\n");
+	function log($msg){
+		global $settings;
+
+		$settings->activity_log()->write("{$this->get_user()} $msg\n");
 	}
 
 	function render(){
