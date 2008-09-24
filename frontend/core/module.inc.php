@@ -87,29 +87,29 @@ class Module {
 		$this->_data = call_user_func_array( $functor, $argv );
 	}
 
-  function redirect($location, array $keep = NULL){
-	if ( $keep != NULL){
-	  $post = array();
+	function redirect($location, array $keep = NULL){
+		if ( $keep != NULL){
+			$post = array();
 
-	  foreach ( $keep as $var ){
-		if ( array_key_exists($var, $_GET) ){
-		  $post[$var] = $_GET[$var];
+			foreach ( $keep as $var ){
+				if ( array_key_exists($var, $_GET) ){
+					$post[$var] = $_GET[$var];
+				}
+			}
+
+			if ( count($post) > 0 ){
+				$n = 0;
+				foreach ( $post as $key => $value ){
+					$location .= $n == 0 ? '?' : '&';
+					$location .= "$key=".urlencode($value);
+					$n++;
+				}
+			}
 		}
-	  }
 
-	  if ( count($post) > 0 ){
-	$n = 0;
-	foreach ( $post as $key => $value ){
-	  $location .= $n == 0 ? '?' : '&';
-	  $location .= "$key=".urlencode($value);
-	  $n++;
+		header("Location: $location");
+		exit();
 	}
-	  }
-	}
-
-	header("Location: $location");
-	exit();
-  }
 
 	function log($msg){
 		global $settings;
