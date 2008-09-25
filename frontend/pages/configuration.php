@@ -68,29 +68,7 @@ class configuration extends Module {
 
 		return array(
 			'settings' => $xmlsettings->as_array(),
-			'resolution' => $resolution,
-			'help' => array(
-				'Path' => array(
-					'BasePath' => 'Base directory',
-					'Image' => 'Image directory',
-					'Video' => 'Video directory',
-					'Temp' => 'Temp directory'
-				),
-
-				'Files' => array(
-					'BinaryPath' => 'Location of the slideshow binary.'
-				),
-
-				'Database' => array(
-					'Password' => 'Leave blank to keep old password',
-					'Hostname' => 'hostname[:port]',
-					'Name' => 'Name of the database'
-				)
-			),
-			'description' => array(
-				'Path' => "The basepath is the homedirectory of the frontend. All other paths are relative to it.",
-				'Files' => "All file paths are either relative to BasePath or an absolute path."
-			)
+			'resolution' => $resolution
 		);
 	}
 
