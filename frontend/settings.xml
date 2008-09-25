@@ -22,7 +22,7 @@
 	</group>
 	
 	<group name="Apparence">
-		<description>If the display forces another resolution or aspect ratio than X uses (e.g some widescreen projectors) set the virtual resolution the resolution used by the display and the regular resolution to the resolution used by X.</description>
+		<description>If the display forces another resolution or aspect ratio than X uses (e.g some widescreen projectors) set the virtual resolution the resolution used by the display and the regular resolution to the resolution used by X. However, be careful using virtual resolution as the slides will be stretched. It is suggested to use a resolution which matches either dimension and is an as close match as possible.</description>
 		
 		<item name="Background" type="file" description="Background image used when creating text slides"></item>
 		<item name="Font" type="file" description="Font used when creating text slides"></item>
