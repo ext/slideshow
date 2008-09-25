@@ -68,6 +68,7 @@ class configuration extends Module {
 
 		return array(
 			'settings' => $xmlsettings->as_array(),
+			'environment' => $settings->environment(),
 			'resolution' => $resolution
 		);
 	}
@@ -76,6 +77,15 @@ class configuration extends Module {
 		$xmlsettings = new XMLSettings('../settings.xml');
 		$xmlsettings->merge_flat_array($_POST);
 		$new_settings = new Settings($xmlsettings->as_settings_array());
+
+		$environment = explode("\n", $_POST['Env']);
+		foreach($environment as $line){
+			$line = trim($line);
+			if ( empty($line) ){
+				continue;
+			}
+			$new_settings->add_environment($line);
+		}
 
 		$password = $new_settings->database_password();
 		if ( empty($password) ){

@@ -73,6 +73,11 @@ class Settings {
 		return isset($this->data['Env']) ? $this->data['Env'] : array();;
 	}
 
+	function add_environment($line){
+		$part = explode('=', $line, 2);
+		$this->data['Env'][$part[0]] = $part[1];
+	}
+
 	function image_path(){
 		return $this->base_path() . '/' . $this->data['Path']['Image'];
 	}

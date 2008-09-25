@@ -34,7 +34,7 @@ class SlideshowInst {
 	public function __construct($binaryfile, $pidfile){
 		$this->pid = 0;
 		$this->pidfile = $pidfile;
-		$this->binary = $binaryfile;
+		$this->binary = escapeshellcmd($binaryfile);
 
 		// This is required if we are going to start the executable.
 		if ( !(file_exists($binaryfile) && is_executable($binaryfile)) ){
@@ -95,7 +95,7 @@ class SlideshowInst {
 		$env = '';
 
 		foreach ( $settings->environment() as $key => $value ){
-			$env .= "$key=\"$value\" ";
+			$env .= "SLIDESHOW_$key=\"$value\" ";
 		}
 
 		$cmd = 	$core_cmd . ';' .
@@ -106,7 +106,6 @@ class SlideshowInst {
 
 		$old_wd = getcwd();
 		chdir( $arguments->basepath() );
-
 
 		$stdout = array();
 		$ret = 0;
