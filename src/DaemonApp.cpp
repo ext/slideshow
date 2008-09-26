@@ -102,16 +102,18 @@ void DaemonApp::daemon_start(){
 		throw KernelException("Kernel: daemon already running on PID file %u\n", pid);
 	}
 
-	/* Create a pipe to write messages from child to parent */
-	int pipefd[2];
-	if ( pipe(pipefd) == -1 ){
-		throw KernelException("Kernel: failed to create pipe: %s\n", strerror(errno));
-	}
-	_readfd = pipefd[0];
-	_writefd = pipefd[1];
-
 	/* Prepare for return value passing from the initialization procedure of the daemon process */
 	daemon_retval_init();
+
+	/* Create a pipe to write messages from child to parent */
+	{
+		int pipefd[2];
+		if ( pipe(pipefd) == -1 ){
+			throw KernelException("Kernel: failed to create pipe: %s\n", strerror(errno));
+		}
+		_readfd = pipefd[0];
+		_writefd = pipefd[1];
+	}
 
 	/* Do the fork */
 	if ((pid = daemon_fork()) < 0) {
