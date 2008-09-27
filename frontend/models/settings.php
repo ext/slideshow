@@ -40,6 +40,9 @@ class Settings {
 
 	private function from_array($array){
 		$this->data = $array;
+		if ( is_string($this->data['Apparence']['Resolution']) ){
+			set_resolution($this->data['Apparence']['Resolution']);
+		}
 	}
 
 	private function from_file($filename){
