@@ -313,10 +313,8 @@ class Slides extends Module {
 		imagefttext( $im, $size, 0, $width - $margin - $x, $y, $color, $font, $string );
 	}
 
-	public function delete(){
+	public function delete($id){
 		global $daemon;
-
-		$id = (int)$_GET['id'];
 
 		if ( array_key_exists('confirm', $_GET) === true ){
 			q("DELETE FROM files WHERE id = $id");
