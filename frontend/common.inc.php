@@ -52,7 +52,7 @@ function array_get(array $array, $name, $default){
  * @param $main Main part
  * @param $section Section part
  * @param $argv Array with arguments or a single string (or string convertable) argument
- * @param $get Array with GET arguments
+ * @param $get Array with GET arguments or a string containing the GET string (must include '?' character)
  */
 function href($main = NULL, $section = NULL, $argv = NULL, $get = NULL){
 	$href = '/index.php';
@@ -82,7 +82,11 @@ function href($main = NULL, $section = NULL, $argv = NULL, $get = NULL){
 				}
 				break;
 			case 3:
-				$href .= '?' . http_build_query($part, '', '&amp;');
+				if ( is_array($part) ){
+					$href .= '?' . http_build_query($part, '', '&amp;');
+				} else {
+					$href .= $part;
+				}
 				break;
 		}
 	}
