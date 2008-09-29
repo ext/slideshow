@@ -63,8 +63,8 @@ class Slides extends Module {
 				$filename = md5(uniqid());
 				$fullpath = $settings->image_path() . "/$filename.png";
 
-				$this->convert($fullpath, $fullpath . '.thumb.jpg', "200x200");
 				$this->_create_image($title, $content, $align, $fullpath);
+				$this->convert($fullpath, $fullpath . '.thumb.jpg', "200x200");
 
 				q("INSERT INTO files (fullpath, type, title, content) VALUES ('$fullpath', 'text', '" . mysql_real_escape_string($title_orig) . "', '" . mysql_real_escape_string($content_orig) . "')");
 
