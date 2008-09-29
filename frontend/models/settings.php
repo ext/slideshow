@@ -41,7 +41,10 @@ class Settings {
 	private function from_array($array){
 		$this->data = $array;
 		if ( is_string($this->data['Apparence']['Resolution']) ){
-			set_resolution($this->data['Apparence']['Resolution']);
+			$this->set_resolution($this->data['Apparence']['Resolution']);
+		}
+		if ( is_string($this->data['Apparence']['VirtualResolution']) ){
+			$this->set_virtual_resolution($this->data['Apparence']['VirtualResolution']);
 		}
 	}
 
@@ -213,24 +216,36 @@ class Settings {
 	}
 
 	function set_resolution(){
-		$nr_of_arguments = func_num_args();
+		$this->data['Apparence']['Resolution'] = $this->transform_resolution(func_get_args());
+	}
+
+	function virtual_resolution(){
+		return $this->data['Apparence']['Resolution'];
+	}
+
+	function virtual_resolution_as_string(){
+		return sprintf("%dx%d", $this->data['Apparence']['Resolution'][0], $this->data['Apparence']['Resolution'][1]);
+	}
+
+	function set_virtual_resolution(){
+		$this->data['Apparence']['VirtualResolution'] = $this->transform_resolution(func_get_args());
+	}
+
+	private function transform_resolution($args){
+		$nr_of_arguments = count($args);
 		if ( $nr_of_arguments == 0 || $nr_of_arguments > 2 ){
 			throw new Exception('Wrong number of arguments');
 		}
 
-		$args = func_get_args();
-
 		if ( $nr_of_arguments == 1 ){
 			if ( is_string($args[0]) ){
-				$this->data['Apparence']['Resolution'] = sscanf("%dx%d", $args[0]);
-				return;
+				return sscanf($args[0], "%dx%d");
 			}
 			if ( is_array($args[0]) ){
 				if ( count($args[0]) != 2 ){
 					throw new Exception('Array count is not two!');
 				}
-				$this->data['Apparence']['Resolution'] = $args[0];
-				return;
+				return $args[0];
 			}
 			throw new Exception('Wrong argument type, must be string or array, got ' . gettype($args[0]));
 		}
@@ -239,7 +254,7 @@ class Settings {
 			throw new Exception('Wrong argument type, must be integers.');
 		}
 
-		$this->data['Apparence']['Resolution'] = array($args[1], $args[2]);
+		return array($args[0], $args[1]);
 	}
 
 	function database_hostname(){

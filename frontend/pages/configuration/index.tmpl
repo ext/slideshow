@@ -54,7 +54,12 @@
 	case 'resolution':
 			// If we have a list of available resolutions for the display we only
 			// list those, otherwise the user must manually enter the resolution.
-			$selected = isset($item->value) ? $item->value : NULL;
+			
+			$selected = NULL;
+			if ( isset($item->value) && !empty($item->value) ){
+				$selected = sprintf("%dx%d", $item->value[0], $item->value[1]);
+			}
+			
 			if ( $resolution ){?>
 					<select name="<?=$item->name?>"><?
 					foreach ($resolution as $key => $value){
