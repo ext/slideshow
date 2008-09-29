@@ -57,13 +57,13 @@ class Slides extends Module {
 			}
 
 			if ( $_POST['submit'] == 'Upload' ){
-				$title = $this->_utf_hack($title_orig);
-				$content = explode("\n", $this->_utf_hack($content_orig));
+				$title = $this->utf_hack($title_orig);
+				$content = explode("\n", $this->utf_hack($content_orig));
 
 				$filename = md5(uniqid());
 				$fullpath = $settings->image_path() . "/$filename.png";
 
-				$this->_create_image($title, $content, $align, $fullpath);
+				$this->create_image($title, $content, $align, $fullpath);
 				$this->convert($fullpath, $fullpath . '.thumb.jpg', "200x200");
 
 				q("INSERT INTO files (fullpath, type, title, content) VALUES ('$fullpath', 'text', '" . mysql_real_escape_string($title_orig) . "', '" . mysql_real_escape_string($content_orig) . "')");
@@ -144,7 +144,7 @@ class Slides extends Module {
 		Module::redirect('/index.php');
 	}
 
-	function _utf_hack($str){
+	private function utf_hack($str){
 		return strtr($str, array(
 			"Å" => "&#0197;",
 			"Ä" => "&#0196;",
@@ -156,17 +156,17 @@ class Slides extends Module {
 	}
 
 	public function preview(){
-		$title = $this->_utf_hack(html_entity_decode(get('title'), ENT_NOQUOTES, 'UTF-8'));
-		$content = explode("\n", $this->_utf_hack(html_entity_decode(get('content'), ENT_NOQUOTES, 'UTF-8')) );
+		$title = $this->utf_hack(html_entity_decode(get('title'), ENT_NOQUOTES, 'UTF-8'));
+		$content = explode("\n", $this->utf_hack(html_entity_decode(get('content'), ENT_NOQUOTES, 'UTF-8')) );
 
 		$align = $_GET['align'];
 
-		$this->_create_image($title, $content, $align);
+		$this->create_image($title, $content, $align);
 
 		exit();
 	}
 
-	private function _create_image($title, $content, $alignment, $filename = NULL){
+	private function create_image($title, $content, $alignment, $filename = NULL){
 		global $settings;
 
 		$resolution = $settings->resolution();
@@ -201,11 +201,11 @@ class Slides extends Module {
 
 		// 1 is alignment (center)
 		// 100 is y-coordinate
-		$this->_render_string_aligned($im, 1, 100, $title_size, $font, $white, $title);
+		$this->render_string_aligned($im, 1, 100, $title_size, $font, $white, $title);
 
 		$y = 180;
 		foreach ( $content as $paragraph ){
-			$y = $this->_render_string_aligned($im, $alignment, $y, $content_size, $font, $white, $paragraph);
+			$y = $this->render_string_aligned($im, $alignment, $y, $content_size, $font, $white, $paragraph);
 		}
 
 		if ( $filename == NULL ){
@@ -253,7 +253,7 @@ class Slides extends Module {
 		}
 	}
 
-	function _render_string_aligned($im, $alignment, $y, $size, $font, $color, $string){
+	function render_string_aligned($im, $alignment, $y, $size, $font, $color, $string){
 		global $settings;
 
 		$resolution = $settings->resolution();
@@ -274,9 +274,9 @@ class Slides extends Module {
 
 			if ( $part_width > $width - $margin * 2 ){
 				switch ( $alignment ){
-					case 0:	$this->_render_string_left( $im, $old_part_width, $y, $margin, $width, $size, $font, $color, $part ); break;
-					case 1:	$this->_render_string_center( $im, $old_part_width, $y, $margin, $width, $size, $font, $color, $part ); break;
-					case 2:	$this->_render_string_right( $im, $old_part_width, $y, $margin, $width, $size, $font, $color, $part ); break;
+					case 0:	$this->render_string_left( $im, $old_part_width, $y, $margin, $width, $size, $font, $color, $part ); break;
+					case 1:	$this->render_string_center( $im, $old_part_width, $y, $margin, $width, $size, $font, $color, $part ); break;
+					case 2:	$this->render_string_right( $im, $old_part_width, $y, $margin, $width, $size, $font, $color, $part ); break;
 					default: die("This alignemnt ($alignment) is not implemented yet");
 				}
 
@@ -292,24 +292,24 @@ class Slides extends Module {
 		}
 
 		switch ( $alignment ){
-			case 0:	$this->_render_string_left( $im, $old_part_width, $y, $margin, $width, $size, $font, $color, $part ); break;
-			case 1:	$this->_render_string_center( $im, $old_part_width, $y, $margin, $width, $size, $font, $color, $part ); break;
-			case 2:	$this->_render_string_right( $im, $old_part_width, $y, $margin, $width, $size, $font, $color, $part ); break;
+			case 0:	$this->render_string_left( $im, $old_part_width, $y, $margin, $width, $size, $font, $color, $part ); break;
+			case 1:	$this->render_string_center( $im, $old_part_width, $y, $margin, $width, $size, $font, $color, $part ); break;
+			case 2:	$this->render_string_right( $im, $old_part_width, $y, $margin, $width, $size, $font, $color, $part ); break;
 			default: die("This alignemnt ($alignment) is not implemented yet");
 		}
 
 		return $y + $line_spacing;
 	}
 
-	private function _render_string_left($im, $x, $y, $margin, $width, $size, $font, $color, $string){
+	private function render_string_left($im, $x, $y, $margin, $width, $size, $font, $color, $string){
 		imagefttext( $im, $size, 0, $margin, $y, $color, $font, $string );
 	}
 
-	private function _render_string_center($im, $x, $y, $margin, $width, $size, $font, $color, $string){
+	private function render_string_center($im, $x, $y, $margin, $width, $size, $font, $color, $string){
 		imagefttext( $im, $size, 0, $width/2-$x/2, $y, $color, $font, $string );
 	}
 
-	private function _render_string_right($im, $x, $y, $margin, $width, $size, $font, $color, $string){
+	private function render_string_right($im, $x, $y, $margin, $width, $size, $font, $color, $string){
 		imagefttext( $im, $size, 0, $width - $margin - $x, $y, $color, $font, $string );
 	}
 
