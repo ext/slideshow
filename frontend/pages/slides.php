@@ -31,15 +31,15 @@ class UploadException extends PageException {
 }
 
 class Slides extends Module {
-	function __construct(){
+	public function __construct(){
 		connect();
 	}
 
-	function __descturuct(){
+	public function __descturuct(){
 		disconnect();
 	}
 
-	function upload(){
+	public function upload(){
 		global $settings;
 
 		$image = NULL;
@@ -85,7 +85,7 @@ class Slides extends Module {
 		);
 	}
 
-	function submit_image(){
+	public function submit_image(){
 		$upload_ok = $_FILES['filename']['error'] === UPLOAD_ERR_OK;
 
 		if ( !$upload_ok ){
@@ -155,7 +155,7 @@ class Slides extends Module {
 		));
 	}
 
-	function preview(){
+	public function preview(){
 		$title = $this->_utf_hack(html_entity_decode(get('title'), ENT_NOQUOTES, 'UTF-8'));
 		$content = explode("\n", $this->_utf_hack(html_entity_decode(get('content'), ENT_NOQUOTES, 'UTF-8')) );
 
@@ -166,7 +166,7 @@ class Slides extends Module {
 		exit();
 	}
 
-	function _create_image($title, $content, $alignment, $filename = NULL){
+	private function _create_image($title, $content, $alignment, $filename = NULL){
 		global $settings;
 
 		$resolution = $settings->resolution();
@@ -301,19 +301,19 @@ class Slides extends Module {
 		return $y + $line_spacing;
 	}
 
-	function _render_string_left($im, $x, $y, $margin, $width, $size, $font, $color, $string){
+	private function _render_string_left($im, $x, $y, $margin, $width, $size, $font, $color, $string){
 		imagefttext( $im, $size, 0, $margin, $y, $color, $font, $string );
 	}
 
-	function _render_string_center($im, $x, $y, $margin, $width, $size, $font, $color, $string){
+	private function _render_string_center($im, $x, $y, $margin, $width, $size, $font, $color, $string){
 		imagefttext( $im, $size, 0, $width/2-$x/2, $y, $color, $font, $string );
 	}
 
-	function _render_string_right($im, $x, $y, $margin, $width, $size, $font, $color, $string){
+	private function _render_string_right($im, $x, $y, $margin, $width, $size, $font, $color, $string){
 		imagefttext( $im, $size, 0, $width - $margin - $x, $y, $color, $font, $string );
 	}
 
-	function delete(){
+	public function delete(){
 		global $daemon;
 
 		$id = (int)$_GET['id'];
@@ -335,7 +335,7 @@ class Slides extends Module {
 		);
 	}
 
-	function deactivate( $id ){
+	public function deactivate( $id ){
 		global $daemon;
 		q('UPDATE files SET active = false WHERE id = ' . (int)$id );
 		$daemon->reload_queue();
@@ -343,7 +343,7 @@ class Slides extends Module {
 		Module::redirect('/index.php');
 	}
 
-	function activate( $id ){
+	public function activate( $id ){
 		global $daemon;
 		q('UPDATE files SET active = true WHERE id = ' . (int)$id );
 		$daemon->reload_queue();
@@ -351,7 +351,7 @@ class Slides extends Module {
 		Module::redirect('/index.php');
 	}
 
-	function activate_bin( $id ){
+	public function activate_bin( $id ){
 		global $settings, $daemon;
 
 		$settings->set_current_bin($id);
@@ -362,7 +362,7 @@ class Slides extends Module {
 		Module::redirect('/index.php');
 	}
 
-	function move( $id ){
+	public function move( $id ){
 		global $daemon;
 		$bin = (int)$_POST['to_bin'];
 		q("UPDATE files SET bin_id = $bin WHERE id = " . (int)$id);
@@ -371,7 +371,7 @@ class Slides extends Module {
 		Module::redirect('/index.php');
 	}
 
-	function moveajax(){
+	public function moveajax(){
 		global $daemon;
 
 		$bin = (int)substr($_POST['bin'], 4);
