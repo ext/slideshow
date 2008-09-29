@@ -45,6 +45,10 @@ function array_get(array $array, $name, $default){
  * The href will have the format '/index.php/$main/$section/$argv?$get' where
  * $argv and $get will be flattened.
  *
+ * Example of generated href:
+ * href('foo', 'bar', array(5, 7), array('spam' => 'egg', 'tux' => 'quux'))
+ * /index.php/foo/bar/5/7?spam=egg&amp;tux=quux
+ *
  * @param $main Main part
  * @param $section Section part
  * @param $argv Array with arguments
