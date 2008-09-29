@@ -40,6 +40,16 @@ function array_get(array $array, $name, $default){
   return $data;
 }
 
+/**
+ * @brief Returns a href built from the arguments
+ * The href will have the format '/index.php/$main/$section/$argv?$get' where
+ * $argv and $get will be flattened.
+ *
+ * @param $main Main part
+ * @param $section Section part
+ * @param $argv Array with arguments
+ * @param $get Array with GET arguments
+ */
 function href($main = NULL, $section = NULL, $argv = NULL, $get = NULL){
 	$href = '/index.php';
 
