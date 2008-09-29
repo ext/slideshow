@@ -39,3 +39,35 @@ function array_get(array $array, $name, $default){
 
   return $data;
 }
+
+function href($main = NULL, $section = NULL, $argv = NULL, $get = NULL){
+	$href = '/index.php';
+
+	$parts = array(
+		$main,
+		$section,
+		$argv,
+		$get
+	);
+
+	foreach ( $parts as $index => $part ){
+		if ( empty($part) ){
+			break;
+		}
+
+		switch ( $index ){
+			case 0:
+			case 1:
+				$href .= "/$part";
+				break;
+			case 2:
+				$href .= '/' . implode('/', $part);
+				break;
+			case 3:
+				$href .= '?' . http_build_query($part, '', '&amp;');
+				break;
+		}
+	}
+
+	return $href;
+}
