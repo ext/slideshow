@@ -1,0 +1,24 @@
+<!ELEMENT template (background?, font?, margin?, fields)>
+
+<!ELEMENT background   (#PCDATA)>
+<!ELEMENT font (#PCDATA)>
+<!ELEMENT margin  (#PCDATA)>
+<!ELEMENT fields  (text*, textarea*, static*)>
+<!ELEMENT text EMPTY>
+<!ELEMENT textarea EMPTY>
+<!ELEMENT static EMPTY>
+
+<!ATTLIST background
+	fit (scale|repeat|fixed) #IMPLIED>
+	
+<!ATTLIST text
+	name CDATA #REQUIRED
+	align (right|left|center) #IMPLIED
+	position CDATA #IMPLIED>
+<!ATTLIST textarea
+	name CDATA #REQUIRED
+	align (right|left|center) #IMPLIED
+	position CDATA #IMPLIED>
+<!ATTLIST static
+	value CDATA #REQUIRED
+	position CDATA #IMPLIED>

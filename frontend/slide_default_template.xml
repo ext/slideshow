@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE template SYSTEM "http://ruri.sidvind.com/slide.dtd">
+<template>
+	<background fit="scale">/path/to/bajs</background>
+	<font>/path/to/more/bajs</font>
+	
+	<!--
+		Units:
+		All units defaults to pixels, if the unit is suffixed 
+		with % it is relative to the size of the slide
+		
+		Negative units can be used to count from the opposite
+		side of the slide. 
+		
+		For instance, an x coordinate of:
+		 * 50;		50 pixels from the right
+		 * -50;		50 pixels from the left
+		 * -5%;		5% of the screen from the left		
+	-->
+	
+	<!-- 
+		CSS-style margin:
+		 * One digit affects all sides
+		 * Two digits affets left-right and top-bottom
+		 * Four digits affets top right bottom left
+	-->
+	<margin>5% 10%</margin>
+	
+	<!--
+		Valid field types:
+		 * text: Single line of text
+		 * textarea: Multiple lines of text
+		 * static: Insert static text at given position
+	 -->
+	<fields>
+		<text name="title" align="center" position="50% 50" />
+		<textarea name="content" align="center" position="50% 100" />
+		<static value="Lorem ipsum" position="10 -10" />
+	</fields>
+
+</template>
