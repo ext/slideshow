@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE template SYSTEM "http://ruri.sidvind.com/slide.dtd">
+<!DOCTYPE template SYSTEM "slide_tempalte.dtd">
 <template>
 	<background fit="scale">/path/to/bajs</background>
 	<font>/path/to/more/bajs</font>
