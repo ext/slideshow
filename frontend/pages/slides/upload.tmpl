@@ -28,6 +28,7 @@
 
 		<form action="<?=href('slides', 'submit_image')?>" method="post" enctype="multipart/form-data">
 			<fieldset>
+				<p>Using this option you can upload an existing image. The image will be scaled to fit the screen but will keep the aspect ratio.</p>
 				<input type="file" id="filename" name="filename" accept="image/*" />
 				<input type="submit" value="Upload" />
 			</fieldset>
@@ -37,6 +38,7 @@
 
 		<form action="<?=href('slides', 'upload')?>" method="post" accept-charset="utf-8">
 			<fieldset>
+				<p>Using this option you can create new slides with text only. The text will be applied to the predefined background if specified in the configuration.</p>
 				<table>
 					<tr valign="top">
 						<td>
