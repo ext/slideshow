@@ -220,11 +220,11 @@ class Settings {
 	}
 
 	function virtual_resolution(){
-		return $this->data['Apparence']['Resolution'];
+		return $this->data['Apparence']['VirtualResolution'];
 	}
 
 	function virtual_resolution_as_string(){
-		return sprintf("%dx%d", $this->data['Apparence']['Resolution'][0], $this->data['Apparence']['Resolution'][1]);
+		return sprintf("%dx%d", $this->data['Apparence']['VirtualResolution'][0], $this->data['Apparence']['VirtualResolution'][1]);
 	}
 
 	function set_virtual_resolution(){
