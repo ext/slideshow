@@ -64,7 +64,7 @@ class Slides extends Module {
 				$fullpath = $settings->image_path() . "/$filename.png";
 
 				$this->_create_image($title, $content, $align, $fullpath);
-				$this->_convert($fullpath, $fullpath . '.thumb.jpg', "200x200");
+				$this->convert($fullpath, $fullpath . '.thumb.jpg', "200x200");
 
 				q("INSERT INTO files (fullpath, type, title, content) VALUES ('$fullpath', 'text', '" . mysql_real_escape_string($title_orig) . "', '" . mysql_real_escape_string($content_orig) . "')");
 
@@ -128,11 +128,12 @@ class Slides extends Module {
 		}
 
 		$resolution = $settings->resolution_as_string();
+		$virtual_resolution = $settings->virtual_resolution_as_string();
 
 		move_uploaded_file($uploaded, $fullpath);
 
-		$this->_convert($fullpath, $fullpath, $resolution);
-		$this->_convert($fullpath, $fullpath . '.thumb.jpg', "200x200");
+		$this->convert($fullpath, $fullpath, $resolution, $virtual_resolution);
+		$this->convert($fullpath, $fullpath . '.thumb.jpg', "200x200");
 
 		q("INSERT INTO files (fullpath, type, title) VALUES ('$fullpath', 'image', '" . mysql_real_escape_string($name) . "')");
 
@@ -214,18 +215,41 @@ class Slides extends Module {
 		imagepng($im, $filename);
 	}
 
-	function _convert($src, $dst, $resolution){
+	private function convert($src, $dst, $resolution, $virtual_resolution = NULL){
 		global $settings;
 
 		$convert = $settings->convert_binary();
 
-		$cmd = "$convert ".escapeshellarg($src)." -resize $resolution -background black -gravity center -extent $resolution ".escapeshellarg($dst)." 2>&1 ";
+		if ( empty($virtual_resolution) ){
+			$this->convert_exec("" .
+					" $convert " .
+					escapeshellarg($src) .
+					" -resize $resolution" .
+					" -background black " .
+					" -gravity center " .
+					" -extent $resolution ".
+					escapeshellarg($dst) .
+					" 2>&1");
+		} else {
+			$this->convert_exec("" .
+					" $convert " .
+					escapeshellarg($src) .
+					" -resize $virtual_resolution" .
+					" -background black " .
+					" -gravity center " .
+					" -extent $virtual_resolution ".
+					" -resize $resolution\! " .
+					escapeshellarg($dst) .
+					" 2>&1");
+		}
+	}
 
+	private function convert_exec($command){
 		$rc = 0;
-		passthru($cmd, $rc);
+		passthru($command, $rc);
 
 		if ( $rc != 0 ){
-			die("\n<br/>$cmd\n");
+			die("\n<br/>$command\n");
 		}
 	}
 
