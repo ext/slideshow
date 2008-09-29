@@ -21,10 +21,10 @@
 	<div id="content">
 	
 		<div id="breadcrumb">
-			<h2><a href="/index.php/">Slideshow</a> &gt; <a href="/index.php/bins">Manage bins</a> &gt; Rename '<?=$name?>'</h2>
+			<h2><a href="<?=href()?>">Slideshow</a> &gt; <a href="<?=href('bins')?>">Manage bins</a> &gt; Rename '<?=$name?>'</h2>
 		</div>
 		
-		<form action="/index.php/bins/perform_rename" method="post">
+		<form action="<?=href('bins', 'perform_rename')?>" method="post">
 			<input type="hidden" name="id" value="<?=$id?>" />
 			<input type="text" name="name" value="<?=$name?>" />
 			<input type="submit" value="Rename" />

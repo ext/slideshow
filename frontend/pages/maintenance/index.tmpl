@@ -20,13 +20,13 @@
 	<div id="content">
 	
 		<div id="breadcrumb">
-			<h2><a href="/index.php/">Slideshow</a> &gt; Maintenance</h2>
+			<h2><a href="<?=href()?>">Slideshow</a> &gt; Maintenance</h2>
 		</div>
 
 <? if ( $status == 2 ){ ?>
 		<p>The slideshow daemon crashed. Please follow these steps: </p>
 		<ol>
-			<li>Download the <a href="/index.php/maintenance/coredump">coredump</a>.</li>
+			<li>Download the <a href="<?=href('maintenance', 'coredump')?>">coredump</a>.</li>
 			<li>
 				File a ticket at <a href="http://sidvind.com:8000/slideshow">http://sidvind.com:8000/slideshow</a>.
 				<ul>
@@ -36,7 +36,7 @@
 				</ul>
 			</li>
 			<li>Go bug <a href="mailto:ext@sidvind.com">ext</a> about it.</li>
-			<li><a href="/index.php/maintenance/forcestart">Force restart</a>.</li>
+			<li><a href="<?=href('maintenance', 'forcestart')?>">Force restart</a>.</li>
 		</ol>
 <? } ?>
 
@@ -44,20 +44,20 @@
 	
 		<ul>
 <? if ( $status == 0 ) { ?>
-			<li><a href="/index.php/maintenance/start">Start daemon</a></li>
+			<li><a href="<?=href('maintenance', 'start')?>">Start daemon</a></li>
 <? } ?>
 <? if ( $status == 1 ) { ?>
-			<li><a href="/index.php/maintenance/stop">Stop daemon</a></li>
+			<li><a href="<?=href('maintenance', 'stop')?>">Stop daemon</a></li>
 <? } ?>
-			<li><a href="/index.php/maintenance/ping">Ping daemon</a></li>
-			<li><a href="/index.php/maintenance/kill_mplayer">Kill mplayer</a></li>
-			<li><a href="/index.php/configuration">Configuration</a></li>
+			<li><a href="<?=href('maintenance', 'ping')?>">Ping daemon</a></li>
+			<li><a href="<?=href('maintenance', 'kill_mplayer')?>">Kill mplayer</a></li>
+			<li><a href="<?=href('configuration')?>">Configuration</a></li>
 		</ul>
 	
 		<h2>Debug</h2>
 	
 		<ul>
-			<li><a href="/index.php/maintenance/debug_dumpqueue">Dump queue</a></li>
+			<li><a href="<?=href('maintenance', 'debug_dumpqueue')?>">Dump queue</a></li>
 		</ul>
 	
 		<h2>Log</h2>

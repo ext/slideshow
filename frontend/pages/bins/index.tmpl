@@ -21,16 +21,16 @@
 	<div id="content">
 	
 		<div id="breadcrumb">
-			<h2><a href="/index.php/">Slideshow</a> &gt; Manage bins</h2>
+			<h2><a href="<?=href()?>">Slideshow</a> &gt; Manage bins</h2>
 		</div>
 		
 		<ul>
 <? foreach( $collection as $bin ){ if ( $bin->id() == 0 ){ continue; } ?>
-			<li><?=$bin->name()?> (<a href="/index.php/bins/rename/<?=$bin->id()?>">Rename</a>, <a href="/index.php/bins/delete/<?=$bin->id()?>">Delete</a>)</li>
+			<li><?=$bin->name()?> (<a href="<?=href('bins', 'rename', $bin->id())?>">Rename</a>, <a href="<?=href('bins', 'delete', $bin->id())?>">Delete</a>)</li>
 <? } ?>
 		</ul>
 	
-		<form action="/index.php/bins/create" method="post">
+		<form action="<?=href('bins', 'create')?>" method="post">
 			<input type="text" name="name" />
 			<input type="submit" name="submit" value="Create" />
 		</form>

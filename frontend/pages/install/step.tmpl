@@ -53,7 +53,7 @@ function write_availability( $var, $ok = 'Available', $fail = 'Unavailable' ){
 		</ul>
 
 		<p>Only those databases supported on your server will be displayed.</p>
-		<p>Proceed to <a href="/index.php/install/step/1">Requirements</a>.</p>
+		<p>Proceed to <a href="<?=href('install', 'step', 1)?>">Requirements</a>.</p>
 <?
 	break;
 	case 1:
@@ -91,12 +91,12 @@ function write_availability( $var, $ok = 'Available', $fail = 'Unavailable' ){
 			</fieldset>
 		</form>
 
-		<p><? if ( !$requirements_ok ){ ?><a href="/index.php/install/step/1">Retry</a>.<? } else { ?>Proceed to <a href="/index.php/install/step/2">Path configuration</a>.<? } ?></p>
+		<p><? if ( !$requirements_ok ){ ?><a href="<?=href('install', 'step', 1)?>">Retry</a>.<? } else { ?>Proceed to <a href="<?=href('install', 'step', 2)?>">Path configuration</a>.<? } ?></p>
 <?
 	break;
 	case 2:
 ?>
-		<form name="configuration" action="/index.php/install/submit/2" method="post">
+		<form name="configuration" action="<?=href('install', 'submit', 2)?>" method="post">
 			<fieldset>
 				<legend>Paths</legend>
 
@@ -130,7 +130,7 @@ function write_availability( $var, $ok = 'Available', $fail = 'Unavailable' ){
 		</div>
 <? } ?>
 
-		<form name="configuration" action="/index.php/install/submit/3" method="post">
+		<form name="configuration" action="<?=href('install', 'submit', 3)?>" method="post">
 			<fieldset>
 				<legend>Database setup</legend>
 
@@ -165,7 +165,7 @@ function write_availability( $var, $ok = 'Available', $fail = 'Unavailable' ){
 	break;
 	case 4:
 ?>
-		<form name="configuration" action="/index.php/install/submit/4" method="post">
+		<form name="configuration" action="<?=href('install', 'submit', 4)?>" method="post">
 			<fieldset>
 				<legend>Apparences</legend>
 
@@ -205,12 +205,12 @@ function write_availability( $var, $ok = 'Available', $fail = 'Unavailable' ){
   		<pre class="summary">
 <?=$json?>
 		</pre>
-		<p>Proceed to <a href="/index.php/install/submit/5">Summary</a>.</p>
+		<p>Proceed to <a href="<?=href('install', 'submit', 5)?>">Summary</a>.</p>
 <?
 	break;
 	case 6:
 ?>
-		<p>To finalize the installation you need to download the <a href="/index.php/install/download">configuration</a> and put it in the root directory (<?=$path?>). <a href="/index.php/install/step/6">Retry</a>.</p>
+		<p>To finalize the installation you need to download the <a href="<?=href('install', 'download')?>">configuration</a> and put it in the root directory (<?=$path?>). <a href="<?=href('install', 'step', 6)?>">Retry</a>.</p>
 <?
 	break;
 }

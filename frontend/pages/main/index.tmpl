@@ -28,7 +28,7 @@
 	<div id="content">
 	
 		<div id="breadcrumb">
-			<h2><a href="/index.php/">Slideshow</a></h2>
+			<h2><a href="<?=href()?>">Slideshow</a></h2>
 		</div>
 		
 		<h2>Current slides</h2>
@@ -49,7 +49,7 @@
 		
 <? foreach ( $collection as $bin ){ ?>
 		<div class="binwrapper">
-			<span class="title"><?=$bin->name()?><? if ( $bin->id() != 0 ){ if ( $bin->id() == $active_bin){ ?> (active)<? } else { ?> (<a href="/index.php/slides/activate_bin/<?=$bin->id()?>">set as active</a>)<? }} ?></span><br/>
+			<span class="title"><?=$bin->name()?><? if ( $bin->id() != 0 ){ if ( $bin->id() == $active_bin){ ?> (active)<? } else { ?> (<a href="<?=href('slides', 'activate_bin', $bin->id() )?>">set as active</a>)<? }} ?></span><br/>
 			<div class="bin" id="bin_<?=$bin->id()?>">
 <?	foreach ( $bin as $slide ){ ?>
 				<div class="slide" id="slide_<?=$slide->id()?>">
@@ -61,17 +61,17 @@
 					<div class="menu">
 						<span class="zoom"><a href="<?=$slide->image_url()?>">Full</a></span>
 <? if ( $slide->type() == 'text' ){ ?>
-						<span class="edit"><a href="/index.php/slides/edit/<?=$slide->id()?>">Edit</a></span>
+						<span class="edit"><a href="<?=href('slides', 'edit', $slide->id())?>">Edit</a></span>
 <? } ?>
 <? if ( $slide->active() ){ ?>
-						<span class="hide"><a href="/index.php/slides/deactivate/<?=$slide->id()?>">Hide</a></span>
+						<span class="hide"><a href="<?=href('slides', 'deactivate', $slide->id())?>">Hide</a></span>
 <? } else { ?>
-						<span class="show"><a href="/index.php/slides/activate/<?=$slide->id()?>">Show</a></span>
+						<span class="show"><a href="<?=href('slides', 'activate', $slide->id())?>">Show</a></span>
 <? } ?>
-						<span class="delete"><a href="/index.php/slides/delete?id=<?=$slide->id()?>">Delete</a></span>
+						<span class="delete"><a href="<?=href('slides', 'delete', $slide->id())?>">Delete</a></span>
 						
 						<noscript>
-							<form action="/index.php/slides/move/<?=$slide->id()?>" method="post">
+							<form action="<?=href('slides', 'move', $slide->id())?>" method="post">
 								<select name="to_bin">
 <? foreach( $available_bins as $id => $name ){ ?>
 									<option value="<?=$id?>"<? if ( $id == $bin->id() ){ ?> selected="selected"<? } ?>><?=$name?></option>
@@ -107,7 +107,7 @@
 				var list = $(this).sortable('toArray');
 				$.ajax({
 					type: "POST",
-					url: "/index.php/slides/moveajax",
+					url: "<?=href('slides', 'moveajax')?>",
 					data: "bin=" + $(this).attr('id') + "&slides=" + list 
 				 });
 <? if ( $id == $active_bin ){ ?>

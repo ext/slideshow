@@ -23,7 +23,7 @@
 		<h2>Configuration</h2>
 		
 		<div class="conf">
-			<form id="form" method="post" action="/index.php/configuration/save">		
+			<form id="form" method="post" action="<?=href('configuration', 'save')?>">		
 <? foreach ( $settings as $name => $group ){ ?>
 				<fieldset title="<?=$name?>">
 					<legend><?=$name?></legend>
