@@ -348,6 +348,36 @@ class SlideTemplate {
 		$y2 = $y + $height / 2;
 
 		imagerectangle($im, $x1, $y1, $x2, $y2, $ctx->color);
+
+		$row = $y1 + (int)($ctx->size * 1.5);
+
+		$lines = explode("\n", $string);
+		foreach ($lines as $line){
+			if ( strlen(trim($line)) == 0 ){
+				continue;
+			}
+
+			$word_stack = explode(' ', $line);
+			$words = array_shift($word_stack);
+			$current_width = $this->get_string_width($ctx->size, $ctx->font, $words);
+
+			while ( count($word_stack) > 0 ){
+				$next_word = array_shift($word_stack);
+				$next_width = $this->get_string_width($ctx->size, $ctx->font, "$words $next_word");
+
+				if ( $next_width > $width ){
+					imagefttext( $im, $ctx->size, 0, $x - $current_width / 2, $row, $ctx->color, $ctx->font, $words );
+					$words = $next_word;
+					$current_width = $this->get_string_width($ctx->size, $ctx->font, $words);
+					$row += (int)($ctx->size * 1.5);
+				}
+
+				$words .= ' ' . $next_word;
+				$current_width = $next_width;
+			}
+			imagefttext( $im, $ctx->size, 0, $x - $current_width / 2, $row, $ctx->color, $ctx->font, $words );
+			$row += (int)($ctx->size * 2.5);
+		}
 	}
 
 	private function render_aligned_string($im, $alignment, $x, $y, $ctx, $string){
@@ -383,7 +413,11 @@ $template->render(NULL, array(
 	'title' => 'This is a left aligned title string',
 	'title2' => 'This is a right aligned title string',
 	'title3' => 'This is a centered title string',
-	'content' => "foo bar baz\nLorem ipsum")
+	'content' =>
+			"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Quisque eu nisl. Donec vitae risus vel pede viverra bibendum. Pellentesque sed ante. In nibh arcu, fermentum sed, dictum ac, convallis vitae, justo. Nulla pharetra, metus sit amet adipiscing placerat, est neque ornare massa, id pulvinar purus enim vitae justo. Etiam consequat, velit eu volutpat sollicitudin, lacus ligula faucibus lorem, nec faucibus sapien ante at arcu. In nec mauris vitae quam auctor hendrerit. Aenean dapibus felis sed turpis. Nullam purus. Duis vel mauris. Proin elementum vestibulum velit.\n" .
+			"\n" .
+			"Donec porta. In faucibus egestas eros. Proin quam nunc, lacinia sed, scelerisque nec, accumsan porta, est. Nullam et ligula. Morbi semper congue dolor. Pellentesque accumsan, urna sit amet mollis porttitor, pede ante pellentesque quam, at dictum ante justo sed est. Nullam et diam. Nullam a libero. Nulla facilisi. Fusce erat justo, adipiscing imperdiet, suscipit vitae, fringilla quis, libero. Nullam auctor tortor at urna. Suspendisse porta, diam quis mollis pellentesque, metus nibh volutpat risus, at mattis diam felis non lectus. Maecenas a erat. Integer diam nibh, lacinia sit amet, adipiscing non, elementum in, elit. Praesent semper nisl ut enim. Cras condimentum, metus a pretium sollicitudin, eros diam lobortis felis, non accumsan urna neque id sapien. Nullam volutpat. Duis aliquam. Nulla facilisi. Etiam at arcu."
+	)
 );
 
 ?>

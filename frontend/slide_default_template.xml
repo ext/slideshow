@@ -34,10 +34,8 @@
 		 * static: Insert static text at given position
 	 -->
 	<fields>
-		<text name="title" font="comic" align="left" position="50% 50" />
-		<text name="title2" font="comic" align="right" position="50% 70" />
-		<text name="title3" font="comic" align="center" position="50% 90" />
-		<textarea name="content" align="center" boxsize="90% 70%" position="50% 55%" />
+		<text name="title" font="comic" align="center" position="50% 50" />
+		<textarea name="content" align="center" boxsize="90% 80%" position="50% 55%" />
 		<static value="Static text" font="comic" color="255, 255, 0" position="10 -10" />
 	</fields>
 
