@@ -1,8 +1,7 @@
-<!ELEMENT template (background?, font?, margin?, fields)>
+<!ELEMENT template (background?, font*, margin?, fields)>
 
 <!ELEMENT background   (#PCDATA)>
 <!ELEMENT font (#PCDATA)>
-<!ELEMENT margin  (#PCDATA)>
 <!ELEMENT fields  (text*, textarea*, static*)>
 <!ELEMENT text EMPTY>
 <!ELEMENT textarea EMPTY>
@@ -10,15 +9,27 @@
 
 <!ATTLIST background
 	fit (scale|repeat|fixed) #IMPLIED>
+<!ATTLIST font
+	name ID #REQUIRED
+	default (true|false) "false">
 	
 <!ATTLIST text
 	name CDATA #REQUIRED
 	align (right|left|center) #IMPLIED
+	font IDREF #IMPLIED
+	color CDATA #IMPLIED
+	size CDATA #IMPLIED
 	position CDATA #IMPLIED>
 <!ATTLIST textarea
 	name CDATA #REQUIRED
 	align (right|left|center) #IMPLIED
+	font IDREF #IMPLIED
+	color CDATA #IMPLIED
+	size CDATA #IMPLIED
 	position CDATA #IMPLIED>
 <!ATTLIST static
 	value CDATA #REQUIRED
+	font IDREF #IMPLIED
+	color CDATA #IMPLIED
+	size CDATA #IMPLIED
 	position CDATA #IMPLIED>
