@@ -49,6 +49,42 @@ class Field {
 
 		$this->position = $parts;
 	}
+
+	protected function parse_alignment($align){
+		switch ( $align ){
+			case 'left': return Field::align_left;
+			case 'right':return Field::align_right;
+			case 'center': return Field::align_center;
+		}
+	}
+
+	/**
+	 * @param $components The number of components to fill
+	 */
+	static protected function extract_units($dst, $src, $components, $width, $height){
+		$parts = explode(' ', $src);
+		$n = count($parts);
+
+		if ( $n < $components ){
+			throw new Exception("To few components, got '$src', expected $components components");
+		}
+
+		for ( $i = 0; $i < $components; $i++ ){
+			$part = $parts[$i % $n];
+			$suffix = substr($part, -1);
+
+			if ( $suffix == '%' ){
+				$value = (int)(substr($part, 0, -1));
+				$dst[$i] = $value * 0.01 * ( $i % 2 == 0 ? $width : $height );
+			} else {
+				$dst[$i] = (int)($part);
+			}
+
+			if ( $dst[$i] < 0 ){
+				$dst[$i] = ( $i % 2 == 0 ? $width : $height ) + $dst[$i];
+			}
+		}
+	}
 }
 
 class TextField extends Field {
@@ -58,25 +94,34 @@ class TextField extends Field {
 	public function __construct($name, $align, $font, $position){
 		parent::__construct(Field::type_text, $font, $position);
 		$this->name = $name;
-		$this->align = $align;
+		$this->align = $this->parse_alignment($align);
 	}
 
 	public function name(){ return $this->name; }
-	public function align(){ return $this->align; }
+	public function alignment(){ return $this->align; }
 }
 
 class TextAreaField extends Field {
 	private $name;
 	private $align;
+	private $width;
+	private $height;
 
-	public function __construct($name, $align, $font, $position){
+	public function __construct($name, $align, $boxsize, $font, $position, $width, $height){
 		parent::__construct(Field::type_textarea, $font, $position);
 		$this->name = $name;
-		$this->align = $align;
+		$this->align = $this->parse_alignment($align);
+		$this->set_boxsize($boxsize, $width, $height);
 	}
 
 	public function name(){ return $this->name; }
-	public function align(){ return $this->align; }
+	public function alignment(){ return $this->align; }
+	public function width(){ return $this->width; }
+	public function height(){ return $this->height; }
+
+	private function set_boxsize($boxsize, $width, $height){
+		Field::extract_units(array(&$this->width, &$this->height), $boxsize, 2, $width, $height);
+	}
 }
 
 class StaticField extends Field {
@@ -105,6 +150,22 @@ class Node {
 	}
 }
 
+class RenderContext {
+	public $width;
+	public $height;
+	public $font;
+	public $color;
+	public $size;
+
+	public function __construct($width, $height, $font, $color, $size){
+		$this->width = $width;
+		$this->height = $height;
+		$this->font = $font;
+		$this->color = $color;
+		$this->size = $size;
+	}
+}
+
 interface ISlideTemplate {
 }
 
@@ -114,8 +175,10 @@ class SlideTemplate {
 	private $default_font = '';
 	private $background = '';
 	private $fields = array();
+	private $width;
+	private $height;
 
-	public function __construct($xmlfile){
+	public function __construct($xmlfile, $width, $height){
 		libxml_use_internal_errors(true);
 
 		$doc = new DOMDocument;
@@ -131,6 +194,9 @@ class SlideTemplate {
 		    libxml_clear_errors();
 		    die("");
 		}
+
+		$this->width = $width;
+		$this->height = $height;
 
 		$xml_parser = xml_parser_create();
 
@@ -181,6 +247,7 @@ class SlideTemplate {
 		$position = isset($attrs['POSITION']) ? $attrs['POSITION'] : '50% 50%';
 		$value = isset($attrs['VALUE']) ? $attrs['VALUE'] : NULL;
 		$size = isset($attrs['SIZE']) ? $attrs['SIZE'] : 12;
+		$boxsize = isset($attrs['BOXSIZE']) ? $attrs['BOXSIZE'] : NULL;
 		$font = isset($attrs['FONT']) ? $attrs['FONT'] : NULL;
 
 		switch ( $tagname ){
@@ -188,7 +255,7 @@ class SlideTemplate {
 				$this->add_field(new TextField($name, $align, $font, $position));
 				break;
 			case 'TEXTAREA':
-				$this->add_field(new TextAreaField($name, $align, $font, $position));
+				$this->add_field(new TextAreaField($name, $align, $boxsize, $font, $position, $this->width, $this->height));
 				break;
 			case 'STATIC':
 				$this->add_field(new StaticField($value, $size, $font, $position));
@@ -222,28 +289,41 @@ class SlideTemplate {
 		$this->node->default = false;
 	}
 
-	public function render($dst, $width, $height, $data){
-		$im  = imagecreatetruecolor(800, 600);
+	public function render($dst, $data){
+		$im  = imagecreatetruecolor($this->width, $this->height);
 		$black  = imagecolorallocate($im, 0, 0, 0);
 		$white  = imagecolorallocate($im, 255, 255, 255);
-		imagefilledrectangle($im, 0, 0, 800, 600, $black);
+		imagefilledrectangle($im, 0, 0, $this->width, $this->height, $black);
 
 		$x = $y = 0;
 
 		foreach ( $this->fields as $field ){
-			$this->parse_position($x, $y, $field->position(), $width, $height);
+			$this->parse_position($x, $y, $field->position(), $this->width, $this->height);
 
 			$font = $this->default_font;
 			if ( $field->font() ){
 				$font = $this->fonts[$field->font()];
 			}
 
+			$ctx = new RenderContext($this->width, $this->height, $font, $white, 12);
+
+		// 1 is alignment (center)
+		// 100 is y-coordinate
+		/*$this->render_string_aligned($im, 1, 100, 12, $font, $white, $title);
+
+		$y = 180;
+		foreach ( $content as $paragraph ){
+			$y = $this->render_string_aligned($im, $field->align(), $y, 12, $font, $white, $paragraph);
+		}*/
+
 			switch ( $field->type() ){
 				case Field::type_text:
-					imagefttext( $im, 24, 0, $x, $y, $white, $font, $data[$field->name()] );
+					$this->render_text($im, $field->alignment(), $x, $y, $ctx, $data[$field->name()]);
 					break;
 				case Field::type_textarea:
-					imagefttext( $im, 24, 0, $x, $y, $white, $font, $data[$field->name()] );
+					//imagefttext( $im, 24, 0, $x, $y, $white, $font, $data[$field->name()] );
+					//$this->render_string_aligned($im, 1, $x, $y, $ctx, $data[$field->name()]);
+					$this->render_textarea($im, $field->alignment(), $x, $y, $field->width(), $field->height(), $ctx, $data[$field->name()]);
 					break;
 				case Field::type_static:
 					imagefttext( $im, 12, 0, $x, $y, $white, $font, $field->value() );
@@ -251,19 +331,59 @@ class SlideTemplate {
 			}
 		}
 
+		if ( !$dst ){
+			header("Content-Type: image/png");
+		}
 		imagepng($im, $dst);
+	}
+
+	private function render_text($im, $alignment, $x, $y, $ctx, $string){
+		$this->render_aligned_string($im, $alignment, $x, $y, $ctx, $string);
+	}
+
+	private function render_textarea($im, $alignment, $x, $y, $width, $height, $ctx, $string){
+		$x1 = $x - $width / 2;
+		$y1 = $y - $height / 2;
+		$x2 = $x + $width / 2;
+		$y2 = $y + $height / 2;
+
+		imagerectangle($im, $x1, $y1, $x2, $y2, $ctx->color);
+	}
+
+	private function render_aligned_string($im, $alignment, $x, $y, $ctx, $string){
+		$string_width = $this->get_string_width($ctx->size, $ctx->font, $string);
+
+		switch ( $alignment ){
+			case Field::align_right:
+				imagefttext( $im, $ctx->size, 0, $x - $string_width, $y, $ctx->color, $ctx->font, $string );
+				break;
+			case Field::align_left:
+				imagefttext( $im, $ctx->size, 0, $x, $y, $ctx->color, $ctx->font, $string );
+				break;
+			case Field::align_center:
+				imagefttext( $im, $ctx->size, 0, $x - $string_width / 2, $y, $ctx->color, $ctx->font, $string );
+				break;
+		}
+	}
+
+	private function get_string_width($size, $font, $string){
+		$data = imagettfbbox( $size, 0, $font, $string );
+		return $data[2] - $data[0];
 	}
 }
 
-class DefaultSlideTemplate extends SlideTemplate implements ISlideTemplate {
+/*class DefaultSlideTemplate extends SlideTemplate implements ISlideTemplate {
 	public function __construct(){
 		parent::__construct('slide_default_template.xml');
 	}
-}
+}*/
 
-header("Content-Type: image/png");
-
-$template = new DefaultSlideTemplate;
-$template->render(NULL, 800, 600, array('title' => 'bajs', 'content' => "foo bar baz\nLorem ipsum"));
+$template = new SlideTemplate('slide_default_template.xml', 800, 600);
+$template->render(NULL, array(
+	'title' => 'This is a left aligned title string',
+	'title2' => 'This is a right aligned title string',
+	'title3' => 'This is a centered title string',
+	'content' => "foo bar baz\nLorem ipsum")
+);
 
 ?>
