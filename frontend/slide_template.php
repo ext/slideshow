@@ -420,7 +420,7 @@ class SlideTemplate {
 		$x2 = $x + $width / 2;
 		$y2 = $y + $height / 2;
 
-		imagerectangle($im, $x1, $y1, $x2, $y2, $ctx->color);
+		//imagerectangle($im, $x1, $y1, $x2, $y2, $ctx->color);
 
 		$row = $y1 + (int)($ctx->size * 1.5);
 
