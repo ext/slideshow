@@ -19,14 +19,33 @@
 ?>
 <?
 
+/**
+ * @brief Get a POST variable
+ * Will strip slashes if magic quotes is enabled.
+ * @return POST variable if set or $default it not set.
+ */
 function post($name, $default = ""){
   return array_get($_POST, $name, $default);
 }
 
+/**
+ * @brief Get a GET variable
+ * Will strip slashes if magic quotes is enabled.
+ * @return POST variable if set or $default it not set.
+ */
 function get($name, $default = ""){
   return array_get($_GET, $name, $default);
 }
 
+/**
+ * @brief Get a value from an array
+ * Will strip slashes if magic quotes is enabled.
+ *
+ * @see post
+ * @see get
+ *
+ * @return Value if key exists otherwise $default
+ */
 function array_get(array $array, $name, $default){
   $data = $default;
   if ( isset ( $array[$name] ) ){
