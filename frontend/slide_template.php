@@ -292,6 +292,8 @@ class SlideTemplate {
 		$this->fields[] = $field;
 	}
 
+	public function fields(){ return $this->fields; }
+
 	private function parse_position(&$x, &$y, $src, $width, $height){
 		$parts = array(
 			&$x,
@@ -480,17 +482,5 @@ class SlideTemplate {
 		return $data[2] - $data[0];
 	}
 }
-
-/*class DefaultSlideTemplate extends SlideTemplate implements ISlideTemplate {
-	public function __construct(){
-		parent::__construct('slide_default_template.xml');
-	}
-}*/
-
-$template = new SlideTemplate('slide_default_template.xml', 800, 600);
-$template->render(NULL, array(
-	'title' => 'This is a title string'
-	)
-);
 
 ?>
