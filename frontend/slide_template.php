@@ -20,7 +20,9 @@
 class Field {
 	private $type;
 	private $font;
+	private $size;
 	private $position;
+	private $color = array(255, 255, 255, 0);
 
 	const type_text = 0;
 	const type_textarea = 1;
@@ -30,15 +32,90 @@ class Field {
 	const align_left = 1;
 	const align_center = 2;
 
-	public function __construct($type, $font, $position){
+	public function __construct($type, $font, $size, $position){
 		$this->type = $type;
 		$this->font = $font;
+		$this->size = $size;
 		$this->set_position($position);
 	}
 
 	public function type(){ return $this->type; }
 	public function font(){ return $this->font; }
+	public function size(){ return $this->size; }
 	public function position(){ return $this->position; }
+
+	public function color(){ return $this->color; }
+	public function gd_color($im){
+		return imagecolorallocatealpha($im,
+			$this->color[0],
+			$this->color[1],
+			$this->color[2],
+			$this->color[3]
+		);
+	}
+	/**
+	 * @brief Parses the color attribute.
+	 * @return An array with rgba values. The alpha value is scaled from 0-255 to 0-127.
+	 */
+	public function set_color($string){
+		$string = trim($string);
+
+		switch ( $this->guess_color_format($string) ) {
+
+			// Decimal RGA[A]
+			case 0:
+				$this->color = explode(',', $string);
+
+				switch ( count($this->color)  ){
+					case 3:
+						$this->color[] = '0';
+					case 4:
+						break;
+					default:
+						throw new Exception("Parse error: $string is not a valid color");
+				}
+
+				foreach ( $this->color as &$component ){
+					$component = intval($component);
+				}
+
+				break;
+
+			// Hexadecimal RGA[A]
+			case 1:
+
+			// Named color
+			case 2:
+				switch ( strtolower($string) ){
+					case 'red': $this->color = array(255, 0, 0, 0); break;
+					case 'blue': $this->color = array(0, 255, 0, 0); break;
+					case 'green': $this->color = array(0, 0, 255, 0); break;
+					case 'yellow': $this->color = array(255, 255, 0, 0); break;
+					default:
+						throw new Exception("Parse error: $string is not a valid color");
+				}
+		}
+
+		// Scale alpha component.
+		$this->color[3] = $this->color[3] / 2;
+	}
+
+	/**
+	 * @brief Guess the format of the color attribute
+	 * @return 0 if decimal RGB[A], 1 if Hexadecimal RGB[A] and 2 if named color
+	 */
+	private function guess_color_format($string){
+		if ( $string[0] == '#' ){
+			return 1;
+		}
+
+		$n = count(explode(',', $string));
+		if ( $n == 3 || $n == 4 ){
+			return 0;
+		}
+
+		return 2;
+	}
 
 	private function set_position($string){
 		$parts = explode(' ', $string);
@@ -91,8 +168,8 @@ class TextField extends Field {
 	private $name;
 	private $align;
 
-	public function __construct($name, $align, $font, $position){
-		parent::__construct(Field::type_text, $font, $position);
+	public function __construct($name, $align, $font, $size, $position){
+		parent::__construct(Field::type_text, $font, $size, $position);
 		$this->name = $name;
 		$this->align = $this->parse_alignment($align);
 	}
@@ -107,8 +184,8 @@ class TextAreaField extends Field {
 	private $width;
 	private $height;
 
-	public function __construct($name, $align, $boxsize, $font, $position, $width, $height){
-		parent::__construct(Field::type_textarea, $font, $position);
+	public function __construct($name, $align, $boxsize, $font, $size, $position, $width, $height){
+		parent::__construct(Field::type_textarea, $font, $size, $position);
 		$this->name = $name;
 		$this->align = $this->parse_alignment($align);
 		$this->set_boxsize($boxsize, $width, $height);
@@ -126,16 +203,13 @@ class TextAreaField extends Field {
 
 class StaticField extends Field {
 	private $value;
-	private $size;
 
-	public function __construct($value, $size, $font, $position){
-		parent::__construct(Field::type_static, $font, $position);
+	public function __construct($value, $font, $size, $position){
+		parent::__construct(Field::type_static, $font, $size, $position);
 		$this->value = $value;
-		$this->size = $size;
 	}
 
 	public function value(){ return $this->value; }
-	public function size(){ return $this->size; }
 }
 
 class Node {
@@ -250,17 +324,28 @@ class SlideTemplate {
 		$boxsize = isset($attrs['BOXSIZE']) ? $attrs['BOXSIZE'] : NULL;
 		$font = isset($attrs['FONT']) ? $attrs['FONT'] : NULL;
 
+		$field = NULL;
 		switch ( $tagname ){
 			case 'TEXT':
-				$this->add_field(new TextField($name, $align, $font, $position));
+				$field = new TextField($name, $align, $font, $size, $position);
 				break;
 			case 'TEXTAREA':
-				$this->add_field(new TextAreaField($name, $align, $boxsize, $font, $position, $this->width, $this->height));
+				$field = new TextAreaField($name, $align, $boxsize, $font, $size, $position, $this->width, $this->height);
 				break;
 			case 'STATIC':
-				$this->add_field(new StaticField($value, $size, $font, $position));
+				$field = new StaticField($value, $font, $size, $position);
 				break;
 		}
+
+		if ( !$field ){
+			return;
+		}
+
+		if ( isset($attrs['COLOR']) ){
+			$field->set_color($attrs['COLOR']);
+		}
+
+		$this->add_field($field);
 	}
 
 	private function endElement($parser, $tagname) {
@@ -292,7 +377,6 @@ class SlideTemplate {
 	public function render($dst, $data){
 		$im  = imagecreatetruecolor($this->width, $this->height);
 		$black  = imagecolorallocate($im, 0, 0, 0);
-		$white  = imagecolorallocate($im, 255, 255, 255);
 		imagefilledrectangle($im, 0, 0, $this->width, $this->height, $black);
 
 		$x = $y = 0;
@@ -305,28 +389,17 @@ class SlideTemplate {
 				$font = $this->fonts[$field->font()];
 			}
 
-			$ctx = new RenderContext($this->width, $this->height, $font, $white, 12);
-
-		// 1 is alignment (center)
-		// 100 is y-coordinate
-		/*$this->render_string_aligned($im, 1, 100, 12, $font, $white, $title);
-
-		$y = 180;
-		foreach ( $content as $paragraph ){
-			$y = $this->render_string_aligned($im, $field->align(), $y, 12, $font, $white, $paragraph);
-		}*/
+			$ctx = new RenderContext($this->width, $this->height, $font, $field->gd_color($im), $field->size());
 
 			switch ( $field->type() ){
 				case Field::type_text:
 					$this->render_text($im, $field->alignment(), $x, $y, $ctx, $data[$field->name()]);
 					break;
 				case Field::type_textarea:
-					//imagefttext( $im, 24, 0, $x, $y, $white, $font, $data[$field->name()] );
-					//$this->render_string_aligned($im, 1, $x, $y, $ctx, $data[$field->name()]);
 					$this->render_textarea($im, $field->alignment(), $x, $y, $field->width(), $field->height(), $ctx, $data[$field->name()]);
 					break;
 				case Field::type_static:
-					imagefttext( $im, 12, 0, $x, $y, $white, $font, $field->value() );
+					imagefttext( $im, 12, 0, $x, $y, $ctx->color, $font, $field->value() );
 					break;
 			}
 		}
@@ -410,9 +483,7 @@ class SlideTemplate {
 
 $template = new SlideTemplate('slide_default_template.xml', 800, 600);
 $template->render(NULL, array(
-	'title' => 'This is a left aligned title string',
-	'title2' => 'This is a right aligned title string',
-	'title3' => 'This is a centered title string',
+	'title' => 'This is a title string',
 	'content' =>
 			"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Quisque eu nisl. Donec vitae risus vel pede viverra bibendum. Pellentesque sed ante. In nibh arcu, fermentum sed, dictum ac, convallis vitae, justo. Nulla pharetra, metus sit amet adipiscing placerat, est neque ornare massa, id pulvinar purus enim vitae justo. Etiam consequat, velit eu volutpat sollicitudin, lacus ligula faucibus lorem, nec faucibus sapien ante at arcu. In nec mauris vitae quam auctor hendrerit. Aenean dapibus felis sed turpis. Nullam purus. Duis vel mauris. Proin elementum vestibulum velit.\n" .
 			"\n" .

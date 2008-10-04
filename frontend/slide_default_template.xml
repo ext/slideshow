@@ -4,29 +4,29 @@
 	<background fit="scale">/path/to/bajs</background>
 	<font name="arial" default="true">/usr/share/fonts/corefonts/arial.ttf</font>
 	<font name="comic">/usr/share/fonts/corefonts/comic.ttf</font>
-	
+
 	<!--
 		Units:
-		All units defaults to pixels, if the unit is suffixed 
+		All units defaults to pixels, if the unit is suffixed
 		with % it is relative to the size of the slide
-		
+
 		Negative units can be used to count from the opposite
-		side of the slide. 
-		
+		side of the slide.
+
 		For instance, an x coordinate of:
 		 * 50;		50 pixels from the right
 		 * -50;		50 pixels from the left
-		 * -5%;		5% of the screen from the left		
+		 * -5%;		5% of the screen from the left
 	-->
-	
+
 	<!--
 		Colors:
 		There is three ways to select a color:
-		 * Decimal RGB: "255, 0, 135"
-		 * Hexadecimal RGB: "#FF00CC"
+		 * Decimal RGB[A]: "255, 0, 135"
+		 * Hexadecimal RGB[A]: "#FF00CC"
 		 * Named color: "red"
 	 -->
-	
+
 	<!--
 		Valid field types:
 		 * text: Single line of text
@@ -34,7 +34,7 @@
 		 * static: Insert static text at given position
 	 -->
 	<fields>
-		<text name="title" font="comic" align="center" position="50% 50" />
+		<text name="title" font="comic" size="28" color="red" align="center" position="50% 50" />
 		<textarea name="content" align="center" boxsize="90% 80%" position="50% 55%" />
 		<static value="Static text" font="comic" color="255, 255, 0" position="10 -10" />
 	</fields>
