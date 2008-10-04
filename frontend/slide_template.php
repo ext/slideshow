@@ -375,6 +375,12 @@ class SlideTemplate {
 	}
 
 	public function render($dst, $data){
+		foreach ( $this->fields as $field ){
+			if ( !isset($data[$field->name()]) ){
+				throw new Exception("Missing data for field {$field->name()}");
+			}
+		}
+
 		$im  = imagecreatetruecolor($this->width, $this->height);
 		$black  = imagecolorallocate($im, 0, 0, 0);
 		imagefilledrectangle($im, 0, 0, $this->width, $this->height, $black);
@@ -483,11 +489,7 @@ class SlideTemplate {
 
 $template = new SlideTemplate('slide_default_template.xml', 800, 600);
 $template->render(NULL, array(
-	'title' => 'This is a title string',
-	'content' =>
-			"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Quisque eu nisl. Donec vitae risus vel pede viverra bibendum. Pellentesque sed ante. In nibh arcu, fermentum sed, dictum ac, convallis vitae, justo. Nulla pharetra, metus sit amet adipiscing placerat, est neque ornare massa, id pulvinar purus enim vitae justo. Etiam consequat, velit eu volutpat sollicitudin, lacus ligula faucibus lorem, nec faucibus sapien ante at arcu. In nec mauris vitae quam auctor hendrerit. Aenean dapibus felis sed turpis. Nullam purus. Duis vel mauris. Proin elementum vestibulum velit.\n" .
-			"\n" .
-			"Donec porta. In faucibus egestas eros. Proin quam nunc, lacinia sed, scelerisque nec, accumsan porta, est. Nullam et ligula. Morbi semper congue dolor. Pellentesque accumsan, urna sit amet mollis porttitor, pede ante pellentesque quam, at dictum ante justo sed est. Nullam et diam. Nullam a libero. Nulla facilisi. Fusce erat justo, adipiscing imperdiet, suscipit vitae, fringilla quis, libero. Nullam auctor tortor at urna. Suspendisse porta, diam quis mollis pellentesque, metus nibh volutpat risus, at mattis diam felis non lectus. Maecenas a erat. Integer diam nibh, lacinia sit amet, adipiscing non, elementum in, elit. Praesent semper nisl ut enim. Cras condimentum, metus a pretium sollicitudin, eros diam lobortis felis, non accumsan urna neque id sapien. Nullam volutpat. Duis aliquam. Nulla facilisi. Etiam at arcu."
+	'title' => 'This is a title string'
 	)
 );
 
