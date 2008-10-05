@@ -22,6 +22,7 @@
 require_once('../common.inc.php');
 require_once('../db_functions.inc.php');
 require_once('../core/module.inc.php');
+require_once('../core/slide_template.php');
 require_once('../core/page_exception.php');
 
 class UploadException extends PageException {
@@ -77,11 +78,19 @@ class Slides extends Module {
 			}
 		}
 
+		$resolution = $settings->virtual_resolution_as_string();
+
+		$template = new SlideTemplate('../slide_default_template.xml', $resolution[0], $resolution[1]);
+		$data = array();
+
+		foreach ( $template->fields() as $field ){
+			$data[$field->name()] = post($field->name());
+		}
+
 		return array(
 			'image' => $image,
-			'title' => $title,
-			'content' => $content,
-			'align' => $align
+			'fields' => $template->fields(),
+			'data' => $data
 		);
 	}
 

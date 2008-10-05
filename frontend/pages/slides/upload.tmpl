@@ -17,13 +17,13 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 ?>
-	
+
 	<div id="content">
-	
+
 		<div id="breadcrumb">
 			<h2><a href="<?=href()?>">Slideshow</a> &gt; Upload slide</h2>
 		</div>
-		
+
 		<h2>Image</h2>
 
 		<form action="<?=href('slides', 'submit_image')?>" method="post" enctype="multipart/form-data">
@@ -39,25 +39,22 @@
 		<form action="<?=href('slides', 'upload')?>" method="post" accept-charset="utf-8">
 			<fieldset>
 				<p>Using this option you can create new slides with text only. The text will be applied to the predefined background if specified in the configuration.</p>
-				<table>
-					<tr valign="top">
-						<td>
-							<label for="title">Title</label><br/>
-							<input type="text" id="title" name="title" size="70" value="<?=$title?>" /><br/>
-							<label for="content">Content</label><br/>
-							<textarea id="content" name="content" cols="60" rows="15"><?=$content?></textarea><br/>
-							<input type="submit" name="submit" value="Preview" />
-							<input type="submit" name="submit" value="Upload" /><br/>
-						</td>
-						<td>
-							<label for="title">Alignment</label><br/>
-							<input type="radio" name="align" value="0" <?=$align==0?"checked=\"checked\"":""?> />Left<br/>
-							<input type="radio" name="align" value="1" <?=$align==1?"checked=\"checked\"":""?> />Center<br/>
-							<input type="radio" name="align" value="2" <?=$align==2?"checked=\"checked\"":""?> />Right<br/>
-						</td>
-					</tr>
-				</table>
-
+<?	foreach ( $fields as $field ){
+		switch ( $field->type() ){
+			case Field::type_text: ?>
+				<label for="content"><?=$field->title()?></label><br/>
+				<input type="text" id="<?=$field->name()?>" name="<?=$field->name()?>" size="70" value="<?=$data[$field->name()]?>" /><br/>
+<?				break;
+			case Field::type_textarea: ?>
+				<label for="content"><?=$field->title()?></label><br/>
+				<textarea id="<?=$field->name()?>" name="<?=$field->name()?>" cols="60" rows="15"><?=$data[$field->name()]?></textarea><br/>
+<?				break;
+		}
+	}
+?>
+				<br/>
+				<input type="submit" name="submit" value="Preview" />
+				<input type="submit" name="submit" value="Upload" /><br/>
 <? if ( $image != NULL ) { ?>
 				<img width="800" height="600" src="<?=$image?>" />
 <? } ?>
