@@ -50,24 +50,44 @@ class Slides extends Module {
 
 		$title = htmlentities($title_orig, ENT_NOQUOTES, "utf-8" );
 		$content = htmlentities($content_orig, ENT_NOQUOTES, "utf-8" );
-		$align = post("align", 1);
+
+		$resolution = $settings->virtual_resolution();
+
+		$template = new SlideTemplate('../slide_default_template.xml', $resolution[0], $resolution[1]);
+		$data = array();
+
+		foreach ( $template->fields() as $count => $field ){
+			switch ( $field->type() ){
+				case Field::type_text:
+				case Field::type_textarea:
+					$data[$field->name()] = $this->utf_hack(html_entity_decode(post($field->name()), ENT_NOQUOTES, 'UTF-8'));
+					break;
+
+				case Field::type_static:
+					continue;
+			}
+		}
 
 		if ( isset($_POST['submit']) ){
+			$data_string = http_build_query($data, '', '&amp;');
+
 			if ( $_POST['submit'] == 'Preview' ){
-				$image = '/index.php/slides/preview?title='.urlencode($title).'&content='.urlencode($content)."&align=$align";
+				$image = '/index.php/slides/preview?' . $data_string;
 			}
 
 			if ( $_POST['submit'] == 'Upload' ){
-				$title = $this->utf_hack($title_orig);
-				$content = explode("\n", $this->utf_hack($content_orig));
-
 				$filename = md5(uniqid());
 				$fullpath = $settings->image_path() . "/$filename.png";
 
-				$this->create_image($title, $content, $align, $fullpath);
+				$template->render($fullpath, $data);
+
+				if ( $settings->resolution_as_string() != $settings->virtual_resolution_as_string() ){
+					$this->convert($fullpath, $fullpath, $settings->resolution_as_string(), $settings->virtual_resolution_as_string());
+				}
+
 				$this->convert($fullpath, $fullpath . '.thumb.jpg', "200x200");
 
-				q("INSERT INTO files (fullpath, type, title, content) VALUES ('$fullpath', 'text', '" . mysql_real_escape_string($title_orig) . "', '" . mysql_real_escape_string($content_orig) . "')");
+				q("INSERT INTO slides (fullpath, type, title, data) VALUES ('$fullpath', 'text', '', '" . mysql_real_escape_string($data_string) . "')");
 
 				global $daemon;
 				$daemon->reload_queue();
@@ -76,15 +96,6 @@ class Slides extends Module {
 				Module::redirect("/index.php");
 				exit();
 			}
-		}
-
-		$resolution = $settings->virtual_resolution_as_string();
-
-		$template = new SlideTemplate('../slide_default_template.xml', $resolution[0], $resolution[1]);
-		$data = array();
-
-		foreach ( $template->fields() as $field ){
-			$data[$field->name()] = post($field->name());
 		}
 
 		return array(
@@ -144,7 +155,7 @@ class Slides extends Module {
 		$this->convert($fullpath, $fullpath . '.thumb.jpg', "200x200");
 		$this->convert($fullpath, $fullpath, $resolution, $virtual_resolution);
 
-		q("INSERT INTO files (fullpath, type, title) VALUES ('$fullpath', 'image', '" . mysql_real_escape_string($name) . "')");
+		q("INSERT INTO slides (fullpath, type, title) VALUES ('$fullpath', 'image', '" . mysql_real_escape_string($name) . "')");
 
 		global $daemon;
 		$daemon->reload_queue();
@@ -165,63 +176,17 @@ class Slides extends Module {
 	}
 
 	public function preview(){
-		$title = $this->utf_hack(html_entity_decode(get('title'), ENT_NOQUOTES, 'UTF-8'));
-		$content = explode("\n", $this->utf_hack(html_entity_decode(get('content'), ENT_NOQUOTES, 'UTF-8')) );
-
-		$align = $_GET['align'];
-
-		$this->create_image($title, $content, $align);
-
-		exit();
-	}
-
-	private function create_image($title, $content, $alignment, $filename = NULL){
 		global $settings;
 
-		$resolution = $settings->resolution();
+		$data = array();
+		parse_str($_SERVER['QUERY_STRING'], $data);
 
-		$bgfile = $settings->background();
+		$resolution = $settings->virtual_resolution();
 
-		$im = false;
-		if ( !empty($bgfile) && is_readable($bgfile)  ){
-			///@todo This only accepts PNG's
-			$im = @imagecreatefrompng($bgfile);
-		}
+		$template = new SlideTemplate('../slide_default_template.xml', $resolution[0], $resolution[1]);
+		$template->render(NULL, $data);
 
-		if ( !$im ){
-			$im  = imagecreatetruecolor($resolution[0], $resolution[1]);
-			$black  = imagecolorallocate($im, 0, 0, 0);
-			$white  = imagecolorallocate($im, 255, 255, 255);
-			imagefilledrectangle($im, 0, 0, $resolution[0], $resolution[1], $black);
-		} else {
-			$black  = imagecolorallocate($im, 0, 0, 0);
-			$white  = imagecolorallocate($im, 255, 255, 255);
-		}
-
-		$font = $settings->font();
-
-		if ( !(empty($font) && is_readable($font) ) ){
-			$font = "../Vera.ttf";
-		}
-
-		///@note Magic numbers
-		$title_size = 28;
-		$content_size = 12;
-
-		// 1 is alignment (center)
-		// 100 is y-coordinate
-		$this->render_string_aligned($im, 1, 100, $title_size, $font, $white, $title);
-
-		$y = 180;
-		foreach ( $content as $paragraph ){
-			$y = $this->render_string_aligned($im, $alignment, $y, $content_size, $font, $white, $paragraph);
-		}
-
-		if ( $filename == NULL ){
-			header("Content-Type: image/png");
-		}
-
-		imagepng($im, $filename);
+		exit();
 	}
 
 	private function convert($src, $dst, $resolution, $virtual_resolution = NULL){
@@ -326,14 +291,14 @@ class Slides extends Module {
 		global $daemon;
 
 		if ( array_key_exists('confirm', $_GET) === true ){
-			q("DELETE FROM files WHERE id = $id");
+			q("DELETE FROM slides WHERE id = $id");
 			$daemon->reload_queue();
 			Module::log("Removed slide with id $id");
 			Module::redirect('/index.php');
 			return;
 		}
 
-		$row = mysql_fetch_assoc(q("SELECT id, fullpath FROM files WHERE id = $id"));
+		$row = mysql_fetch_assoc(q("SELECT id, fullpath FROM slides WHERE id = $id"));
 
 		return array(
 			'id' => $id,
@@ -344,7 +309,7 @@ class Slides extends Module {
 
 	public function deactivate( $id ){
 		global $daemon;
-		q('UPDATE files SET active = false WHERE id = ' . (int)$id );
+		q('UPDATE slides SET active = false WHERE id = ' . (int)$id );
 		$daemon->reload_queue();
 		Module::log("Deactivated slide with id $id");
 		Module::redirect('/index.php');
@@ -352,7 +317,7 @@ class Slides extends Module {
 
 	public function activate( $id ){
 		global $daemon;
-		q('UPDATE files SET active = true WHERE id = ' . (int)$id );
+		q('UPDATE slides SET active = true WHERE id = ' . (int)$id );
 		$daemon->reload_queue();
 		Module::log("Activated slide with id $id");
 		Module::redirect('/index.php');
@@ -372,7 +337,7 @@ class Slides extends Module {
 	public function move( $id ){
 		global $daemon;
 		$bin = (int)$_POST['to_bin'];
-		q("UPDATE files SET bin_id = $bin WHERE id = " . (int)$id);
+		q("UPDATE slides SET bin_id = $bin WHERE id = " . (int)$id);
 		$daemon->reload_queue();
 		Module::log("Moving slide $id to bin $bin");
 		Module::redirect('/index.php');
@@ -391,7 +356,7 @@ class Slides extends Module {
 
 		q("START TRANSACTION");
 		foreach ($slides as $i => $slide){
-			q("UPDATE files SET bin_id = $bin, sortorder = $i WHERE id = $slide");
+			q("UPDATE slides SET bin_id = $bin, sortorder = $i WHERE id = $slide");
 		}
 		q("COMMIT");
 

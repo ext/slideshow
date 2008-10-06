@@ -220,11 +220,19 @@ class Settings {
 	}
 
 	function virtual_resolution(){
-		return $this->data['Apparence']['VirtualResolution'];
+		if ( isset($this->data['Apparence']['VirtualResolution']) && !empty($this->data['Apparence']['VirtualResolution']) ){
+			return $this->data['Apparence']['VirtualResolution'];
+		} else {
+			return $this->resolution();
+		}
 	}
 
 	function virtual_resolution_as_string(){
-		return sprintf("%dx%d", $this->data['Apparence']['VirtualResolution'][0], $this->data['Apparence']['VirtualResolution'][1]);
+		if ( isset($this->data['Apparence']['VirtualResolution']) && !empty($this->data['Apparence']['VirtualResolution']) ){
+			return sprintf("%dx%d", $this->data['Apparence']['VirtualResolution'][0], $this->data['Apparence']['VirtualResolution'][1]);
+		} else {
+			return $this->resolution_as_string();
+		}
 	}
 
 	function set_virtual_resolution(){

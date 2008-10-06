@@ -114,15 +114,15 @@ class BinCollection implements Iterator, ArrayAccess {
 
 	function __construct( ){
 		$result = q('
-			SELECT files.id, fullpath, bins.id as bid, bin_id, active, name, sortorder, type, title
-				FROM files
+			SELECT slides.id, fullpath, bins.id as bid, bin_id, active, name, sortorder, type, title
+				FROM slides
 				LEFT JOIN bins
-					ON files.bin_id = bins.id
+					ON slides.bin_id = bins.id
 			UNION
-			SELECT files.id, fullpath, bins.id as bid, bin_id, active, name, sortorder, type, title
-				FROM files
+			SELECT slides.id, fullpath, bins.id as bid, bin_id, active, name, sortorder, type, title
+				FROM slides
 				RIGHT JOIN bins
-					ON files.bin_id = bins.id
+					ON slides.bin_id = bins.id
 			ORDER BY bid, bin_id, sortorder, id'
 		);
 

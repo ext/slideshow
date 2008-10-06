@@ -11,11 +11,11 @@ CREATE TABLE `bins` (
 INSERT INTO `bins` VALUES (1, 'Default');
 
 --
--- Table structure for table `files`
+-- Table structure for table `slides`
 --
 
-DROP TABLE IF EXISTS `files`;
-CREATE TABLE `files` (
+DROP TABLE IF EXISTS `slides`;
+CREATE TABLE `slides` (
   `id` int(11) NOT NULL auto_increment,
   `fullpath` text,
   `bin_id` int(11) NOT NULL default '0',
@@ -23,6 +23,6 @@ CREATE TABLE `files` (
   `active` tinyint(1) NOT NULL default '1',
   `type` enum('image','text') NOT NULL,
   `title` text,
-  `content` text,
+  `data` text,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

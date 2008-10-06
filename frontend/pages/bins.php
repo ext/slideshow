@@ -45,7 +45,7 @@ class Bins extends Module {
 
 	function delete( $id ){
 		if ( array_key_exists('confirm', $_GET) === true ){
-			q("UPDATE files SET bin_id = 0 WHERE bin_id = $id");
+			q("UPDATE slides SET bin_id = 0 WHERE bin_id = $id");
 			q("DELETE FROM bins WHERE id = $id");
 			$this->send_signal("Reload");
 			Module::log("Removed bin with id $id");

@@ -402,8 +402,16 @@ class SlideTemplate {
 
 	public function render($dst, $data){
 		foreach ( $this->fields as $field ){
-			if ( !isset($data[$field->name()]) ){
-				throw new Exception("Missing data for field {$field->name()}");
+			switch ( $field->type() ){
+				case Field::type_text:
+				case Field::type_textarea:
+					if ( !isset($data[$field->name()]) ){
+						throw new Exception("Missing data for field {$field->name()}");
+					}
+					break;
+
+				case Field::type_static:
+					continue;
 			}
 		}
 
