@@ -9,6 +9,8 @@ AC_PROG_LIBTOOL
 LT_INIT
 AC_LIBTOOL_DLOPEN
 
+AX_CHECK_GLU
+
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
@@ -90,25 +92,6 @@ PKG_CHECK_MODULES(libdaemon, [libdaemon],
 
 AC_SUBST(libdaemon_CFLAGS)
 AC_SUBST(libdaemon_LIBS)
-
-dnl #######################################################################
-dnl # OpenGL/GLX
-dnl #######################################################################
-AC_CHECK_HEADERS([GL/gl.h GL/glx.h], [HAVE_GL=yes; break;], [HAVE_GL=no])
-if test x$HAVE_GL = xno; then
-dnl   AC_CHECK_HEADERS([GL/gl.h], [HAVE_GL=yes; break;], [HAVE_GL=no])
-   AC_MSG_ERROR(OpenGL development libraries not found);
-else
-   AC_CHECK_HEADERS([GL/glx.h], [HAVE_GLX=yes], [HAVE_GLX=no])
-   if test x$HAVE_GLX = xno; then   
-      AC_MSG_ERROR(OpenGL development libraries not found);
-   fi
-   GL_LIBS="-lGL"
-   GL_CFLAGS=""
-fi
-
-AC_SUBST(GL_CFLAGS)
-AC_SUBST(GL_LIBS)
 
 dnl #######################################################################
 dnl # FreeImage
