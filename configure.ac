@@ -41,15 +41,25 @@ AC_FUNC_FORK
 dnl #######################################################################
 dnl # D-Bus
 dnl #######################################################################
-PKG_CHECK_MODULES(dbus, [dbus-1, dbus-glib-1],
-	[
-		AC_DEFINE(HAVE_DBUS, 1, [Define if D-Bus is available])
-		enable_dbus=yes
-	],
-	[
-		AC_MSG_ERROR([Required D-Bus not found.])
-	])
+AC_ARG_WITH([dbus],
+	[AS_HELP_STRING([--with-dbus], [support for D-Bus])],
+	[],
+	[with_dbus=no])
 
+AS_IF([test "x$with_dbus" != xno],
+	[
+		PKG_CHECK_MODULES(dbus, [dbus-1, dbus-glib-1],
+		[
+			AC_DEFINE(HAVE_DBUS, 1, [Define if D-Bus is available])
+			enable_dbus=yes
+		],
+		[
+			AC_MSG_ERROR([Required D-Bus not found.])
+		])
+	],
+	[])
+	
+AM_CONDITIONAL([DBUS], [test "x$with_dbus" != xno])
 AC_SUBST(dbus_CFLAGS)
 AC_SUBST(dbus_LIBS)
 
@@ -84,10 +94,15 @@ AC_SUBST(libdaemon_LIBS)
 dnl #######################################################################
 dnl # OpenGL/GLX
 dnl #######################################################################
-AC_CHECK_HEADERS([GL/gl.h GL/glx.h], [HAVE_GL=yes], [HAVE_GL=no])
+AC_CHECK_HEADERS([GL/gl.h GL/glx.h], [HAVE_GL=yes; break;], [HAVE_GL=no])
 if test x$HAVE_GL = xno; then
+dnl   AC_CHECK_HEADERS([GL/gl.h], [HAVE_GL=yes; break;], [HAVE_GL=no])
    AC_MSG_ERROR(OpenGL development libraries not found);
 else
+   AC_CHECK_HEADERS([GL/glx.h], [HAVE_GLX=yes], [HAVE_GLX=no])
+   if test x$HAVE_GLX = xno; then   
+      AC_MSG_ERROR(OpenGL development libraries not found);
+   fi
    GL_LIBS="-lGL"
    GL_CFLAGS=""
 fi
