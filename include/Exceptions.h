@@ -120,4 +120,14 @@ ADD_EXCEPTION_INTERFACE(IPCException, IPC_ERROR);
 ADD_EXCEPTION_INTERFACE(GraphicsException, GRAPHICS_ERROR);
 ADD_EXCEPTION_INTERFACE(DaemonException, DAEMON_ERROR);
 
+/*
+ * verify is like assert but is always compiled.
+ */
+#define verify(x) \
+	do \
+		if ( !(x) ){ \
+			fprintf(stderr, " %s:%d *** verify failed: %s", __FILE__, __LINE__, #x); \
+		} \
+	while (0)
+
 #endif // EXCEPTIONS_H
