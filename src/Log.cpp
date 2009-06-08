@@ -17,6 +17,7 @@
  */
 
 #include "Log.h"
+#include "Exceptions.h"
 #include <stdarg.h>
 #include <cstdlib>
 #include <cstring>
@@ -47,7 +48,7 @@ void Log::message(Severity severity, const char* fmt, ...){
 	char buf[255];
 
 	char* line;
-	vasprintf(&line, fmt, arg);
+	verify( vasprintf(&line, fmt, arg) >= 0 );
 
 	if ( severity >= _level ){
 		fprintf(stdout, "(%s) [%s] %s", severity_string(severity), timestring(buf, 255), line);
@@ -91,7 +92,7 @@ void Log::message_ex_fmt(const char* fmt, ...){
 	va_start(arg, fmt);
 
 	char* line;
-	vasprintf(&line, fmt, arg);
+	verify( vasprintf(&line, fmt, arg) >= 0 );
 
 	if ( last_severity >= _level ){
 		fprintf(stdout, "%s", line);
