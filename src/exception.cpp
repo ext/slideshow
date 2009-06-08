@@ -1,5 +1,6 @@
 #include "Exceptions.h"
 #include <cstdlib>
+#include <cstdio>
 
 BaseException::BaseException(const char* message): std::exception(), _msg(NULL) {
 	if ( message ){
