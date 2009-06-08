@@ -4,13 +4,13 @@
 
 BaseException::BaseException(const char* message): std::exception(), _msg(NULL) {
 	if ( message ){
-		asprintf(&_msg, "%s", message);
+		verify( asprintf(&_msg, "%s", message) >= 0 );
 	}
 }
 
 BaseException::BaseException(const BaseException& e): std::exception(), _msg(NULL) {
 	if ( e._msg ){
-		asprintf(&_msg, "%s", e._msg);
+		verify( asprintf(&_msg, "%s", e._msg) >= 0 );
 	}
 }
 
@@ -27,7 +27,7 @@ void BaseException::set_message(const char* fmt, va_list va){
 		free(_msg);
 	}
 
-	vasprintf(&_msg, fmt, va);
+	verify( vasprintf(&_msg, fmt, va) >= 0);
 }
 
 FatalException::FatalException(ErrorCode code, const char* message): BaseException(message), _code(code){
