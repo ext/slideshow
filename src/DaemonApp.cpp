@@ -67,8 +67,10 @@ void DaemonApp::cleanup(){
 
 void DaemonApp::pass_exception(const BaseException &e){
 	size_t size = strlen(e.what());
-	write(_writefd, &size, sizeof(size));
-	write(_writefd, e.what(), size);
+
+	// @todo Errors should be handled properly
+	verify( write(_writefd, &size, sizeof(size)) >= 0 );
+	verify( write(_writefd, e.what(), size) >= 0 );
 }
 
 void DaemonApp::run(){
@@ -133,11 +135,14 @@ void DaemonApp::daemon_start(){
 		}
 
 		if ( ret != 0 ){
-			size_t size;
-			read(_readfd, &size, sizeof(size_t));
+			ssize_t size;
+
+			// @todo Errors should be handled properly
+			verify( read(_readfd, &size, sizeof(size_t)) == sizeof(size_t) );
 
 			char buf[size+1];
-			read(_readfd, buf, size);
+			// @todo Errors should be handled properly
+			verify( read(_readfd, buf, size) == size );
 			close(_readfd);
 			buf[size] = '\0';
 
