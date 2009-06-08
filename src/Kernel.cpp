@@ -129,7 +129,7 @@ char* Kernel::get_password(){
 	}
 
 	char* password = (char*)malloc(256);
-	scanf("%256s", password);
+	verify( scanf("%256s", password) == 1 );
 
 	return password;
 }
@@ -202,7 +202,7 @@ void Kernel::print_transitions(){
 		printf("Available transitions: \n");
 		for ( int i = 0; i < n; i++ ){
 			char* path;
-			asprintf(&path, "%s/%s", pluginpath(), namelist[i]->d_name);
+			verify( asprintf(&path, "%s/%s", pluginpath(), namelist[i]->d_name) >= 0 );
 			free(namelist[i]);
 
 			struct module_context_t* context = module_open(path);
@@ -330,7 +330,7 @@ const char* Kernel::pluginpath(){
 }
 void Kernel::create_pidpath(){
 	char* cwd = get_current_dir_name();
-	asprintf(&pidfile, "%s/slideshow.pid", cwd);
+	verify( asprintf(&pidfile, "%s/slideshow.pid", cwd) >= 0 );
 	free(cwd);
 }
 
