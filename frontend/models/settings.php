@@ -121,11 +121,11 @@ class Settings {
 	}
 
 	function log_file(){
-		return $this->base_path() . '/' . $this->data['Files']['Log']['Base'];
+		return $this->base_path() . '/' . $this->data['Files']['BaseLog'];
 	}
 
 	function set_log($new_path){
-		$this->data['Files']['Log']['Base'] = $new_path;
+		$this->data['Files']['BaseLog'] = $new_path;
 	}
 
 	function activity_log(){
@@ -133,11 +133,11 @@ class Settings {
 	}
 
 	function activity_log_file(){
-		return $this->base_path() . '/' .  $this->data['Files']['Log']['Activity'];
+		return $this->base_path() . '/' .  $this->data['Files']['ActivityLog'];
 	}
 
 	function set_activity_log($new_path){
-		$this->data['Files']['Log']['Activity'] = $new_path;
+		$this->data['Files']['ActivityLog'] = $new_path;
 	}
 
 	function pid(){
