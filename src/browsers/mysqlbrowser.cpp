@@ -109,7 +109,7 @@ MYSQL_RES* MySQLBrowser::query(const char* str, ...){
 void MySQLBrowser::reload(){
 	clear_fields();
 
-	MYSQL_RES *res = query("SELECT fullpath FROM files WHERE bin_id = %d AND active = true ORDER BY sortorder, id", current_bin());
+	MYSQL_RES *res = query("SELECT fullpath FROM slides WHERE bin_id = %d AND active = true ORDER BY sortorder, id", current_bin());
 	MYSQL_ROW row;
 
 	my_ulonglong n = mysql_num_rows(res);
