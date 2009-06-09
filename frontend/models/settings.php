@@ -265,6 +265,14 @@ class Settings {
 		return array($args[0], $args[1]);
 	}
 
+	function display(){
+		return $this->data['Apparence']['Display'];
+	}
+
+	function set_display($new_value){
+		$this->data['Apparence']['Display'] = $new_value;
+	}
+
 	function database_hostname(){
 		return $this->data['Database']['Hostname'];
 	}

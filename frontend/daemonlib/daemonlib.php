@@ -101,7 +101,7 @@ class SlideshowInst {
 		$cmd = 	$core_cmd . ';' .
 				$password_cmd . '|' .
 				$env .
-				'DISPLAY=":0" ' .
+				'DISPLAY="' . $settings->display() . '" ' .
 				"$this->binary {$arguments->as_string()} 2>&1";
 
 		$old_wd = getcwd();

@@ -30,6 +30,7 @@
 		<item name="VirtualResolution" title="Virtual resolution" type="resolution"></item>
 		<item name="TransitionTime" title="Transition time" type="float" description="Time in sec it takes to change slide">3.0</item>
 		<item name="SwitchTime" title="Switch time" type="float" description="Time in sec each slide will be shown">10.0</item>
+		<item name="Display" title="Display" type="display" description="X display to use">:0</item>
 	</group>
 	
 	<group name="Database">

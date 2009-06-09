@@ -7,6 +7,6 @@
 <!ATTLIST group 	name ID #REQUIRED>
 <!ATTLIST item 		name ID #REQUIRED
 					title CDATA #IMPLIED
-					type (string|int|float|directory|file|resolution|password) #REQUIRED
+					type (string|int|float|directory|file|resolution|password|display) #REQUIRED
 					description CDATA #IMPLIED
 					install (yes|no) "no">
