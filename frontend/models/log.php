@@ -19,7 +19,7 @@
 
 class Log {
 	function __construct( $filename ){
-		if ( !file_exists($filename) ){
+		if ( !is_file($filename) ){
 			if ( !is_writable( dirname($filename) ) ){
 				throw new Exception("Could not open log `$filename'");
 			}
