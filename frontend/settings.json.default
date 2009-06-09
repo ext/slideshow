@@ -8,10 +8,8 @@
 
 	"Files": {
 		"BinaryPath": "",
-		"Log": {
-			"Base": "slideshow.log",
-			"Activity": "activity.log"
-		},
+		"BaseLog": "slideshow.log",
+		"ActivityLog": "activity.log",
 		"PID": "slideshow.pid",
 		"MOTD": "motd",
 		"convert": ""
