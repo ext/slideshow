@@ -32,7 +32,6 @@
 #endif /* HAVE_XF86VIDMODE */
 
 #include <GL/glx.h>
-//#include <GL/glu.h>
 
 static Display*             dpy;
 static Window                   win;
