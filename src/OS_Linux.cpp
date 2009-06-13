@@ -127,8 +127,12 @@ XVisualInfo* glXVisualFromFBConfigAttributes(Display* dpy, int screen, int* attr
 }
 
 void store_display_config(Display* dpy, Window root){
+#if HAVE_XRANDR
 	saved_screen_config = XRRGetScreenInfo(dpy, root);
 	saved_size_id = XRRConfigCurrentConfiguration(saved_screen_config, &saved_rotation);
+#elif HAVE_XF86VIDMODE
+
+#endif
 }
 
 enum fullscreen_state_t {
@@ -166,12 +170,18 @@ bool resolution_available(Display* dpy, Window root, int width, int height){
 }
 
 void enter_fullscreen(glx_state* state){
-	printf("setting resolution to %dx%d\n", state->width, state->height);
+#if HAVE_XRANDR
+#elif HAVE_XF86VIDMODE
+#	error NOT IMPLEMENTED
+#endif
 	state->in_fullscreen = true;
 }
 
 void exit_fullscreen(glx_state* state){
-	printf("restoring display\n");
+#if HAVE_XRANDR
+#elif HAVE_XF86VIDMODE
+#	error NOT IMPLEMENTED
+#endif
 	state->in_fullscreen = false;
 }
 
