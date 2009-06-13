@@ -172,8 +172,6 @@ void OS::init_view(int width, int height, bool fullscreen){
 
 	if ( fullscreen ){
 		Log::message(Log::Verbose, "Graphics: Going fullscreen\n");
-		width = DisplayWidth(dpy, DefaultScreen(dpy));
-		height = DisplayHeight(dpy, DefaultScreen(dpy));
 	}
 
 	Colormap cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
