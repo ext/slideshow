@@ -82,6 +82,29 @@ XVisualInfo* glXVisualFromFBConfigAttributes(Display* dpy, int screen, int* attr
 	return visual;
 }
 
+enum fullscreen_state_t {
+	ENABLE = (_NET_WM_STATE_ADD),
+	DISABLE = (_NET_WM_STATE_REMOVE),
+	TOGGLE = (_NET_WM_STATE_TOGGLE)
+};
+
+void set_fullscreen(Display* dpy, Window win, fullscreen_state_t status){
+	XEvent xev;
+
+	xev.xclient.type=ClientMessage;
+	xev.xclient.serial = 0;
+	xev.xclient.send_event=True;
+	xev.xclient.window=win;
+	xev.xclient.message_type=wm_state;
+	xev.xclient.format=32;
+
+	xev.xclient.data.l[0] = status;
+	xev.xclient.data.l[1] = wm_fullscreen;
+	xev.xclient.data.l[2] = 0;
+
+	XSendEvent(dpy, DefaultRootWindow(dpy), False, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+}
+
 void OS::init_view(int width, int height, bool fullscreen){
 	dpy = XOpenDisplay(NULL);
 
@@ -137,18 +160,7 @@ void OS::init_view(int width, int height, bool fullscreen){
     XDefineCursor(dpy, win, no_cursor);
 
 	if ( fullscreen ){
-		XEvent xev;
-		xev.xclient.type=ClientMessage;
-		xev.xclient.serial = 0;
-		xev.xclient.send_event=True;
-		xev.xclient.window=win;
-		xev.xclient.message_type=wm_state;
-		xev.xclient.format=32;
-		xev.xclient.data.l[0] = (_NET_WM_STATE_ADD);
-		xev.xclient.data.l[1] = wm_fullscreen;
-		xev.xclient.data.l[2] = 0;
-
-		XSendEvent(dpy, DefaultRootWindow(dpy), False, SubstructureRedirectMask | SubstructureNotifyMask,&xev);
+		set_fullscreen(dpy, root, ENABLE);
 	}
 
 	glx_drawable = glXGetCurrentDrawable();
@@ -181,19 +193,7 @@ void OS::poll_events(bool& running){
 		switch (event.type){
 			case KeyPress:
 				if ( event.xkey.state == 24 && event.xkey.keycode == 36 ){
-					XEvent xev;
-					xev.xclient.type=ClientMessage;
-					xev.xclient.serial = 0;
-					xev.xclient.send_event=True;
-					xev.xclient.window=win;
-					xev.xclient.message_type=wm_state;
-					xev.xclient.format=32;
-					xev.xclient.data.l[0] = (_NET_WM_STATE_TOGGLE);
-					xev.xclient.data.l[1] = wm_fullscreen;
-					xev.xclient.data.l[2] = 0;
-
-					XSendEvent(dpy, DefaultRootWindow(dpy), False, SubstructureRedirectMask | SubstructureNotifyMask,&xev);
-
+					set_fullscreen(dpy, win, TOGGLE);
 					continue;
 				}
 
