@@ -156,21 +156,21 @@ bool resolution_available(Display* dpy, Window root, int width, int height){
  * @param win Specifies the X window.
  * @param status Action to perform.
  */
-void set_fullscreen(Display* dpy, Window win, fullscreen_state_t status){
+void set_fullscreen(glx_state* state, fullscreen_state_t status){
 	XEvent xev;
 
-	xev.xclient.type=ClientMessage;
-	xev.xclient.serial = 0;
-	xev.xclient.send_event=True;
-	xev.xclient.window=win;
-	xev.xclient.message_type=wm_state;
-	xev.xclient.format=32;
+	xev.xclient.type =         ClientMessage;
+	xev.xclient.serial =       0;
+	xev.xclient.send_event =   True;
+	xev.xclient.window =       state->win;
+	xev.xclient.message_type = wm_state;
+	xev.xclient.format =       32;
 
 	xev.xclient.data.l[0] = status;
 	xev.xclient.data.l[1] = wm_fullscreen;
 	xev.xclient.data.l[2] = 0;
 
-	XSendEvent(dpy, DefaultRootWindow(dpy), False, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+	XSendEvent(state->dpy, state->root, False, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
 }
 
 void OS::init_view(int width, int height, bool fullscreen){
@@ -208,6 +208,13 @@ void OS::init_view(int width, int height, bool fullscreen){
 
 	GLXContext ctx = glXCreateContext(dpy, vi, NULL, GL_TRUE);
 	glXMakeCurrent(dpy, win, ctx);
+	GLXDrawable glx_drawable = glXGetCurrentDrawable();
+
+	g.dpy = dpy;
+	g.win = win;
+	g.root = root;
+	g.ctx = ctx;
+	g.glx_drawable = glx_drawable;
 
 	generate_atoms(dpy);
 
@@ -217,16 +224,8 @@ void OS::init_view(int width, int height, bool fullscreen){
 	generate_cursors(dpy, win);
 
 	if ( fullscreen ){
-		set_fullscreen(dpy, root, ENABLE);
+		set_fullscreen(&g, ENABLE);
 	}
-
-	GLXDrawable glx_drawable = glXGetCurrentDrawable();
-
-	g.dpy = dpy;
-	g.win = win;
-	g.root = root;
-	g.ctx = ctx;
-	g.glx_drawable = glx_drawable;
 
 	set_cursor(&g, no_cursor);
 }
@@ -258,7 +257,7 @@ void OS::poll_events(bool& running){
 		switch (event.type){
 			case KeyPress:
 				if ( event.xkey.state == 24 && event.xkey.keycode == 36 ){
-					set_fullscreen(g.dpy, g.win, TOGGLE);
+					set_fullscreen(&g, TOGGLE);
 					continue;
 				}
 
