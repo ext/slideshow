@@ -108,6 +108,34 @@ enum fullscreen_state_t {
 	TOGGLE = _NET_WM_STATE_TOGGLE
 };
 
+/**
+ * Checks if the specified resolution is available. It is important that the
+ * exact resolution requested is used since the slides has been created in that
+ * resolution. No scaling must occur.
+ *
+ * @param dpy Specifies the connection to the X server.
+ * @param root Specifies the X window.
+ * @param width
+ * @param height
+ */
+bool resolution_available(Display* dpy, Window root, int width, int height){
+#if HAVE_XRANDR
+	XRRScreenConfiguration* screen_config = XRRGetScreenInfo(dpy, root);
+
+	int nsizes;
+	XRRScreenSize *sizes = XRRConfigSizes(screen_config, &nsizes);
+
+	for ( int i = 0; i < nsizes; i++ ){
+		if ( width == sizes[i].width && height == sizes[i].height ){
+			return true;
+		}
+	}
+#elif HAVE_XF86VIDMODE
+#	error NOT IMPLEMENTED
+#endif
+	return false;
+}
+
 void set_fullscreen(Display* dpy, Window win, fullscreen_state_t status){
 	XEvent xev;
 
@@ -137,6 +165,10 @@ void OS::init_view(int width, int height, bool fullscreen){
 	XVisualInfo* vi = glXVisualFromFBConfigAttributes(dpy, DefaultScreen(dpy), doubleBufferAttributes);
 
 	unsigned long mask = CWColormap | CWEventMask;
+
+	if ( fullscreen && !resolution_available(dpy, root, width, height) ){
+		throw XlibException("The specified resolution %dx%d is not available in fullscreen mode", width, height);
+	}
 
 	if ( fullscreen ){
 		Log::message(Log::Verbose, "Graphics: Going fullscreen\n");
