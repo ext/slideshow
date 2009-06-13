@@ -33,26 +33,27 @@
 
 #include <GL/glx.h>
 
-static Display*             dpy;
-static Window                   win;
-static Window                   root;
-static GLXContext               ctx;
-static XVisualInfo*         vi;
-static Colormap             cmap;
-static XSetWindowAttributes swa;
+typedef struct __glx_state {
+	Display* dpy;
+	Window win;
+	Window root;
+	GLXContext ctx;
+	GLXDrawable glx_drawable;
+} glx_state;
+
+/* @todo Remove usage of this global state */
+static glx_state g;
 
 #if HAVE_XF86VIDMODE
 static XF86VidModeModeInfo **vidmodes;
 #endif /* HAVE_XF86VIDMODE */
 
-static Atom                     wm_delete_window;
-static Atom                     wm_fullscreen;
-static Atom                     wm_state;
+static Atom wm_delete_window;
+static Atom wm_fullscreen;
+static Atom wm_state;
 
-Cursor                          default_cursor = 0;
-Cursor                          no_cursor = 0;
-
-GLXDrawable glx_drawable;
+Cursor default_cursor = 0;
+Cursor no_cursor = 0;
 
 enum
 {
@@ -115,15 +116,15 @@ void set_fullscreen(Display* dpy, Window win, fullscreen_state_t status){
 }
 
 void OS::init_view(int width, int height, bool fullscreen){
-	dpy = XOpenDisplay(NULL);
+	Display* dpy = XOpenDisplay(NULL);
 
 	if( !dpy ) {
 		throw XlibException("Could not connect to an X server");
 	}
 
-	root = DefaultRootWindow(dpy);
+	Window root = DefaultRootWindow(dpy);
 
-	vi = glXVisualFromFBConfigAttributes(dpy, DefaultScreen(dpy), doubleBufferAttributes);
+	XVisualInfo* vi = glXVisualFromFBConfigAttributes(dpy, DefaultScreen(dpy), doubleBufferAttributes);
 
 	unsigned long mask = CWColormap | CWEventMask;
 
@@ -133,17 +134,19 @@ void OS::init_view(int width, int height, bool fullscreen){
 		height = DisplayHeight(dpy, DefaultScreen(dpy));
 	}
 
-	cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
+	Colormap cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
+
+	XSetWindowAttributes swa;
 	swa.colormap = cmap;
 	swa.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask ;
 
-	win = XCreateWindow(dpy, root, 0, 0, width, height, 0, vi->depth, InputOutput, vi->visual, mask, &swa);
+	Window win = XCreateWindow(dpy, root, 0, 0, width, height, 0, vi->depth, InputOutput, vi->visual, mask, &swa);
 
 	XStoreName(dpy, win, "Slideshow");
 
 	XMapWindow(dpy, win);
 
-	ctx = glXCreateContext(dpy, vi, NULL, GL_TRUE);
+	GLXContext ctx = glXCreateContext(dpy, vi, NULL, GL_TRUE);
 	glXMakeCurrent(dpy, win, ctx);
 
 	wm_delete_window = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
@@ -172,37 +175,43 @@ void OS::init_view(int width, int height, bool fullscreen){
 		set_fullscreen(dpy, root, ENABLE);
 	}
 
-	glx_drawable = glXGetCurrentDrawable();
+	GLXDrawable glx_drawable = glXGetCurrentDrawable();
+
+	g.dpy = dpy;
+	g.win = win;
+	g.root = root;
+	g.ctx = ctx;
+	g.glx_drawable = glx_drawable;
 }
 
 void OS::swap_gl_buffers(){
-	glXSwapBuffers(dpy, glx_drawable);
+	glXSwapBuffers(g.dpy, g.glx_drawable);
 }
 
 void OS::cleanup(){
-  XDefineCursor(dpy, win, default_cursor);
-  glXDestroyContext(dpy, ctx);
+  XDefineCursor(g.dpy, g.win, default_cursor);
+  glXDestroyContext(g.dpy, g.ctx);
 
-  if( win && dpy ){
-	XDestroyWindow( dpy, win );
-	win = (Window) 0;
+  if( g.win && g.dpy ){
+	XDestroyWindow(g.dpy, g.win );
+	g.win = (Window) 0;
   }
 
-  if ( dpy ){
-	XCloseDisplay( dpy );
-	dpy = 0;
+  if ( g.dpy ){
+	XCloseDisplay( g.dpy );
+	g.dpy = 0;
   }
 }
 
 void OS::poll_events(bool& running){
 	XEvent event;
 
-	while ( XPending(dpy) > 0 ){
-		XNextEvent(dpy, &event);
+	while ( XPending(g.dpy) > 0 ){
+		XNextEvent(g.dpy, &event);
 		switch (event.type){
 			case KeyPress:
 				if ( event.xkey.state == 24 && event.xkey.keycode == 36 ){
-					set_fullscreen(dpy, win, TOGGLE);
+					set_fullscreen(g.dpy, g.win, TOGGLE);
 					continue;
 				}
 
