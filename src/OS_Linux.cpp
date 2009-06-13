@@ -173,6 +173,10 @@ void set_fullscreen(glx_state* state, fullscreen_state_t status){
 	XSendEvent(state->dpy, state->root, False, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
 }
 
+bool is_window_delete_event(XEvent* event){
+	return (unsigned int)event->xclient.data.l[0] == wm_delete_window;
+}
+
 void OS::init_view(int width, int height, bool fullscreen){
 	Display* dpy = XOpenDisplay(NULL);
 
@@ -266,7 +270,7 @@ void OS::poll_events(bool& running){
 				break;
 
 			case ClientMessage:
-				if( (unsigned int)event.xclient.data.l[0] == wm_delete_window ){
+				if( is_window_delete_event(&event) ){
 					running = false;
 					continue;
 				}
