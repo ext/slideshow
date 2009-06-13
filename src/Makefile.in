@@ -85,7 +85,8 @@ slideshow_DEPENDENCIES = IPC/libipc.a state/libfsm.a \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_2)
 am_xquery_OBJECTS = xquery-xquery.$(OBJEXT)
 xquery_OBJECTS = $(am_xquery_OBJECTS)
 xquery_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
@@ -297,7 +298,8 @@ slideshow_SOURCES = ${top_srcdir}/include/Browser.h \
 	$(am__append_1)
 slideshow_LDADD = IPC/libipc.a state/libfsm.a -lltdl \
 	${libportable_LIBS} ${libdaemon_LIBS} ${dbus_LIBS} ${GL_LIBS} \
-	${FREEIMAGE_LIBS} ${X11_LIBS} ${xxf86vm_LIBS} $(am__append_2)
+	${FREEIMAGE_LIBS} ${X11_LIBS} ${xxf86vm_LIBS} ${xrandr_LIBS} \
+	$(am__append_2)
 xquery_CFLAGS = -pipe -Wall -Wextra
 xquery_SOURCES = xquery.c
 xquery_LDADD = ${X11_LIBS} ${xrandr_LIBS}
