@@ -44,6 +44,10 @@ typedef struct __glx_state {
 	int height;
 	bool in_fullscreen;
 	bool fullscreen_available;
+#if HAVE_XRANDR
+	XRRScreenConfiguration* screen_config;
+	int size_id;
+#endif
 } glx_state;
 
 /* @todo Remove usage of this global state */
@@ -154,12 +158,14 @@ enum fullscreen_state_t {
 bool resolution_available(Display* dpy, Window root, int width, int height){
 #if HAVE_XRANDR
 	XRRScreenConfiguration* screen_config = XRRGetScreenInfo(dpy, root);
+	g.screen_config = screen_config;
 
 	int nsizes;
 	XRRScreenSize *sizes = XRRConfigSizes(screen_config, &nsizes);
 
 	for ( int i = 0; i < nsizes; i++ ){
 		if ( width == sizes[i].width && height == sizes[i].height ){
+			g.size_id = i;
 			return true;
 		}
 	}
@@ -171,6 +177,7 @@ bool resolution_available(Display* dpy, Window root, int width, int height){
 
 void enter_fullscreen(glx_state* state){
 #if HAVE_XRANDR
+	XRRSetScreenConfig(state->dpy, state->screen_config, state->root, state->size_id, saved_rotation, CurrentTime);
 #elif HAVE_XF86VIDMODE
 #	error NOT IMPLEMENTED
 #endif
@@ -179,6 +186,7 @@ void enter_fullscreen(glx_state* state){
 
 void exit_fullscreen(glx_state* state){
 #if HAVE_XRANDR
+	XRRSetScreenConfig(state->dpy, saved_screen_config, state->root, saved_size_id, saved_rotation, CurrentTime);
 #elif HAVE_XF86VIDMODE
 #	error NOT IMPLEMENTED
 #endif
@@ -252,6 +260,12 @@ void OS::init_view(int width, int height, bool fullscreen){
 	XSetWindowAttributes swa;
 	swa.colormap = cmap;
 	swa.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask ;
+
+	if ( fullscreen ){
+		swa.override_redirect = True;
+		swa.backing_store = NotUseful;
+		swa.save_under = False;
+	}
 
 	Window win = XCreateWindow(dpy, root, 0, 0, width, height, 0, vi->depth, InputOutput, vi->visual, mask, &swa);
 
