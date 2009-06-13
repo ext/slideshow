@@ -22,7 +22,15 @@
 #include "Exceptions.h"
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
-#include <X11/extensions/xf86vmode.h>
+
+#if HAVE_XRANDR
+#	include <X11/extensions/Xrandr.h>
+#endif /* HAVE_XRANDR */
+
+#if HAVE_XF86VIDMODE
+#	include <X11/extensions/xf86vmode.h>
+#endif /* HAVE_XF86VIDMODE */
+
 #include <GL/glx.h>
 //#include <GL/glu.h>
 
@@ -34,7 +42,10 @@ static GLXContext               ctx;
 static XVisualInfo*         vi;
 static Colormap             cmap;
 static XSetWindowAttributes swa;
+
+#if HAVE_XF86VIDMODE
 static XF86VidModeModeInfo **vidmodes;
+#endif /* HAVE_XF86VIDMODE */
 
 static Atom                     wm_delete_window;
 static Atom                     wm_fullscreen;

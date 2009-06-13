@@ -18585,7 +18585,7 @@ $as_echo "yes" >&6; }
 
 
 cat >>confdefs.h <<\_ACEOF
-#define HAVE_VIDMODE 1
+#define HAVE_XF86VIDMODE 1
 _ACEOF
 
 
@@ -18669,7 +18669,7 @@ $as_echo "yes" >&6; }
 
 
 cat >>confdefs.h <<\_ACEOF
-#define HAVE_VIDMODE 1
+#define HAVE_XF86VIDMODE 1
 _ACEOF
 
 
@@ -18683,7 +18683,7 @@ $as_echo "yes" >&6; }
 
 
 cat >>confdefs.h <<\_ACEOF
-#define HAVE_VIDMODE 1
+#define HAVE_XF86VIDMODE 1
 _ACEOF
 
 

@@ -124,12 +124,12 @@ AC_SUBST(X11_LIBS)
 
 PKG_CHECK_MODULES(xxf86vm, [xxf86vm],
 	[
-		AC_DEFINE(HAVE_VIDMODE, 1, [Define if xxf86vm development libraries is available])
+		AC_DEFINE(HAVE_XF86VIDMODE, 1, [Define if xxf86vm development libraries is available])
 	],
 	[
 		PKG_CHECK_MODULES(xxf86vm, [xf86vidmodeproto],
 			[
-				AC_DEFINE(HAVE_VIDMODE, 1, [Define if xxf86vm development libraries is available])
+				AC_DEFINE(HAVE_XF86VIDMODE, 1, [Define if xxf86vm development libraries is available])
 			],
 			[
 				AC_MSG_ERROR([Required xxf86vm development libraries not found])
