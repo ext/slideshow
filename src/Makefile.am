@@ -47,7 +47,8 @@ slideshow_LDADD = \
 	${GL_LIBS} \
 	${FREEIMAGE_LIBS} \
 	${X11_LIBS} \
-	${xxf86vm_LIBS}
+	${xxf86vm_LIBS} \
+	${xrandr_LIBS}
 
 if MYSQL
 slideshow_SOURCES += browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
