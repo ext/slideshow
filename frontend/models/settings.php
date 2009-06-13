@@ -108,7 +108,7 @@ class Settings {
 		$this->data['Path']['Temp'] = $new_path;
 	}
 
-	function slideshow_executable(){
+	function ensure_binary_path_slash(){
 		// Ensure that path ends with a slash.
 		// It might seem wiser to just check this when setting the path
 		// but it might be edited manually by the user.
@@ -116,7 +116,10 @@ class Settings {
 		if ( substr($path, -1) != '/' ){
 			$this->set_binary_path($path . '/');
 		}
+	}
 
+	function slideshow_executable(){
+		$this->ensure_binary_path_slash();
 		return $this->data['Files']['BinaryPath'] . 'slideshow';
 	}
 
