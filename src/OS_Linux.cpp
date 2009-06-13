@@ -40,10 +40,20 @@ typedef struct __glx_state {
 	Window root;
 	GLXContext ctx;
 	GLXDrawable glx_drawable;
+	int width;
+	int height;
+	bool in_fullscreen;
+	bool fullscreen_available;
 } glx_state;
 
 /* @todo Remove usage of this global state */
 static glx_state g;
+
+#if HAVE_XRANDR
+XRRScreenConfiguration* saved_screen_config = NULL;
+Rotation saved_rotation;
+int saved_size_id = -1;
+#endif
 
 #if HAVE_XF86VIDMODE
 static XF86VidModeModeInfo **vidmodes;
@@ -116,6 +126,11 @@ XVisualInfo* glXVisualFromFBConfigAttributes(Display* dpy, int screen, int* attr
 	return visual;
 }
 
+void store_display_config(Display* dpy, Window root){
+	saved_screen_config = XRRGetScreenInfo(dpy, root);
+	saved_size_id = XRRConfigCurrentConfiguration(saved_screen_config, &saved_rotation);
+}
+
 enum fullscreen_state_t {
 	ENABLE = _NET_WM_STATE_ADD,
 	DISABLE = _NET_WM_STATE_REMOVE,
@@ -150,6 +165,16 @@ bool resolution_available(Display* dpy, Window root, int width, int height){
 	return false;
 }
 
+void enter_fullscreen(glx_state* state){
+	printf("setting resolution to %dx%d\n", state->width, state->height);
+	state->in_fullscreen = true;
+}
+
+void exit_fullscreen(glx_state* state){
+	printf("restoring display\n");
+	state->in_fullscreen = false;
+}
+
 /**
  * Enable, disable or toggle fullscreen mode.
  * @param dpy Specifies the connection to the X server.
@@ -157,6 +182,24 @@ bool resolution_available(Display* dpy, Window root, int width, int height){
  * @param status Action to perform.
  */
 void set_fullscreen(glx_state* state, fullscreen_state_t status){
+	if ( !state->fullscreen_available ){
+		Log::message(Log::Warning, "Graphics: Cannot enter fullscreen mode as the requested resolution %dx%d isn't available.\n", state->width, state->height);
+		return;
+	}
+
+	switch ( status ) {
+		case ENABLE: enter_fullscreen(state); break;
+		case DISABLE: exit_fullscreen(state); break;
+		case TOGGLE:
+			if ( state->in_fullscreen ){
+				exit_fullscreen(state);
+			} else {
+				enter_fullscreen(state);
+			}
+			break;
+	}
+
+	/* Notify the window manager to enable/disable the window decorations */
 	XEvent xev;
 
 	xev.xclient.type =         ClientMessage;
@@ -187,13 +230,12 @@ void OS::init_view(int width, int height, bool fullscreen){
 	Window root = DefaultRootWindow(dpy);
 	XVisualInfo* vi = glXVisualFromFBConfigAttributes(dpy, DefaultScreen(dpy), doubleBufferAttributes);
 
-	if ( fullscreen && !resolution_available(dpy, root, width, height) ){
+	bool fullscreen_available = resolution_available(dpy, root, width, height);
+	if ( fullscreen && !fullscreen_available ){
 		throw XlibException("The specified resolution %dx%d is not available in fullscreen mode", width, height);
 	}
 
-	if ( fullscreen ){
-		Log::message(Log::Verbose, "Graphics: Going fullscreen\n");
-	}
+	store_display_config(dpy, root);
 
 	unsigned long mask = CWColormap | CWEventMask;
 	Colormap cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
@@ -216,6 +258,10 @@ void OS::init_view(int width, int height, bool fullscreen){
 	g.root = root;
 	g.ctx = ctx;
 	g.glx_drawable = glx_drawable;
+	g.width = width;
+	g.height = height;
+	g.in_fullscreen = false;
+	g.fullscreen_available = fullscreen_available;
 
 	generate_atoms(dpy);
 
@@ -226,6 +272,7 @@ void OS::init_view(int width, int height, bool fullscreen){
 	set_cursor(&g, no_cursor);
 
 	if ( fullscreen ){
+		Log::message(Log::Verbose, "Graphics: Going fullscreen\n");
 		set_fullscreen(&g, ENABLE);
 	}
 }
@@ -235,6 +282,10 @@ void OS::swap_gl_buffers(){
 }
 
 void OS::cleanup(){
+	if ( g.in_fullscreen ){
+		exit_fullscreen(&g);
+	}
+
 	set_cursor(&g, default_cursor);
   glXDestroyContext(g.dpy, g.ctx);
 
