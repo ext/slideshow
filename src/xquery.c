@@ -34,6 +34,27 @@ static void resolutions_for_screen(Display* dpy, int screen_num){
 	XRRFreeScreenResources(res);
 }
 
+/**
+ * Parse a display string to a screen number.
+ *
+ * N -> N
+ * :X.N -> N
+ *
+ * @param display_string
+ */
+int parse_screen(const char* display_string){
+	int screen = 0;
+
+	if ( display_string[0] == ':' ){
+		int dummy;
+		sscanf(display_string, ":%d.%d", &dummy, &screen);
+	} else {
+		sscanf(display_string, "%d", &screen);
+	}
+
+	return screen;
+}
+
 int main(int argc, const char* argv[]){
 	Display* dpy = XOpenDisplay(NULL);
 	assert(dpy);
@@ -52,7 +73,7 @@ int main(int argc, const char* argv[]){
 	for ( int i = 1; i < argc; i++ ){
 		if ( strcmp(argv[i], "--screen") == 0 ){
 			if ( ++i<argc ){
-				int screen = atoi(argv[i]);
+				int screen = parse_screen(argv[i]);
 				resolutions_for_screen(dpy, screen);
 			} else {
 				fprintf(stderr, "--screen takes one argument\n");
