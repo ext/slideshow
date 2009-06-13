@@ -37,7 +37,6 @@
 static Display*             dpy;
 static Window                   win;
 static Window                   root;
-static GLXFBConfig*         fbConfigs;
 static GLXContext               ctx;
 static XVisualInfo*         vi;
 static Colormap             cmap;
@@ -80,7 +79,7 @@ int doubleBufferAttributes[] = {
 XVisualInfo* glXVisualFromFBConfigAttributes(Display* dpy, int screen, int* attribList){
 	int configs = 0;
 
-	fbConfigs = glXChooseFBConfig(dpy, screen, attribList, &configs);
+	GLXFBConfig* fbConfigs = glXChooseFBConfig(dpy, screen, attribList, &configs);
 	if ( !fbConfigs ) {
 		throw XlibException( "No double buffered config available\n" );
 	}
