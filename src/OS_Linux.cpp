@@ -52,14 +52,33 @@ enum
 };
 
 int doubleBufferAttributes[] = {
-	GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
-	GLX_RENDER_TYPE,
-	GLX_RGBA_BIT,
-	GLX_DOUBLEBUFFER,  True,
-	GLX_RED_SIZE,      1,
-	GLX_BLUE_SIZE,     1,
+	GLX_DRAWABLE_TYPE,	GLX_WINDOW_BIT,
+	GLX_RENDER_TYPE,	GLX_RGBA_BIT,
+	GLX_DOUBLEBUFFER,	True,
 	None
 };
+
+/**
+ * Return a glXVisualInfo from a FBConfig attribute list.
+ * @param dpy Specifies the connection to the X server.
+ * @param screen  Specifies the screen number.
+ * @param attribList Specifies a list of boolean attributes and integer attribute/value pairs.  The last attribute must be None.
+ */
+XVisualInfo* glXVisualFromFBConfigAttributes(Display* dpy, int screen, int* attribList){
+	int configs = 0;
+
+	fbConfigs = glXChooseFBConfig(dpy, screen, attribList, &configs);
+	if ( !fbConfigs ) {
+		throw XlibException( "No double buffered config available\n" );
+	}
+
+	XVisualInfo* visual = glXGetVisualFromFBConfig(dpy, fbConfigs[0]);
+	if ( !visual ){
+		throw XlibException("No appropriate visual found\n");
+	}
+
+	return visual;
+}
 
 void OS::init_view(int width, int height, bool fullscreen){
 	dpy = XOpenDisplay(NULL);
@@ -70,18 +89,7 @@ void OS::init_view(int width, int height, bool fullscreen){
 
 	root = DefaultRootWindow(dpy);
 
-	int numReturned = 0;
-	fbConfigs = glXChooseFBConfig( dpy, DefaultScreen(dpy), doubleBufferAttributes, &numReturned );
-
-	if ( !fbConfigs ) {
-		throw XlibException( "No double buffered config available\n" );
-	}
-
-	vi = glXGetVisualFromFBConfig(dpy, fbConfigs[0]);
-
-	if( !vi ) {
-		throw XlibException("No appropriate visual found\n");
-	}
+	vi = glXVisualFromFBConfigAttributes(dpy, DefaultScreen(dpy), doubleBufferAttributes);
 
 	unsigned long mask = CWColormap | CWEventMask;
 
