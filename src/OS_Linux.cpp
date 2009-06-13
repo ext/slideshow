@@ -55,12 +55,10 @@ static Atom wm_state;
 Cursor default_cursor = 0;
 Cursor no_cursor = 0;
 
-enum
-{
-  _NET_WM_STATE_REMOVE =0,
-  _NET_WM_STATE_ADD = 1,
-  _NET_WM_STATE_TOGGLE =2
-
+enum {
+	_NET_WM_STATE_REMOVE =0,
+	_NET_WM_STATE_ADD = 1,
+	_NET_WM_STATE_TOGGLE =2
 };
 
 void generate_cursors(Display* dpy, Window win){
@@ -104,9 +102,9 @@ XVisualInfo* glXVisualFromFBConfigAttributes(Display* dpy, int screen, int* attr
 }
 
 enum fullscreen_state_t {
-	ENABLE = (_NET_WM_STATE_ADD),
-	DISABLE = (_NET_WM_STATE_REMOVE),
-	TOGGLE = (_NET_WM_STATE_TOGGLE)
+	ENABLE = _NET_WM_STATE_ADD,
+	DISABLE = _NET_WM_STATE_REMOVE,
+	TOGGLE = _NET_WM_STATE_TOGGLE
 };
 
 void set_fullscreen(Display* dpy, Window win, fullscreen_state_t status){
