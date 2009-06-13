@@ -1,10 +1,6 @@
 SUBDIRS = IPC state transitions
 
-AM_CPPFLAGS = \
-	${dbus_CFLAGS} \
-	${libdaemon_CFLAGS} \
-	-I${top_srcdir}/include \
-	-pipe -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
+bin_PROGRAMS = slideshow xquery
 
 if GCCPARSER
 .cpp.o:
@@ -12,7 +8,11 @@ if GCCPARSER
 	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
 endif
 
-bin_PROGRAMS = slideshow
+slideshow_CPPFLAGS = \
+	${dbus_CFLAGS} \
+	${libdaemon_CFLAGS} \
+	-I${top_srcdir}/include \
+	-pipe -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
 
 slideshow_SOURCES = \
 	${top_srcdir}/include/Browser.h \
@@ -52,3 +52,7 @@ if MYSQL
 slideshow_SOURCES += browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
 slideshow_LDADD += ${MYSQL_LIBS}
 endif
+
+xquery_CFLAGS = -pipe -Wall -Wextra
+xquery_SOURCES = xquery.c
+xquery_LDADD = ${X11_LIBS} ${xrandr_LIBS}

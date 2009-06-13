@@ -8,6 +8,7 @@ AC_PROG_CXX
 AC_PROG_LIBTOOL
 LT_INIT
 AC_LIBTOOL_DLOPEN
+AC_PROG_CC_C99
 
 AX_CHECK_GLU
 
@@ -137,6 +138,17 @@ PKG_CHECK_MODULES(xxf86vm, [xxf86vm],
 	
 AC_SUBST(xxf86vm_CFLAGS)
 AC_SUBST(xxf86vm_LIBS)
+
+PKG_CHECK_MODULES(xrandr, [xrandr],
+	[
+		AC_DEFINE(HAVE_XRANDR, 1, [Define if Xrandr development libraries is available])
+	],
+	[
+		AC_MSG_ERROR([Required Xrandr development libraries not found])
+	])
+
+AC_SUBST(xrandr_CFLAGS)
+AC_SUBST(xrandr_LIBS)
 
 dnl #######################################################################
 dnl # MySQL
