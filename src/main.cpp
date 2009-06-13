@@ -49,6 +49,7 @@ int main( int argc, const char* argv[] ){
 		}
 
 		initTime();
+		moduleloader_init(Kernel::pluginpath());
 
 		Log::initialize("slideshow.log");
 		Log::set_level( (Log::Severity)arguments.loglevel );
@@ -58,6 +59,9 @@ int main( int argc, const char* argv[] ){
 		switch ( arguments.mode ){
 			case Kernel::ForegroundMode: application = new ForegroundApp(arguments); break;
 			case Kernel::DaemonMode: application = new DaemonApp(arguments); break;
+			case Kernel::ListTransitionMode:
+				Kernel::print_transitions();
+				throw ExitException();
 			default:
 				throw KernelException("No valid mode. This should not happen, please report this to the maintainer. Modeid: %d\n", arguments.mode);
 		}
@@ -67,6 +71,8 @@ int main( int argc, const char* argv[] ){
 		application->cleanup();
 
 		delete application;
+
+		moduleloader_cleanup();
 
 		Log::deinitialize();
 

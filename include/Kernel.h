@@ -50,6 +50,8 @@ class Kernel {
 			ListTransitionMode
 		};
 
+		static void print_transitions();
+
 		Kernel(const argument_set_t& arg);
 		virtual ~Kernel();
 
@@ -81,12 +83,12 @@ class Kernel {
 		 */
 		static char* real_path(const char* filename);
 
+		static const char* datapath();
+		static const char* pluginpath();
 	protected:
 		static const char* pidpath();
 
 	private:
-		static const char* datapath();
-		static const char* pluginpath();
 
 		void create_pidpath();
 
@@ -96,7 +98,6 @@ class Kernel {
 
 		void print_licence_statement();
 		void print_cli_arguments(int argc, const char* argv[]);
-		void print_transitions();
 
 		Browser* browser(){ return _browser; }
 

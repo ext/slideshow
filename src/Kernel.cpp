@@ -79,8 +79,6 @@ Kernel::~Kernel(){
 void Kernel::init(){
 	Log::message(Log::Info, "Kernel: Starting slideshow\n");
 
-	moduleloader_init(pluginpath());
-
 	init_graphics();
 	init_IPC();
 	init_browser();
@@ -94,8 +92,6 @@ void Kernel::cleanup(){
 	delete _ipc;
 	free(pidfile);
 	free(_password);
-
-	moduleloader_cleanup();
 
 	_state = NULL;
 	_browser = NULL;
