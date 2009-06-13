@@ -35,9 +35,11 @@ static XVisualInfo*         vi;
 static Colormap             cmap;
 static XSetWindowAttributes swa;
 static XF86VidModeModeInfo **vidmodes;
+
 static Atom                     wm_delete_window;
-static Atom                     fullScreen;
-static Atom                     wmState;
+static Atom                     wm_fullscreen;
+static Atom                     wm_state;
+
 Cursor                          default_cursor = 0;
 Cursor                          no_cursor = 0;
 
@@ -112,9 +114,9 @@ void OS::init_view(int width, int height, bool fullscreen){
 	ctx = glXCreateContext(dpy, vi, NULL, GL_TRUE);
 	glXMakeCurrent(dpy, win, ctx);
 
-	wm_delete_window = XInternAtom(dpy, "WM_DELETE_WINDOW", 0);
-	fullScreen = XInternAtom(dpy,"_NET_WM_STATE_FULLSCREEN", False);
-	wmState = XInternAtom(dpy, "_NET_WM_STATE", False);
+	wm_delete_window = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
+	wm_fullscreen = XInternAtom(dpy,"_NET_WM_STATE_FULLSCREEN", False);
+	wm_state = XInternAtom(dpy, "_NET_WM_STATE", False);
 
 	XSetWMProtocols(dpy, win, &wm_delete_window, 1);
 
@@ -140,10 +142,10 @@ void OS::init_view(int width, int height, bool fullscreen){
 		xev.xclient.serial = 0;
 		xev.xclient.send_event=True;
 		xev.xclient.window=win;
-		xev.xclient.message_type=wmState;
+		xev.xclient.message_type=wm_state;
 		xev.xclient.format=32;
 		xev.xclient.data.l[0] = (_NET_WM_STATE_ADD);
-		xev.xclient.data.l[1] = fullScreen;
+		xev.xclient.data.l[1] = wm_fullscreen;
 		xev.xclient.data.l[2] = 0;
 
 		XSendEvent(dpy, DefaultRootWindow(dpy), False, SubstructureRedirectMask | SubstructureNotifyMask,&xev);
@@ -184,10 +186,10 @@ void OS::poll_events(bool& running){
 					xev.xclient.serial = 0;
 					xev.xclient.send_event=True;
 					xev.xclient.window=win;
-					xev.xclient.message_type=wmState;
+					xev.xclient.message_type=wm_state;
 					xev.xclient.format=32;
 					xev.xclient.data.l[0] = (_NET_WM_STATE_TOGGLE);
-					xev.xclient.data.l[1] = fullScreen;
+					xev.xclient.data.l[1] = wm_fullscreen;
 					xev.xclient.data.l[2] = 0;
 
 					XSendEvent(dpy, DefaultRootWindow(dpy), False, SubstructureRedirectMask | SubstructureNotifyMask,&xev);
