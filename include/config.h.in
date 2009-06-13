@@ -75,9 +75,6 @@
 /* Define to 1 if you have the <vfork.h> header file. */
 #undef HAVE_VFORK_H
 
-/* Define if xxf86vm development libraries is available */
-#undef HAVE_VIDMODE
-
 /* Define to 1 if you have the <windows.h> header file. */
 #undef HAVE_WINDOWS_H
 
@@ -90,9 +87,18 @@
 /* Define if X11 development libraries is available */
 #undef HAVE_X11
 
+/* Define if xxf86vm development libraries is available */
+#undef HAVE_XF86VIDMODE
+
+/* Define if Xrandr development libraries is available */
+#undef HAVE_XRANDR
+
 /* Define to the sub-directory in which libtool stores uninstalled libraries.
    */
 #undef LT_OBJDIR
+
+/* Define to 1 if your C compiler doesn't accept -c and -o together. */
+#undef NO_MINUS_C_MINUS_O
 
 /* Name of package */
 #undef PACKAGE

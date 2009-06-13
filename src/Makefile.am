@@ -22,7 +22,8 @@ slideshow_SOURCES = \
 	${top_srcdir}/include/IPC.h \
 	${top_srcdir}/include/OS.h \
 	${top_srcdir}/include/Transition.h \
-	argument_parser.c ${top_srcdir}/include/argument_parser.h \
+	${top_srcdir}/include/argument_parser.h \
+	argument_parser.c \
 	browser_context.cpp \
 	exception.cpp \
 	Browser.cpp ${top_srcdir}/include/Browser.h \
