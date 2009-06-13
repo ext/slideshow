@@ -44,7 +44,7 @@ class configuration extends Module {
 				array(3, 2), // NTSC
 				array(5, 3),
 				array(5, 4), // SXGA, QSXGA
-				array(8, 5), // 16:10 "Widescreen"
+				array(16, 10), // 16:10 "Widescreen"
 				array(16, 9), // 16:9 Widescreen
 				array(17, 9)
 			);
