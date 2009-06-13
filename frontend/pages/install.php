@@ -90,7 +90,7 @@ class Install extends Module {
 
 	 	case 2:
 		  $ret['basepath'] = $_SESSION['config']->base_path();
-		  $ret['binpath'] = $_SESSION['config']->binary();
+		  $ret['binpath'] = $_SESSION['config']->slideshow_executable();
 
 	 		// This is a bit ugly but to suppres error messages it assumes paths are valid
 	 		$ret['basepath_found'] = isset($_GET['basepath_found']) ? $_GET['basepath_found'] : true;
@@ -154,7 +154,7 @@ class Install extends Module {
 			$basepath_writable = is_writable($basepath);
 
 			$binpath = $_POST['binpath'];
-			$_SESSION['config']->set_binary($binpath);
+			$_SESSION['config']->set_binary_path($binpath);
 			$binpath_valid = (file_exists($binpath)) && (!is_dir($binpath )) && (is_executable($binpath));
 
 			if ( $basepath_found && $basepath_writable && $binpath_valid ){

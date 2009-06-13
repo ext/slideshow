@@ -37,7 +37,7 @@ $daemon = NULL;
 try {
 	try {
 		$settings = new Settings();
-		$daemon = new SlideshowInst($settings->binary(), $settings->pid_file());
+		$daemon = new SlideshowInst($settings->slideshow_executable(), $settings->pid_file());
 	} catch ( InvalidSettings $e ){
 		if ( $path->module() != 'install'){
 			$path = new Path( 'install', 'welcome' );

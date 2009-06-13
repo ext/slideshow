@@ -108,11 +108,11 @@ class Settings {
 		$this->data['Path']['Temp'] = $new_path;
 	}
 
-	function binary(){
-		return $this->data['Files']['BinaryPath'];
+	function slideshow_executable(){
+		return $this->data['Files']['BinaryPath'] . 'slideshow';
 	}
 
-	function set_binary($new_path){
+	function set_binary_path($new_path){
 		$this->data['Files']['BinaryPath'] = $new_path;
 	}
 
