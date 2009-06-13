@@ -63,6 +63,17 @@ enum
 
 };
 
+void generate_cursors(Display* dpy, Window win){
+	Pixmap blank;
+	XColor dummy;
+	char data[1] = {0};
+
+	blank = XCreateBitmapFromData (dpy, win, data, 1, 1);
+	no_cursor = XCreatePixmapCursor(dpy, blank, blank, &dummy, &dummy, 0, 0);
+	XFreePixmap (dpy, blank);
+	default_cursor = XCreateFontCursor(dpy, XC_left_ptr);
+}
+
 int doubleBufferAttributes[] = {
 	GLX_DRAWABLE_TYPE,	GLX_WINDOW_BIT,
 	GLX_RENDER_TYPE,	GLX_RGBA_BIT,
@@ -155,19 +166,8 @@ void OS::init_view(int width, int height, bool fullscreen){
 
 	XSetWMProtocols(dpy, win, &wm_delete_window, 1);
 
-
-	Pixmap blank;
-	XColor dummy;
-	char data[1] = {0};
-	//Cursor cursor;
-
 	/* make a blank cursor */
-	blank = XCreateBitmapFromData (dpy, win, data, 1, 1);
-	//if(blank == None) fprintf(stderr, "error: out of memory.\n");
-	no_cursor = XCreatePixmapCursor(dpy, blank, blank, &dummy, &dummy, 0, 0);
-	XFreePixmap (dpy, blank);
-
-	default_cursor = XCreateFontCursor(dpy, XC_left_ptr);
+	generate_cursors(dpy, win);
 
     XDefineCursor(dpy, win, no_cursor);
 
