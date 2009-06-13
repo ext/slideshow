@@ -18,6 +18,7 @@
  */
 
 require('../core/xml_settings.php');
+require('../models/xquery.php');
 
 class configuration extends Module {
 	public function index(){
@@ -25,6 +26,9 @@ class configuration extends Module {
 
 		$xmlsettings = new XMLSettings('../settings.xml');
 		$xmlsettings->merge_settings('../settings.json');
+
+		$xquery = new xquery( $settings->xquery_executable() );
+		$displays = $xquery->get_displays();
 
 		$temp = NULL;
 		$rc = 0;
@@ -69,6 +73,7 @@ class configuration extends Module {
 		return array(
 			'settings' => $xmlsettings->as_array(),
 			'environment' => $settings->environment(),
+			'displays' => $displays,
 			'resolution' => $resolution
 		);
 	}

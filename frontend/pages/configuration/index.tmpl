@@ -77,8 +77,7 @@
 <?			}
 			break;
 
-	case 'display':
-			$displays = array(':0.0',':0.1'); ?>
+	case 'display': ?>
 					<select name="<?=$item->name?>">
 <?					foreach ( $displays as $screen ){ ?>
 						<option value="<?=$screen?>"<?=$screen == $item->value?"selected=\"selected\"":""?>><?=$screen?></option>

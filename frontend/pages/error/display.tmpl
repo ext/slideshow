@@ -26,11 +26,15 @@
 <? } else if ( $code == EXECUTABLE_ERROR ){ ?>
 		<h1>Daemon error</h1>
 		<p><?=$message?></p>
+<? } else if ( $code == XQUERY_ERROR ){ ?>
+		<h1>xquery error <?=$rc?></h1>
+		<p><?=$message?></p>
+		<p><pre><?=$stdout?></pre></p>
 <? } else if ( $code == FILE_NOT_FOUND ){ ?>
 		<h1>File not found</h1><br/>
 <? } else { ?>
 		<h1>Unknown error</h1>
 		<p><?=$message?></p>
 <? } ?>
-  		
+
 	</div>

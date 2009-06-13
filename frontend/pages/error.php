@@ -22,6 +22,8 @@ class error extends Module {
 		return array(
 			'message' => $exception->getMessage(),
 			'code' => $exception->getCode(),
+			'rc' => $exception->get_rc(),
+			'stdout' => $exception->get_stdout(),
 		);
 	}
 }

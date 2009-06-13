@@ -18,11 +18,18 @@
  */
 
 class PageException extends Exception {
+	function get_rc(){
+		return 0;
+	}
 
+	function get_stdout(){
+		return "";
+	}
 }
 
 define('UPLOAD_ERROR', 1);
 define('EXECUTABLE_ERROR', 2);
+define('XQUERY_ERROR', 3);
 define('FILE_NOT_FOUND', 404);
 
 ?>
