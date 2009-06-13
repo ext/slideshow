@@ -181,10 +181,7 @@ void OS::init_view(int width, int height, bool fullscreen){
 	}
 
 	Window root = DefaultRootWindow(dpy);
-
 	XVisualInfo* vi = glXVisualFromFBConfigAttributes(dpy, DefaultScreen(dpy), doubleBufferAttributes);
-
-	unsigned long mask = CWColormap | CWEventMask;
 
 	if ( fullscreen && !resolution_available(dpy, root, width, height) ){
 		throw XlibException("The specified resolution %dx%d is not available in fullscreen mode", width, height);
@@ -194,8 +191,8 @@ void OS::init_view(int width, int height, bool fullscreen){
 		Log::message(Log::Verbose, "Graphics: Going fullscreen\n");
 	}
 
+	unsigned long mask = CWColormap | CWEventMask;
 	Colormap cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
-
 	XSetWindowAttributes swa;
 	swa.colormap = cmap;
 	swa.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask ;
