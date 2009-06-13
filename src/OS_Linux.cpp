@@ -73,6 +73,10 @@ void generate_cursors(Display* dpy, Window win){
 	default_cursor = XCreateFontCursor(dpy, XC_left_ptr);
 }
 
+void set_cursor(glx_state* state, Cursor cursor){
+	XDefineCursor(state->dpy, state->win, cursor);
+}
+
 int doubleBufferAttributes[] = {
 	GLX_DRAWABLE_TYPE,	GLX_WINDOW_BIT,
 	GLX_RENDER_TYPE,	GLX_RGBA_BIT,
@@ -198,8 +202,6 @@ void OS::init_view(int width, int height, bool fullscreen){
 	/* make a blank cursor */
 	generate_cursors(dpy, win);
 
-    XDefineCursor(dpy, win, no_cursor);
-
 	if ( fullscreen ){
 		set_fullscreen(dpy, root, ENABLE);
 	}
@@ -211,6 +213,8 @@ void OS::init_view(int width, int height, bool fullscreen){
 	g.root = root;
 	g.ctx = ctx;
 	g.glx_drawable = glx_drawable;
+
+	set_cursor(&g, no_cursor);
 }
 
 void OS::swap_gl_buffers(){
@@ -218,7 +222,7 @@ void OS::swap_gl_buffers(){
 }
 
 void OS::cleanup(){
-  XDefineCursor(g.dpy, g.win, default_cursor);
+	set_cursor(&g, default_cursor);
   glXDestroyContext(g.dpy, g.ctx);
 
   if( g.win && g.dpy ){
