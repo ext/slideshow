@@ -54,8 +54,18 @@ int main(int argc, const char* argv[]){
 			if ( ++i<argc ){
 				int screen = atoi(argv[i]);
 				resolutions_for_screen(dpy, screen);
-				continue;
+			} else {
+				fprintf(stderr, "--screen takes one argument\n");
 			}
+			continue;
+		}
+
+		if ( strcmp(argv[i], "--get-screens") == 0 ){
+			int screen_count = XScreenCount(dpy);
+			for ( int screen_num = 0; screen_num < screen_count; screen_num++ ){
+				printf(":0.%d\n", screen_num);
+			}
+			continue;
 		}
 	}
 
