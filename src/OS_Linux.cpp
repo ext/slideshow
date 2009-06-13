@@ -16,6 +16,7 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
 #include "OS.h"
 #include "Log.h"
 //#include <cstdio>
