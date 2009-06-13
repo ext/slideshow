@@ -62,6 +62,16 @@ enum {
 	_NET_WM_STATE_TOGGLE =2
 };
 
+/**
+ * Generates X interal atoms.
+ * @param dpy Specifies the connection to the X server.
+ */
+void generate_atoms(Display* dpy){
+	wm_delete_window = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
+	wm_fullscreen = XInternAtom(dpy,"_NET_WM_STATE_FULLSCREEN", False);
+	wm_state = XInternAtom(dpy, "_NET_WM_STATE", False);
+}
+
 void generate_cursors(Display* dpy, Window win){
 	Pixmap blank;
 	XColor dummy;
@@ -193,9 +203,7 @@ void OS::init_view(int width, int height, bool fullscreen){
 	GLXContext ctx = glXCreateContext(dpy, vi, NULL, GL_TRUE);
 	glXMakeCurrent(dpy, win, ctx);
 
-	wm_delete_window = XInternAtom(dpy, "WM_DELETE_WINDOW", False);
-	wm_fullscreen = XInternAtom(dpy,"_NET_WM_STATE_FULLSCREEN", False);
-	wm_state = XInternAtom(dpy, "_NET_WM_STATE", False);
+	generate_atoms(dpy);
 
 	XSetWMProtocols(dpy, win, &wm_delete_window, 1);
 
