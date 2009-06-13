@@ -150,6 +150,12 @@ bool resolution_available(Display* dpy, Window root, int width, int height){
 	return false;
 }
 
+/**
+ * Enable, disable or toggle fullscreen mode.
+ * @param dpy Specifies the connection to the X server.
+ * @param win Specifies the X window.
+ * @param status Action to perform.
+ */
 void set_fullscreen(Display* dpy, Window win, fullscreen_state_t status){
 	XEvent xev;
 
