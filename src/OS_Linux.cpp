@@ -222,12 +222,11 @@ void OS::init_view(int width, int height, bool fullscreen){
 
 	/* make a blank cursor */
 	generate_cursors(dpy, win);
+	set_cursor(&g, no_cursor);
 
 	if ( fullscreen ){
 		set_fullscreen(&g, ENABLE);
 	}
-
-	set_cursor(&g, no_cursor);
 }
 
 void OS::swap_gl_buffers(){
