@@ -25,8 +25,6 @@ static void resolutions_for_screen(Display* dpy, int screen_num){
 	XRRScreenResources* res = XRRGetScreenResources (dpy, root);
 	assert(res);
 
-	printf("screen :0.%d\n", screen_num);
-
 	for ( int o = 0; o < res->nmode; o++ ){
 		printf("\t%d %ux%u@%.1f\n", o, res->modes[o].width, res->modes[o].height, mode_refresh(&res->modes[o]));
 	}
@@ -64,6 +62,7 @@ int main(int argc, const char* argv[]){
 		printf("%d available screens\n", screen_count);
 
 		for ( int screen_num = 0; screen_num < screen_count; screen_num++ ){
+			printf("screen :0.%d\n", screen_num);
 			resolutions_for_screen(dpy, screen_num);
 		}
 
