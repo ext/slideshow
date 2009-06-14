@@ -29,7 +29,12 @@ class configuration extends Module {
 
 		$xquery = new xquery( $settings->xquery_executable() );
 		$displays = $xquery->get_displays();
-		$resolution = $xquery->resolutions_for_display($displays[0]);
+
+		// This isn't really good as if the users switches display the list
+		// should update available resolutions. Perhaps we should send an array
+		// with display as key and resolution as value.
+		// See #89'
+		$resolution = $xquery->resolutions_for_display($settings->display());
 
 		return array(
 			'settings' => $xmlsettings->as_array(),
