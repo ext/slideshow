@@ -22,6 +22,7 @@
 #include "Transition.h"
 #include <ltdl.h>
 #include <cstdio>
+#include <cstdlib>
 
 struct module_context_t {
 	lt_dlhandle handle;
