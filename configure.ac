@@ -6,9 +6,9 @@ AC_CONFIG_HEADERS([include/config.h])
 
 AC_PROG_CXX
 AM_PROG_CC_C_O
+AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 LT_INIT
-AC_LIBTOOL_DLOPEN
 AC_PROG_CC_C99
 
 AX_CHECK_GLU
@@ -84,12 +84,9 @@ AC_SUBST(libportable_LIBS)
 dnl #######################################################################
 dnl # libdaemon
 dnl #######################################################################
-PKG_CHECK_MODULES(libdaemon, [libdaemon],
+PKG_CHECK_MODULES(libdaemon, [libdaemon >= 0.13],
 	[
 		AC_DEFINE(HAVE_LIBDAEMON, 1, [Define if libdaemon is available])
-	],
-	[
-		AC_MSG_ERROR([Required libdaemon not found])
 	])
 
 AC_SUBST(libdaemon_CFLAGS)
