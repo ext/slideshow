@@ -45,7 +45,7 @@ class Log {
 
 		// Get the FD, this is needed by the daemon as it automatically closes all
 		// FD's unless explicitly specified.
-		static int fileno();
+		static int file_no();
 
 	private:
 		Log(){}
