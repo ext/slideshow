@@ -137,6 +137,6 @@ void Log::flush(){
 	fflush(_file);
 }
 
-int Log::fileno(){
+int Log::file_no(){
 	return _file->_fileno;
 }
