@@ -123,6 +123,11 @@ class Settings {
 		return $this->data['Files']['BinaryPath'] . 'slideshow';
 	}
 
+	function slidetool_executable(){
+		$this->ensure_binary_path_slash();
+		return $this->data['Files']['BinaryPath'] . 'slidetool';
+	}
+
 	function xquery_executable(){
 		$this->ensure_binary_path_slash();
 		return $this->data['Files']['BinaryPath'] . 'xquery';
