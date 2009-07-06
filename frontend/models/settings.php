@@ -118,19 +118,21 @@ class Settings {
 		}
 	}
 
-	function slideshow_executable(){
+	private function executable_path($name){
 		$this->ensure_binary_path_slash();
-		return $this->data['Files']['BinaryPath'] . 'slideshow';
+		return $this->data['Files']['BinaryPath'] . $name;
+	}
+
+	function slideshow_executable(){
+		return $this->executable_path('slideshow');
 	}
 
 	function slidetool_executable(){
-		$this->ensure_binary_path_slash();
-		return $this->data['Files']['BinaryPath'] . 'slidetool';
+		return $this->executable_path('slidetool');
 	}
 
 	function xquery_executable(){
-		$this->ensure_binary_path_slash();
-		return $this->data['Files']['BinaryPath'] . 'xquery';
+		return $this->executable_path('xquery');
 	}
 
 	function set_binary_path($new_path){
