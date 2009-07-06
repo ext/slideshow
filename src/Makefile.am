@@ -1,6 +1,6 @@
 SUBDIRS = IPC state transitions
 
-bin_PROGRAMS = slideshow xquery
+bin_PROGRAMS = slideshow xquery slidetool
 
 if GCCPARSER
 .cpp.o:
@@ -58,3 +58,6 @@ endif
 xquery_CFLAGS = -pipe -Wall -Wextra
 xquery_SOURCES = xquery.c
 xquery_LDADD = ${X11_LIBS} ${xrandr_LIBS}
+
+slidetool_CFLAGS = -pipe -Wall -Wextra
+slidetool_SOURCES = slidetool.c
