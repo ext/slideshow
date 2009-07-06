@@ -108,7 +108,7 @@ class Settings {
 		$this->data['Path']['Temp'] = $new_path;
 	}
 
-	function ensure_binary_path_slash(){
+	private function ensure_binary_path_slash(){
 		// Ensure that path ends with a slash.
 		// It might seem wiser to just check this when setting the path
 		// but it might be edited manually by the user.
