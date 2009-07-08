@@ -1,5 +1,6 @@
 SUBDIRS = IPC state transitions
 
+lib_LTLIBRARIES = libslide.la
 bin_PROGRAMS = slideshow xquery slidetool
 
 if GCCPARSER
@@ -38,6 +39,7 @@ slideshow_SOURCES = \
 	browsers/dummybrowser.cpp browsers/dummybrowser.h
 
 slideshow_LDADD = \
+	-lslide \
 	IPC/libipc.a \
 	state/libfsm.a \
 	-lltdl \
@@ -55,10 +57,15 @@ slideshow_SOURCES += browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
 slideshow_LDADD += ${MYSQL_LIBS}
 endif
 
+libslide_la_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra ${wand_CFLAGS}
+libslide_la_SOURCES = slidelib.c
+libslide_la_LIBADD = ${json_LIBS} ${wand_LIBS}
+libslide_la_LDFLAGS = -shared -avoid-version
+
 xquery_CFLAGS = -pipe -Wall -Wextra
 xquery_SOURCES = xquery.c
 xquery_LDADD = ${X11_LIBS} ${xrandr_LIBS}
 
-slidetool_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra ${wand_CFLAGS}
+slidetool_CFLAGS = -pipe -Wall -Wextra
 slidetool_SOURCES = slidetool.c
-slidetool_LDADD = ${json_LIBS} ${wand_LIBS}
+slidetool_LDADD = -lslide
