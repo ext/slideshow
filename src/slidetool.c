@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <assert.h>
 #include <json/json.h>
+#include <wand/MagickWand.h>
 
 static const int DEFAULT_MASK = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
 static const int USAGE_ERROR = 1;
@@ -121,11 +122,41 @@ static resolution_t resolution_from_string(const char* str){
 	return res;
 }
 
+char* __attribute__ ((format (printf, 1, 2))) asprintf_(const char* fmt, ...) {
+	va_list arg;
+	va_start(arg, fmt);
+	char* buf;
+	if ( vasprintf(&buf, fmt, arg) < 0 ){
+		va_end(arg);
+		print_error("out-of-memory\n");
+		return NULL;
+	}
+	va_end(arg);
+	return buf;
+}
+
 int slide_resample(slide_t* target, resolution_t* resolution, resolution_t* virtual_resolution){
 	/* ignore types for now, assume image */
 	/* also, images only have exactly one datafile, assue that is true too */
 
-	printf("datafile: %s\n", target->datafiles[0]);
+	MagickWandGenesis();
+	MagickWand* image = NewMagickWand();
+
+	char* datafile = asprintf_("%s/%s", target->path.data_path, target->datafiles[0]);
+	printf("datafile: %s\n", datafile);
+
+	MagickBooleanType status = MagickReadImage(image, datafile);
+	free(datafile);
+
+	if ( status == MagickFalse ){
+		ExceptionType severity;
+		char *description = MagickGetException(image, &severity);
+		print_error("%s\n",description);
+		MagickRelinquishMemory(description);
+		return 3;
+	}
+
+
 
 	return 0;
 }
@@ -145,12 +176,16 @@ void slide_type_from_json(slide_t* slide, struct json_object* meta){
 void slide_datafiles_from_json(slide_t* slide, struct json_object* meta){
 	struct json_object* data = json_object_object_get(meta, "data");
 	int nr_datafiles = json_object_array_length(data);
-	slide->datafiles = (const char**)malloc(sizeof(char*) * nr_datafiles);
-	for ( int i = 0; i < nr_datafiles; i++ ){
+	slide->datafiles = (const char**)malloc(sizeof(char*) * (nr_datafiles+1)); /* last is a sentinel */
+
+	int i;
+	for ( i = 0; i < nr_datafiles; i++ ){
 		 struct json_object* file = json_object_array_get_idx(data, i);
 		 slide->datafiles[i] = json_object_get_string_copy(file);
 		 json_object_put(file);
 	}
+	slide->datafiles[i] = NULL;
+
 	json_object_put(data);
 }
 
