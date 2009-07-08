@@ -42,8 +42,8 @@ class Graphics {
 		void swap_textures();
 
 		transition_module_t* _transition;
-		unsigned int texture_0;
-		unsigned int texture_1;
+		unsigned int _texture_0;
+		unsigned int _texture_1;
 		int _width;
 		int _height;
 };

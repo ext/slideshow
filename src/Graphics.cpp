@@ -54,8 +54,8 @@ static FIBITMAP* GenericLoader(const char* lpszPathName, int flag = 0) {
 }
 Graphics::Graphics(int width, int height, bool fullscreen):
 	_transition(NULL),
-	texture_0(0),
-	texture_1(0),
+	_texture_0(0),
+	_texture_1(0),
 	_width(width),
 	_height(height){
 
@@ -122,20 +122,20 @@ void Graphics::gl_set_matrices(){
 }
 
 void Graphics::gl_init_textures(){
-	glGenTextures(1, &texture_0);
-	glGenTextures(1, &texture_1);
+	glGenTextures(1, &_texture_0);
+	glGenTextures(1, &_texture_1);
 }
 
 void Graphics::gl_cleanup_textures(){
-	glDeleteTextures(1, &texture_0);
-	glDeleteTextures(1, &texture_1);
+	glDeleteTextures(1, &_texture_0);
+	glDeleteTextures(1, &_texture_1);
 }
 
 void Graphics::render(float state){
 	transition_context_t context;
 
-	context.texture[0] = texture_0;
-	context.texture[1] = texture_1;
+	context.texture[0] = _texture_0;
+	context.texture[1] = _texture_1;
 	context.state = state;
 
 	if ( _transition ){
@@ -157,7 +157,7 @@ void Graphics::load_image(const char* name){
 	int width = 1;
 	int height = 1;
 
-	glBindTexture(GL_TEXTURE_2D, texture_0);
+	glBindTexture(GL_TEXTURE_2D, _texture_0);
 
 	if ( name ){
 		char* path = Kernel::real_path(name);
@@ -200,9 +200,9 @@ void Graphics::load_image(const char* name){
 }
 
 void Graphics::swap_textures(){
-	unsigned int tmp = texture_0;
-	texture_0 = texture_1;
-	texture_1 = tmp;
+	unsigned int tmp = _texture_0;
+	_texture_0 = _texture_1;
+	_texture_1 = tmp;
 }
 
 void Graphics::set_transition(transition_module_t* module){
