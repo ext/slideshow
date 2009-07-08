@@ -89,7 +89,7 @@ slideshow_DEPENDENCIES = IPC/libipc.a state/libfsm.a \
 	$(am__DEPENDENCIES_2)
 am_slidetool_OBJECTS = slidetool-slidetool.$(OBJEXT)
 slidetool_OBJECTS = $(am_slidetool_OBJECTS)
-slidetool_DEPENDENCIES = $(am__DEPENDENCIES_1)
+slidetool_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 slidetool_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(slidetool_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
@@ -279,6 +279,8 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
+wand_CFLAGS = @wand_CFLAGS@
+wand_LIBS = @wand_LIBS@
 xrandr_CFLAGS = @xrandr_CFLAGS@
 xrandr_LIBS = @xrandr_LIBS@
 xxf86vm_CFLAGS = @xxf86vm_CFLAGS@
@@ -312,9 +314,9 @@ slideshow_LDADD = IPC/libipc.a state/libfsm.a -lltdl \
 xquery_CFLAGS = -pipe -Wall -Wextra
 xquery_SOURCES = xquery.c
 xquery_LDADD = ${X11_LIBS} ${xrandr_LIBS}
-slidetool_CFLAGS = -pipe -Wall -Wextra
+slidetool_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra ${wand_CFLAGS}
 slidetool_SOURCES = slidetool.c
-slidetool_LDADD = ${json_LIBS}
+slidetool_LDADD = ${json_LIBS} ${wand_LIBS}
 all: all-recursive
 
 .SUFFIXES:

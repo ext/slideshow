@@ -10,6 +10,7 @@ AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 LT_INIT
 AC_PROG_CC_C99
+AC_CHECK_FUNCS([asprintf])
 
 AX_CHECK_GLU
 
@@ -189,5 +190,10 @@ dnl # json
 dnl #######################################################################
 PKG_CHECK_MODULES(json, [json])
 AC_SUBST(json_LIBS)
+
+dnl #######################################################################
+dnl # ImageMagick Wand
+dnl #######################################################################
+PKG_CHECK_MODULES(wand, [Wand])
 
 AC_OUTPUT
