@@ -131,12 +131,6 @@ class Slides extends Module {
 
 		global $settings;
 
-		$convert = $settings->convert_binary();
-
-		if ( !file_exists($convert) ){
-			throw new Exception("Could not find ImageMagick 'convert' executable.");
-		}
-
 		$name = $_FILES['filename']['name'];
 		$hash = md5(uniqid());
 		$fullpath = "{$settings->image_path()}/{$hash}_$name";
@@ -193,6 +187,9 @@ class Slides extends Module {
 		global $settings;
 
 		$convert = $settings->convert_binary();
+		if ( !is_executable($convert) ){
+			throw new Exception("Could not find ImageMagick 'convert' executable.");
+		}
 
 		if ( empty($virtual_resolution) ){
 			$this->convert_exec("" .
