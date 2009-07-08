@@ -20,7 +20,7 @@ State* SwitchState::action(){
 		gfx()->load_image( filename );
 	} catch ( ... ) {
 		Log::message(Log::Warning, "Kernel: Failed to load image '%s'\n", filename);
-		return this;
+		return new ViewState(this);
 	}
 
 	return new TransitionState(this);
