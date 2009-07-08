@@ -28,7 +28,7 @@ class Module {
 	private $_data = array();
 	private $_name = 'undefined';
 
-	function factory( $module ){
+	static function factory( $module ){
 		$fullpath = "../pages/$module.php";
 
 		if ( !file_exists($fullpath) ){
