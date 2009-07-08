@@ -3,6 +3,9 @@
 /* Data directory */
 #undef DATA_DIR
 
+/* Define to 1 if you have the `asprintf' function. */
+#undef HAVE_ASPRINTF
+
 /* Define if D-Bus is available */
 #undef HAVE_DBUS
 
