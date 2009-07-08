@@ -24,6 +24,7 @@ require_once('../db_functions.inc.php');
 require_once('../core/module.inc.php');
 require_once('../core/slide_template.php');
 require_once('../core/page_exception.php');
+require_once('../models/slide.php');
 
 class UploadException extends PageException {
 	public function __construct($message){
@@ -132,24 +133,21 @@ class Slides extends Module {
 		global $settings;
 
 		$name = $_FILES['filename']['name'];
-		$hash = md5(uniqid());
-		$fullpath = "{$settings->image_path()}/{$hash}_$name";
+		$temppath = "{$settings->temp_path()}/$name";
 
-		$uploaded = $_FILES['filename']['tmp_name'];
-
-		if ( !is_uploaded_file( $uploaded ) ){
-			die("Handling file that was not uploaded");
-		}
+		move_uploaded_file($_FILES['filename']['tmp_name'], $temppath);
 
 		$resolution = $settings->resolution_as_string();
 		$virtual_resolution = $settings->virtual_resolution_as_string();
 
-		move_uploaded_file($uploaded, $fullpath);
+		$slide = Slide::create_image($temppath);
+		$slide->resample("200x200");
+		$slide->resample($resolution, $virtual_resolution);
+		$slide_path = $slide->fullpath();
 
-		$this->convert($fullpath, $fullpath . '.thumb.jpg', "200x200");
-		$this->convert($fullpath, $fullpath, $resolution, $virtual_resolution);
+		unlink($temppath);
 
-		q("INSERT INTO slides (fullpath, type, title) VALUES ('$fullpath', 'image', '" . mysql_real_escape_string($name) . "')");
+		q("INSERT INTO slides (fullpath, type, title) VALUES ('$slide_path', 'image', '" . mysql_real_escape_string($name) . "')");
 
 		global $daemon;
 		$daemon->reload_queue();

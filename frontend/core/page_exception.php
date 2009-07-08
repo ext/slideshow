@@ -30,6 +30,7 @@ class PageException extends Exception {
 define('UPLOAD_ERROR', 1);
 define('EXECUTABLE_ERROR', 2);
 define('XQUERY_ERROR', 3);
+define('SLIDETOOL_ERROR', 4);
 define('FILE_NOT_FOUND', 404);
 
 ?>

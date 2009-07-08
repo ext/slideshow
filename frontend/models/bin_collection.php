@@ -43,7 +43,11 @@ class Slide {
 	}
 
 	function image_url(){
-		return '/image/' . $this->name();
+		return 'image/' . basename($this->fullpath()) . '/samples/1280x1024.png';
+	}
+
+	function thumbnail_url(){
+		return 'image/' . basename($this->fullpath()) . '/samples/200x200.png';
 	}
 
 	function fullpath(){

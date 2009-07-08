@@ -30,6 +30,10 @@
 		<h1>xquery error <?=$rc?></h1>
 		<p><?=$message?></p>
 		<p><pre><?=$stdout?></pre></p>
+<? } else if ( $code == SLIDETOOL_ERROR ){ ?>
+		<h1>slidetool error <?=$rc?></h1>
+		<p><?=$message?></p>
+		<p><pre><?=$stdout?></pre></p>
 <? } else if ( $code == FILE_NOT_FOUND ){ ?>
 		<h1>File not found</h1><br/>
 <? } else { ?>
