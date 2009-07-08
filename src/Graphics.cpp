@@ -29,6 +29,8 @@
 #include <portable/string.h>
 #include <FreeImage.h>
 
+#include "slidelib.h"
+
 static void FreeImageErrorHandler(FREE_IMAGE_FORMAT fif, const char *message) {
 	const char* format = fif != FIF_UNKNOWN ? FreeImage_GetFormatFromFIF(fif) : "Unknown";
 	Log::message(Log::Verbose, "FreeImage: An error occured while loading an image\n");
@@ -162,6 +164,12 @@ void Graphics::load_image(const char* name){
 	if ( name ){
 		char* path = Kernel::real_path(name);
 
+		slide_t* slide = slide_from_name(path);
+		if ( slide ){
+			free(path);
+			resolution_t resolution = {_width, _height};
+			path = slide_sample(slide, &resolution);
+		}
 		FIBITMAP* dib = GenericLoader(path);
 
 		if( !dib ){

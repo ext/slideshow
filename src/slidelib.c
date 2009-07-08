@@ -185,6 +185,10 @@ int slide_resample(slide_t* target, resolution_t* resolution, resolution_t* virt
 	return status == MagickFalse ? 0 : 3;
 }
 
+char* slide_sample(slide_t* target, resolution_t* resolution){
+	return asprintf_("%s/%dx%d.png", target->path.sample_path, resolution->width, resolution->height);
+}
+
 slide_t* slide_from_name(const char* name){
 	char* metafilename = asprintf_("%s/meta", name);
 

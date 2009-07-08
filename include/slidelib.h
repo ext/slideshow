@@ -40,14 +40,23 @@ typedef struct {
 enum {
 	USAGE_ERROR = 1,
 	ACCESS_ERROR = 2
-} _error_types;
+};
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 int slide_create(const char* name);
 int slide_resample(slide_t* target, resolution_t* resolution, resolution_t* virtual_resolution);
+char* slide_sample(slide_t* target, resolution_t* resolution);
 
 slide_t* slide_from_name(const char* name);
 void slide_free(slide_t* slide);
 
 resolution_t resolution_from_string(const char* str);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SLIDELIB_H */
