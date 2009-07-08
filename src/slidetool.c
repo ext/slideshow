@@ -14,9 +14,9 @@ static const int ACCESS_ERROR = 2;
 
 typedef struct {
 	const char* name;
-	const char* fullpath;
-	const char* data_path;
-	const char* sample_path;
+	char* fullpath;
+	char* data_path;
+	char* sample_path;
 } slide_path_t;
 
 typedef struct {
@@ -25,8 +25,8 @@ typedef struct {
 } resolution_t;
 
 typedef struct {
-	const char* type;
-	const char** datafiles;
+	char* type;
+	char** datafiles;
 	slide_path_t path;
 } slide_t;
 
@@ -54,7 +54,7 @@ static void print_usage(){
  * Concaternates two strings. Similar to strcat but returns a *new* string instead.
  * Caller should free memory using free
  */
-static const char* str_concat(const char* a, const char* b){
+static char* str_concat(const char* a, const char* b){
 	size_t len = strlen(a) + strlen(b) + 1;
 	char* buf = (char*)malloc(len);
 	sprintf(buf, "%s%s", a, b);
@@ -135,33 +135,52 @@ char* __attribute__ ((format (printf, 1, 2))) asprintf_(const char* fmt, ...) {
 	return buf;
 }
 
+#define ThrowWandException(wand) \
+	{ \
+		ExceptionType severity; \
+		char* description = MagickGetException(wand,&severity); \
+		print_error("%s\n", description); \
+		description=(char *) MagickRelinquishMemory(description); \
+		return 3; \
+	}
+
 int slide_resample(slide_t* target, resolution_t* resolution, resolution_t* virtual_resolution){
 	/* ignore types for now, assume image */
 	/* also, images only have exactly one datafile, assue that is true too */
 
 	MagickWandGenesis();
-	MagickWand* image = NewMagickWand();
 
+	char* resolution_str = asprintf_("%dx%d", resolution->width, resolution->height);
 	char* datafile = asprintf_("%s/%s", target->path.data_path, target->datafiles[0]);
-	printf("datafile: %s\n", datafile);
+	char* samplefile = asprintf_("%s/%s.png", target->path.sample_path, resolution_str);
 
-	MagickBooleanType status = MagickReadImage(image, datafile);
-	free(datafile);
+	char* commands[] = {
+		(char*)program_name,
+		datafile,
+		"-resize", resolution_str,
+		"-background", "black",
+		"-gravity", "center",
+		"-extent", resolution_str,
+		samplefile
+	};
+	int nr_commands = sizeof(commands) / sizeof(char*);
 
-	if ( status == MagickFalse ){
-		ExceptionType severity;
-		char *description = MagickGetException(image, &severity);
-		print_error("%s\n",description);
-		MagickRelinquishMemory(description);
-		return 3;
+	ImageInfo* image_info = AcquireImageInfo();
+	ExceptionInfo* exception=AcquireExceptionInfo();
+	MagickBooleanType status = ConvertImageCommand(image_info, nr_commands, commands,(char **) NULL, exception);
+	if (exception->severity != UndefinedException){
+		CatchException(exception);
+		status = MagickTrue;
 	}
+	image_info=DestroyImageInfo(image_info);
+	exception=DestroyExceptionInfo(exception);
 
+	MagickWandTerminus();
 
-
-	return 0;
+	return status == MagickFalse ? 0 : 3;
 }
 
-static const char* json_object_get_string_copy(struct json_object* obj){
+static char* json_object_get_string_copy(struct json_object* obj){
 	const char* a = json_object_get_string(obj);
 	char* b = (char*)malloc(strlen(a) + 1);
 	strcpy(b, a);
@@ -171,18 +190,16 @@ static const char* json_object_get_string_copy(struct json_object* obj){
 void slide_type_from_json(slide_t* slide, struct json_object* meta){
 	struct json_object* type = json_object_object_get(meta, "type");
 	slide->type = json_object_get_string_copy(type);
-	json_object_put(type);
 }
 void slide_datafiles_from_json(slide_t* slide, struct json_object* meta){
 	struct json_object* data = json_object_object_get(meta, "data");
 	int nr_datafiles = json_object_array_length(data);
-	slide->datafiles = (const char**)malloc(sizeof(char*) * (nr_datafiles+1)); /* last is a sentinel */
+	slide->datafiles = (char**)malloc(sizeof(char*) * (nr_datafiles+1)); /* last is a sentinel */
 
 	int i;
 	for ( i = 0; i < nr_datafiles; i++ ){
 		 struct json_object* file = json_object_array_get_idx(data, i);
 		 slide->datafiles[i] = json_object_get_string_copy(file);
-		 json_object_put(file);
 	}
 	slide->datafiles[i] = NULL;
 
@@ -190,8 +207,7 @@ void slide_datafiles_from_json(slide_t* slide, struct json_object* meta){
 }
 
 slide_t* slide_from_name(const char* name){
-	char* metafilename;
-	asprintf(&metafilename, "%s/meta", name);
+	char* metafilename = asprintf_("%s/meta", name);
 
 	FILE* meta_f = fopen(metafilename, "r");
 	free(metafilename);
@@ -206,6 +222,8 @@ slide_t* slide_from_name(const char* name){
 
 	char meta_buf[max_size];
 	int bytes = fread(meta_buf, 1, max_size, meta_f);
+	fclose(meta_f);
+	meta_f = NULL;
 
 	struct json_object* meta = json_tokener_parse(meta_buf);
 	if ( is_error(meta) ){
@@ -216,6 +234,12 @@ slide_t* slide_from_name(const char* name){
 
 	slide_t* slide = (slide_t*)malloc(sizeof(slide_t));
 
+	/* strings are copied */
+	slide->path.name = NULL;
+	slide->path.fullpath =    asprintf_("%s", name);
+	slide->path.data_path =   asprintf_("%s/data", name);
+	slide->path.sample_path = asprintf_("%s/samples", name);
+
 	slide_type_from_json(slide, meta);
 	slide_datafiles_from_json(slide, meta);
 
@@ -225,6 +249,17 @@ slide_t* slide_from_name(const char* name){
 }
 
 void slide_free(slide_t* slide){
+	int i = 0;
+	while (slide->datafiles[i]){
+		free(slide->datafiles[i]);
+		i++;
+	}
+
+	free(slide->type);
+	free(slide->datafiles);
+	free(slide->path.fullpath);
+	free(slide->path.data_path);
+	free(slide->path.sample_path);
 	free(slide);
 }
 
