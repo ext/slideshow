@@ -184,4 +184,10 @@ AC_ARG_ENABLE([gccparser],
 	[gccparser=false])
 AM_CONDITIONAL([GCCPARSER], [test x$gccparser == xtrue])
 
+dnl #######################################################################
+dnl # json
+dnl #######################################################################
+PKG_CHECK_MODULES(json, [json])
+AC_SUBST(json_LIBS)
+
 AC_OUTPUT

@@ -61,3 +61,4 @@ xquery_LDADD = ${X11_LIBS} ${xrandr_LIBS}
 
 slidetool_CFLAGS = -pipe -Wall -Wextra
 slidetool_SOURCES = slidetool.c
+slidetool_LDADD = ${json_LIBS}
