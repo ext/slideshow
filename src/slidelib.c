@@ -182,11 +182,26 @@ int slide_resample(slide_t* target, resolution_t* resolution, resolution_t* virt
 
 	MagickWandTerminus();
 
+	/* Must change permissions because sometimes the file is created with no
+	 * permissions at all. Perhaps its just a weird umask or something but
+	 * this ensures correct persmissions.
+	 */
+	chmod(samplefile, S_IRUSR | S_IWUSR | S_IRGRP);
+
 	return status == MagickFalse ? 0 : 3;
 }
 
 char* slide_sample(slide_t* target, resolution_t* resolution){
-	return asprintf_("%s/%dx%d.png", target->path.sample_path, resolution->width, resolution->height);
+	char* path = asprintf_("%s/%dx%d.png", target->path.sample_path, resolution->width, resolution->height);
+
+	if ( access(path, R_OK) != 0 ){
+		fprintf(stdout, "not found, resampling\n");
+		slide_resample(target, resolution, NULL);
+	} else {
+		fprintf(stdout, "found\n");
+	}
+
+	return path;
 }
 
 slide_t* slide_from_name(const char* name){
