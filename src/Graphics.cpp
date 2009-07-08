@@ -55,7 +55,9 @@ static FIBITMAP* GenericLoader(const char* lpszPathName, int flag = 0) {
 Graphics::Graphics(int width, int height, bool fullscreen):
 	_transition(NULL),
 	texture_0(0),
-	texture_1(0){
+	texture_1(0),
+	_width(width),
+	_height(height){
 
 	OS::init_view(width, height, fullscreen);
 	Log::message(Log::Verbose, "Graphics: Using resoultion %dx%d\n", width, height);

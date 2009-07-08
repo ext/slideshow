@@ -44,6 +44,8 @@ class Graphics {
 		transition_module_t* _transition;
 		unsigned int texture_0;
 		unsigned int texture_1;
+		int _width;
+		int _height;
 };
 
 #endif // GRAPHICS_H
