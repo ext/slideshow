@@ -223,6 +223,7 @@ void Kernel::print_transitions(){
 		path = strtok(NULL, ":");
 	}
 
+	free(path_list);
 }
 
 bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
