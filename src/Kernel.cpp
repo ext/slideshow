@@ -189,32 +189,40 @@ static int filter(const struct dirent* el){
 }
 
 void Kernel::print_transitions(){
+	printf("Available transitions: \n");
+
 	struct dirent **namelist;
 	int n;
 
-	n = scandir(pluginpath(), &namelist, filter, alphasort);
-	if (n < 0){
-		perror("scandir");
-	} else {
-		printf("Available transitions: \n");
-		for ( int i = 0; i < n; i++ ){
-			struct module_context_t* context = module_open(namelist[i]->d_name);
-			free(namelist[i]);
+	char* path_list = strdup(pluginpath());
+	char* path = strtok(path_list, ":");
+	while ( path ){
+		n = scandir(path, &namelist, filter, alphasort);
+		if (n < 0){
+			perror("scandir");
+		} else {
+			for ( int i = 0; i < n; i++ ){
+				struct module_context_t* context = module_open(namelist[i]->d_name);
+				free(namelist[i]);
 
-			if ( !context ){
-				continue;
+				if ( !context ){
+					continue;
+				}
+
+				if ( module_type(context) != TRANSITION_MODULE ){
+					continue;
+				}
+
+				printf(" * %s\n", module_get_name(context));
+
+				module_close(context);
 			}
-
-			if ( module_type(context) != TRANSITION_MODULE ){
-				continue;
-			}
-
-			printf("%s\n", module_get_name(context));
-
-			module_close(context);
+			free(namelist);
 		}
-		free(namelist);
+
+		path = strtok(NULL, ":");
 	}
+
 }
 
 bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
