@@ -34,9 +34,6 @@ int assemble(const slide_t* slide, const resolution_t* resolution){
 	char* datafile = slide_datapath(slide, slide->datafiles[0]);
 	char* samplefile = slide_sample_path(slide, resolution);
 
-	printf("datafile: %s\n", datafile);
-	printf("samplefile: %s\n", samplefile);
-
 	char* commands[] = {
 		"slidelib", // dummy program name
 		datafile,

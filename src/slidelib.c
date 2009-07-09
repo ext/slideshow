@@ -170,10 +170,7 @@ int slide_resample(slide_t* target, resolution_t* resolution, resolution_t* virt
 
 	MagickWandGenesis();
 
-	printf("m: %p assemble: %p\n", m, m->assemble);
-
 	int status = m->assemble(target, resolution);
-	printf("status: %d\n", status);
 
 	MagickWandTerminus();
 
