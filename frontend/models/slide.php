@@ -99,7 +99,13 @@ class Slide {
 		global $settings;
 
 		$slidetool = $settings->slidetool_executable();
-		$command = $slidetool . ' ' . $command . ' 2>&1';
+		$env = '';
+
+		foreach ( $settings->environment() as $key => $value ){
+			$env .= "SLIDESHOW_$key=\"$value\" ";
+		}
+
+		$command = $env . ' ' . $slidetool . ' ' . $command . ' 2>&1';
 
 		$stdout = '';
 		$rc = 0;
