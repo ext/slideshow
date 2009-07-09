@@ -1,4 +1,4 @@
-SUBDIRS = IPC state transitions
+SUBDIRS = IPC state transitions assembler
 
 lib_LTLIBRARIES = libslide.la
 bin_PROGRAMS = slideshow xquery slidetool
@@ -34,7 +34,7 @@ slideshow_SOURCES = \
 	Kernel.cpp ${top_srcdir}/include/Kernel.h \
 	Log.cpp ${top_srcdir}/include/Log.h\
 	main.cpp \
-	module_loader.cpp \
+	module_loader.c \
 	OS_Linux.cpp \
 	browsers/dummybrowser.cpp browsers/dummybrowser.h
 
@@ -67,5 +67,5 @@ xquery_SOURCES = xquery.c
 xquery_LDADD = ${X11_LIBS} ${xrandr_LIBS}
 
 slidetool_CFLAGS = -pipe -Wall -Wextra
-slidetool_SOURCES = slidetool.c
+slidetool_SOURCES = slidetool.c module_loader.c
 slidetool_LDADD = -lslide

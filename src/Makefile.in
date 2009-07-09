@@ -81,7 +81,7 @@ am__slideshow_SOURCES_DIST = ${top_srcdir}/include/Browser.h \
 	${top_srcdir}/include/ForegroundApp.h Graphics.cpp \
 	${top_srcdir}/include/Graphics.h Kernel.cpp \
 	${top_srcdir}/include/Kernel.h Log.cpp \
-	${top_srcdir}/include/Log.h main.cpp module_loader.cpp \
+	${top_srcdir}/include/Log.h main.cpp module_loader.c \
 	OS_Linux.cpp browsers/dummybrowser.cpp browsers/dummybrowser.h \
 	browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
 @MYSQL_TRUE@am__objects_1 = slideshow-mysqlbrowser.$(OBJEXT)
@@ -102,7 +102,8 @@ slideshow_DEPENDENCIES = IPC/libipc.a state/libfsm.a \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_2)
-am_slidetool_OBJECTS = slidetool-slidetool.$(OBJEXT)
+am_slidetool_OBJECTS = slidetool-slidetool.$(OBJEXT) \
+	slidetool-module_loader.$(OBJEXT)
 slidetool_OBJECTS = $(am_slidetool_OBJECTS)
 slidetool_DEPENDENCIES =
 slidetool_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -302,7 +303,7 @@ xrandr_CFLAGS = @xrandr_CFLAGS@
 xrandr_LIBS = @xrandr_LIBS@
 xxf86vm_CFLAGS = @xxf86vm_CFLAGS@
 xxf86vm_LIBS = @xxf86vm_LIBS@
-SUBDIRS = IPC state transitions
+SUBDIRS = IPC state transitions assembler
 lib_LTLIBRARIES = libslide.la
 slideshow_CPPFLAGS = \
 	${dbus_CFLAGS} \
@@ -322,7 +323,7 @@ slideshow_SOURCES = ${top_srcdir}/include/Browser.h \
 	${top_srcdir}/include/ForegroundApp.h Graphics.cpp \
 	${top_srcdir}/include/Graphics.h Kernel.cpp \
 	${top_srcdir}/include/Kernel.h Log.cpp \
-	${top_srcdir}/include/Log.h main.cpp module_loader.cpp \
+	${top_srcdir}/include/Log.h main.cpp module_loader.c \
 	OS_Linux.cpp browsers/dummybrowser.cpp browsers/dummybrowser.h \
 	$(am__append_1)
 slideshow_LDADD = -lslide IPC/libipc.a state/libfsm.a -lltdl \
@@ -337,7 +338,7 @@ xquery_CFLAGS = -pipe -Wall -Wextra
 xquery_SOURCES = xquery.c
 xquery_LDADD = ${X11_LIBS} ${xrandr_LIBS}
 slidetool_CFLAGS = -pipe -Wall -Wextra
-slidetool_SOURCES = slidetool.c
+slidetool_SOURCES = slidetool.c module_loader.c
 slidetool_LDADD = -lslide
 all: all-recursive
 
@@ -460,6 +461,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-module_loader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-mysqlbrowser.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slidetool-module_loader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slidetool-slidetool.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xquery-xquery.Po@am__quote@
 
@@ -505,6 +507,20 @@ slideshow-argument_parser.obj: argument_parser.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o slideshow-argument_parser.obj `if test -f 'argument_parser.c'; then $(CYGPATH_W) 'argument_parser.c'; else $(CYGPATH_W) '$(srcdir)/argument_parser.c'; fi`
 
+slideshow-module_loader.o: module_loader.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT slideshow-module_loader.o -MD -MP -MF $(DEPDIR)/slideshow-module_loader.Tpo -c -o slideshow-module_loader.o `test -f 'module_loader.c' || echo '$(srcdir)/'`module_loader.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/slideshow-module_loader.Tpo $(DEPDIR)/slideshow-module_loader.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='module_loader.c' object='slideshow-module_loader.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o slideshow-module_loader.o `test -f 'module_loader.c' || echo '$(srcdir)/'`module_loader.c
+
+slideshow-module_loader.obj: module_loader.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT slideshow-module_loader.obj -MD -MP -MF $(DEPDIR)/slideshow-module_loader.Tpo -c -o slideshow-module_loader.obj `if test -f 'module_loader.c'; then $(CYGPATH_W) 'module_loader.c'; else $(CYGPATH_W) '$(srcdir)/module_loader.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/slideshow-module_loader.Tpo $(DEPDIR)/slideshow-module_loader.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='module_loader.c' object='slideshow-module_loader.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o slideshow-module_loader.obj `if test -f 'module_loader.c'; then $(CYGPATH_W) 'module_loader.c'; else $(CYGPATH_W) '$(srcdir)/module_loader.c'; fi`
+
 slidetool-slidetool.o: slidetool.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(slidetool_CFLAGS) $(CFLAGS) -MT slidetool-slidetool.o -MD -MP -MF $(DEPDIR)/slidetool-slidetool.Tpo -c -o slidetool-slidetool.o `test -f 'slidetool.c' || echo '$(srcdir)/'`slidetool.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/slidetool-slidetool.Tpo $(DEPDIR)/slidetool-slidetool.Po
@@ -518,6 +534,20 @@ slidetool-slidetool.obj: slidetool.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='slidetool.c' object='slidetool-slidetool.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(slidetool_CFLAGS) $(CFLAGS) -c -o slidetool-slidetool.obj `if test -f 'slidetool.c'; then $(CYGPATH_W) 'slidetool.c'; else $(CYGPATH_W) '$(srcdir)/slidetool.c'; fi`
+
+slidetool-module_loader.o: module_loader.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(slidetool_CFLAGS) $(CFLAGS) -MT slidetool-module_loader.o -MD -MP -MF $(DEPDIR)/slidetool-module_loader.Tpo -c -o slidetool-module_loader.o `test -f 'module_loader.c' || echo '$(srcdir)/'`module_loader.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/slidetool-module_loader.Tpo $(DEPDIR)/slidetool-module_loader.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='module_loader.c' object='slidetool-module_loader.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(slidetool_CFLAGS) $(CFLAGS) -c -o slidetool-module_loader.o `test -f 'module_loader.c' || echo '$(srcdir)/'`module_loader.c
+
+slidetool-module_loader.obj: module_loader.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(slidetool_CFLAGS) $(CFLAGS) -MT slidetool-module_loader.obj -MD -MP -MF $(DEPDIR)/slidetool-module_loader.Tpo -c -o slidetool-module_loader.obj `if test -f 'module_loader.c'; then $(CYGPATH_W) 'module_loader.c'; else $(CYGPATH_W) '$(srcdir)/module_loader.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/slidetool-module_loader.Tpo $(DEPDIR)/slidetool-module_loader.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='module_loader.c' object='slidetool-module_loader.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(slidetool_CFLAGS) $(CFLAGS) -c -o slidetool-module_loader.obj `if test -f 'module_loader.c'; then $(CYGPATH_W) 'module_loader.c'; else $(CYGPATH_W) '$(srcdir)/module_loader.c'; fi`
 
 xquery-xquery.o: xquery.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(xquery_CFLAGS) $(CFLAGS) -MT xquery-xquery.o -MD -MP -MF $(DEPDIR)/xquery-xquery.Tpo -c -o xquery-xquery.o `test -f 'xquery.c' || echo '$(srcdir)/'`xquery.c
@@ -679,20 +709,6 @@ slideshow-main.obj: main.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='main.cpp' object='slideshow-main.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o slideshow-main.obj `if test -f 'main.cpp'; then $(CYGPATH_W) 'main.cpp'; else $(CYGPATH_W) '$(srcdir)/main.cpp'; fi`
-
-slideshow-module_loader.o: module_loader.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-module_loader.o -MD -MP -MF $(DEPDIR)/slideshow-module_loader.Tpo -c -o slideshow-module_loader.o `test -f 'module_loader.cpp' || echo '$(srcdir)/'`module_loader.cpp
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/slideshow-module_loader.Tpo $(DEPDIR)/slideshow-module_loader.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='module_loader.cpp' object='slideshow-module_loader.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o slideshow-module_loader.o `test -f 'module_loader.cpp' || echo '$(srcdir)/'`module_loader.cpp
-
-slideshow-module_loader.obj: module_loader.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-module_loader.obj -MD -MP -MF $(DEPDIR)/slideshow-module_loader.Tpo -c -o slideshow-module_loader.obj `if test -f 'module_loader.cpp'; then $(CYGPATH_W) 'module_loader.cpp'; else $(CYGPATH_W) '$(srcdir)/module_loader.cpp'; fi`
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/slideshow-module_loader.Tpo $(DEPDIR)/slideshow-module_loader.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='module_loader.cpp' object='slideshow-module_loader.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o slideshow-module_loader.obj `if test -f 'module_loader.cpp'; then $(CYGPATH_W) 'module_loader.cpp'; else $(CYGPATH_W) '$(srcdir)/module_loader.cpp'; fi`
 
 slideshow-OS_Linux.o: OS_Linux.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-OS_Linux.o -MD -MP -MF $(DEPDIR)/slideshow-OS_Linux.Tpo -c -o slideshow-OS_Linux.o `test -f 'OS_Linux.cpp' || echo '$(srcdir)/'`OS_Linux.cpp

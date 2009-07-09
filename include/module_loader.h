@@ -21,6 +21,10 @@
 
 #include "module.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void moduleloader_init(const char* searchpath);
 void moduleloader_cleanup();
 
@@ -45,5 +49,9 @@ module_t* module_get(struct module_context_t* context);
 const char* module_get_name(const struct module_context_t* context);
 const char* module_get_author(const struct module_context_t* context);
 int module_type(const struct module_context_t* module_context_t);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SLIDESHOW_MODULE_LOADER_H

@@ -19,11 +19,14 @@
 #ifndef SLIDESHOW_MODULE_H
 #define SLIDESHOW_MODULE_H
 
-#define TRANSITION_MODULE 1
+enum module_type_t {
+	TRANSITION_MODULE,
+	ASSEMBLER_MODULE
+};
 
 #define MODULE_INFO(name, type, author) \
 	const char const * __module_name = name; \
-	const int __module_type = type; \
+	const enum module_type_t __module_type = type; \
 	const char const * __module_author = author
 
 #endif // SLIDESHOW_MODULE_H
