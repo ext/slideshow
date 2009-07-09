@@ -324,6 +324,7 @@ const char* Kernel::pluginpath(){
 	}
 	return path;
 }
+
 void Kernel::create_pidpath(){
 	char* cwd = get_current_dir_name();
 	verify( asprintf(&pidfile, "%s/slideshow.pid", cwd) >= 0 );
