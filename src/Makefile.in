@@ -104,7 +104,7 @@ slideshow_DEPENDENCIES = IPC/libipc.a state/libfsm.a \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_2)
 am_slidetool_OBJECTS = slidetool-slidetool.$(OBJEXT) \
-	slidetool-module_loader.$(OBJEXT)
+	slidetool-module_loader.$(OBJEXT) slidetool-path.$(OBJEXT)
 slidetool_OBJECTS = $(am_slidetool_OBJECTS)
 slidetool_DEPENDENCIES =
 slidetool_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -340,8 +340,8 @@ libslide_la_LDFLAGS = -shared -avoid-version
 xquery_CFLAGS = -pipe -Wall -Wextra
 xquery_SOURCES = xquery.c
 xquery_LDADD = ${X11_LIBS} ${xrandr_LIBS}
-slidetool_CFLAGS = -pipe -Wall -Wextra
-slidetool_SOURCES = slidetool.c module_loader.c
+slidetool_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra
+slidetool_SOURCES = slidetool.c module_loader.c path.c
 slidetool_LDADD = -lslide
 all: all-recursive
 
@@ -466,6 +466,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-mysqlbrowser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-path.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slidetool-module_loader.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slidetool-path.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slidetool-slidetool.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xquery-xquery.Po@am__quote@
 
@@ -566,6 +567,20 @@ slidetool-module_loader.obj: module_loader.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='module_loader.c' object='slidetool-module_loader.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(slidetool_CFLAGS) $(CFLAGS) -c -o slidetool-module_loader.obj `if test -f 'module_loader.c'; then $(CYGPATH_W) 'module_loader.c'; else $(CYGPATH_W) '$(srcdir)/module_loader.c'; fi`
+
+slidetool-path.o: path.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(slidetool_CFLAGS) $(CFLAGS) -MT slidetool-path.o -MD -MP -MF $(DEPDIR)/slidetool-path.Tpo -c -o slidetool-path.o `test -f 'path.c' || echo '$(srcdir)/'`path.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/slidetool-path.Tpo $(DEPDIR)/slidetool-path.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='path.c' object='slidetool-path.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(slidetool_CFLAGS) $(CFLAGS) -c -o slidetool-path.o `test -f 'path.c' || echo '$(srcdir)/'`path.c
+
+slidetool-path.obj: path.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(slidetool_CFLAGS) $(CFLAGS) -MT slidetool-path.obj -MD -MP -MF $(DEPDIR)/slidetool-path.Tpo -c -o slidetool-path.obj `if test -f 'path.c'; then $(CYGPATH_W) 'path.c'; else $(CYGPATH_W) '$(srcdir)/path.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/slidetool-path.Tpo $(DEPDIR)/slidetool-path.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='path.c' object='slidetool-path.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(slidetool_CFLAGS) $(CFLAGS) -c -o slidetool-path.obj `if test -f 'path.c'; then $(CYGPATH_W) 'path.c'; else $(CYGPATH_W) '$(srcdir)/path.c'; fi`
 
 xquery-xquery.o: xquery.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(xquery_CFLAGS) $(CFLAGS) -MT xquery-xquery.o -MD -MP -MF $(DEPDIR)/xquery-xquery.Tpo -c -o xquery-xquery.o `test -f 'xquery.c' || echo '$(srcdir)/'`xquery.c

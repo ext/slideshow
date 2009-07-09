@@ -20,6 +20,8 @@
 #include <stdarg.h>
 #include <string.h>
 #include "slidelib.h"
+#include "module_loader.h"
+#include "path.h"
 
 static const char* program_name = NULL;
 
@@ -41,14 +43,8 @@ static void print_usage(){
 	printf("%s resample TARGET RESOLUTION [VIRTUAL_RESOLUTION]\n", program_name);
 }
 
-int main(int argc, const char* argv[]){
-	program_name = argv[0];
-
-	if ( argc < 2 ){
-		print_usage();
-		return 1;
-
-	} else if ( strcmp("create", argv[1]) == 0 ){
+int action(int argc, const char* argv[]){
+	if ( strcmp("create", argv[1]) == 0 ){
 		if ( argc < 3 ){
 			print_error("create requires target.\n");
 			print_usage_suggestion();
@@ -84,5 +80,18 @@ int main(int argc, const char* argv[]){
 		print_error("Unknown action `%s'.\n", argv[1]);
 		print_usage_suggestion();
 		return USAGE_ERROR;
+	}
+}
+
+int main(int argc, const char* argv[]){
+	program_name = argv[0];
+
+	if ( argc < 2 ){
+		print_usage();
+		return 1;
+	} else {
+		moduleloader_init(pluginpath());
+		action(argc, argv);
+		moduleloader_cleanup();
 	}
 }

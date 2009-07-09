@@ -68,6 +68,6 @@ xquery_CFLAGS = -pipe -Wall -Wextra
 xquery_SOURCES = xquery.c
 xquery_LDADD = ${X11_LIBS} ${xrandr_LIBS}
 
-slidetool_CFLAGS = -pipe -Wall -Wextra
-slidetool_SOURCES = slidetool.c module_loader.c
+slidetool_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra
+slidetool_SOURCES = slidetool.c module_loader.c path.c
 slidetool_LDADD = -lslide
