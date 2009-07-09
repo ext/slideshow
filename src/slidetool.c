@@ -69,6 +69,7 @@ int main(int argc, const char* argv[]){
 		const char* filename = argv[2];
 		slide_t* target = slide_from_name(filename);
 		if ( !target ){
+			print_error("Target is not a valid slide or you do not have permission to read it.\n");
 			print_error("failed to load `%s'.\n", filename);
 			return ACCESS_ERROR;
 		}

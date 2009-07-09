@@ -195,10 +195,7 @@ char* slide_sample(slide_t* target, resolution_t* resolution){
 	char* path = asprintf_("%s/%dx%d.png", target->path.sample_path, resolution->width, resolution->height);
 
 	if ( access(path, R_OK) != 0 ){
-		fprintf(stdout, "not found, resampling\n");
 		slide_resample(target, resolution, NULL);
-	} else {
-		fprintf(stdout, "found\n");
 	}
 
 	return path;
@@ -211,7 +208,6 @@ slide_t* slide_from_name(const char* name){
 	free(metafilename);
 
 	if ( !meta_f ){
-		fprintf(stderr, "Target is not a valid slide or you do not have permission to read it.\n");
 		return NULL;
 	}
 
