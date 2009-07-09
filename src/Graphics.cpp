@@ -23,6 +23,7 @@
 #include "OS.h"
 #include "Log.h"
 #include "Transition.h"
+#include "path.h"
 #include <GL/gl.h>
 #include <cstdlib>
 
@@ -162,7 +163,7 @@ void Graphics::load_image(const char* name){
 	glBindTexture(GL_TEXTURE_2D, _texture_0);
 
 	if ( name ){
-		char* path = Kernel::real_path(name);
+		char* path = real_path(name);
 
 		slide_t* slide = slide_from_name(path);
 		if ( slide ){

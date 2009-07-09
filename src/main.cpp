@@ -22,6 +22,7 @@
 #include "Log.h"
 #include "Exceptions.h"
 #include "module_loader.h"
+#include "path.h"
 #include <cstring>
 #include <portable/Time.h>
 
@@ -49,7 +50,7 @@ int main( int argc, const char* argv[] ){
 		}
 
 		initTime();
-		moduleloader_init(Kernel::pluginpath());
+		moduleloader_init(pluginpath());
 
 		Log::initialize("slideshow.log");
 		Log::set_level( (Log::Severity)arguments.loglevel );

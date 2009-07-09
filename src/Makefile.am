@@ -13,6 +13,7 @@ slideshow_CPPFLAGS = \
 	${dbus_CFLAGS} \
 	${libdaemon_CFLAGS} \
 	-I${top_srcdir}/include \
+	-D_GNU_SOURCE \
 	-pipe -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
 
 slideshow_SOURCES = \
@@ -35,6 +36,7 @@ slideshow_SOURCES = \
 	Log.cpp ${top_srcdir}/include/Log.h\
 	main.cpp \
 	module_loader.c \
+	path.c ${top_srcdir}/include/path.h \
 	OS_Linux.cpp \
 	browsers/dummybrowser.cpp browsers/dummybrowser.h
 

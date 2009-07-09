@@ -75,16 +75,6 @@ class Kernel {
 
 		static bool parse_arguments(argument_set_t& arg, int argc, const char* argv[]);
 
-		/**
-		 * @brief Return the real path to a resource.
-		 * Translates filename into an absolute path in either pkgdatadir (usually
-		 * /usr/share/slideshow) or in SLIDESHOW_DATA_PATH if that env. variable
-		 * is set.
-		 */
-		static char* real_path(const char* filename);
-
-		static const char* datapath();
-		static const char* pluginpath();
 	protected:
 		static const char* pidpath();
 

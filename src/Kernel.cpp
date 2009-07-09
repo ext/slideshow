@@ -25,6 +25,7 @@
 #include "Kernel.h"
 #include "Graphics.h"
 #include "OS.h"
+#include "path.h"
 #include "Log.h"
 #include "Exceptions.h"
 #include "Transition.h"
@@ -197,11 +198,8 @@ void Kernel::print_transitions(){
 	} else {
 		printf("Available transitions: \n");
 		for ( int i = 0; i < n; i++ ){
-			char* path;
-			verify( asprintf(&path, "%s/%s", pluginpath(), namelist[i]->d_name) >= 0 );
+			struct module_context_t* context = module_open(namelist[i]->d_name);
 			free(namelist[i]);
-
-			struct module_context_t* context = module_open(path);
 
 			if ( !context ){
 				continue;
@@ -291,38 +289,6 @@ void Kernel::ipc_quit(){
 
 void Kernel::debug_dumpqueue(){
 	_browser->dump_queue();
-}
-
-char* Kernel::real_path(const char* filename){
-	char* dst;
-
-	if ( filename[0] == '/' ){
-		dst = (char*)malloc(strlen(filename)+1);
-		strcpy(dst, filename);
-	} else {
-		if ( asprintf(&dst, "%s/%s", datapath(), filename) == -1 ){
-			Log::message(Log::Fatal, "Memory allocation failed!");
-			return NULL;
-		}
-	}
-
-	return dst;
-}
-
-const char* Kernel::datapath(){
-	const char* path = getenv("SLIDESHOW_DATA_DIR");
-	if ( !path ){
-		path = DATA_DIR;
-	}
-	return path;
-}
-
-const char* Kernel::pluginpath(){
-	const char* path = getenv("SLIDESHOW_PLUGIN_DIR");
-	if ( !path ){
-		path = PLUGIN_DIR;
-	}
-	return path;
 }
 
 void Kernel::create_pidpath(){

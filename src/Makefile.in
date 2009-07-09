@@ -81,8 +81,9 @@ am__slideshow_SOURCES_DIST = ${top_srcdir}/include/Browser.h \
 	${top_srcdir}/include/ForegroundApp.h Graphics.cpp \
 	${top_srcdir}/include/Graphics.h Kernel.cpp \
 	${top_srcdir}/include/Kernel.h Log.cpp \
-	${top_srcdir}/include/Log.h main.cpp module_loader.c \
-	OS_Linux.cpp browsers/dummybrowser.cpp browsers/dummybrowser.h \
+	${top_srcdir}/include/Log.h main.cpp module_loader.c path.c \
+	${top_srcdir}/include/path.h OS_Linux.cpp \
+	browsers/dummybrowser.cpp browsers/dummybrowser.h \
 	browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
 @MYSQL_TRUE@am__objects_1 = slideshow-mysqlbrowser.$(OBJEXT)
 am_slideshow_OBJECTS = slideshow-argument_parser.$(OBJEXT) \
@@ -92,8 +93,8 @@ am_slideshow_OBJECTS = slideshow-argument_parser.$(OBJEXT) \
 	slideshow-ForegroundApp.$(OBJEXT) slideshow-Graphics.$(OBJEXT) \
 	slideshow-Kernel.$(OBJEXT) slideshow-Log.$(OBJEXT) \
 	slideshow-main.$(OBJEXT) slideshow-module_loader.$(OBJEXT) \
-	slideshow-OS_Linux.$(OBJEXT) slideshow-dummybrowser.$(OBJEXT) \
-	$(am__objects_1)
+	slideshow-path.$(OBJEXT) slideshow-OS_Linux.$(OBJEXT) \
+	slideshow-dummybrowser.$(OBJEXT) $(am__objects_1)
 slideshow_OBJECTS = $(am_slideshow_OBJECTS)
 @MYSQL_TRUE@am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
 slideshow_DEPENDENCIES = IPC/libipc.a state/libfsm.a \
@@ -309,6 +310,7 @@ slideshow_CPPFLAGS = \
 	${dbus_CFLAGS} \
 	${libdaemon_CFLAGS} \
 	-I${top_srcdir}/include \
+	-D_GNU_SOURCE \
 	-pipe -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
 
 slideshow_SOURCES = ${top_srcdir}/include/Browser.h \
@@ -323,8 +325,9 @@ slideshow_SOURCES = ${top_srcdir}/include/Browser.h \
 	${top_srcdir}/include/ForegroundApp.h Graphics.cpp \
 	${top_srcdir}/include/Graphics.h Kernel.cpp \
 	${top_srcdir}/include/Kernel.h Log.cpp \
-	${top_srcdir}/include/Log.h main.cpp module_loader.c \
-	OS_Linux.cpp browsers/dummybrowser.cpp browsers/dummybrowser.h \
+	${top_srcdir}/include/Log.h main.cpp module_loader.c path.c \
+	${top_srcdir}/include/path.h OS_Linux.cpp \
+	browsers/dummybrowser.cpp browsers/dummybrowser.h \
 	$(am__append_1)
 slideshow_LDADD = -lslide IPC/libipc.a state/libfsm.a -lltdl \
 	${libportable_LIBS} ${libdaemon_LIBS} ${dbus_LIBS} ${GL_LIBS} \
@@ -461,6 +464,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-module_loader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-mysqlbrowser.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-path.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slidetool-module_loader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slidetool-slidetool.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xquery-xquery.Po@am__quote@
@@ -520,6 +524,20 @@ slideshow-module_loader.obj: module_loader.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='module_loader.c' object='slideshow-module_loader.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o slideshow-module_loader.obj `if test -f 'module_loader.c'; then $(CYGPATH_W) 'module_loader.c'; else $(CYGPATH_W) '$(srcdir)/module_loader.c'; fi`
+
+slideshow-path.o: path.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT slideshow-path.o -MD -MP -MF $(DEPDIR)/slideshow-path.Tpo -c -o slideshow-path.o `test -f 'path.c' || echo '$(srcdir)/'`path.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/slideshow-path.Tpo $(DEPDIR)/slideshow-path.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='path.c' object='slideshow-path.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o slideshow-path.o `test -f 'path.c' || echo '$(srcdir)/'`path.c
+
+slideshow-path.obj: path.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT slideshow-path.obj -MD -MP -MF $(DEPDIR)/slideshow-path.Tpo -c -o slideshow-path.obj `if test -f 'path.c'; then $(CYGPATH_W) 'path.c'; else $(CYGPATH_W) '$(srcdir)/path.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/slideshow-path.Tpo $(DEPDIR)/slideshow-path.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='path.c' object='slideshow-path.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o slideshow-path.obj `if test -f 'path.c'; then $(CYGPATH_W) 'path.c'; else $(CYGPATH_W) '$(srcdir)/path.c'; fi`
 
 slidetool-slidetool.o: slidetool.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(slidetool_CFLAGS) $(CFLAGS) -MT slidetool-slidetool.o -MD -MP -MF $(DEPDIR)/slidetool-slidetool.Tpo -c -o slidetool-slidetool.o `test -f 'slidetool.c' || echo '$(srcdir)/'`slidetool.c
