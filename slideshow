@@ -8,7 +8,7 @@
 #
 
 export SLIDESHOW_DATA_DIR="`pwd`/data"
-export SLIDESHOW_PLUGIN_DIR="`pwd`/src/transitions"
+export SLIDESHOW_PLUGIN_DIR="`pwd`/src/transitions:`pwd`/src/assembler"
 
 case `basename $0` in
     slideshow-gdb)
@@ -16,6 +16,9 @@ case `basename $0` in
 	;;
     slideshow-valgrind)
 	exec valgrind $*
+	;;
+    slidetool)
+	exec src/slidetool $*
 	;;
     *)
 	exec src/slideshow $*

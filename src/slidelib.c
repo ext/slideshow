@@ -26,6 +26,8 @@
 #include <json/json.h>
 #include <wand/MagickWand.h>
 #include "slidelib.h"
+#include "module_loader.h"
+#include "assembler.h"
 
 static const int DEFAULT_MASK = S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
 
@@ -103,6 +105,10 @@ static char* __attribute__ ((format (printf, 1, 2))) asprintf_(const char* fmt, 
 	return buf;
 }
 
+char* resolution_as_string(const resolution_t* resolution){
+	return asprintf_("%dx%d", resolution->width, resolution->height);
+}
+
 #define ThrowWandException(wand) \
 	{ \
 		ExceptionType severity; \
@@ -113,10 +119,8 @@ static char* __attribute__ ((format (printf, 1, 2))) asprintf_(const char* fmt, 
 	}
 
 static char* json_object_get_string_copy(struct json_object* obj){
-	const char* a = json_object_get_string(obj);
-	char* b = (char*)malloc(strlen(a) + 1);
-	strcpy(b, a);
-	return b;
+	const char* tmp = json_object_get_string(obj);
+	return strdup(tmp);
 }
 
 static void slide_type_from_json(slide_t* slide, struct json_object* meta){
@@ -150,55 +154,48 @@ int slide_create(const char* name){
 }
 
 int slide_resample(slide_t* target, resolution_t* resolution, resolution_t* virtual_resolution){
-	/* ignore types for now, assume image */
-	/* also, images only have exactly one datafile, assue that is true too */
+	struct module_context_t* context = module_open(target->type);
+
+	if ( !context ){
+		fprintf(stderr, "Failed to load slide module (\"%s\")\n", target->type);
+		return 3;
+	}
+
+	if ( module_type(context) != ASSEMBLER_MODULE ){
+		fprintf(stderr, "Invalid module (%d)\n", module_type(context));
+		return 3;
+	}
+
+	assembler_module_t* m = (assembler_module_t*)module_get(context);
 
 	MagickWandGenesis();
 
-	char* resolution_str = asprintf_("%dx%d", resolution->width, resolution->height);
-	char* datafile = asprintf_("%s/%s", target->path.data_path, target->datafiles[0]);
-	char* samplefile = asprintf_("%s/%s.png", target->path.sample_path, resolution_str);
+	printf("m: %p assemble: %p\n", m, m->assemble);
 
-	char* commands[] = {
-		"slidelib", // dummy program name
-		datafile,
-		"-resize", resolution_str,
-		"-background", "black",
-		"-gravity", "center",
-		"-extent", resolution_str,
-		samplefile
-	};
-	int nr_commands = sizeof(commands) / sizeof(char*);
-
-	ImageInfo* image_info = AcquireImageInfo();
-	ExceptionInfo* exception=AcquireExceptionInfo();
-	MagickBooleanType status = ConvertImageCommand(image_info, nr_commands, commands,(char **) NULL, exception);
-	if (exception->severity != UndefinedException){
-		CatchException(exception);
-		status = MagickTrue;
-	}
-	image_info=DestroyImageInfo(image_info);
-	exception=DestroyExceptionInfo(exception);
+	int status = m->assemble(target, resolution);
+	printf("status: %d\n", status);
 
 	MagickWandTerminus();
 
-	/* Must change permissions because sometimes the file is created with no
-	 * permissions at all. Perhaps its just a weird umask or something but
-	 * this ensures correct persmissions.
-	 */
-	chmod(samplefile, S_IRUSR | S_IWUSR | S_IRGRP);
-
-	return status == MagickFalse ? 0 : 3;
+	return status;
 }
 
 char* slide_sample(slide_t* target, resolution_t* resolution){
-	char* path = asprintf_("%s/%dx%d.png", target->path.sample_path, resolution->width, resolution->height);
+	char* path = slide_sample_path(target, resolution);
 
 	if ( access(path, R_OK) != 0 ){
 		slide_resample(target, resolution, NULL);
 	}
 
 	return path;
+}
+
+char* slide_sample_path(const slide_t* target, const resolution_t* resolution){
+	return asprintf_("%s/%dx%d.png", target->path.sample_path, resolution->width, resolution->height);
+}
+
+char* slide_datapath(const slide_t* slide, const char* path){
+	return asprintf_("%s/%s", slide->path.data_path, path);
 }
 
 slide_t* slide_from_name(const char* name){

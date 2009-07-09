@@ -48,12 +48,33 @@ extern "C" {
 
 int slide_create(const char* name);
 int slide_resample(slide_t* target, resolution_t* resolution, resolution_t* virtual_resolution);
+
+/**
+ * Get an assembled sample. Will assemble if it does not exist.
+ * @param target slide
+ * @param resolution sample resolution
+ * @return
+ */
 char* slide_sample(slide_t* target, resolution_t* resolution);
+
+/**
+ * Get path only to a sample.
+ * @param target slide
+ * @param resolution sample resolution
+ * @return
+ */
+char* slide_sample_path(const slide_t* target, const resolution_t* resolution);
 
 slide_t* slide_from_name(const char* name);
 void slide_free(slide_t* slide);
 
 resolution_t resolution_from_string(const char* str);
+char* resolution_as_string(const resolution_t* resolution);
+
+/**
+ * Appends datapath
+ */
+char* slide_datapath(const slide_t* slide, const char* path);
 
 #ifdef __cplusplus
 }

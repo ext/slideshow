@@ -1,5 +1,6 @@
 SUBDIRS = IPC state transitions assembler
 
+noinst_LIBRARIES = libmodule_loader.a
 lib_LTLIBRARIES = libslide.la
 bin_PROGRAMS = slideshow xquery slidetool
 
@@ -13,7 +14,6 @@ slideshow_CPPFLAGS = \
 	${dbus_CFLAGS} \
 	${libdaemon_CFLAGS} \
 	-I${top_srcdir}/include \
-	-D_GNU_SOURCE \
 	-pipe -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
 
 slideshow_SOURCES = \
@@ -35,13 +35,13 @@ slideshow_SOURCES = \
 	Kernel.cpp ${top_srcdir}/include/Kernel.h \
 	Log.cpp ${top_srcdir}/include/Log.h\
 	main.cpp \
-	module_loader.c \
 	path.c ${top_srcdir}/include/path.h \
 	OS_Linux.cpp \
 	browsers/dummybrowser.cpp browsers/dummybrowser.h
 
 slideshow_LDADD = \
 	-lslide \
+	libmodule_loader.a \
 	IPC/libipc.a \
 	state/libfsm.a \
 	-lltdl \
@@ -59,6 +59,9 @@ slideshow_SOURCES += browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
 slideshow_LDADD += ${MYSQL_LIBS}
 endif
 
+libmodule_loader_a_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra
+libmodule_loader_a_SOURCES = module_loader.c ${top_srcdir}/include/module_loader.h
+
 libslide_la_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra ${wand_CFLAGS}
 libslide_la_SOURCES = slidelib.c
 libslide_la_LIBADD = ${json_LIBS} ${wand_LIBS}
@@ -70,4 +73,4 @@ xquery_LDADD = ${X11_LIBS} ${xrandr_LIBS}
 
 slidetool_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra
 slidetool_SOURCES = slidetool.c module_loader.c path.c
-slidetool_LDADD = -lslide
+slidetool_LDADD = -lslide libmodule_loader.a

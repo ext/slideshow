@@ -18,6 +18,8 @@
 
 #include "module.h"
 #include "slidelib.h"
+#include <wand/MagickWand.h>
+#include <sys/stat.h>
 
 MODULE_INFO("image", ASSEMBLER_MODULE, "David Sveningsson");
 
@@ -27,6 +29,44 @@ int module_init(){
 int module_cleanup(){
 }
 
-void assemble(const slide_t* slide, const resolution_t* resolution){
+int assemble(const slide_t* slide, const resolution_t* resolution){
+	char* resolution_str = resolution_as_string(resolution);
+	char* datafile = slide_datapath(slide, slide->datafiles[0]);
+	char* samplefile = slide_sample_path(slide, resolution);
 
+	printf("datafile: %s\n", datafile);
+	printf("samplefile: %s\n", samplefile);
+
+	char* commands[] = {
+		"slidelib", // dummy program name
+		datafile,
+		"-resize", resolution_str,
+		"-background", "black",
+		"-gravity", "center",
+		"-extent", resolution_str,
+		samplefile
+	};
+	int nr_commands = sizeof(commands) / sizeof(char*);
+
+	ImageInfo* image_info = AcquireImageInfo();
+	ExceptionInfo* exception=AcquireExceptionInfo();
+	MagickBooleanType status = ConvertImageCommand(image_info, nr_commands, commands,(char **) NULL, exception);
+	if (exception->severity != UndefinedException){
+		CatchException(exception);
+		status = MagickTrue;
+	}
+	image_info=DestroyImageInfo(image_info);
+	exception=DestroyExceptionInfo(exception);
+
+	/* Must change permissions because sometimes the file is created with no
+	 * permissions at all. Perhaps its just a weird umask or something but
+	 * this ensures correct persmissions.
+	 */
+	chmod(samplefile, S_IRUSR | S_IWUSR | S_IRGRP);
+
+	free(resolution_str);
+	free(datafile);
+	free(samplefile);
+
+	return status == MagickFalse ? 0 : 3;
 }

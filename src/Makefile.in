@@ -15,6 +15,7 @@
 @SET_MAKE@
 
 
+
 VPATH = @srcdir@
 pkglibdir = $(libdir)/@PACKAGE@
 pkgincludedir = $(includedir)/@PACKAGE@
@@ -52,6 +53,13 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/include/config.h
 CONFIG_CLEAN_FILES =
+LIBRARIES = $(noinst_LIBRARIES)
+ARFLAGS = cru
+libmodule_loader_a_AR = $(AR) $(ARFLAGS)
+libmodule_loader_a_LIBADD =
+am_libmodule_loader_a_OBJECTS =  \
+	libmodule_loader_a-module_loader.$(OBJEXT)
+libmodule_loader_a_OBJECTS = $(am_libmodule_loader_a_OBJECTS)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -81,7 +89,7 @@ am__slideshow_SOURCES_DIST = ${top_srcdir}/include/Browser.h \
 	${top_srcdir}/include/ForegroundApp.h Graphics.cpp \
 	${top_srcdir}/include/Graphics.h Kernel.cpp \
 	${top_srcdir}/include/Kernel.h Log.cpp \
-	${top_srcdir}/include/Log.h main.cpp module_loader.c path.c \
+	${top_srcdir}/include/Log.h main.cpp path.c \
 	${top_srcdir}/include/path.h OS_Linux.cpp \
 	browsers/dummybrowser.cpp browsers/dummybrowser.h \
 	browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
@@ -92,13 +100,13 @@ am_slideshow_OBJECTS = slideshow-argument_parser.$(OBJEXT) \
 	slideshow-DaemonApp.$(OBJEXT) \
 	slideshow-ForegroundApp.$(OBJEXT) slideshow-Graphics.$(OBJEXT) \
 	slideshow-Kernel.$(OBJEXT) slideshow-Log.$(OBJEXT) \
-	slideshow-main.$(OBJEXT) slideshow-module_loader.$(OBJEXT) \
-	slideshow-path.$(OBJEXT) slideshow-OS_Linux.$(OBJEXT) \
-	slideshow-dummybrowser.$(OBJEXT) $(am__objects_1)
+	slideshow-main.$(OBJEXT) slideshow-path.$(OBJEXT) \
+	slideshow-OS_Linux.$(OBJEXT) slideshow-dummybrowser.$(OBJEXT) \
+	$(am__objects_1)
 slideshow_OBJECTS = $(am_slideshow_OBJECTS)
 @MYSQL_TRUE@am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
-slideshow_DEPENDENCIES = IPC/libipc.a state/libfsm.a \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+slideshow_DEPENDENCIES = libmodule_loader.a IPC/libipc.a \
+	state/libfsm.a $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
@@ -106,7 +114,7 @@ slideshow_DEPENDENCIES = IPC/libipc.a state/libfsm.a \
 am_slidetool_OBJECTS = slidetool-slidetool.$(OBJEXT) \
 	slidetool-module_loader.$(OBJEXT) slidetool-path.$(OBJEXT)
 slidetool_OBJECTS = $(am_slidetool_OBJECTS)
-slidetool_DEPENDENCIES =
+slidetool_DEPENDENCIES = libmodule_loader.a
 slidetool_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(slidetool_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
@@ -137,10 +145,11 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libslide_la_SOURCES) $(slideshow_SOURCES) \
-	$(slidetool_SOURCES) $(xquery_SOURCES)
-DIST_SOURCES = $(libslide_la_SOURCES) $(am__slideshow_SOURCES_DIST) \
-	$(slidetool_SOURCES) $(xquery_SOURCES)
+SOURCES = $(libmodule_loader_a_SOURCES) $(libslide_la_SOURCES) \
+	$(slideshow_SOURCES) $(slidetool_SOURCES) $(xquery_SOURCES)
+DIST_SOURCES = $(libmodule_loader_a_SOURCES) $(libslide_la_SOURCES) \
+	$(am__slideshow_SOURCES_DIST) $(slidetool_SOURCES) \
+	$(xquery_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
 	install-dvi-recursive install-exec-recursive \
@@ -305,12 +314,12 @@ xrandr_LIBS = @xrandr_LIBS@
 xxf86vm_CFLAGS = @xxf86vm_CFLAGS@
 xxf86vm_LIBS = @xxf86vm_LIBS@
 SUBDIRS = IPC state transitions assembler
+noinst_LIBRARIES = libmodule_loader.a
 lib_LTLIBRARIES = libslide.la
 slideshow_CPPFLAGS = \
 	${dbus_CFLAGS} \
 	${libdaemon_CFLAGS} \
 	-I${top_srcdir}/include \
-	-D_GNU_SOURCE \
 	-pipe -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
 
 slideshow_SOURCES = ${top_srcdir}/include/Browser.h \
@@ -325,14 +334,16 @@ slideshow_SOURCES = ${top_srcdir}/include/Browser.h \
 	${top_srcdir}/include/ForegroundApp.h Graphics.cpp \
 	${top_srcdir}/include/Graphics.h Kernel.cpp \
 	${top_srcdir}/include/Kernel.h Log.cpp \
-	${top_srcdir}/include/Log.h main.cpp module_loader.c path.c \
+	${top_srcdir}/include/Log.h main.cpp path.c \
 	${top_srcdir}/include/path.h OS_Linux.cpp \
 	browsers/dummybrowser.cpp browsers/dummybrowser.h \
 	$(am__append_1)
-slideshow_LDADD = -lslide IPC/libipc.a state/libfsm.a -lltdl \
-	${libportable_LIBS} ${libdaemon_LIBS} ${dbus_LIBS} ${GL_LIBS} \
-	${FREEIMAGE_LIBS} ${X11_LIBS} ${xxf86vm_LIBS} ${xrandr_LIBS} \
-	$(am__append_2)
+slideshow_LDADD = -lslide libmodule_loader.a IPC/libipc.a \
+	state/libfsm.a -lltdl ${libportable_LIBS} ${libdaemon_LIBS} \
+	${dbus_LIBS} ${GL_LIBS} ${FREEIMAGE_LIBS} ${X11_LIBS} \
+	${xxf86vm_LIBS} ${xrandr_LIBS} $(am__append_2)
+libmodule_loader_a_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra
+libmodule_loader_a_SOURCES = module_loader.c ${top_srcdir}/include/module_loader.h
 libslide_la_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra ${wand_CFLAGS}
 libslide_la_SOURCES = slidelib.c
 libslide_la_LIBADD = ${json_LIBS} ${wand_LIBS}
@@ -342,7 +353,7 @@ xquery_SOURCES = xquery.c
 xquery_LDADD = ${X11_LIBS} ${xrandr_LIBS}
 slidetool_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra
 slidetool_SOURCES = slidetool.c module_loader.c path.c
-slidetool_LDADD = -lslide
+slidetool_LDADD = -lslide libmodule_loader.a
 all: all-recursive
 
 .SUFFIXES:
@@ -376,6 +387,13 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+
+clean-noinstLIBRARIES:
+	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+libmodule_loader.a: $(libmodule_loader_a_OBJECTS) $(libmodule_loader_a_DEPENDENCIES) 
+	-rm -f libmodule_loader.a
+	$(libmodule_loader_a_AR) libmodule_loader.a $(libmodule_loader_a_OBJECTS) $(libmodule_loader_a_LIBADD)
+	$(RANLIB) libmodule_loader.a
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
 	test -z "$(libdir)" || $(MKDIR_P) "$(DESTDIR)$(libdir)"
@@ -449,6 +467,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmodule_loader_a-module_loader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libslide_la-slidelib.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-Browser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-DaemonApp.Po@am__quote@
@@ -462,7 +481,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-dummybrowser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-exception.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-module_loader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-mysqlbrowser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-path.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slidetool-module_loader.Po@am__quote@
@@ -491,6 +509,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
 
+libmodule_loader_a-module_loader.o: module_loader.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmodule_loader_a_CFLAGS) $(CFLAGS) -MT libmodule_loader_a-module_loader.o -MD -MP -MF $(DEPDIR)/libmodule_loader_a-module_loader.Tpo -c -o libmodule_loader_a-module_loader.o `test -f 'module_loader.c' || echo '$(srcdir)/'`module_loader.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libmodule_loader_a-module_loader.Tpo $(DEPDIR)/libmodule_loader_a-module_loader.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='module_loader.c' object='libmodule_loader_a-module_loader.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmodule_loader_a_CFLAGS) $(CFLAGS) -c -o libmodule_loader_a-module_loader.o `test -f 'module_loader.c' || echo '$(srcdir)/'`module_loader.c
+
+libmodule_loader_a-module_loader.obj: module_loader.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmodule_loader_a_CFLAGS) $(CFLAGS) -MT libmodule_loader_a-module_loader.obj -MD -MP -MF $(DEPDIR)/libmodule_loader_a-module_loader.Tpo -c -o libmodule_loader_a-module_loader.obj `if test -f 'module_loader.c'; then $(CYGPATH_W) 'module_loader.c'; else $(CYGPATH_W) '$(srcdir)/module_loader.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libmodule_loader_a-module_loader.Tpo $(DEPDIR)/libmodule_loader_a-module_loader.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='module_loader.c' object='libmodule_loader_a-module_loader.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmodule_loader_a_CFLAGS) $(CFLAGS) -c -o libmodule_loader_a-module_loader.obj `if test -f 'module_loader.c'; then $(CYGPATH_W) 'module_loader.c'; else $(CYGPATH_W) '$(srcdir)/module_loader.c'; fi`
+
 libslide_la-slidelib.lo: slidelib.c
 @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libslide_la_CFLAGS) $(CFLAGS) -MT libslide_la-slidelib.lo -MD -MP -MF $(DEPDIR)/libslide_la-slidelib.Tpo -c -o libslide_la-slidelib.lo `test -f 'slidelib.c' || echo '$(srcdir)/'`slidelib.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libslide_la-slidelib.Tpo $(DEPDIR)/libslide_la-slidelib.Plo
@@ -511,20 +543,6 @@ slideshow-argument_parser.obj: argument_parser.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='argument_parser.c' object='slideshow-argument_parser.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o slideshow-argument_parser.obj `if test -f 'argument_parser.c'; then $(CYGPATH_W) 'argument_parser.c'; else $(CYGPATH_W) '$(srcdir)/argument_parser.c'; fi`
-
-slideshow-module_loader.o: module_loader.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT slideshow-module_loader.o -MD -MP -MF $(DEPDIR)/slideshow-module_loader.Tpo -c -o slideshow-module_loader.o `test -f 'module_loader.c' || echo '$(srcdir)/'`module_loader.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/slideshow-module_loader.Tpo $(DEPDIR)/slideshow-module_loader.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='module_loader.c' object='slideshow-module_loader.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o slideshow-module_loader.o `test -f 'module_loader.c' || echo '$(srcdir)/'`module_loader.c
-
-slideshow-module_loader.obj: module_loader.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT slideshow-module_loader.obj -MD -MP -MF $(DEPDIR)/slideshow-module_loader.Tpo -c -o slideshow-module_loader.obj `if test -f 'module_loader.c'; then $(CYGPATH_W) 'module_loader.c'; else $(CYGPATH_W) '$(srcdir)/module_loader.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/slideshow-module_loader.Tpo $(DEPDIR)/slideshow-module_loader.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='module_loader.c' object='slideshow-module_loader.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o slideshow-module_loader.obj `if test -f 'module_loader.c'; then $(CYGPATH_W) 'module_loader.c'; else $(CYGPATH_W) '$(srcdir)/module_loader.c'; fi`
 
 slideshow-path.o: path.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT slideshow-path.o -MD -MP -MF $(DEPDIR)/slideshow-path.Tpo -c -o slideshow-path.o `test -f 'path.c' || echo '$(srcdir)/'`path.c
@@ -966,7 +984,7 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(LTLIBRARIES) $(PROGRAMS)
+all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(PROGRAMS)
 install-binPROGRAMS: install-libLTLIBRARIES
 
 installdirs: installdirs-recursive
@@ -1001,7 +1019,7 @@ maintainer-clean-generic:
 clean: clean-recursive
 
 clean-am: clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
-	clean-libtool mostlyclean-am
+	clean-libtool clean-noinstLIBRARIES mostlyclean-am
 
 distclean: distclean-recursive
 	-rm -rf ./$(DEPDIR)
@@ -1062,19 +1080,19 @@ uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES
 
 .PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
 	all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic clean-libLTLIBRARIES clean-libtool ctags \
-	ctags-recursive distclean distclean-compile distclean-generic \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-libLTLIBRARIES \
-	install-man install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags tags-recursive uninstall uninstall-am \
+	clean-generic clean-libLTLIBRARIES clean-libtool \
+	clean-noinstLIBRARIES ctags ctags-recursive distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-binPROGRAMS install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-libLTLIBRARIES install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs installdirs-am \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags tags-recursive uninstall uninstall-am \
 	uninstall-binPROGRAMS uninstall-libLTLIBRARIES
 
 

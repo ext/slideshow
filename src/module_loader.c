@@ -18,6 +18,7 @@
 
 #include "config.h"
 #include "module_loader.h"
+#include "assembler.h"
 #include "Transition.h"
 #include <ltdl.h>
 #include <stdio.h>
@@ -93,6 +94,14 @@ module_t* module_get(struct module_context_t* context){
 		{
 			transition_module_t* m = (transition_module_t*)malloc(sizeof(transition_module_t));
 			m->render = (render_callback)lt_dlsym(context->handle, "render");
+			module = (module_t*)m;
+		}
+		break;
+
+		case ASSEMBLER_MODULE:
+		{
+			assembler_module_t* m = (assembler_module_t*)malloc(sizeof(assembler_module_t));
+			m->assemble = (assemble_callback)lt_dlsym(context->handle, "assemble");
 			module = (module_t*)m;
 		}
 		break;
