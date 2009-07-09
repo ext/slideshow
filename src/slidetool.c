@@ -91,7 +91,8 @@ int main(int argc, const char* argv[]){
 		return 1;
 	} else {
 		moduleloader_init(pluginpath());
-		action(argc, argv);
+		int rc = action(argc, argv);
 		moduleloader_cleanup();
+		return rc;
 	}
 }
