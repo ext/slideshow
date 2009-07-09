@@ -23,6 +23,7 @@
 #include <ltdl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct module_context_t {
 	lt_dlhandle handle;
@@ -35,7 +36,14 @@ static int errnum = 0;
 
 void moduleloader_init(const char* searchpath){
 	lt_dlinit();
-	lt_dladdsearchdir(searchpath);
+
+	char* path_list = strdup(searchpath);
+	char* path = strtok(path_list, ":");
+	while ( path ){
+		lt_dladdsearchdir(path);
+		path = strtok(NULL, ":");
+	}
+	free(path_list);
 }
 
 void moduleloader_cleanup(){
