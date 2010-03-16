@@ -23,10 +23,12 @@
 #include <stdarg.h>
 
 #define ARGUMENT_HEAD \
-	const char* name; \
-	char flag; \
-	const char* description; \
-	int type;
+	struct { \
+		const char* name; \
+		char flag; \
+		const char* description; \
+		int type; \
+	}
 
 #define arg_flag 1
 #define arg_string 2
@@ -34,7 +36,7 @@
 #define arg_fmt 4
 
 typedef struct {
-	ARGUMENT_HEAD
+	ARGUMENT_HEAD;
 } argument_t;
 
 typedef struct {
