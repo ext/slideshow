@@ -16,8 +16,9 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Internal
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
 #include "argument_parser.h"
 #include "module.h"
