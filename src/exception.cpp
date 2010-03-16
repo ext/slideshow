@@ -1,6 +1,7 @@
 #include "Exceptions.h"
 #include <cstdlib>
 #include <cstdio>
+#include <portable/asprintf.h>
 
 BaseException::BaseException(const char* message): std::exception(), _msg(NULL) {
 	if ( message ){
