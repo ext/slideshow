@@ -32,7 +32,9 @@
 #include "Transition.h"
 
 // IPC
-#include "IPC/dbus.h"
+#ifdef HAVE_DBUS
+#	include "IPC/dbus.h"
+#endif /* HAVE_DBUS */
 
 // FSM
 #include "state/State.h"
