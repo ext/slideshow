@@ -16,17 +16,19 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
 #include "module_loader.h"
 #include "assembler.h"
 #include "Transition.h"
-#include <ltdl.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <stdio.h>
+#include "win32.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct module_context_t {
-	lt_dlhandle handle;
+	HMODULE handle;
 };
 
 static int errnum = 0;
@@ -34,20 +36,30 @@ static int errnum = 0;
 #define MODULE_NOT_FOUND 1
 #define MODULE_INVALID 2
 
-void moduleloader_init(const char* searchpath){
-	lt_dlinit();
+/* convert to LPCTSTR, release memory with free */
+static TCHAR* to_tchar(const char* src){
+	int len = mbtowc(NULL, src, strlen(src));
+	TCHAR* buf = (TCHAR*)malloc(sizeof(TCHAR) * (len+1));
+	mbtowc(buf, src, strlen(src));
+	return buf;
+}
 
+void moduleloader_init(const char* searchpath){
 	char* path_list = strdup(searchpath);
-	char* path = strtok(path_list, ":");
+	char* cur = NULL;
+	char* path = strtok_s(path_list, ":", &cur);
 	while ( path ){
-		lt_dladdsearchdir(path);
-		path = strtok(NULL, ":");
+		LPTSTR tpath = to_tchar(path);
+		SetDllDirectory(tpath);
+		
+		free(tpath);
+		path = strtok_s(NULL, ":", &cur);
 	}
 	free(path_list);
 }
 
 void moduleloader_cleanup(){
-	lt_dlexit();
+	SetDllDirectory(NULL);
 }
 
 int module_error(){
@@ -65,14 +77,16 @@ const char* module_error_string(){
 }
 
 struct module_context_t* module_open(const char* name){
-	lt_dlhandle handle = lt_dlopenext(name);
+	LPTSTR tname = to_tchar(name);
+	HMODULE handle = LoadLibrary(tname);
+	free(tname);
 
 	if ( !handle ){
 		errnum = MODULE_NOT_FOUND;
 		return NULL;
 	}
 
-	void* sym = lt_dlsym(handle, "__module_name");
+	void* sym = (void*)GetProcAddress(handle, "__module_name");
 
 	if ( !sym ){
 		errnum = MODULE_INVALID;
@@ -90,7 +104,7 @@ void module_close(struct module_context_t* context){
 		return;
 	}
 
-	lt_dlclose(context->handle);
+	FreeLibrary(context->handle);
 	free(context);
 }
 
@@ -101,7 +115,7 @@ module_t* module_get(struct module_context_t* context){
 		case TRANSITION_MODULE:
 		{
 			transition_module_t* m = (transition_module_t*)malloc(sizeof(transition_module_t));
-			m->render = (render_callback)lt_dlsym(context->handle, "render");
+			m->render = (render_callback)GetProcAddress(context->handle, "render");
 			module = (module_t*)m;
 		}
 		break;
@@ -109,7 +123,7 @@ module_t* module_get(struct module_context_t* context){
 		case ASSEMBLER_MODULE:
 		{
 			assembler_module_t* m = (assembler_module_t*)malloc(sizeof(assembler_module_t));
-			m->assemble = (assemble_callback)lt_dlsym(context->handle, "assemble");
+			m->assemble = (assemble_callback)GetProcAddress(context->handle, "assemble");
 			module = (module_t*)m;
 		}
 		break;
@@ -119,24 +133,28 @@ module_t* module_get(struct module_context_t* context){
 			return NULL;
 	}
 
-	module->init = (module_init_callback)lt_dlsym(context->handle, "module_init");
-	module->cleanup = (module_cleanup_callback)lt_dlsym(context->handle, "module_cleanup");
+	module->init = (module_init_callback)GetProcAddress(context->handle, "module_init");
+	module->cleanup = (module_cleanup_callback)GetProcAddress(context->handle, "module_cleanup");
 
 	return module;
 }
 
 const char* module_get_name(const struct module_context_t* context){
-	void* sym = lt_dlsym(context->handle, "__module_name");
+	void* sym = GetProcAddress(context->handle, "__module_name");
 	return *((char**)sym);
 
 }
 
 const char* module_get_author(const struct module_context_t* context){
-	void* sym = lt_dlsym(context->handle, "__module_author");
+	void* sym = GetProcAddress(context->handle, "__module_author");
 	return *((char**)sym);
 }
 
 int module_type(const struct module_context_t* context){
-	void* sym = lt_dlsym(context->handle, "__module_type");
+	void* sym = GetProcAddress(context->handle, "__module_type");
 	return *((int*)sym);
 }
+
+#ifdef __cplusplus
+}
+#endif
