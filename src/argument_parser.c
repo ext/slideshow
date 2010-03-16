@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <portable/vscanf.h>
 
 #define ARGUMENT_HEAD \
 	struct { \
@@ -338,10 +339,43 @@ void option_add_int(option_set_t* option, const char* name, char flag, const cha
 }
 
 void option_add_format(option_set_t* option, const char* name, char flag, const char* description, const char* format_description, const char* fmt, ...){
+	void** fmtbuf = NULL;
+	int args = 0;
+
 	argument_format_t* arg = (argument_format_t*)argument_allocate(sizeof(argument_format_t), arg_fmt, name, flag, description);
 	arg->format_description = format_description;
 	arg->fmt = fmt;
-	va_start(arg->dst, fmt);
+
+	/* The va_list cannot be copied directly since it might just be a pointer
+	 * to the stack, in which case it will probably be overwritten by the time
+	 * it is actually used. Therefore a buffer is manually allocated and filled
+	 * with the passed pointers. */
+
+	/* allocate argument buffer */
+	{
+		const char* ch = fmt;
+
+		while ( *ch ){
+			if ( *ch++ == '%' ) args++;
+		}
+
+		/* @todo memory leak */
+		fmtbuf = (void**)malloc(args * sizeof(void*));
+	}
+
+	/* fill argument buffer */
+	{
+		int i;
+		va_list ap;
+		va_start(ap, fmt);
+
+		for ( i = 0; i < args; i++ ){
+			fmtbuf[i] = va_arg(ap, void*);
+		}
+	}
+
+	arg->dst = (va_list)fmtbuf;
+
 	option_add_argument(option, (argument_t*)arg);
 }
 
