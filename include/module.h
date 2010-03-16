@@ -29,4 +29,14 @@ enum module_type_t {
 	const enum module_type_t __module_type = type; \
 	const char * __module_author = author
 
+#ifdef WIN32
+#	ifdef BUILD_DLL
+#		define EXPORT __declspec(dllexport)
+#	else /* BUILD_DLL */
+#		define EXPORT __declspec(dllimport)
+#	endif /* BUILD_DLL */
+#else /* WIN32 */
+#	define EXPORt
+#endif
+
 #endif // SLIDESHOW_MODULE_H

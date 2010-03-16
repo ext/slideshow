@@ -27,15 +27,15 @@
 
 MODULE_INFO("Spin", TRANSITION_MODULE, "David Sveningsson");
 
-int module_init(){
+int EXPORT module_init(){
 	return 0;
 }
 
-int module_cleanup(){
+int EXPORT module_cleanup(){
 	return 0;
 }
 
-void render(transition_context_t* context){
+void EXPORT render(transition_context_t* context){
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glPushMatrix();
