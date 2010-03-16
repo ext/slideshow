@@ -110,7 +110,9 @@ void Kernel::init_graphics(){
 }
 
 void Kernel::init_IPC(){
+#ifdef HAVE_DBUS
 	_ipc = new DBus(this, 50);
+#endif /* HAVE_DBUS */
 }
 
 void Kernel::init_browser(){
