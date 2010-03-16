@@ -23,6 +23,7 @@
 #include <cstring>
 #include <errno.h>
 #include <time.h>
+#include <portable/asprintf.h>
 
 Log::Severity Log::_level = Info;
 FILE* Log::_file = NULL;
