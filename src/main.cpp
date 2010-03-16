@@ -88,7 +88,7 @@ int main( int argc, const char* argv[] ){
 
 		Log::deinitialize();
 
-	} catch ( ExitException &e ){
+	} catch ( ExitException ){
 		return 0;
 
 	} catch ( FatalException &e ){
