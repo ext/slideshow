@@ -18,7 +18,11 @@
 
 #include "Kernel.h"
 #include "ForegroundApp.h"
-#include "DaemonApp.h"
+
+#ifdef BUILD_DAEMON
+#	include "DaemonApp.h"
+#endif /* BUILD_DAEMON */
+
 #include "Log.h"
 #include "Exceptions.h"
 #include "module_loader.h"
@@ -58,8 +62,15 @@ int main( int argc, const char* argv[] ){
 		Kernel* application = NULL;
 
 		switch ( arguments.mode ){
-			case Kernel::ForegroundMode: application = new ForegroundApp(arguments); break;
-			case Kernel::DaemonMode: application = new DaemonApp(arguments); break;
+			case Kernel::ForegroundMode:
+				application = new ForegroundApp(arguments);
+				break;
+			case Kernel::DaemonMode: 
+#ifdef BUILD_DAEMON
+				application = new DaemonApp(arguments); break;
+#else /* BUILD_DAEMON */
+				throw KernelException("DaemonMode is not supported.");
+#endif /* BUILD_DAEMON */
 			case Kernel::ListTransitionMode:
 				Kernel::print_transitions();
 				throw ExitException();
