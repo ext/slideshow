@@ -25,8 +25,8 @@ enum module_type_t {
 };
 
 #define MODULE_INFO(name, type, author) \
-	const char const * __module_name = name; \
+	const char * __module_name = name; \
 	const enum module_type_t __module_type = type; \
-	const char const * __module_author = author
+	const char * __module_author = author
 
 #endif // SLIDESHOW_MODULE_H
