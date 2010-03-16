@@ -18,7 +18,7 @@
 
 #include "module.h"
 #include "Transition.h"
-#include <GL/gl.h>
+#include "gl.h"
 
 MODULE_INFO("Fade", TRANSITION_MODULE, "David Sveningsson");
 

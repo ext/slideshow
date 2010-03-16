@@ -18,7 +18,7 @@
 
 #include "module.h"
 #include "Transition.h"
-#include <GL/gl.h>
+#include "gl.h"
 #include <math.h>
 
 #ifndef M_PI
