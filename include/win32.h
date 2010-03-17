@@ -29,3 +29,6 @@
 
 // POSIX name "compability"-fixes
 #define strdup _strdup
+
+// Simple security enhancements fixes
+#define scanf scanf_s
