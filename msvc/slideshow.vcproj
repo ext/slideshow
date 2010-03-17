@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="$(SolutionDir)\..\include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;UNICODE;DATA_DIR=\&quot;data\&quot;;PLUGIN_DIR=\&quot;plugins\&quot;;HAVE_SDL"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;UNICODE;DATA_DIR=\&quot;..\\data\&quot;;PLUGIN_DIR=\&quot;..\\plugins\&quot;;HAVE_SDL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libportable32.lib SDL.lib"
+				AdditionalDependencies="libportable32.lib SDL.lib FreeImage.lib OpenGL32.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -189,6 +189,10 @@
 			</File>
 			<File
 				RelativePath="..\src\ForegroundApp.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Graphics.cpp"
 				>
 			</File>
 			<File
