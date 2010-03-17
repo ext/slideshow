@@ -29,8 +29,7 @@ char* real_path(const char* filename){
 	char* dst;
 
 	if ( filename[0] == '/' ){
-		dst = (char*)malloc(strlen(filename)+1);
-		strcpy(dst, filename);
+		dst = strdup(filename);
 	} else {
 		if ( asprintf(&dst, "%s/%s", datapath(), filename) == -1 ){
 			fprintf(stderr, "out-of-memory\n");
