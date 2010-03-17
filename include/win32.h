@@ -33,5 +33,6 @@
 
 // Simple security enhancements fixes
 #define scanf scanf_s
+#define sscanf sscanf_s
 #define strtok_r strtok_s
 #define strncpy(dst, src, n) strncpy_s(dst, n, src, _TRUNCATE)
