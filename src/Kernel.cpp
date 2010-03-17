@@ -275,6 +275,7 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 }
 
 void Kernel::play_video(const char* fullpath){
+#ifndef WIN32
 	Log::message(Log::Info, "Kernel: Playing video \"%s\"\n", fullpath);
 
 	int status;
@@ -285,6 +286,9 @@ void Kernel::play_video(const char* fullpath){
 	}
 
 	::wait(&status);
+#else /* WIN32 */
+	Log::message(Log::Warning, "Kernel: Video playback is not supported on this platform (skipping \"%s\")\n", fullpath);
+#endif /* WIN32 */
 }
 
 void Kernel::start(){
