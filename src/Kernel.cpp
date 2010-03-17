@@ -70,9 +70,15 @@
 
 static char* pidfile = NULL;
 
-Kernel::Kernel(const argument_set_t& arg):
-	_arg(arg),
-	_password(NULL){
+Kernel::Kernel(const argument_set_t& arg)
+	: _arg(arg)
+	, _password(NULL)
+	, _state(NULL)
+	, _graphics(NULL)
+	, _browser(NULL)
+	, _ipc(NULL)
+	, _running(false) {
+
 	create_pidpath();
 	_password = get_password();
 }
