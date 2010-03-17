@@ -1,5 +1,9 @@
 #include "backend/SDLbackend.h"
-#include "exception.h"
+#include "Exceptions.h"
+
+#ifdef WIN32
+#	include "win32.h"
+#endif
 
 SDLBackend::SDLBackend()
 	: PlatformBackend()
@@ -36,11 +40,9 @@ void SDLBackend::poll(){
 				case SDL_VIDEORESIZE:
 					printf("video resize\n");
 					set_resolution(event.resize.w, event.resize.h);
-					app->resize(event.resize.w, event.resize.h);
 					break;
 
 				case SDL_QUIT:
-					app->quit();
 					break;
 			}
 		}
