@@ -45,7 +45,7 @@
 
 // libportable
 #include <portable/Time.h>
-#include <portable/string.h>
+#include <portable/asprintf.h>
 #include <portable/scandir.h>
 
 // libc
