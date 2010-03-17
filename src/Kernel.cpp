@@ -126,7 +126,7 @@ void Kernel::cleanup_backend(){
 }
 
 void Kernel::init_graphics(){
-	_graphics = new Graphics(_arg.width, _arg.height, _arg.fullscreen);
+	_graphics = new Graphics(_arg.width, _arg.height, _arg.fullscreen > 0);
 	load_transition( _arg.transition_string ? _arg.transition_string : "fade" );
 }
 
