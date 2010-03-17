@@ -24,14 +24,13 @@
 #include <errno.h>
 #include <time.h>
 #include <portable/asprintf.h>
+#include <portable/file.h>
 
 Log::Severity Log::_level = Info;
 FILE* Log::_file = NULL;
 
 void Log::initialize(const char* filename){
-	_file = fopen(filename, "a");
-
-	if ( !_file ){
+	if ( fopen_s(&_file, filename, "a") != 0 ){
 		fprintf(stderr, "Failed to open logfile '%s' ! Fatal error!\n", filename);
 		exit(1);
 	}
