@@ -165,7 +165,10 @@ void Kernel::init_fsm(){
 
 void Kernel::load_transition(const char* name){
 	Log::message(Log::Warning, "Loading %s\n", name);
-	struct module_context_t* context = module_open(name);
+
+	char* fullname = asprintf2("%s%s", name, SO_SUFFIX);
+	struct module_context_t* context = module_open(fullname);
+	free(fullname);
 
 	if ( !context ){
 		Log::message(Log::Info, "Transition plugin not found\n");
