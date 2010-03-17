@@ -212,7 +212,7 @@ void Kernel::print_transitions(){
 	char* path_list = strdup(pluginpath());
 	char* path = strtok(path_list, ":");
 	while ( path ){
-		n = scandir(path, &namelist, filter, alphasort);
+		n = scandir(path, &namelist, filter, NULL);
 		if (n < 0){
 			perror("scandir");
 		} else {
