@@ -47,6 +47,7 @@
 #include <portable/Time.h>
 #include <portable/asprintf.h>
 #include <portable/scandir.h>
+#include <portable/cwd.h>
 
 // libc
 #include <cstdlib>
