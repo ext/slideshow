@@ -25,6 +25,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <portable/asprintf.h>
+
 #ifdef WIN32
 #	include "win32.h"
 #endif
