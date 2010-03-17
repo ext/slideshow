@@ -26,6 +26,10 @@
 #include <portable/asprintf.h>
 #include <portable/file.h>
 
+#ifdef WIN32
+#	include "win32.h"
+#endif
+
 Log::Severity Log::_level = Info;
 FILE* Log::_file = NULL;
 
