@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "slideshow", "slideshow.vcproj", "{112E805A-40C7-4F17-8FF5-2A6F353E15B2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "transitions", "transitions", "{769A2387-49D0-425E-B077-81A984CF82B8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fade", "transitions\fade.vcproj", "{50F01F64-B5F3-413D-9936-A61267AD4818}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spin", "transitions\spin.vcproj", "{B9BB0B7E-6949-4010-8342-46555DAE05AE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{112E805A-40C7-4F17-8FF5-2A6F353E15B2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{112E805A-40C7-4F17-8FF5-2A6F353E15B2}.Debug|Win32.Build.0 = Debug|Win32
+		{112E805A-40C7-4F17-8FF5-2A6F353E15B2}.Release|Win32.ActiveCfg = Release|Win32
+		{112E805A-40C7-4F17-8FF5-2A6F353E15B2}.Release|Win32.Build.0 = Release|Win32
+		{50F01F64-B5F3-413D-9936-A61267AD4818}.Debug|Win32.ActiveCfg = Debug|Win32
+		{50F01F64-B5F3-413D-9936-A61267AD4818}.Debug|Win32.Build.0 = Debug|Win32
+		{50F01F64-B5F3-413D-9936-A61267AD4818}.Release|Win32.ActiveCfg = Release|Win32
+		{50F01F64-B5F3-413D-9936-A61267AD4818}.Release|Win32.Build.0 = Release|Win32
+		{B9BB0B7E-6949-4010-8342-46555DAE05AE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B9BB0B7E-6949-4010-8342-46555DAE05AE}.Debug|Win32.Build.0 = Debug|Win32
+		{B9BB0B7E-6949-4010-8342-46555DAE05AE}.Release|Win32.ActiveCfg = Release|Win32
+		{B9BB0B7E-6949-4010-8342-46555DAE05AE}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{50F01F64-B5F3-413D-9936-A61267AD4818} = {769A2387-49D0-425E-B077-81A984CF82B8}
+		{B9BB0B7E-6949-4010-8342-46555DAE05AE} = {769A2387-49D0-425E-B077-81A984CF82B8}
+	EndGlobalSection
+EndGlobal
