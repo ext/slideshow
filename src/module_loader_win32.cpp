@@ -38,9 +38,9 @@ static int errnum = 0;
 
 /* convert to LPCTSTR, release memory with free */
 static TCHAR* to_tchar(const char* src){
-	int len = mbtowc(NULL, src, strlen(src));
+	size_t len = mbstowcs(NULL, src, INT_MAX);
 	TCHAR* buf = (TCHAR*)malloc(sizeof(TCHAR) * (len+1));
-	mbtowc(buf, src, strlen(src));
+	mbstowcs(buf, src, INT_MAX);
 	return buf;
 }
 
