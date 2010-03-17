@@ -34,7 +34,7 @@
 char* real_path(const char* filename){
 	char* dst;
 
-	if ( filename[0] == '/' ){
+	if ( filename[0] == '/' || filename[1] == ':' ){
 		dst = strdup(filename);
 	} else {
 		if ( asprintf(&dst, "%s/%s", datapath(), filename) == -1 ){
