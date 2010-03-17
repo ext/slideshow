@@ -54,11 +54,10 @@
 #include <cstring>
 
 // Platform
-#include <sys/wait.h>
-#include <signal.h>
-
 #ifdef LINUX
 //#include <sys/time.h>
+#	include <sys/wait.h>
+#	include <signal.h>
 #endif
 
 #ifdef WIN32
