@@ -43,6 +43,9 @@
 #include "state/TransitionState.h"
 #include "state/ViewState.h"
 
+// Backend
+#include "backend/platform.h"
+
 // libportable
 #include <portable/Time.h>
 #include <portable/asprintf.h>
@@ -67,14 +70,17 @@
 
 static char* pidfile = NULL;
 
-Kernel::Kernel(const argument_set_t& arg)
+Kernel::Kernel(const argument_set_t& arg, PlatformBackend* backend)
 	: _arg(arg)
 	, _password(NULL)
 	, _state(NULL)
 	, _graphics(NULL)
 	, _browser(NULL)
 	, _ipc(NULL)
+	, _backend(backend)
 	, _running(false) {
+
+	verify(_backend);
 
 	create_pidpath();
 	_password = get_password();
@@ -87,6 +93,7 @@ Kernel::~Kernel(){
 void Kernel::init(){
 	Log::message(Log::Info, "Kernel: Starting slideshow\n");
 
+	init_backend();
 	init_graphics();
 	init_IPC();
 	init_browser();
@@ -101,11 +108,21 @@ void Kernel::cleanup(){
 	free(pidfile);
 	free(_password);
 
+	cleanup_backend();
+
 	_state = NULL;
 	_browser = NULL;
 	_graphics = NULL;
 	_ipc = NULL;
 	pidfile = NULL;
+}
+
+void Kernel::init_backend(){
+	_backend->init(Vector2ui(_arg.width, _arg.height), _arg.fullscreen);
+}
+
+void Kernel::cleanup_backend(){
+	_backend->cleanup();
 }
 
 void Kernel::init_graphics(){
@@ -165,11 +182,16 @@ void Kernel::load_transition(const char* name){
 }
 
 void Kernel::poll(){
-	OS::poll_events(_running);
+	_backend->poll();
 }
 
 void Kernel::action(){
-	_state = _state->action();
+	bool flip = false;
+	_state = _state->action(flip);
+
+	if ( flip ){
+		_backend->swap_buffers();
+	}
 }
 
 void Kernel::print_licence_statement(){

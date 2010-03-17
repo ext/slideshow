@@ -3,7 +3,7 @@
 #include "ViewState.h"
 #include "Log.h"
 
-State* SwitchState::action(){
+State* SwitchState::action(bool &flip){
 	if ( !browser() ){
 		return new ViewState(this);
 	}

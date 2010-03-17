@@ -25,6 +25,11 @@
 
 class PlatformBackend {
 	public:
+		typedef PlatformBackend* (*factory_callback)();
+		static PlatformBackend* factory(const char* name);
+		static void register_factory(const char* name, factory_callback callback);
+		static void register_all();
+
 		PlatformBackend(){}
 		virtual ~PlatformBackend(){}
 
@@ -32,7 +37,7 @@ class PlatformBackend {
 		 * Initializes the backend.
 		 * @return zero if successful
 		 */
-		virtual int init(const Vector2ui &resolution) = 0;
+		virtual int init(const Vector2ui &resolution, bool fullscreen) = 0;
 
 		/**
 		 * Cleanup method.

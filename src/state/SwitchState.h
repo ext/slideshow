@@ -8,7 +8,7 @@ class SwitchState: public State {
 		SwitchState(State* state): State(state){}
 		virtual ~SwitchState(){}
 
-		virtual State* action();
+		virtual State* action(bool &flip);
 };
 
 #endif // SWITCHSTATE_H

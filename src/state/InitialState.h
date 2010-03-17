@@ -8,7 +8,7 @@ class InitialState: public State {
 		InitialState(Browser* browser, Graphics* gfx, IPC* ipc): State(browser, gfx, ipc){}
 		virtual ~InitialState(){}
 
-		virtual State* action();
+		virtual State* action(bool &flip);
 };
 
 #endif // INITIALSTATE_H

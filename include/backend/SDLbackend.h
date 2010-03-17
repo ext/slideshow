@@ -6,10 +6,12 @@
 
 class SDLBackend:public PlatformBackend {
 	public:
+		static void register_factory();
+
 		SDLBackend();
 		virtual ~SDLBackend();
 
-		virtual int init(const Vector2ui &resolution);
+		virtual int init(const Vector2ui &resolution, bool fullscreen);
 		virtual void cleanup();
 
 		virtual void poll();

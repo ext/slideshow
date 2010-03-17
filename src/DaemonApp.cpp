@@ -26,8 +26,8 @@
 #include <errno.h>
 #include <csignal>
 
-DaemonApp::DaemonApp(const argument_set_t& arg):
-	Kernel(arg){
+DaemonApp::DaemonApp(const argument_set_t& arg, PlatformBackend* backend):
+	Kernel(arg, backend){
 
 }
 

@@ -62,7 +62,6 @@ Graphics::Graphics(int width, int height, bool fullscreen):
 	_width(width),
 	_height(height){
 
-	OS::init_view(width, height, fullscreen);
 	Log::message(Log::Verbose, "Graphics: Using resoultion %dx%d\n", width, height);
 
 	freeimage_init();
@@ -80,8 +79,6 @@ Graphics::~Graphics(){
 	}
 
 	free(_transition);
-
-	OS::cleanup();
 }
 
 void Graphics::freeimage_init(){
@@ -144,8 +141,6 @@ void Graphics::render(float state){
 	if ( _transition ){
 		_transition->render(&context);
 	}
-
-	OS::swap_gl_buffers();
 }
 
 void Graphics::load_image(const char* name){

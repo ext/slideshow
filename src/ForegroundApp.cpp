@@ -18,8 +18,8 @@
 
 #include "ForegroundApp.h"
 
-ForegroundApp::ForegroundApp(const argument_set_t& arg):
-	Kernel(arg){
+ForegroundApp::ForegroundApp(const argument_set_t& arg, PlatformBackend* backend):
+	Kernel(arg, backend){
 
 }
 

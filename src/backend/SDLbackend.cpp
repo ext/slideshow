@@ -5,6 +5,14 @@
 #	include "win32.h"
 #endif
 
+static PlatformBackend* factory(void){
+	return new SDLBackend;
+}
+
+void SDLBackend::register_factory(){
+	PlatformBackend::register_factory("sdl", ::factory);
+}
+
 SDLBackend::SDLBackend()
 	: PlatformBackend()
 	, _lock(false) {
@@ -15,11 +23,17 @@ SDLBackend::~SDLBackend(){
 
 }
 
-int SDLBackend::init(const Vector2ui &resolution){
+int SDLBackend::init(const Vector2ui &resolution, bool fullscreen){
 	set_resolution(resolution.width, resolution.height);
 
+	int flags = SDL_OPENGL | SDL_DOUBLEBUF;
+
+	if ( fullscreen ){
+		flags |= SDL_FULLSCREEN;
+	}
+
 	SDL_Init(SDL_INIT_VIDEO);
-	SDL_SetVideoMode(resolution.width, resolution.height, 0, SDL_OPENGL);
+	SDL_SetVideoMode(resolution.width, resolution.height, 0, flags);
 	SDL_EnableUNICODE(1);
 
 #ifdef WIN32

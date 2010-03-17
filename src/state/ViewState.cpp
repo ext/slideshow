@@ -3,7 +3,7 @@
 
 double ViewState::view_time = 1.0;
 
-State* ViewState::action(){
+State* ViewState::action(bool &flip){
 	if ( age() > view_time ){
 		return new SwitchState(this);
 	}

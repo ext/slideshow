@@ -18,7 +18,7 @@ class State {
 			delete state;
 		}
 
-		virtual State* action() = 0;
+		virtual State* action(bool &flip) = 0;
 
 		Browser* browser(){ return _browser; }
 		Graphics* gfx(){ return _gfx; }

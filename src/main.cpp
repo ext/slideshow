@@ -29,6 +29,7 @@
 #include "path.h"
 #include <cstring>
 #include <portable/Time.h>
+#include "backend/platform.h"
 
 int main( int argc, const char* argv[] ){
 	try {
@@ -55,19 +56,21 @@ int main( int argc, const char* argv[] ){
 
 		initTime();
 		moduleloader_init(pluginpath());
+		PlatformBackend::register_all();
 
 		Log::initialize("slideshow.log");
 		Log::set_level( (Log::Severity)arguments.loglevel );
 
 		Kernel* application = NULL;
+		PlatformBackend* backend = PlatformBackend::factory("sdl");
 
 		switch ( arguments.mode ){
 			case Kernel::ForegroundMode:
-				application = new ForegroundApp(arguments);
+				application = new ForegroundApp(arguments, backend);
 				break;
 			case Kernel::DaemonMode: 
 #ifdef BUILD_DAEMON
-				application = new DaemonApp(arguments); break;
+				application = new DaemonApp(arguments, backend); break;
 #else /* BUILD_DAEMON */
 				throw KernelException("DaemonMode is not supported.");
 #endif /* BUILD_DAEMON */

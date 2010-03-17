@@ -8,7 +8,7 @@ class TransitionState: public State {
 		TransitionState(State* state): State(state){}
 		virtual ~TransitionState(){}
 
-		virtual State* action();
+		virtual State* action(bool &flip);
 
 		static void set_transition_time(double t){ transition_time = t; }
 

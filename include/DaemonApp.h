@@ -25,7 +25,7 @@
 
 class DaemonApp: public Kernel {
 	public:
-		DaemonApp(const argument_set_t& arg);
+		DaemonApp(const argument_set_t& arg, PlatformBackend* backend);
 		~DaemonApp();
 
 		virtual void init();

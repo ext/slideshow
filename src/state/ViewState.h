@@ -8,7 +8,7 @@ class ViewState: public State {
 		ViewState(State* state): State(state){}
 		virtual ~ViewState(){}
 
-		virtual State* action();
+		virtual State* action(bool &flip);
 
 		static void set_view_time(double t){ view_time = t; }
 
