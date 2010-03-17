@@ -54,8 +54,7 @@ void Browser::set_string(char*& dst, const char* src){
 		return;
 	}
 
-	dst = (char*)malloc( strlen(src) + 1 );
-	strcpy(dst, src);
+	dst = strdup(src);
 }
 
 void Browser::register_factory(factory_callback callback, const char* name){
