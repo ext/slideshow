@@ -19,8 +19,6 @@
 #ifndef KERNEL_H
 #define KERNEL_H
 
-#include <sys/select.h>
-
 class Graphics;
 class Browser;
 class IPC;
