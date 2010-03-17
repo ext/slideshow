@@ -22,6 +22,7 @@ class SDLBackend:public PlatformBackend {
 
 	private:
 		bool _lock;
+		bool _fullscreen;
 };
 
 #endif /* SDLBACKEND_H */

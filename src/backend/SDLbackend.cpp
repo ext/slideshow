@@ -5,6 +5,7 @@
 #	include "win32.h"
 #endif
 
+static const int sdl_flags = SDL_OPENGL | SDL_DOUBLEBUF;
 static PlatformBackend* factory(void){
 	return new SDLBackend;
 }
@@ -26,12 +27,13 @@ SDLBackend::~SDLBackend(){
 int SDLBackend::init(const Vector2ui &resolution, bool fullscreen){
 	set_resolution(resolution.width, resolution.height);
 
-	int flags = SDL_OPENGL | SDL_DOUBLEBUF;
+	int flags = sdl_flags;
 
 	if ( fullscreen ){
 		flags |= SDL_FULLSCREEN;
 	}
 
+	_fullscreen = fullscreen;
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_SetVideoMode(resolution.width, resolution.height, 0, flags);
 	SDL_EnableUNICODE(1);
@@ -51,6 +53,25 @@ void SDLBackend::poll(bool& running){
 	SDL_Event event;
 		while(SDL_PollEvent(&event) ){
 			switch(event.type){
+				case SDL_KEYDOWN:
+					if ( event.key.keysym.sym == SDLK_ESCAPE ){
+						running = false;
+					}
+
+					if ( (event.key.keysym.sym == SDLK_RETURN) && (event.key.keysym.mod & KMOD_ALT)){
+						_fullscreen = !_fullscreen;
+						int flags = sdl_flags;
+
+						if ( _fullscreen ){
+							flags |= SDL_FULLSCREEN;
+						}
+
+						
+						SDL_SetVideoMode(resolution().width, resolution().height, 0, flags);
+					}
+
+					break;
+
 				case SDL_VIDEORESIZE:
 					printf("video resize\n");
 					set_resolution(event.resize.w, event.resize.h);
