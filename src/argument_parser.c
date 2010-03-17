@@ -23,6 +23,10 @@
 #include <stdarg.h>
 #include <portable/vscanf.h>
 
+#ifdef WIN32
+#	include "win32.h"
+#endif
+
 #define ARGUMENT_HEAD \
 	struct { \
 		const char* name; \
