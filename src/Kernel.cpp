@@ -118,7 +118,7 @@ void Kernel::cleanup(){
 }
 
 void Kernel::init_backend(){
-	_backend->init(Vector2ui(_arg.width, _arg.height), _arg.fullscreen);
+	_backend->init(Vector2ui(_arg.width, _arg.height), _arg.fullscreen > 0);
 }
 
 void Kernel::cleanup_backend(){
