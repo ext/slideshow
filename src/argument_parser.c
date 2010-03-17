@@ -225,8 +225,7 @@ int option_parse(option_set_t* option_set){
 			{
 				const argument_string_t* real_option = (const argument_string_t*)extracted_option;
 				free(*(real_option->dst));
-				*(real_option->dst) = (char*)malloc(strlen(argv[i])+1);
-				strcpy(*(real_option->dst), argv[i]);
+				*real_option->dst = strdup(argv[i]);
 				break;
 			}
 
@@ -260,8 +259,7 @@ int option_parse(option_set_t* option_set){
 }
 
 void option_set_description(option_set_t* option, const char* description){
-	option->description = (char*)malloc(strlen(description) + 1);
-	strcpy(option->description, description);
+	option->description = strdup(description);
 }
 
 void option_display_help(option_set_t* option){
