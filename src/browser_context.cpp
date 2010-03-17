@@ -38,7 +38,7 @@ static int extract_part(char* dst, const char* src, int offset, int n){
 		return offset;
 	}
 
-	strncpy(dst, &src[offset], n);
+	strncpy(dst, &src[offset], n+1);
 	dst[n] = '\0';
 
 	// We move the offset past the extracted string AND the delimiter.
