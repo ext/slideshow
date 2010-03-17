@@ -47,7 +47,7 @@ void SDLBackend::cleanup(){
 	SDL_Quit();
 }
 
-void SDLBackend::poll(){
+void SDLBackend::poll(bool& running){
 	SDL_Event event;
 		while(SDL_PollEvent(&event) ){
 			switch(event.type){
@@ -57,6 +57,7 @@ void SDLBackend::poll(){
 					break;
 
 				case SDL_QUIT:
+					running = false;
 					break;
 			}
 		}

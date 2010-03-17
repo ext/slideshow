@@ -14,7 +14,7 @@ class SDLBackend:public PlatformBackend {
 		virtual int init(const Vector2ui &resolution, bool fullscreen);
 		virtual void cleanup();
 
-		virtual void poll();
+		virtual void poll(bool& running);
 
 		virtual void swap_buffers() const;
 

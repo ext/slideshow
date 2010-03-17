@@ -47,7 +47,7 @@ class PlatformBackend {
 		/**
 		 * Poll backend for updates.
 		 */
-		virtual void poll() = 0;
+		virtual void poll(bool& running) = 0;
 
 		/**
 		 * Swap buffers.

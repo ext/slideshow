@@ -303,7 +303,7 @@
 				Name="backend"
 				>
 				<File
-					RelativePath="..\include\platform.h"
+					RelativePath="..\include\backend\platform.h"
 					>
 				</File>
 				<File

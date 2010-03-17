@@ -185,7 +185,7 @@ void Kernel::load_transition(const char* name){
 }
 
 void Kernel::poll(){
-	_backend->poll();
+	_backend->poll(_running);
 }
 
 void Kernel::action(){
