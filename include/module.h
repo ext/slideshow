@@ -24,11 +24,6 @@ enum module_type_t {
 	ASSEMBLER_MODULE
 };
 
-#define MODULE_INFO(name, type, author) \
-	const char * __module_name = name; \
-	const enum module_type_t __module_type = type; \
-	const char * __module_author = author
-
 #ifdef WIN32
 #	ifdef BUILD_DLL
 #		define EXPORT __declspec(dllexport)
@@ -36,7 +31,12 @@ enum module_type_t {
 #		define EXPORT __declspec(dllimport)
 #	endif /* BUILD_DLL */
 #else /* WIN32 */
-#	define EXPORt
+#	define EXPORT
 #endif
+
+#define MODULE_INFO(name, type, author) \
+	EXPORT const char *             __module_name = name; \
+	EXPORT const enum module_type_t __module_type = type; \
+	EXPORT const char *             __module_author = author
 
 #endif // SLIDESHOW_MODULE_H
