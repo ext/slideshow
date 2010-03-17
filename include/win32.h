@@ -32,3 +32,4 @@
 
 // Simple security enhancements fixes
 #define scanf scanf_s
+#define strtok_r strtok_s

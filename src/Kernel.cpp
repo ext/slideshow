@@ -232,7 +232,8 @@ void Kernel::print_transitions(){
 	int n;
 
 	char* path_list = strdup(pluginpath());
-	char* path = strtok(path_list, ":");
+	char* ctx;
+	char* path = strtok_r(path_list, ":", &ctx);
 	while ( path ){
 		n = scandir(path, &namelist, filter, NULL);
 		if (n < 0){
@@ -257,7 +258,7 @@ void Kernel::print_transitions(){
 			free(namelist);
 		}
 
-		path = strtok(NULL, ":");
+		path = strtok_r(NULL, ":", &ctx);
 	}
 
 	free(path_list);
