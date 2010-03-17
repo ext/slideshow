@@ -364,6 +364,14 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="browser"
+			>
+			<File
+				RelativePath="..\src\browsers\directory.cpp"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>
