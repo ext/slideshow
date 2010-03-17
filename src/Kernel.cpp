@@ -46,6 +46,7 @@
 // libportable
 #include <portable/Time.h>
 #include <portable/string.h>
+#include <portable/scandir.h>
 
 // libc
 #include <cstdlib>
@@ -189,8 +190,14 @@ void Kernel::print_cli_arguments(int argc, const char* argv[]){
 	Log::message_ex("\n");
 }
 
+#ifdef WIN32
+#	define SO_SUFFIX ".dll"
+#else
+#	define SO_SUFFIX ".la"
+#endif
+
 static int filter(const struct dirent* el){
-	return fnmatch("*.la", el->d_name, 0) == 0;
+	return fnmatch("*" SO_SUFFIX , el->d_name, 0) == 0;
 }
 
 void Kernel::print_transitions(){
