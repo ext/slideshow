@@ -27,7 +27,8 @@
 #include "Log.h"
 #include "Transition.h"
 #include "path.h"
-#include <GL/gl.h>
+#include "gl.h"
+
 #include <cstdlib>
 
 #include <portable/string.h>
