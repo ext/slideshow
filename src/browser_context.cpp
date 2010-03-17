@@ -21,6 +21,10 @@
 #include <cstring>
 #include <cstdlib>
 
+#ifdef WIN32
+#	include "win32.h"
+#endif
+
 static const int state_provider = 0;
 static const int state_user = 1;
 static const int state_pass = 2;
