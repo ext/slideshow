@@ -25,6 +25,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef WIN32
+#	include "win32.h"
+#endif
+
 char* real_path(const char* filename){
 	char* dst;
 
