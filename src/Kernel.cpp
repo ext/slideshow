@@ -65,7 +65,7 @@
 #endif
 
 #ifdef WIN32
-#include <windows.h>
+#	include "win32.h"
 #endif
 
 static char* pidfile = NULL;
