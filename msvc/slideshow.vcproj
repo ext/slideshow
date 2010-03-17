@@ -176,6 +176,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Browser.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\browser_context.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\exception.cpp"
 				>
 			</File>
