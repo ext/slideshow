@@ -25,6 +25,12 @@
 extern "C" {
 #endif
 
+#ifdef WIN32
+#	define SO_SUFFIX ".dll"
+#else
+#	define SO_SUFFIX ".la"
+#endif
+
 void moduleloader_init(const char* searchpath);
 void moduleloader_cleanup();
 
