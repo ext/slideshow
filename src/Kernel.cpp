@@ -57,8 +57,6 @@
 #include <sys/wait.h>
 #include <signal.h>
 #include <X11/Xlib.h>
-#include <dirent.h>
-#include <fnmatch.h>
 
 #ifdef LINUX
 //#include <sys/time.h>
