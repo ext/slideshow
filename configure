@@ -761,8 +761,8 @@ xxf86vm_LIBS
 xxf86vm_CFLAGS
 X11_LIBS
 X11_CFLAGS
-FREEIMAGE_LIBS
-FREEIMAGE_CFLAGS
+DEVIL_CFLAGS
+DEVIL_LIBS
 libdaemon_LIBS
 libdaemon_CFLAGS
 libportable_LIBS
@@ -16536,25 +16536,25 @@ fi
 
 
 
-for ac_header in FreeImage.h
+for ac_header in IL/il.h
 do :
-  ac_fn_c_check_header_mongrel "$LINENO" "FreeImage.h" "ac_cv_header_FreeImage_h" "$ac_includes_default"
-if test "x$ac_cv_header_FreeImage_h" = x""yes; then :
+  ac_fn_c_check_header_mongrel "$LINENO" "IL/il.h" "ac_cv_header_IL_il_h" "$ac_includes_default"
+if test "x$ac_cv_header_IL_il_h" = x""yes; then :
   cat >>confdefs.h <<_ACEOF
-#define HAVE_FREEIMAGE_H 1
+#define HAVE_IL_IL_H 1
 _ACEOF
- HAVE_FREEIMAGE=yes
+ HAVE_DEVIL=yes
 else
-  HAVE_FREEIMAGE=no
+  HAVE_DEVIL=no
 fi
 
 done
 
 if test x$HAVE_FREEIMAGE = xno; then
-   as_fn_error "FreeImage development libraries not found" "$LINENO" 5;
+   as_fn_error "DevIL development libraries not found" "$LINENO" 5;
 else
-   FREEIMAGE_LIBS="-lfreeimage"
-   FREEIMAGE_CFLAGS=""
+   DEVIL_LIBS="-lIL -lILU -lILUT"
+   DEVIL_CFLAGS=""
 fi
 
 

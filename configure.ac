@@ -98,18 +98,18 @@ AC_SUBST(libdaemon_CFLAGS)
 AC_SUBST(libdaemon_LIBS)
 
 dnl #######################################################################
-dnl # FreeImage
+dnl # DevIL
 dnl #######################################################################
-AC_CHECK_HEADERS([FreeImage.h], [HAVE_FREEIMAGE=yes], [HAVE_FREEIMAGE=no])
+AC_CHECK_HEADERS([IL/il.h], [HAVE_DEVIL=yes], [HAVE_DEVIL=no])
 if test x$HAVE_FREEIMAGE = xno; then
-   AC_MSG_ERROR(FreeImage development libraries not found);
+   AC_MSG_ERROR(DevIL development libraries not found);
 else
-   FREEIMAGE_LIBS="-lfreeimage"
-   FREEIMAGE_CFLAGS=""
+   DEVIL_LIBS="-lIL -lILU -lILUT"
+   DEVIL_CFLAGS=""
 fi
 
-AC_SUBST(FREEIMAGE_CFLAGS)
-AC_SUBST(FREEIMAGE_LIBS)
+AC_SUBST(DEVIL_LIBS)
+AC_SUBST(DEVIL_CFLAGS)
 
 dnl #######################################################################
 dnl # Xlib

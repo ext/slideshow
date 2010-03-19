@@ -218,6 +218,8 @@ CYGPATH_W = @CYGPATH_W@
 DATA_DIR = @DATA_DIR@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DEVIL_CFLAGS = @DEVIL_CFLAGS@
+DEVIL_LIBS = @DEVIL_LIBS@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
 ECHO_C = @ECHO_C@
@@ -226,8 +228,6 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
-FREEIMAGE_CFLAGS = @FREEIMAGE_CFLAGS@
-FREEIMAGE_LIBS = @FREEIMAGE_LIBS@
 GLU_CFLAGS = @GLU_CFLAGS@
 GLU_LIBS = @GLU_LIBS@
 GL_CFLAGS = @GL_CFLAGS@
@@ -371,7 +371,7 @@ slideshow_SOURCES = ${top_srcdir}/include/Browser.h \
 	$(am__append_1)
 slideshow_LDADD = libmodule_loader.a IPC/libipc.a state/libfsm.a \
 	-lltdl ${libportable_LIBS} ${libdaemon_LIBS} ${dbus_LIBS} \
-	${GL_LIBS} ${FREEIMAGE_LIBS} ${X11_LIBS} ${xxf86vm_LIBS} \
+	${GL_LIBS} ${DEVIL_LIBS} ${X11_LIBS} ${xxf86vm_LIBS} \
 	${xrandr_LIBS} $(am__append_2)
 libmodule_loader_a_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra -I${top_srcdir}/include
 libmodule_loader_a_SOURCES = module_loader.c ${top_srcdir}/include/module_loader.h

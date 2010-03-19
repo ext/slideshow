@@ -49,7 +49,7 @@ slideshow_LDADD = \
 	${libdaemon_LIBS} \
 	${dbus_LIBS} \
 	${GL_LIBS} \
-	${FREEIMAGE_LIBS} \
+	${DEVIL_LIBS} \
 	${X11_LIBS} \
 	${xxf86vm_LIBS} \
 	${xrandr_LIBS}
