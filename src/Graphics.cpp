@@ -141,6 +141,7 @@ void Graphics::render(float state){
 	}
 }
 
+#ifdef WIN32
 /* convert to LPCTSTR, release memory with free */
 static TCHAR* to_tchar(const char* src){
 	size_t len = 0;
@@ -176,6 +177,7 @@ static char* from_tchar(const TCHAR* src){
 
 	return buf;
 }
+#endif WIN32
 
 void Graphics::load_image(const char* name){
 	swap_textures();
