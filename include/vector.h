@@ -115,15 +115,15 @@ class Vector2 {
 
 		Vector2 clamp( T min_x, T min_y, T max_x, T max_y ){
 			return Vector2(
-					math::clamp(x, min_x, max_x),
-					math::clamp(y, min_y, max_y)
+					clamp(x, min_x, max_x),
+					clamp(y, min_y, max_y)
 			);
 		}
 
 		Vector2 clamp( const Vector2& min, const Vector2& max ){
 			return Vector2(
-					math::clamp(x, min.x, max.x),
-					math::clamp(y, min.y, max.y)
+					clamp(x, min.x, max.x),
+					clamp(y, min.y, max.y)
 			);
 		}
 
