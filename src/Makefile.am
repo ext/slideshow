@@ -1,8 +1,7 @@
 SUBDIRS = IPC state transitions assembler
 
 noinst_LIBRARIES = libmodule_loader.a
-lib_LTLIBRARIES = libslide.la
-bin_PROGRAMS = slideshow xquery slidetool
+bin_PROGRAMS = slideshow xquery
 
 if GCCPARSER
 .cpp.o:
@@ -10,11 +9,13 @@ if GCCPARSER
 	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
 endif
 
-slideshow_CPPFLAGS = \
+common_flags = 
 	${dbus_CFLAGS} \
 	${libdaemon_CFLAGS} \
-	-I${top_srcdir}/include \
 	-pipe -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
+
+slideshow_CPPFLAGS = -I${top_srcdir}/include ${common_flags}
+slideshow_CFLAGS   = -I${top_srcdir}/include ${common_flags}
 
 slideshow_SOURCES = \
 	${top_srcdir}/include/Browser.h \
@@ -40,7 +41,6 @@ slideshow_SOURCES = \
 	browsers/dummybrowser.cpp browsers/dummybrowser.h
 
 slideshow_LDADD = \
-	-lslide \
 	libmodule_loader.a \
 	IPC/libipc.a \
 	state/libfsm.a \
@@ -59,18 +59,9 @@ slideshow_SOURCES += browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
 slideshow_LDADD += ${MYSQL_LIBS}
 endif
 
-libmodule_loader_a_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra
+libmodule_loader_a_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra -I${top_srcdir}/include
 libmodule_loader_a_SOURCES = module_loader.c ${top_srcdir}/include/module_loader.h
-
-libslide_la_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra ${wand_CFLAGS}
-libslide_la_SOURCES = slidelib.c
-libslide_la_LIBADD = ${json_LIBS} ${wand_LIBS}
-libslide_la_LDFLAGS = -shared -avoid-version
 
 xquery_CFLAGS = -pipe -Wall -Wextra
 xquery_SOURCES = xquery.c
 xquery_LDADD = ${X11_LIBS} ${xrandr_LIBS}
-
-slidetool_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra
-slidetool_SOURCES = slidetool.c module_loader.c path.c
-slidetool_LDADD = -lslide libmodule_loader.a
