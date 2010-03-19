@@ -177,7 +177,7 @@ static char* from_tchar(const TCHAR* src){
 
 	return buf;
 }
-#endif WIN32
+#endif /* WIN32 */
 
 void Graphics::load_image(const char* name){
 	swap_textures();
