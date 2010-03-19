@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libportable32.lib SDL.lib FreeImage.lib OpenGL32.lib"
+				AdditionalDependencies="libportable32.lib SDL.lib OpenGL32.lib DevIL.lib ILU.lib ILUT.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"

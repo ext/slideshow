@@ -32,8 +32,8 @@ class Graphics {
 		void set_transition(transition_module_t* module);
 
 	private:
-		void freeimage_init();
-		void freeimage_cleanup();
+		void imageloader_init();
+		void imageloader_cleanup();
 		void gl_setup();
 		void gl_set_matrices();
 		void gl_init_textures();
@@ -42,8 +42,7 @@ class Graphics {
 		void swap_textures();
 
 		transition_module_t* _transition;
-		unsigned int _texture_0;
-		unsigned int _texture_1;
+		unsigned int _texture[2];
 		int _width;
 		int _height;
 };
