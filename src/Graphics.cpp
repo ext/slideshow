@@ -33,6 +33,11 @@
 #include <memory>
 
 #include <portable/string.h>
+
+/* hack to get opengl functions, does not seem to be used in header even when
+ * built with opengl support. */
+#define ILUT_USE_OPENGL
+
 #include <IL/il.h>
 #include <IL/ilu.h>
 #include <IL/ilut.h>
