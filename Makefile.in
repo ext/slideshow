@@ -48,7 +48,8 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac-define-dir.m4 \
 	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
 	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/pkg.m4 \
 	$(top_srcdir)/m4/ax_check_gl.m4 \
-	$(top_srcdir)/m4/ax_check_glu.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/ax_check_glu.m4 $(top_srcdir)/m4/sdl.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -213,6 +214,9 @@ PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
 PTHREAD_LIBS = @PTHREAD_LIBS@
 RANLIB = @RANLIB@
 RESOURCE_DIR = @RESOURCE_DIR@
+SDL_CFLAGS = @SDL_CFLAGS@
+SDL_CONFIG = @SDL_CONFIG@
+SDL_LIBS = @SDL_LIBS@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@

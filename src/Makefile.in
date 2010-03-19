@@ -47,7 +47,8 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac-define-dir.m4 \
 	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
 	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/pkg.m4 \
 	$(top_srcdir)/m4/ax_check_gl.m4 \
-	$(top_srcdir)/m4/ax_check_glu.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/ax_check_glu.m4 $(top_srcdir)/m4/sdl.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -74,8 +75,9 @@ am__slideshow_SOURCES_DIST = ${top_srcdir}/include/Browser.h \
 	${top_srcdir}/include/ErrorCodes.h \
 	${top_srcdir}/include/Exceptions.h ${top_srcdir}/include/IPC.h \
 	${top_srcdir}/include/OS.h ${top_srcdir}/include/Transition.h \
-	${top_srcdir}/include/argument_parser.h argument_parser.c \
-	browser_context.cpp exception.cpp Browser.cpp DaemonApp.cpp \
+	${top_srcdir}/include/argument_parser.h backend/factory.cpp \
+	backend/SDLbackend.cpp argument_parser.c browser_context.cpp \
+	exception.cpp Browser.cpp DaemonApp.cpp \
 	${top_srcdir}/include/DaemonApp.h ForegroundApp.cpp \
 	${top_srcdir}/include/ForegroundApp.h Graphics.cpp \
 	${top_srcdir}/include/Graphics.h Kernel.cpp \
@@ -85,7 +87,9 @@ am__slideshow_SOURCES_DIST = ${top_srcdir}/include/Browser.h \
 	browsers/dummybrowser.cpp browsers/dummybrowser.h \
 	browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
 @MYSQL_TRUE@am__objects_1 = slideshow-mysqlbrowser.$(OBJEXT)
-am_slideshow_OBJECTS = slideshow-argument_parser.$(OBJEXT) \
+am_slideshow_OBJECTS = slideshow-factory.$(OBJEXT) \
+	slideshow-SDLbackend.$(OBJEXT) \
+	slideshow-argument_parser.$(OBJEXT) \
 	slideshow-browser_context.$(OBJEXT) \
 	slideshow-exception.$(OBJEXT) slideshow-Browser.$(OBJEXT) \
 	slideshow-DaemonApp.$(OBJEXT) \
@@ -102,7 +106,7 @@ slideshow_DEPENDENCIES = libmodule_loader.a IPC/libipc.a \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
@@ -270,6 +274,9 @@ PTHREAD_CFLAGS = @PTHREAD_CFLAGS@
 PTHREAD_LIBS = @PTHREAD_LIBS@
 RANLIB = @RANLIB@
 RESOURCE_DIR = @RESOURCE_DIR@
+SDL_CFLAGS = @SDL_CFLAGS@
+SDL_CONFIG = @SDL_CONFIG@
+SDL_LIBS = @SDL_LIBS@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
@@ -358,12 +365,12 @@ slideshow_SOURCES = ${top_srcdir}/include/Browser.h \
 	${top_srcdir}/include/ErrorCodes.h \
 	${top_srcdir}/include/Exceptions.h ${top_srcdir}/include/IPC.h \
 	${top_srcdir}/include/OS.h ${top_srcdir}/include/Transition.h \
-	${top_srcdir}/include/argument_parser.h argument_parser.c \
-	browser_context.cpp exception.cpp Browser.cpp \
-	${top_srcdir}/include/Browser.h DaemonApp.cpp \
-	${top_srcdir}/include/DaemonApp.h ForegroundApp.cpp \
-	${top_srcdir}/include/ForegroundApp.h Graphics.cpp \
-	${top_srcdir}/include/Graphics.h Kernel.cpp \
+	${top_srcdir}/include/argument_parser.h backend/factory.cpp \
+	backend/SDLbackend.cpp argument_parser.c browser_context.cpp \
+	exception.cpp Browser.cpp ${top_srcdir}/include/Browser.h \
+	DaemonApp.cpp ${top_srcdir}/include/DaemonApp.h \
+	ForegroundApp.cpp ${top_srcdir}/include/ForegroundApp.h \
+	Graphics.cpp ${top_srcdir}/include/Graphics.h Kernel.cpp \
 	${top_srcdir}/include/Kernel.h Log.cpp \
 	${top_srcdir}/include/Log.h main.cpp path.c \
 	${top_srcdir}/include/path.h OS_Linux.cpp \
@@ -371,8 +378,8 @@ slideshow_SOURCES = ${top_srcdir}/include/Browser.h \
 	$(am__append_1)
 slideshow_LDADD = libmodule_loader.a IPC/libipc.a state/libfsm.a \
 	-lltdl ${libportable_LIBS} ${libdaemon_LIBS} ${dbus_LIBS} \
-	${GL_LIBS} ${DEVIL_LIBS} ${X11_LIBS} ${xxf86vm_LIBS} \
-	${xrandr_LIBS} $(am__append_2)
+	${GL_LIBS} ${DEVIL_LIBS} ${SDL_LIBS} ${X11_LIBS} \
+	${xxf86vm_LIBS} ${xrandr_LIBS} $(am__append_2)
 libmodule_loader_a_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra -I${top_srcdir}/include
 libmodule_loader_a_SOURCES = module_loader.c ${top_srcdir}/include/module_loader.h
 xquery_CFLAGS = -pipe -Wall -Wextra
@@ -483,10 +490,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-Kernel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-Log.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-OS_Linux.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-SDLbackend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-argument_parser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-browser_context.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-dummybrowser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-exception.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-factory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-mysqlbrowser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-path.Po@am__quote@
@@ -603,6 +612,38 @@ xquery-xquery.obj: xquery.c
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+
+slideshow-factory.o: backend/factory.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-factory.o -MD -MP -MF $(DEPDIR)/slideshow-factory.Tpo -c -o slideshow-factory.o `test -f 'backend/factory.cpp' || echo '$(srcdir)/'`backend/factory.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/slideshow-factory.Tpo $(DEPDIR)/slideshow-factory.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='backend/factory.cpp' object='slideshow-factory.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o slideshow-factory.o `test -f 'backend/factory.cpp' || echo '$(srcdir)/'`backend/factory.cpp
+
+slideshow-factory.obj: backend/factory.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-factory.obj -MD -MP -MF $(DEPDIR)/slideshow-factory.Tpo -c -o slideshow-factory.obj `if test -f 'backend/factory.cpp'; then $(CYGPATH_W) 'backend/factory.cpp'; else $(CYGPATH_W) '$(srcdir)/backend/factory.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/slideshow-factory.Tpo $(DEPDIR)/slideshow-factory.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='backend/factory.cpp' object='slideshow-factory.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o slideshow-factory.obj `if test -f 'backend/factory.cpp'; then $(CYGPATH_W) 'backend/factory.cpp'; else $(CYGPATH_W) '$(srcdir)/backend/factory.cpp'; fi`
+
+slideshow-SDLbackend.o: backend/SDLbackend.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-SDLbackend.o -MD -MP -MF $(DEPDIR)/slideshow-SDLbackend.Tpo -c -o slideshow-SDLbackend.o `test -f 'backend/SDLbackend.cpp' || echo '$(srcdir)/'`backend/SDLbackend.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/slideshow-SDLbackend.Tpo $(DEPDIR)/slideshow-SDLbackend.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='backend/SDLbackend.cpp' object='slideshow-SDLbackend.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o slideshow-SDLbackend.o `test -f 'backend/SDLbackend.cpp' || echo '$(srcdir)/'`backend/SDLbackend.cpp
+
+slideshow-SDLbackend.obj: backend/SDLbackend.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-SDLbackend.obj -MD -MP -MF $(DEPDIR)/slideshow-SDLbackend.Tpo -c -o slideshow-SDLbackend.obj `if test -f 'backend/SDLbackend.cpp'; then $(CYGPATH_W) 'backend/SDLbackend.cpp'; else $(CYGPATH_W) '$(srcdir)/backend/SDLbackend.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/slideshow-SDLbackend.Tpo $(DEPDIR)/slideshow-SDLbackend.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='backend/SDLbackend.cpp' object='slideshow-SDLbackend.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o slideshow-SDLbackend.obj `if test -f 'backend/SDLbackend.cpp'; then $(CYGPATH_W) 'backend/SDLbackend.cpp'; else $(CYGPATH_W) '$(srcdir)/backend/SDLbackend.cpp'; fi`
 
 slideshow-browser_context.o: browser_context.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-browser_context.o -MD -MP -MF $(DEPDIR)/slideshow-browser_context.Tpo -c -o slideshow-browser_context.o `test -f 'browser_context.cpp' || echo '$(srcdir)/'`browser_context.cpp

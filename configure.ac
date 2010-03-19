@@ -6,6 +6,7 @@ AC_CONFIG_HEADERS([include/config.h])
 
 m4_include([m4/ax_check_gl.m4])
 m4_include([m4/ax_check_glu.m4])
+m4_include([m4/sdl.m4])
 
 AC_PROG_CXX
 AM_PROG_CC_C_O
@@ -199,5 +200,23 @@ dnl #######################################################################
 dnl # ImageMagick Wand
 dnl #######################################################################
 PKG_CHECK_MODULES(wand, [Wand])
+
+dnl #######################################################################
+dnl # SDL
+dnl #######################################################################
+AC_ARG_WITH([sdl],
+	[AS_HELP_STRING([--with-sdl], [support for SDL backend])],
+	[],
+	[with_sdl=no])
+
+AS_IF([test "x$with_sdl" != xno],
+	[
+		AM_PATH_SDL
+	],
+	[])
+	
+AM_CONDITIONAL([WITH_SDL], [test "x$with_sdl" != xno])
+AC_SUBST(SDL_CFLAGS)
+AC_SUBST(SDL_LIBS)
 
 AC_OUTPUT

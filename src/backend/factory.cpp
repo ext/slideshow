@@ -19,6 +19,7 @@
 
 #include "backend/platform.h"
 #include <map>
+#include <cstring>
 
 #ifdef HAVE_SDL
 #	include "backend/SDLbackend.h"

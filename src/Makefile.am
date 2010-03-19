@@ -26,6 +26,8 @@ slideshow_SOURCES = \
 	${top_srcdir}/include/OS.h \
 	${top_srcdir}/include/Transition.h \
 	${top_srcdir}/include/argument_parser.h \
+	backend/factory.cpp \
+	backend/SDLbackend.cpp \
 	argument_parser.c \
 	browser_context.cpp \
 	exception.cpp \
@@ -50,6 +52,7 @@ slideshow_LDADD = \
 	${dbus_LIBS} \
 	${GL_LIBS} \
 	${DEVIL_LIBS} \
+	${SDL_LIBS} \
 	${X11_LIBS} \
 	${xxf86vm_LIBS} \
 	${xrandr_LIBS}
