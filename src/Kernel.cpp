@@ -58,10 +58,8 @@
 #include <cstring>
 
 // Platform
-#ifdef LINUX
-//#include <sys/time.h>
+#ifdef __GNUC__
 #	include <sys/wait.h>
-#	include <signal.h>
 #endif
 
 #ifdef WIN32
