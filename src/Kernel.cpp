@@ -227,7 +227,7 @@ void Kernel::print_config() const {
 }
 
 void Kernel::print_licence_statement() const {
-	printf("Slideshow  Copyright (C) 2008 David Sveningsson <ext@sidvind.com>\n");
+	printf("Slideshow  Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>\n");
 	printf("This program comes with ABSOLUTELY NO WARRANTY.\n");
 	printf("This is free software, and you are welcome to redistribute it\n");
 	printf("under certain conditions; see COPYING or <http://www.gnu.org/licenses/>\n");
