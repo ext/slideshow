@@ -26,6 +26,7 @@ class ForegroundApp: public Kernel {
 		ForegroundApp(const argument_set_t& arg, PlatformBackend* backend);
 		~ForegroundApp();
 
+		virtual void init();
 		virtual void run();
 
 	private:

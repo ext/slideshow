@@ -21,6 +21,7 @@
 #endif
 
 #include "ForegroundApp.h"
+#include <cstdio>
 
 ForegroundApp::ForegroundApp(const argument_set_t& arg, PlatformBackend* backend):
 	Kernel(arg, backend){
@@ -28,6 +29,15 @@ ForegroundApp::ForegroundApp(const argument_set_t& arg, PlatformBackend* backend
 }
 
 ForegroundApp::~ForegroundApp(){
+
+}
+
+void ForegroundApp::init(){
+	print_licence_statement();
+	print_config();
+
+	Kernel::init();
+	
 
 }
 

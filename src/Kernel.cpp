@@ -99,8 +99,6 @@ void Kernel::init(){
 	init_IPC();
 	init_browser();
 	init_fsm();
-
-	print_config();
 }
 
 void Kernel::cleanup(){
@@ -223,6 +221,7 @@ void Kernel::print_config() const {
 	printf("  switch time: %0.3fs\n", _arg.switch_time);
 	printf("  connection string: %s\n", _arg.connection_string);
 	printf("  transition: %s\n", _arg.transition_string);
+	printf("\n");
 
 	free(cwd);
 }
@@ -232,7 +231,7 @@ void Kernel::print_licence_statement() const {
 	printf("This program comes with ABSOLUTELY NO WARRANTY.\n");
 	printf("This is free software, and you are welcome to redistribute it\n");
 	printf("under certain conditions; see COPYING or <http://www.gnu.org/licenses/>\n");
-	printf("for details.\n");
+	printf("for details.\n\n");
 }
 
 void Kernel::print_cli_arguments(int argc, const char* argv[]) const {

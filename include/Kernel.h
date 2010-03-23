@@ -77,6 +77,10 @@ class Kernel {
 	protected:
 		static const char* pidpath();
 
+		void print_config() const;
+		void print_licence_statement() const;
+		void print_cli_arguments(int argc, const char* argv[]) const;
+
 	private:
 
 		void create_pidpath();
@@ -84,10 +88,6 @@ class Kernel {
 		void view_state(double t);
 		void transition_state(double t);
 		void switch_state(double t);
-
-		void print_config() const;
-		void print_licence_statement() const;
-		void print_cli_arguments(int argc, const char* argv[]) const;
 
 		Browser* browser(){ return _browser; }
 
