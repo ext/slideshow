@@ -16,6 +16,10 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
 #include "module_loader.h"
 #include "assembler.h"
 #include "Transition.h"
