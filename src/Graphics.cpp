@@ -53,6 +53,7 @@ Graphics::Graphics(int width, int height, bool fullscreen):
 
 	Log::message(Log::Verbose, "Graphics: Using resoultion %dx%d\n", width, height);
 
+	glew_init();
 	imageloader_init();
 	gl_setup();
 	gl_set_matrices();
@@ -62,12 +63,33 @@ Graphics::Graphics(int width, int height, bool fullscreen):
 Graphics::~Graphics(){
 	gl_cleanup_textures();
 	imageloader_cleanup();
+	glew_cleanup();
 
 	if ( _transition && _transition->cleanup ){
 		_transition->cleanup();
 	}
 
 	free(_transition);
+}
+
+void Graphics::glew_init(){
+	GLenum err = glewInit();
+
+	if (GLEW_OK != err){
+		throw exception("Failed to initialize glew");
+	}
+
+	if (GLEW_VERSION_2_0){
+		Log::message(Log::Warning, "Graphics card does not support OpenGL 2.0+\n");
+	}
+
+	if (!GLEW_ARB_texture_non_power_of_two){
+		Log::message(Log::Warning, "Graphics card does not support ARB_texture_non_power_of_two, performance will suffer\n");
+	}
+}
+
+void Graphics::glew_cleanup(){
+
 }
 
 void Graphics::imageloader_init(){

@@ -382,6 +382,7 @@ slideshow_LDADD = \
 	libipc.a \
 	libfsm.a \
 	-lltdl \
+	-lGLEW \
 	${libportable_LIBS} \
 	${libdaemon_LIBS} \
 	${dbus_LIBS} \

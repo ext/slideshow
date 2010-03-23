@@ -32,6 +32,8 @@ class Graphics {
 		void set_transition(transition_module_t* module);
 
 	private:
+		void glew_init();
+		void glew_cleanup();
 		void imageloader_init();
 		void imageloader_cleanup();
 		void gl_setup();
