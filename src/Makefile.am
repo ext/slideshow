@@ -1,13 +1,7 @@
-SUBDIRS = IPC state transitions assembler
+SUBDIRS = IPC state transitions
 
 noinst_LIBRARIES = libmodule_loader.a
 bin_PROGRAMS = slideshow xquery
-
-if GCCPARSER
-.cpp.o:
-	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $< 2>&1 | gccparser
-	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
-endif
 
 common_flags = 
 	${dbus_CFLAGS} \
@@ -58,8 +52,8 @@ slideshow_LDADD = \
 	${xrandr_LIBS}
 
 if MYSQL
-slideshow_SOURCES += browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
-slideshow_LDADD += ${MYSQL_LIBS}
+	slideshow_SOURCES += browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
+	slideshow_LDADD += ${MYSQL_LIBS}
 endif
 
 libmodule_loader_a_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra -I${top_srcdir}/include

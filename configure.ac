@@ -8,20 +8,19 @@ m4_include([m4/ax_check_gl.m4])
 m4_include([m4/ax_check_glu.m4])
 m4_include([m4/sdl.m4])
 
+AC_GNU_SOURCE
 AC_PROG_CXX
 AM_PROG_CC_C_O
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 LT_INIT
 AC_PROG_CC_C99
-AC_CHECK_FUNCS([asprintf])
 
 AX_CHECK_GLU
 
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
-	src/assembler/Makefile
 	src/IPC/Makefile
 	src/state/Makefile
 	src/transitions/Makefile
@@ -115,41 +114,50 @@ AC_SUBST(DEVIL_CFLAGS)
 dnl #######################################################################
 dnl # Xlib
 dnl #######################################################################
-PKG_CHECK_MODULES(X11, [x11],
-	[
-		AC_DEFINE(HAVE_X11, 1, [Define if X11 development libraries is available])
-	],
-	[
-		AC_MSG_ERROR([Required X11 development libraries not found])
-	])
+AC_ARG_WITH([xlib],
+	[AS_HELP_STRING([--with-xlib], [support for XLib backend])],
+	[],
+	[with_xlib=no])
 
-AC_SUBST(X11_CFLAGS)
-AC_SUBST(X11_LIBS)
-
-PKG_CHECK_MODULES(xxf86vm, [xxf86vm],
+AS_IF([test "x$with_sdl" != xno],
 	[
-		AC_DEFINE(HAVE_XF86VIDMODE, 1, [Define if xxf86vm development libraries is available])
-	],
-	[
-		PKG_CHECK_MODULES(xxf86vm, [xf86vidmodeproto],
+		PKG_CHECK_MODULES(X11, [x11],
+		[
+			AC_DEFINE(HAVE_X11, 1, [Define if X11 development libraries is available])
+		],
+		[
+			AC_MSG_ERROR([Required X11 development libraries not found])
+		])
+		PKG_CHECK_MODULES(xxf86vm, [xxf86vm],
 			[
 				AC_DEFINE(HAVE_XF86VIDMODE, 1, [Define if xxf86vm development libraries is available])
 			],
 			[
-				AC_MSG_ERROR([Required xxf86vm development libraries not found])
+				PKG_CHECK_MODULES(xxf86vm, [xf86vidmodeproto],
+					[
+						AC_DEFINE(HAVE_XF86VIDMODE, 1, [Define if xxf86vm development libraries is available])
+					],
+					[
+						AC_MSG_ERROR([Required xxf86vm development libraries not found])
+					])
 			])
-	])
+		PKG_CHECK_MODULES(xrandr, [xrandr],
+			[
+				AC_DEFINE(HAVE_XRANDR, 1, [Define if Xrandr development libraries is available])
+			],
+			[
+				AC_MSG_ERROR([Required Xrandr development libraries not found])
+			])
+	],
+	[])
+
+AM_CONDITIONAL([WITH_XLIB], [test "x$with_xlib" != xno])
+
+AC_SUBST(X11_CFLAGS)
+AC_SUBST(X11_LIBS)
 	
 AC_SUBST(xxf86vm_CFLAGS)
 AC_SUBST(xxf86vm_LIBS)
-
-PKG_CHECK_MODULES(xrandr, [xrandr],
-	[
-		AC_DEFINE(HAVE_XRANDR, 1, [Define if Xrandr development libraries is available])
-	],
-	[
-		AC_MSG_ERROR([Required Xrandr development libraries not found])
-	])
 
 AC_SUBST(xrandr_CFLAGS)
 AC_SUBST(xrandr_LIBS)
@@ -175,31 +183,6 @@ AS_IF([test "x$with_mysql" != xno],
 
 AM_CONDITIONAL([MYSQL], [test "x$with_mysql" != xno])
 AC_SUBST(MYSQL_LIBS)
-
-dnl #######################################################################
-dnl # gccparser
-dnl #######################################################################
-
-AC_ARG_ENABLE([gccparser],
-	[AS_HELP_STRING([--enable-gccparser], [support for gccparser])],
-	[case "${enableval}" in
-       yes) gccparser=true ;;
-       no)  gccparser=false ;;
-       *) AC_MSG_ERROR([bad value ${enableval} for --enable-gccparser]) ;;
-     esac],
-	[gccparser=false])
-AM_CONDITIONAL([GCCPARSER], [test x$gccparser == xtrue])
-
-dnl #######################################################################
-dnl # json
-dnl #######################################################################
-PKG_CHECK_MODULES(json, [json])
-AC_SUBST(json_LIBS)
-
-dnl #######################################################################
-dnl # ImageMagick Wand
-dnl #######################################################################
-PKG_CHECK_MODULES(wand, [Wand])
 
 dnl #######################################################################
 dnl # SDL
