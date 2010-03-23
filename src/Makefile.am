@@ -24,7 +24,6 @@ slideshow_SOURCES = \
 	backend/SDLbackend.cpp \
 	argument_parser.c \
 	browser_context.cpp \
-	exception.cpp \
 	Browser.cpp ${top_srcdir}/include/Browser.h \
 	DaemonApp.cpp ${top_srcdir}/include/DaemonApp.h \
 	ForegroundApp.cpp ${top_srcdir}/include/ForegroundApp.h \
@@ -33,7 +32,6 @@ slideshow_SOURCES = \
 	Log.cpp ${top_srcdir}/include/Log.h\
 	main.cpp \
 	path.c ${top_srcdir}/include/path.h \
-	OS_Linux.cpp \
 	browsers/dummybrowser.cpp browsers/dummybrowser.h
 
 slideshow_LDADD = \

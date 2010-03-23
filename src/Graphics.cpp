@@ -76,7 +76,7 @@ void Graphics::imageloader_init(){
 	ILuint devilError = ilGetError();
 
 	if (devilError != IL_NO_ERROR) {
-		throw GraphicsException("Devil Error (ilInit: %s", iluErrorString(devilError));
+		throw exception("Devil Error (ilInit: %s)", iluErrorString(devilError));
 	}
 
 	ilutRenderer(ILUT_OPENGL);
@@ -212,7 +212,7 @@ void Graphics::load_image(const char* name){
 #else /* UNICODE */
 			const char* error = iluErrorString (devilError);
 #endif /* UNICODE */
-			throw GraphicsException("Failed to load image '%s' (ilLoadImage: %s)", path.get(), error);
+			throw exception("Failed to load image '%s' (ilLoadImage: %s)", path.get(), error);
 		}
 
 		ilutGLTexImage(0);

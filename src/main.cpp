@@ -32,8 +32,16 @@
 #include "module_loader.h"
 #include "path.h"
 #include <cstring>
+#include <limits.h>
 #include <portable/Time.h>
 #include "backend/platform.h"
+
+// for getcwd
+#ifdef WIN32
+#	include <direct.h>
+#	define getcwd _getcwd
+#	define PATH_MAX _MAX_PATH
+#endif
 
 int main( int argc, const char* argv[] ){
 	try {
@@ -55,7 +63,7 @@ int main( int argc, const char* argv[] ){
 
 		// Parse the cli arguments, overriding the defaults
 		if ( !Kernel::parse_arguments(arguments, argc, argv) ){
-			throw ArgumentException("");
+			throw exception("Failed to parse commandline arguments");
 		}
 
 		initTime();
@@ -76,13 +84,13 @@ int main( int argc, const char* argv[] ){
 #ifdef BUILD_DAEMON
 				application = new DaemonApp(arguments, backend); break;
 #else /* BUILD_DAEMON */
-				throw KernelException("DaemonMode is not supported.");
+				throw exception("DaemonMode is not supported on this platform.");
 #endif /* BUILD_DAEMON */
 			case Kernel::ListTransitionMode:
 				Kernel::print_transitions();
 				throw ExitException();
 			default:
-				throw KernelException("No valid mode. This should not happen, please report this to the maintainer. Modeid: %d\n", arguments.mode);
+				throw exception("No valid mode. This should not happen, please report this to the maintainer. Modeid: %d\n", arguments.mode);
 		}
 
 		application->init();
@@ -95,23 +103,41 @@ int main( int argc, const char* argv[] ){
 
 		Log::deinitialize();
 
-	} catch ( ExitException ){
-		return 0;
-
-	} catch ( FatalException &e ){
-
-		// Only display message if there is one available.
-		// Some exceptions like ArgumentException usually
-		// print the error messages before throwing the
-		// exception.
-		if ( e.what() && strlen(e.what()) > 0 ){
-			fprintf(stderr, "\nError 0x%02x:\n%s\n", e.code(), e.what());
-		}
+	} catch ( ExitException &e ){
 		return e.code();
 
-	} catch ( BaseException &e ){
-		fprintf(stderr, "Uhh, unhandled exception, recovery not possible. The message was: %s\n", e.what());
-		return UNHANDLED_ERROR;
+	} catch ( exception &e ){
+		/* Handle unhandled exceptions, if anythin makes it here it is a fatal
+		 * error and it is not possible to continue operation. */
+
+		char cwd[PATH_MAX];
+
+		if ( getcwd(cwd, 256) == NULL ){
+			fprintf(stderr, "Failed to get cwd\n");
+			cwd[0] = '\0';
+		}
+
+		printf(" *** slideshow unhandled exception ***\n");
+		printf("\tcwd:     %s\n", cwd);
+		printf("\tSource:  %s:%d\n", e.file(), e.line());
+		printf("\tMessage: %s\n\n", e.what());
+		printf("Troubleshooting:\n");
+		printf(" - Make sure that all required dll's are installed.\n");
+		printf(" - Make sure that the cwd is correct.\n\n");
+		printf("If the problem persists report the bug at\n"
+				"http://sidvind.com:8000/slideshow/newticket\n"
+				"and copy the entire output from the console.\n\n");
+		printf("This is a fatal error, the application will now terminate!\n\n");
+
+#ifdef WIN32
+		__debugbreak();
+#elif defined(__GNUC__)
+		__builtin_trap();
+#else
+		abort();
+#endif
+
+		return -1;
 	}
 
 	return 0;

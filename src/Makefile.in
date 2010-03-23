@@ -72,12 +72,11 @@ am_slideshow_OBJECTS = slideshow-factory.$(OBJEXT) \
 	slideshow-SDLbackend.$(OBJEXT) \
 	slideshow-argument_parser.$(OBJEXT) \
 	slideshow-browser_context.$(OBJEXT) \
-	slideshow-exception.$(OBJEXT) slideshow-Browser.$(OBJEXT) \
-	slideshow-DaemonApp.$(OBJEXT) \
+	slideshow-Browser.$(OBJEXT) slideshow-DaemonApp.$(OBJEXT) \
 	slideshow-ForegroundApp.$(OBJEXT) slideshow-Graphics.$(OBJEXT) \
 	slideshow-Kernel.$(OBJEXT) slideshow-Log.$(OBJEXT) \
 	slideshow-main.$(OBJEXT) slideshow-path.$(OBJEXT) \
-	slideshow-OS_Linux.$(OBJEXT) slideshow-dummybrowser.$(OBJEXT)
+	slideshow-dummybrowser.$(OBJEXT)
 slideshow_OBJECTS = $(am_slideshow_OBJECTS)
 am__DEPENDENCIES_1 =
 slideshow_DEPENDENCIES = libmodule_loader.a IPC/libipc.a \
@@ -348,7 +347,6 @@ slideshow_SOURCES = \
 	backend/SDLbackend.cpp \
 	argument_parser.c \
 	browser_context.cpp \
-	exception.cpp \
 	Browser.cpp ${top_srcdir}/include/Browser.h \
 	DaemonApp.cpp ${top_srcdir}/include/DaemonApp.h \
 	ForegroundApp.cpp ${top_srcdir}/include/ForegroundApp.h \
@@ -357,7 +355,6 @@ slideshow_SOURCES = \
 	Log.cpp ${top_srcdir}/include/Log.h\
 	main.cpp \
 	path.c ${top_srcdir}/include/path.h \
-	OS_Linux.cpp \
 	browsers/dummybrowser.cpp browsers/dummybrowser.h
 
 slideshow_LDADD = \
@@ -484,12 +481,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-Graphics.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-Kernel.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-Log.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-OS_Linux.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-SDLbackend.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-argument_parser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-browser_context.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-dummybrowser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-exception.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-factory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-path.Po@am__quote@
@@ -655,22 +650,6 @@ slideshow-browser_context.obj: browser_context.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o slideshow-browser_context.obj `if test -f 'browser_context.cpp'; then $(CYGPATH_W) 'browser_context.cpp'; else $(CYGPATH_W) '$(srcdir)/browser_context.cpp'; fi`
 
-slideshow-exception.o: exception.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-exception.o -MD -MP -MF $(DEPDIR)/slideshow-exception.Tpo -c -o slideshow-exception.o `test -f 'exception.cpp' || echo '$(srcdir)/'`exception.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/slideshow-exception.Tpo $(DEPDIR)/slideshow-exception.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='exception.cpp' object='slideshow-exception.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o slideshow-exception.o `test -f 'exception.cpp' || echo '$(srcdir)/'`exception.cpp
-
-slideshow-exception.obj: exception.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-exception.obj -MD -MP -MF $(DEPDIR)/slideshow-exception.Tpo -c -o slideshow-exception.obj `if test -f 'exception.cpp'; then $(CYGPATH_W) 'exception.cpp'; else $(CYGPATH_W) '$(srcdir)/exception.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/slideshow-exception.Tpo $(DEPDIR)/slideshow-exception.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='exception.cpp' object='slideshow-exception.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o slideshow-exception.obj `if test -f 'exception.cpp'; then $(CYGPATH_W) 'exception.cpp'; else $(CYGPATH_W) '$(srcdir)/exception.cpp'; fi`
-
 slideshow-Browser.o: Browser.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-Browser.o -MD -MP -MF $(DEPDIR)/slideshow-Browser.Tpo -c -o slideshow-Browser.o `test -f 'Browser.cpp' || echo '$(srcdir)/'`Browser.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/slideshow-Browser.Tpo $(DEPDIR)/slideshow-Browser.Po
@@ -782,22 +761,6 @@ slideshow-main.obj: main.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='main.cpp' object='slideshow-main.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o slideshow-main.obj `if test -f 'main.cpp'; then $(CYGPATH_W) 'main.cpp'; else $(CYGPATH_W) '$(srcdir)/main.cpp'; fi`
-
-slideshow-OS_Linux.o: OS_Linux.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-OS_Linux.o -MD -MP -MF $(DEPDIR)/slideshow-OS_Linux.Tpo -c -o slideshow-OS_Linux.o `test -f 'OS_Linux.cpp' || echo '$(srcdir)/'`OS_Linux.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/slideshow-OS_Linux.Tpo $(DEPDIR)/slideshow-OS_Linux.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='OS_Linux.cpp' object='slideshow-OS_Linux.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o slideshow-OS_Linux.o `test -f 'OS_Linux.cpp' || echo '$(srcdir)/'`OS_Linux.cpp
-
-slideshow-OS_Linux.obj: OS_Linux.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-OS_Linux.obj -MD -MP -MF $(DEPDIR)/slideshow-OS_Linux.Tpo -c -o slideshow-OS_Linux.obj `if test -f 'OS_Linux.cpp'; then $(CYGPATH_W) 'OS_Linux.cpp'; else $(CYGPATH_W) '$(srcdir)/OS_Linux.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/slideshow-OS_Linux.Tpo $(DEPDIR)/slideshow-OS_Linux.Po
-@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='OS_Linux.cpp' object='slideshow-OS_Linux.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o slideshow-OS_Linux.obj `if test -f 'OS_Linux.cpp'; then $(CYGPATH_W) 'OS_Linux.cpp'; else $(CYGPATH_W) '$(srcdir)/OS_Linux.cpp'; fi`
 
 slideshow-dummybrowser.o: browsers/dummybrowser.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-dummybrowser.o -MD -MP -MF $(DEPDIR)/slideshow-dummybrowser.Tpo -c -o slideshow-dummybrowser.o `test -f 'browsers/dummybrowser.cpp' || echo '$(srcdir)/'`browsers/dummybrowser.cpp

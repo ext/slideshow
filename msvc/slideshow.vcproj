@@ -184,10 +184,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\exception.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\ForegroundApp.cpp"
 				>
 			</File>

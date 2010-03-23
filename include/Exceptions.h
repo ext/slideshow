@@ -21,6 +21,64 @@
 
 #include <stdexcept>
 #include <cstdarg>
+#include <cstdlib>
+
+#include <portable/asprintf.h>
+
+/**
+ * @brief Base exception.
+ */
+class exception: public std::exception {
+	public:
+		exception(const char* file, unsigned int line, const char* fmt, ...)
+			: _file(file)
+			, _line(line)
+			, _buf(NULL) {
+
+			va_list arg;
+			va_start(arg, fmt);
+			create_string(fmt, arg);
+			va_end(arg);
+		}
+
+		exception(const char* file, unsigned int line, const char* fmt, va_list arg)
+			: _file(file)
+			, _line(line)
+			, _buf(NULL) {
+
+			create_string(fmt, arg);
+		}
+
+		~exception() throw (){
+			free(_buf);
+		}
+
+		virtual const char* what() const throw (){
+			return _buf;
+		}
+
+		virtual const char* file() const throw(){
+			return _file;
+		}
+
+		virtual unsigned int line() const throw(){
+			return _line;
+		}
+
+	private:
+		void create_string(const char* fmt, va_list arg){
+			if ( vasprintf(&_buf, fmt, arg) == -1 ){
+				free(_buf);
+			}
+		}
+
+		const char* _file;
+		unsigned int _line;
+		char* _buf;
+		
+};
+
+#define exception(x, ...) exception(__FILE__, __LINE__, x, ## __VA_ARGS__)
 
 enum ErrorCode {
 	NO_ERROR = 0,
@@ -43,82 +101,28 @@ enum ErrorCode {
 };
 
 /**
- * @brief Base exception.
- * You should never throw this specifically but rather catch it
- * when you wish to catch all exceptions.
- *
- * @param message The error message.
+ * @brief Causes the application to exit.
+ * Throw this exception if you want to exit the application but want
+ * it to shut down properly.
+ * @param code Which error code to exit with.
  */
-class BaseException: public std::exception {
+class ExitException: public std::exception {
 	public:
-		BaseException(const char* message = NULL);
-		BaseException(const BaseException& e);
-		virtual ~BaseException() throw();
+		ExitException(ErrorCode code = NO_ERROR)
+			: _code(code) {
+		}
 
-		virtual const char* what() const throw();
+		virtual ~ExitException() throw() {
 
-	protected:
-		void set_message(const char* fmt, va_list va);
+		}
 
-	private:
-		char* _msg;
-};
-
-/**
- * @brief Fatal exceptions will cause the application to terminate.
- * The application will terminate but will try to cleanup.
- *
- * @param message The error message.
- * @param code The error code which will be returned.
- */
-class FatalException: public BaseException {
-	public:
-		FatalException(ErrorCode code, const char* message = NULL);
-		FatalException(const FatalException& e);
-		virtual ~FatalException() throw();
-
-		ErrorCode code();
+		virtual ErrorCode code() const throw(){
+			return _code;
+		}
 
 	private:
 		ErrorCode _code;
 };
-
-/**
- * @brief Causes the application to exit.
- * Throw this exception if you want to exit the application but want
- * it to shut down properly.
- */
-class ExitException: public FatalException {
-	public:
-		ExitException(): FatalException(NO_ERROR){}
-		virtual ~ExitException() throw() {}
-};
-
-#define ADD_EXCEPTION_INTERFACE(name, code) \
-class name: public FatalException { \
-	public: \
-		name(const char* fmt, ...); \
-		virtual ~name() throw();\
-}
-
-#define ADD_EXCEPTION_IMPLEMENTATION(name, code) \
-name::name(const char* fmt, ...): FatalException(code){ \
-	va_list va; \
-	va_start(va, fmt); \
-	set_message(fmt, va); \
-	va_end(va);\
-} \
-name::~name() throw() { \
-\
-}
-
-ADD_EXCEPTION_INTERFACE(XlibException, XLIB);
-ADD_EXCEPTION_INTERFACE(KernelException, KERNEL);
-ADD_EXCEPTION_INTERFACE(ArgumentException, ARGUMENT);
-ADD_EXCEPTION_INTERFACE(BrowserException, BROWSER);
-ADD_EXCEPTION_INTERFACE(IPCException, IPC_ERROR);
-ADD_EXCEPTION_INTERFACE(GraphicsException, GRAPHICS_ERROR);
-ADD_EXCEPTION_INTERFACE(DaemonException, DAEMON_ERROR);
 
 /*
  * verify is like assert but is always compiled.

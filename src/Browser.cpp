@@ -26,6 +26,10 @@
 #include <cstring>
 #include <cstdlib>
 
+#ifdef WIN32
+#	include "win32.h"
+#endif
+
 typedef std::map<const char*, Browser::factory_callback> factory_map;
 typedef std::pair<const char*, Browser::factory_callback> pair;
 typedef factory_map::iterator iterator;
