@@ -195,6 +195,7 @@ AC_ARG_WITH([sdl],
 AS_IF([test "x$with_sdl" != xno],
 	[
 		AM_PATH_SDL
+		AC_DEFINE(HAVE_SDL, 1, [Define if libsdl is available])
 	],
 	[])
 	
