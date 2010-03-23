@@ -74,7 +74,12 @@ int main( int argc, const char* argv[] ){
 		Log::set_level( (Log::Severity)arguments.loglevel );
 
 		Kernel* application = NULL;
-		PlatformBackend* backend = PlatformBackend::factory("sdl");
+
+		const char* backend_name = "sdl";
+		PlatformBackend* backend = PlatformBackend::factory(backend_name);
+		if ( !backend ){
+			throw exception("Failed to create a backend named \"%s\"", backend_name);
+		}
 
 		switch ( arguments.mode ){
 			case Kernel::ForegroundMode:
