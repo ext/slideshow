@@ -79,6 +79,7 @@ void Graphics::imageloader_init(){
 		throw exception("Devil Error (ilInit: %s)", iluErrorString(devilError));
 	}
 
+	iluInit();
 	ilutRenderer(ILUT_OPENGL);
 }
 
