@@ -187,8 +187,18 @@ void Kernel::poll(){
 }
 
 void Kernel::action(){
+	if ( !_state ){
+		return;
+	}
+
 	bool flip = false;
-	_state = _state->action(flip);
+
+	try {
+		_state = _state->action(flip);
+	} catch ( exception& e ){
+		Log::message(Log::Warning, "State exception: %s\n", e.what());
+		_state = NULL;
+	}
 
 	if ( flip ){
 		_backend->swap_buffers();
