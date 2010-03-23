@@ -216,7 +216,12 @@ void Graphics::load_image(const char* name){
 			throw exception("Failed to load image '%s' (ilLoadImage: %s)", path.get(), error);
 		}
 
-		ilutGLTexImage(0);
+		ILubyte* pixels = ilGetData();
+		int width  = ilGetInteger(IL_IMAGE_WIDTH);
+		int height = ilGetInteger(IL_IMAGE_HEIGHT);
+		int format = ilGetInteger(IL_IMAGE_FORMAT);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, pixels);
 	} else {
 		static const unsigned char black[] = {
 			0, 0, 0
