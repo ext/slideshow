@@ -225,7 +225,7 @@ void Kernel::print_config() const {
 	printf("  transition: %s\n", _arg.transition_string);
 }
 
-void Kernel::print_licence_statement(){
+void Kernel::print_licence_statement() const {
 	printf("Slideshow  Copyright (C) 2008 David Sveningsson <ext@sidvind.com>\n");
 	printf("This program comes with ABSOLUTELY NO WARRANTY.\n");
 	printf("This is free software, and you are welcome to redistribute it\n");
@@ -233,7 +233,7 @@ void Kernel::print_licence_statement(){
 	printf("for details.\n");
 }
 
-void Kernel::print_cli_arguments(int argc, const char* argv[]){
+void Kernel::print_cli_arguments(int argc, const char* argv[]) const {
 	Log::message_begin(Log::Verbose);
 	Log::message_ex("Starting with \"");
 
