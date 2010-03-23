@@ -1,5 +1,5 @@
-#ifndef __BLUEFLOWER_GL_H
-#define __BLUEFLOWER_GL_H
+#ifndef __SLIDESHOW_GL_H
+#define __SLIDESHOW_GL_H
 
 #ifdef WIN32
 #	include "windows.h"
@@ -9,4 +9,4 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
-#endif /* __BLUEFLOWER_GL_H */
+#endif /* __SLIDESHOW_GL_H */
