@@ -223,6 +223,8 @@ void Kernel::print_config() const {
 	printf("  switch time: %0.3fs\n", _arg.switch_time);
 	printf("  connection string: %s\n", _arg.connection_string);
 	printf("  transition: %s\n", _arg.transition_string);
+
+	free(cwd);
 }
 
 void Kernel::print_licence_statement() const {
