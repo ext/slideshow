@@ -64,6 +64,9 @@
 
 #ifdef WIN32
 #	include "win32.h"
+#	include <direct.h>
+#	define getcwd _getcwd
+#	define PATH_MAX _MAX_PATH
 #endif
 
 static char* pidfile = NULL;
@@ -96,6 +99,8 @@ void Kernel::init(){
 	init_IPC();
 	init_browser();
 	init_fsm();
+
+	print_config();
 }
 
 void Kernel::cleanup(){
@@ -203,6 +208,21 @@ void Kernel::action(){
 	if ( flip ){
 		_backend->swap_buffers();
 	}
+}
+
+void Kernel::print_config() const {
+	char* cwd = get_current_dir_name();
+
+	printf("Slideshow configuration\n");
+	printf("  cwd: %s\n", cwd);
+	printf("  pidfile: %s\n", pidfile);
+	printf("  datapath: %s\n", datapath());
+	printf("  pluginpath: %s\n", pluginpath());
+	printf("  resolution: %dx%d (%s)\n", _arg.width, _arg.height, _arg.fullscreen ? "fullscreen" : "windowed");
+	printf("  transition time: %0.3fs\n", _arg.transition_time);
+	printf("  switch time: %0.3fs\n", _arg.switch_time);
+	printf("  connection string: %s\n", _arg.connection_string);
+	printf("  transition: %s\n", _arg.transition_string);
 }
 
 void Kernel::print_licence_statement(){

@@ -85,6 +85,7 @@ class Kernel {
 		void transition_state(double t);
 		void switch_state(double t);
 
+		void print_config() const;
 		void print_licence_statement();
 		void print_cli_arguments(int argc, const char* argv[]);
 
