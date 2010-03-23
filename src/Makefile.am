@@ -1,15 +1,30 @@
-SUBDIRS = IPC state transitions
+SUBDIRS = transitions
 
-noinst_LIBRARIES = libmodule_loader.a
+noinst_LIBRARIES = libmodule_loader.a libipc.a libfsm.a
 bin_PROGRAMS = slideshow xquery
 
-common_flags = 
-	${dbus_CFLAGS} \
-	${libdaemon_CFLAGS} \
-	-pipe -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
+warning_flags = -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
 
-slideshow_CPPFLAGS = -I${top_srcdir}/include ${common_flags} -DBUILD_DAEMON
-slideshow_CFLAGS   = -I${top_srcdir}/include ${common_flags}
+AM_LDFLAGS = -shared -module -avoid-version
+AM_CPPFLAGS = -I${top_srcdir}/include -pipe ${warning_flags}
+
+libipc_a_CPPFLAGS = -I${top_srcdir}/include
+libipc_a_SOURCES = 
+
+if WITH_DBUS
+	libipc_a_CPPFLAGS += ${dbus_CFLAGS}
+	libipc_a_SOURCES += IPC/dbus.cpp IPC/dbus.h
+endif
+
+libfsm_a_SOURCES = \
+	state/State.h \
+	state/InitialState.cpp state/InitialState.h \
+	state/SwitchState.cpp state/SwitchState.h \
+	state/TransitionState.cpp state/TransitionState.h \
+	state/ViewState.cpp state/ViewState.h
+
+slideshow_CPPFLAGS = ${AM_CPPFLAGS} ${libdaemon_CFLAGS} -DBUILD_DAEMON
+slideshow_CFLAGS   = ${AM_CPPFLAGS}
 
 slideshow_SOURCES = \
 	${top_srcdir}/include/Browser.h \
@@ -36,8 +51,8 @@ slideshow_SOURCES = \
 
 slideshow_LDADD = \
 	libmodule_loader.a \
-	IPC/libipc.a \
-	state/libfsm.a \
+	libipc.a \
+	libfsm.a \
 	-lltdl \
 	${libportable_LIBS} \
 	${libdaemon_LIBS} \
@@ -54,9 +69,7 @@ if MYSQL
 	slideshow_LDADD += ${MYSQL_LIBS}
 endif
 
-libmodule_loader_a_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra -I${top_srcdir}/include
 libmodule_loader_a_SOURCES = module_loader.c ${top_srcdir}/include/module_loader.h
 
-xquery_CFLAGS = -pipe -Wall -Wextra
 xquery_SOURCES = xquery.c
 xquery_LDADD = ${X11_LIBS} ${xrandr_LIBS}

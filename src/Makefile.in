@@ -61,10 +61,18 @@ am__v_AR_0 = @echo "  AR    " $@;
 AM_V_at = $(am__v_at_$(V))
 am__v_at_ = $(am__v_at_$(AM_DEFAULT_VERBOSITY))
 am__v_at_0 = @
+libfsm_a_AR = $(AR) $(ARFLAGS)
+libfsm_a_LIBADD =
+am_libfsm_a_OBJECTS = InitialState.$(OBJEXT) SwitchState.$(OBJEXT) \
+	TransitionState.$(OBJEXT) ViewState.$(OBJEXT)
+libfsm_a_OBJECTS = $(am_libfsm_a_OBJECTS)
+libipc_a_AR = $(AR) $(ARFLAGS)
+libipc_a_LIBADD =
+am_libipc_a_OBJECTS =
+libipc_a_OBJECTS = $(am_libipc_a_OBJECTS)
 libmodule_loader_a_AR = $(AR) $(ARFLAGS)
 libmodule_loader_a_LIBADD =
-am_libmodule_loader_a_OBJECTS =  \
-	libmodule_loader_a-module_loader.$(OBJEXT)
+am_libmodule_loader_a_OBJECTS = module_loader.$(OBJEXT)
 libmodule_loader_a_OBJECTS = $(am_libmodule_loader_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
@@ -79,8 +87,8 @@ am_slideshow_OBJECTS = slideshow-factory.$(OBJEXT) \
 	slideshow-dummybrowser.$(OBJEXT)
 slideshow_OBJECTS = $(am_slideshow_OBJECTS)
 am__DEPENDENCIES_1 =
-slideshow_DEPENDENCIES = libmodule_loader.a IPC/libipc.a \
-	state/libfsm.a $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+slideshow_DEPENDENCIES = libmodule_loader.a libipc.a libfsm.a \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
@@ -88,12 +96,9 @@ slideshow_DEPENDENCIES = libmodule_loader.a IPC/libipc.a \
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
-am_xquery_OBJECTS = xquery-xquery.$(OBJEXT)
+am_xquery_OBJECTS = xquery.$(OBJEXT)
 xquery_OBJECTS = $(am_xquery_OBJECTS)
 xquery_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-xquery_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(xquery_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__depfiles_maybe = depfiles
@@ -133,9 +138,11 @@ am__v_CXXLD_0 = @echo "  CXXLD " $@;
 AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
-SOURCES = $(libmodule_loader_a_SOURCES) $(slideshow_SOURCES) \
+SOURCES = $(libfsm_a_SOURCES) $(libipc_a_SOURCES) \
+	$(libmodule_loader_a_SOURCES) $(slideshow_SOURCES) \
 	$(xquery_SOURCES)
-DIST_SOURCES = $(libmodule_loader_a_SOURCES) $(slideshow_SOURCES) \
+DIST_SOURCES = $(libfsm_a_SOURCES) $(libipc_a_SOURCES) \
+	$(libmodule_loader_a_SOURCES) $(slideshow_SOURCES) \
 	$(xquery_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
@@ -329,11 +336,22 @@ xrandr_CFLAGS = @xrandr_CFLAGS@
 xrandr_LIBS = @xrandr_LIBS@
 xxf86vm_CFLAGS = @xxf86vm_CFLAGS@
 xxf86vm_LIBS = @xxf86vm_LIBS@
-SUBDIRS = IPC state transitions
-noinst_LIBRARIES = libmodule_loader.a
-common_flags = 
-slideshow_CPPFLAGS = -I${top_srcdir}/include ${common_flags} -DBUILD_DAEMON
-slideshow_CFLAGS = -I${top_srcdir}/include ${common_flags}
+SUBDIRS = transitions
+noinst_LIBRARIES = libmodule_loader.a libipc.a libfsm.a
+warning_flags = -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
+AM_LDFLAGS = -shared -module -avoid-version
+AM_CPPFLAGS = -I${top_srcdir}/include -pipe ${warning_flags}
+libipc_a_CPPFLAGS = -I${top_srcdir}/include
+libipc_a_SOURCES = 
+libfsm_a_SOURCES = \
+	state/State.h \
+	state/InitialState.cpp state/InitialState.h \
+	state/SwitchState.cpp state/SwitchState.h \
+	state/TransitionState.cpp state/TransitionState.h \
+	state/ViewState.cpp state/ViewState.h
+
+slideshow_CPPFLAGS = ${AM_CPPFLAGS} ${libdaemon_CFLAGS} -DBUILD_DAEMON
+slideshow_CFLAGS = ${AM_CPPFLAGS}
 slideshow_SOURCES = \
 	${top_srcdir}/include/Browser.h \
 	${top_srcdir}/include/config.h \
@@ -359,8 +377,8 @@ slideshow_SOURCES = \
 
 slideshow_LDADD = \
 	libmodule_loader.a \
-	IPC/libipc.a \
-	state/libfsm.a \
+	libipc.a \
+	libfsm.a \
 	-lltdl \
 	${libportable_LIBS} \
 	${libdaemon_LIBS} \
@@ -372,9 +390,7 @@ slideshow_LDADD = \
 	${xxf86vm_LIBS} \
 	${xrandr_LIBS}
 
-libmodule_loader_a_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra -I${top_srcdir}/include
 libmodule_loader_a_SOURCES = module_loader.c ${top_srcdir}/include/module_loader.h
-xquery_CFLAGS = -pipe -Wall -Wextra
 xquery_SOURCES = xquery.c
 xquery_LDADD = ${X11_LIBS} ${xrandr_LIBS}
 all: all-recursive
@@ -414,6 +430,14 @@ $(am__aclocal_m4_deps):
 
 clean-noinstLIBRARIES:
 	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+libfsm.a: $(libfsm_a_OBJECTS) $(libfsm_a_DEPENDENCIES) 
+	$(AM_V_at)-rm -f libfsm.a
+	$(AM_V_AR)$(libfsm_a_AR) libfsm.a $(libfsm_a_OBJECTS) $(libfsm_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libfsm.a
+libipc.a: $(libipc_a_OBJECTS) $(libipc_a_DEPENDENCIES) 
+	$(AM_V_at)-rm -f libipc.a
+	$(AM_V_AR)$(libipc_a_AR) libipc.a $(libipc_a_OBJECTS) $(libipc_a_LIBADD)
+	$(AM_V_at)$(RANLIB) libipc.a
 libmodule_loader.a: $(libmodule_loader_a_OBJECTS) $(libmodule_loader_a_DEPENDENCIES) 
 	$(AM_V_at)-rm -f libmodule_loader.a
 	$(AM_V_AR)$(libmodule_loader_a_AR) libmodule_loader.a $(libmodule_loader_a_OBJECTS) $(libmodule_loader_a_LIBADD)
@@ -466,7 +490,7 @@ slideshow$(EXEEXT): $(slideshow_OBJECTS) $(slideshow_DEPENDENCIES)
 	$(AM_V_CXXLD)$(CXXLINK) $(slideshow_OBJECTS) $(slideshow_LDADD) $(LIBS)
 xquery$(EXEEXT): $(xquery_OBJECTS) $(xquery_DEPENDENCIES) 
 	@rm -f xquery$(EXEEXT)
-	$(AM_V_CCLD)$(xquery_LINK) $(xquery_OBJECTS) $(xquery_LDADD) $(LIBS)
+	$(AM_V_CCLD)$(LINK) $(xquery_OBJECTS) $(xquery_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -474,7 +498,11 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmodule_loader_a-module_loader.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InitialState.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SwitchState.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TransitionState.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ViewState.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/module_loader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-Browser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-DaemonApp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-ForegroundApp.Po@am__quote@
@@ -488,7 +516,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-factory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-path.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xquery-xquery.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xquery.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -513,22 +541,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
-
-libmodule_loader_a-module_loader.o: module_loader.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmodule_loader_a_CFLAGS) $(CFLAGS) -MT libmodule_loader_a-module_loader.o -MD -MP -MF $(DEPDIR)/libmodule_loader_a-module_loader.Tpo -c -o libmodule_loader_a-module_loader.o `test -f 'module_loader.c' || echo '$(srcdir)/'`module_loader.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libmodule_loader_a-module_loader.Tpo $(DEPDIR)/libmodule_loader_a-module_loader.Po
-@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='module_loader.c' object='libmodule_loader_a-module_loader.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmodule_loader_a_CFLAGS) $(CFLAGS) -c -o libmodule_loader_a-module_loader.o `test -f 'module_loader.c' || echo '$(srcdir)/'`module_loader.c
-
-libmodule_loader_a-module_loader.obj: module_loader.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmodule_loader_a_CFLAGS) $(CFLAGS) -MT libmodule_loader_a-module_loader.obj -MD -MP -MF $(DEPDIR)/libmodule_loader_a-module_loader.Tpo -c -o libmodule_loader_a-module_loader.obj `if test -f 'module_loader.c'; then $(CYGPATH_W) 'module_loader.c'; else $(CYGPATH_W) '$(srcdir)/module_loader.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libmodule_loader_a-module_loader.Tpo $(DEPDIR)/libmodule_loader_a-module_loader.Po
-@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='module_loader.c' object='libmodule_loader_a-module_loader.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmodule_loader_a_CFLAGS) $(CFLAGS) -c -o libmodule_loader_a-module_loader.obj `if test -f 'module_loader.c'; then $(CYGPATH_W) 'module_loader.c'; else $(CYGPATH_W) '$(srcdir)/module_loader.c'; fi`
 
 slideshow-argument_parser.o: argument_parser.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(slideshow_CFLAGS) $(CFLAGS) -MT slideshow-argument_parser.o -MD -MP -MF $(DEPDIR)/slideshow-argument_parser.Tpo -c -o slideshow-argument_parser.o `test -f 'argument_parser.c' || echo '$(srcdir)/'`argument_parser.c
@@ -562,22 +574,6 @@ slideshow-path.obj: path.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(slideshow_CFLAGS) $(CFLAGS) -c -o slideshow-path.obj `if test -f 'path.c'; then $(CYGPATH_W) 'path.c'; else $(CYGPATH_W) '$(srcdir)/path.c'; fi`
 
-xquery-xquery.o: xquery.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(xquery_CFLAGS) $(CFLAGS) -MT xquery-xquery.o -MD -MP -MF $(DEPDIR)/xquery-xquery.Tpo -c -o xquery-xquery.o `test -f 'xquery.c' || echo '$(srcdir)/'`xquery.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/xquery-xquery.Tpo $(DEPDIR)/xquery-xquery.Po
-@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='xquery.c' object='xquery-xquery.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(xquery_CFLAGS) $(CFLAGS) -c -o xquery-xquery.o `test -f 'xquery.c' || echo '$(srcdir)/'`xquery.c
-
-xquery-xquery.obj: xquery.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(xquery_CFLAGS) $(CFLAGS) -MT xquery-xquery.obj -MD -MP -MF $(DEPDIR)/xquery-xquery.Tpo -c -o xquery-xquery.obj `if test -f 'xquery.c'; then $(CYGPATH_W) 'xquery.c'; else $(CYGPATH_W) '$(srcdir)/xquery.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/xquery-xquery.Tpo $(DEPDIR)/xquery-xquery.Po
-@am__fastdepCC_FALSE@	$(AM_V_CC) @AM_BACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='xquery.c' object='xquery-xquery.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(xquery_CFLAGS) $(CFLAGS) -c -o xquery-xquery.obj `if test -f 'xquery.c'; then $(CYGPATH_W) 'xquery.c'; else $(CYGPATH_W) '$(srcdir)/xquery.c'; fi`
-
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
@@ -601,6 +597,70 @@ xquery-xquery.obj: xquery.c
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+
+InitialState.o: state/InitialState.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT InitialState.o -MD -MP -MF $(DEPDIR)/InitialState.Tpo -c -o InitialState.o `test -f 'state/InitialState.cpp' || echo '$(srcdir)/'`state/InitialState.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/InitialState.Tpo $(DEPDIR)/InitialState.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='state/InitialState.cpp' object='InitialState.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o InitialState.o `test -f 'state/InitialState.cpp' || echo '$(srcdir)/'`state/InitialState.cpp
+
+InitialState.obj: state/InitialState.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT InitialState.obj -MD -MP -MF $(DEPDIR)/InitialState.Tpo -c -o InitialState.obj `if test -f 'state/InitialState.cpp'; then $(CYGPATH_W) 'state/InitialState.cpp'; else $(CYGPATH_W) '$(srcdir)/state/InitialState.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/InitialState.Tpo $(DEPDIR)/InitialState.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='state/InitialState.cpp' object='InitialState.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o InitialState.obj `if test -f 'state/InitialState.cpp'; then $(CYGPATH_W) 'state/InitialState.cpp'; else $(CYGPATH_W) '$(srcdir)/state/InitialState.cpp'; fi`
+
+SwitchState.o: state/SwitchState.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT SwitchState.o -MD -MP -MF $(DEPDIR)/SwitchState.Tpo -c -o SwitchState.o `test -f 'state/SwitchState.cpp' || echo '$(srcdir)/'`state/SwitchState.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/SwitchState.Tpo $(DEPDIR)/SwitchState.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='state/SwitchState.cpp' object='SwitchState.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o SwitchState.o `test -f 'state/SwitchState.cpp' || echo '$(srcdir)/'`state/SwitchState.cpp
+
+SwitchState.obj: state/SwitchState.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT SwitchState.obj -MD -MP -MF $(DEPDIR)/SwitchState.Tpo -c -o SwitchState.obj `if test -f 'state/SwitchState.cpp'; then $(CYGPATH_W) 'state/SwitchState.cpp'; else $(CYGPATH_W) '$(srcdir)/state/SwitchState.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/SwitchState.Tpo $(DEPDIR)/SwitchState.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='state/SwitchState.cpp' object='SwitchState.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o SwitchState.obj `if test -f 'state/SwitchState.cpp'; then $(CYGPATH_W) 'state/SwitchState.cpp'; else $(CYGPATH_W) '$(srcdir)/state/SwitchState.cpp'; fi`
+
+TransitionState.o: state/TransitionState.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TransitionState.o -MD -MP -MF $(DEPDIR)/TransitionState.Tpo -c -o TransitionState.o `test -f 'state/TransitionState.cpp' || echo '$(srcdir)/'`state/TransitionState.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TransitionState.Tpo $(DEPDIR)/TransitionState.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='state/TransitionState.cpp' object='TransitionState.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TransitionState.o `test -f 'state/TransitionState.cpp' || echo '$(srcdir)/'`state/TransitionState.cpp
+
+TransitionState.obj: state/TransitionState.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT TransitionState.obj -MD -MP -MF $(DEPDIR)/TransitionState.Tpo -c -o TransitionState.obj `if test -f 'state/TransitionState.cpp'; then $(CYGPATH_W) 'state/TransitionState.cpp'; else $(CYGPATH_W) '$(srcdir)/state/TransitionState.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/TransitionState.Tpo $(DEPDIR)/TransitionState.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='state/TransitionState.cpp' object='TransitionState.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o TransitionState.obj `if test -f 'state/TransitionState.cpp'; then $(CYGPATH_W) 'state/TransitionState.cpp'; else $(CYGPATH_W) '$(srcdir)/state/TransitionState.cpp'; fi`
+
+ViewState.o: state/ViewState.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ViewState.o -MD -MP -MF $(DEPDIR)/ViewState.Tpo -c -o ViewState.o `test -f 'state/ViewState.cpp' || echo '$(srcdir)/'`state/ViewState.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ViewState.Tpo $(DEPDIR)/ViewState.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='state/ViewState.cpp' object='ViewState.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ViewState.o `test -f 'state/ViewState.cpp' || echo '$(srcdir)/'`state/ViewState.cpp
+
+ViewState.obj: state/ViewState.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ViewState.obj -MD -MP -MF $(DEPDIR)/ViewState.Tpo -c -o ViewState.obj `if test -f 'state/ViewState.cpp'; then $(CYGPATH_W) 'state/ViewState.cpp'; else $(CYGPATH_W) '$(srcdir)/state/ViewState.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/ViewState.Tpo $(DEPDIR)/ViewState.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='state/ViewState.cpp' object='ViewState.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ViewState.obj `if test -f 'state/ViewState.cpp'; then $(CYGPATH_W) 'state/ViewState.cpp'; else $(CYGPATH_W) '$(srcdir)/state/ViewState.cpp'; fi`
 
 slideshow-factory.o: backend/factory.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-factory.o -MD -MP -MF $(DEPDIR)/slideshow-factory.Tpo -c -o slideshow-factory.o `test -f 'backend/factory.cpp' || echo '$(srcdir)/'`backend/factory.cpp
@@ -1100,9 +1160,9 @@ uninstall-am: uninstall-binPROGRAMS
 	pdf pdf-am ps ps-am tags tags-recursive uninstall uninstall-am \
 	uninstall-binPROGRAMS
 
-	${dbus_CFLAGS} \
-	${libdaemon_CFLAGS} \
-	-pipe -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
+
+@WITH_DBUS_TRUE@	libipc_a_CPPFLAGS += ${dbus_CFLAGS}
+@WITH_DBUS_TRUE@	libipc_a_SOURCES += IPC/dbus.cpp IPC/dbus.h
 
 @MYSQL_TRUE@	slideshow_SOURCES += browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
 @MYSQL_TRUE@	slideshow_LDADD += ${MYSQL_LIBS}
