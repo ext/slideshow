@@ -22,10 +22,18 @@
 
 #include "InitialState.h"
 #include "TransitionState.h"
+#include "Exceptions.h"
+#include "Log.h"
 
 State* InitialState::action(bool &flip){
-	gfx()->load_image(NULL);
-	gfx()->load_image("resources/splash.png");
+	try {
+		gfx()->load_image(NULL);
+		gfx()->load_image("resources/splash.png");
+	} catch ( exception &e ){
+		Log::message(Log::Warning, "%s\n", e.what());
+		Log::message(Log::Warning, "Failed to load initial resources, check your configuration\n");
+	}
+
 	gfx()->render(0.0);
 	flip = true;
 
