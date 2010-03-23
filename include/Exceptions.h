@@ -30,47 +30,16 @@
  */
 class exception: public std::exception {
 	public:
-		exception(const char* file, unsigned int line, const char* fmt, ...)
-			: _file(file)
-			, _line(line)
-			, _buf(NULL) {
+		exception(const char* file, unsigned int line, const char* fmt, ...);
+		exception(const char* file, unsigned int line, const char* fmt, va_list arg);
+		~exception() throw ();
 
-			va_list arg;
-			va_start(arg, fmt);
-			create_string(fmt, arg);
-			va_end(arg);
-		}
-
-		exception(const char* file, unsigned int line, const char* fmt, va_list arg)
-			: _file(file)
-			, _line(line)
-			, _buf(NULL) {
-
-			create_string(fmt, arg);
-		}
-
-		~exception() throw (){
-			free(_buf);
-		}
-
-		virtual const char* what() const throw (){
-			return _buf;
-		}
-
-		virtual const char* file() const throw(){
-			return _file;
-		}
-
-		virtual unsigned int line() const throw(){
-			return _line;
-		}
+		virtual const char* what() const throw ();
+		virtual const char* file() const throw();
+		virtual unsigned int line() const throw();
 
 	private:
-		void create_string(const char* fmt, va_list arg){
-			if ( vasprintf(&_buf, fmt, arg) == -1 ){
-				free(_buf);
-			}
-		}
+		void create_string(const char* fmt, va_list arg);
 
 		const char* _file;
 		unsigned int _line;
@@ -108,17 +77,9 @@ enum ErrorCode {
  */
 class ExitException: public std::exception {
 	public:
-		ExitException(ErrorCode code = NO_ERROR)
-			: _code(code) {
-		}
-
-		virtual ~ExitException() throw() {
-
-		}
-
-		virtual ErrorCode code() const throw(){
-			return _code;
-		}
+		ExitException(ErrorCode code = NO_ERROR);
+		virtual ~ExitException() throw();
+		virtual ErrorCode code() const throw();
 
 	private:
 		ErrorCode _code;

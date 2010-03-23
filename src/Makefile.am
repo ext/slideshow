@@ -41,6 +41,7 @@ slideshow_SOURCES = \
 	browser_context.cpp \
 	Browser.cpp ${top_srcdir}/include/Browser.h \
 	DaemonApp.cpp ${top_srcdir}/include/DaemonApp.h \
+	exception.cpp ${top_srcdir}/include/Exceptions.h \
 	ForegroundApp.cpp ${top_srcdir}/include/ForegroundApp.h \
 	Graphics.cpp ${top_srcdir}/include/Graphics.h \
 	Kernel.cpp ${top_srcdir}/include/Kernel.h \

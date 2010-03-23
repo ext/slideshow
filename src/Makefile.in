@@ -81,6 +81,7 @@ am_slideshow_OBJECTS = slideshow-factory.$(OBJEXT) \
 	slideshow-argument_parser.$(OBJEXT) \
 	slideshow-browser_context.$(OBJEXT) \
 	slideshow-Browser.$(OBJEXT) slideshow-DaemonApp.$(OBJEXT) \
+	slideshow-exception.$(OBJEXT) \
 	slideshow-ForegroundApp.$(OBJEXT) slideshow-Graphics.$(OBJEXT) \
 	slideshow-Kernel.$(OBJEXT) slideshow-Log.$(OBJEXT) \
 	slideshow-main.$(OBJEXT) slideshow-path.$(OBJEXT) \
@@ -367,6 +368,7 @@ slideshow_SOURCES = \
 	browser_context.cpp \
 	Browser.cpp ${top_srcdir}/include/Browser.h \
 	DaemonApp.cpp ${top_srcdir}/include/DaemonApp.h \
+	exception.cpp ${top_srcdir}/include/Exceptions.h \
 	ForegroundApp.cpp ${top_srcdir}/include/ForegroundApp.h \
 	Graphics.cpp ${top_srcdir}/include/Graphics.h \
 	Kernel.cpp ${top_srcdir}/include/Kernel.h \
@@ -513,6 +515,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-argument_parser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-browser_context.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-dummybrowser.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-exception.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-factory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-path.Po@am__quote@
@@ -741,6 +744,22 @@ slideshow-DaemonApp.obj: DaemonApp.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='DaemonApp.cpp' object='slideshow-DaemonApp.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o slideshow-DaemonApp.obj `if test -f 'DaemonApp.cpp'; then $(CYGPATH_W) 'DaemonApp.cpp'; else $(CYGPATH_W) '$(srcdir)/DaemonApp.cpp'; fi`
+
+slideshow-exception.o: exception.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-exception.o -MD -MP -MF $(DEPDIR)/slideshow-exception.Tpo -c -o slideshow-exception.o `test -f 'exception.cpp' || echo '$(srcdir)/'`exception.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/slideshow-exception.Tpo $(DEPDIR)/slideshow-exception.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='exception.cpp' object='slideshow-exception.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o slideshow-exception.o `test -f 'exception.cpp' || echo '$(srcdir)/'`exception.cpp
+
+slideshow-exception.obj: exception.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-exception.obj -MD -MP -MF $(DEPDIR)/slideshow-exception.Tpo -c -o slideshow-exception.obj `if test -f 'exception.cpp'; then $(CYGPATH_W) 'exception.cpp'; else $(CYGPATH_W) '$(srcdir)/exception.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/slideshow-exception.Tpo $(DEPDIR)/slideshow-exception.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='exception.cpp' object='slideshow-exception.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o slideshow-exception.obj `if test -f 'exception.cpp'; then $(CYGPATH_W) 'exception.cpp'; else $(CYGPATH_W) '$(srcdir)/exception.cpp'; fi`
 
 slideshow-ForegroundApp.o: ForegroundApp.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-ForegroundApp.o -MD -MP -MF $(DEPDIR)/slideshow-ForegroundApp.Tpo -c -o slideshow-ForegroundApp.o `test -f 'ForegroundApp.cpp' || echo '$(srcdir)/'`ForegroundApp.cpp
