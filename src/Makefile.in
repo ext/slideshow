@@ -333,7 +333,7 @@ xxf86vm_LIBS = @xxf86vm_LIBS@
 SUBDIRS = IPC state transitions
 noinst_LIBRARIES = libmodule_loader.a
 common_flags = 
-slideshow_CPPFLAGS = -I${top_srcdir}/include ${common_flags}
+slideshow_CPPFLAGS = -I${top_srcdir}/include ${common_flags} -DBUILD_DAEMON
 slideshow_CFLAGS = -I${top_srcdir}/include ${common_flags}
 slideshow_SOURCES = \
 	${top_srcdir}/include/Browser.h \

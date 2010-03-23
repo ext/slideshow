@@ -8,7 +8,7 @@ common_flags =
 	${libdaemon_CFLAGS} \
 	-pipe -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
 
-slideshow_CPPFLAGS = -I${top_srcdir}/include ${common_flags}
+slideshow_CPPFLAGS = -I${top_srcdir}/include ${common_flags} -DBUILD_DAEMON
 slideshow_CFLAGS   = -I${top_srcdir}/include ${common_flags}
 
 slideshow_SOURCES = \
