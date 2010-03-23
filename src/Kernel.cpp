@@ -28,7 +28,7 @@
 #include "OS.h"
 #include "path.h"
 #include "Log.h"
-#include "Exceptions.h"
+#include "exception.h"
 #include "Transition.h"
 
 // IPC

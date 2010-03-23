@@ -20,7 +20,7 @@
 #	include "config.h"
 #endif
 
-#include "Exceptions.h"
+#include "exception.h"
 #include "Graphics.h"
 #include "Kernel.h"
 #include "OS.h"

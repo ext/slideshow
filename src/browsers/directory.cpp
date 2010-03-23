@@ -21,7 +21,7 @@
 #endif
 
 #include "Browser.h"
-#include "Exceptions.h"
+#include "exception.h"
 #include "Log.h"
 #include <vector>
 #include <algorithm>

@@ -236,7 +236,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\include\Exceptions.h"
+				RelativePath="..\include\exception.h"
 				>
 			</File>
 			<File

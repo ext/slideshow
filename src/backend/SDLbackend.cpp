@@ -22,7 +22,7 @@
 #endif
 
 #include "backend/SDLbackend.h"
-#include "Exceptions.h"
+#include "exception.h"
 
 #ifdef WIN32
 #	include "win32.h"

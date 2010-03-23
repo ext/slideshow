@@ -28,7 +28,7 @@
 #endif /* BUILD_DAEMON */
 
 #include "Log.h"
-#include "Exceptions.h"
+#include "exception.h"
 #include "module_loader.h"
 #include "path.h"
 #include <cstring>

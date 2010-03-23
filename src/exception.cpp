@@ -20,7 +20,7 @@
 #	include "config.h"
 #endif
 
-#include "Exceptions.h"
+#include "exception.h"
 #include <stdexcept>
 #include <cstdarg>
 #include <cstdlib>

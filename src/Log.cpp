@@ -21,7 +21,7 @@
 #endif
 
 #include "Log.h"
-#include "Exceptions.h"
+#include "exception.h"
 #include <stdarg.h>
 #include <cstdlib>
 #include <cstring>

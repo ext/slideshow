@@ -20,7 +20,7 @@
 #define DAEMON_APP_H
 
 #include "Kernel.h"
-#include "Exceptions.h"
+#include "exception.h"
 #include <sys/select.h>
 
 class DaemonApp: public Kernel {

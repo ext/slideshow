@@ -22,7 +22,7 @@
 
 #include "InitialState.h"
 #include "TransitionState.h"
-#include "Exceptions.h"
+#include "exception.h"
 #include "Log.h"
 
 State* InitialState::action(bool &flip){
