@@ -17,7 +17,7 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-require_once('../core/page_exception.php');
+require_once('../core/exception.php');
 
 class SlidetoolException extends PageException {
 	private $rc;

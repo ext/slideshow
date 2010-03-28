@@ -23,7 +23,7 @@ require_once('../common.inc.php');
 require_once('../db_functions.inc.php');
 require_once('../core/module.inc.php');
 require_once('../core/slide_template.php');
-require_once('../core/page_exception.php');
+require_once('../core/exception.php');
 require_once('../models/slide.php');
 
 class UploadException extends PageException {

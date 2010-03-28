@@ -26,7 +26,7 @@ require_once('../db_functions.inc.php');
 require_once('../common.inc.php');
 require_once('../thumb_functions.inc.php');
 require_once('../core/module.inc.php');
-require_once('../core/page_exception.php');
+require_once('../core/exception.php');
 require_once('../models/settings.php');
 require_once('../daemonlib/daemonlib.php');
 
