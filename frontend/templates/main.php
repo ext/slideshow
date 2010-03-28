@@ -29,7 +29,7 @@
 	</div>
 
 	<div id="bar">
-		<span class="daemonstatus">Status: <?=$daemon->get_status_string()?></span>
+		<span class="daemonstatus">Status: <?= $daemon ? $daemon->get_status_string() : 'Unknown' ?></span>
 
 		<div id="menu">
 			<h2>Menu</h2>
