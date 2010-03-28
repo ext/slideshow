@@ -25,6 +25,7 @@
 #include <stdarg.h>
 #include <cstdlib>
 #include <cstring>
+#include <memory> /* for auto_ptr */
 #include <errno.h>
 #include <time.h>
 #include <portable/asprintf.h>
@@ -56,18 +57,16 @@ void Log::message(Severity severity, const char* fmt, ...){
 }
 
 void Log::vmessage(Severity severity, const char* fmt, va_list ap){
-	char buf[255];
+	static char buf[255]; /* this isn't thread-safe anyway, might as well make it static */
 
-	char* line;
-	verify( vasprintf(&line, fmt, ap) >= 0 );
+	std::auto_ptr<char> content( vasprintf2(fmt, ap) );
+	std::auto_ptr<char> line( asprintf2("(%s) [%s] %s", severity_string(severity), timestring(buf, 255), content.get()) );
 
 	if ( severity >= _level ){
-		fprintf(stdout, "(%s) [%s] %s", severity_string(severity), timestring(buf, 255), line);
+		fputs(line.get(), stdout);
 	}
 
-	fprintf(_file, "(%s) [%s] %s", severity_string(severity), timestring(buf, 255), line);
-
-	free(line);
+	fputs(line.get(), _file);
 }
 
 static Log::Severity last_severity;
