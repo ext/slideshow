@@ -19,7 +19,7 @@
 ?>
 <?
 
-require_once ('file_not_found.inc.php');
+require_once ('exception.php');
 
 class Module {
 	private $_view = '';

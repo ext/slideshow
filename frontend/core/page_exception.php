@@ -39,4 +39,10 @@ class ExecutableException extends PageException {
 	}
 }
 
+class FileNotFound extends PageException {
+	function __construct(){
+		parent::__construct("File not found", FILE_NOT_FOUND);
+	}
+}
+
 ?>
