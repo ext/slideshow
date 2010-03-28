@@ -33,4 +33,10 @@ define('XQUERY_ERROR', 3);
 define('SLIDETOOL_ERROR', 4);
 define('FILE_NOT_FOUND', 404);
 
+class ExecutableException extends PageException {
+	public function __construct($message){
+		parent::__construct($message, EXECUTABLE_ERROR);
+	}
+}
+
 ?>

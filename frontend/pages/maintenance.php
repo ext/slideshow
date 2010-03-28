@@ -21,12 +21,6 @@
 
 require_once('../core/module.inc.php');
 
-class ExecutableException extends PageException {
-	public function __construct($message){
-		parent::__construct($message, EXECUTABLE_ERROR);
-	}
-}
-
 class Maintenance extends Module {
 	function __construct(){
 		connect();
