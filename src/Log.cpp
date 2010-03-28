@@ -49,13 +49,17 @@ void Log::deinitialize(){
 }
 
 void Log::message(Severity severity, const char* fmt, ...){
-	va_list arg;
-	va_start(arg, fmt);
+	va_list ap;
+	va_start(ap, fmt);
+	vmessage(severity, fmt, ap);
+	va_end(ap);
+}
 
+void Log::vmessage(Severity severity, const char* fmt, va_list ap){
 	char buf[255];
 
 	char* line;
-	verify( vasprintf(&line, fmt, arg) >= 0 );
+	verify( vasprintf(&line, fmt, ap) >= 0 );
 
 	if ( severity >= _level ){
 		fprintf(stdout, "(%s) [%s] %s", severity_string(severity), timestring(buf, 255), line);
@@ -64,7 +68,6 @@ void Log::message(Severity severity, const char* fmt, ...){
 	fprintf(_file, "(%s) [%s] %s", severity_string(severity), timestring(buf, 255), line);
 
 	free(line);
-	va_end(arg);
 }
 
 static Log::Severity last_severity;

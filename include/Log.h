@@ -35,7 +35,8 @@ class Log {
 		};
 
 		static void set_level(Severity level){ _level = level; }
-		static void message(Severity severity, const char* fmt, ...);
+		static void  message(Severity severity, const char* fmt, ...);
+		static void vmessage(Severity severity, const char* fmt, va_list ap);
 
 		static void message_begin(Severity severity);
 		static void message_ex(const char* str);
