@@ -77,18 +77,13 @@ class Slides extends Module {
 			}
 
 			if ( $_POST['submit'] == 'Upload' ){
-				$filename = md5(uniqid());
-				$fullpath = $settings->image_path() . "/$filename.png";
+				$slide = Slide::create_text('../slide_default_template.xml', $title, $data);
+				$slide->resample($settings->resolution_as_string());
+				$slide->resample('200x200');
+				
+				$fullpath = $slide->fullpath();
 
-				$template->render($fullpath, $data);
-
-				if ( $settings->resolution_as_string() != $settings->virtual_resolution_as_string() ){
-					$this->convert($fullpath, $fullpath, $settings->resolution_as_string(), $settings->virtual_resolution_as_string());
-				}
-
-				$this->convert($fullpath, $fullpath . '.thumb.jpg', "200x200");
-
-				q("INSERT INTO slides (fullpath, type, title, data) VALUES ('$fullpath', 'text', '', '" . mysql_real_escape_string($data_string) . "')");
+				q("INSERT INTO slides (fullpath, type, title) VALUES ('$fullpath', 'text', '')");
 
 				global $daemon;
 				$daemon->reload_queue();

@@ -46,9 +46,9 @@ class Slide {
 	private $fullpath;
 	private $id;
 	private $active;
-	private $meta;
-
-	static public function create_image(){
+	protected $meta;
+	
+	static private function create_slide(){
 		global $settings;
 
 		$id = Slide::unique_id();
@@ -58,7 +58,13 @@ class Slide {
 		mkdir($fullpath);
 		mkdir($fullpath . '/data');
 		mkdir($fullpath . '/samples');
+		
+		return $fullpath;
+	}
 
+	static public function create_image(){
+		$fullpath = Slide::create_slide();
+	
 		$datafiles = func_get_args();
 		foreach ( $datafiles as $file ){
 			$basename = basename($file);
@@ -78,6 +84,32 @@ class Slide {
 		fclose($file);
 		
 		return new SlideImage($fullpath, $meta);
+	}
+	
+	static public function create_text($template, $title, $data){
+		$fullpath = Slide::create_slide();
+
+		$meta = array(
+			'type' => 'text',
+			'data' => array('raster.png'),
+			'source' => $data,
+			'template' => $template,
+			'title' => $title
+		);
+
+		$metastr = json_encode($meta) . "\n";
+		$file = fopen("$fullpath/meta", 'w');
+		fwrite($file, $metastr);
+		fclose($file);
+		
+		global $settings;
+		$resolution = $settings->resolution();
+		$template = new SlideTemplate($template, $resolution[0], $resolution[1]);
+		$dst = "$fullpath/data/raster.png";
+		
+		$template->render($dst, $data);
+		
+		return new SlideText($fullpath, $meta);
 	}
 
 	public function fullpath(){
@@ -178,6 +210,7 @@ class Slide {
 		
 		switch ( $type ){
 			case 'image': return new SlideImage($fullpath, $meta, $id, $active);
+			case 'text': return new SlideText($fullpath, $meta, $id, $active);
 			default: throw new PageException("could not open slide at $fullpath: unknown type $type");
 		}
 	}
@@ -188,6 +221,7 @@ class Slide {
 		
 		switch ( $type ){
 			case 'image': return new SlideImage($fullpath, $meta);
+			case 'text': return new SlideText($fullpath, $meta);
 			default: throw new PageException("could not open slide at $fullpath: unknown type $type");
 		}
 	}
@@ -210,6 +244,10 @@ class Slide {
 }
 
 class SlideImage extends Slide {
+
+}
+
+class SlideText extends Slide {
 
 }
 
