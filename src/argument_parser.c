@@ -68,7 +68,7 @@ typedef struct {
 	ARGUMENT_HEAD;
 	const char* format_description;
 	const char* fmt;
-	void** dst;
+	va_list dst;
 } argument_format_t;
 
 typedef struct argument_node_t {
@@ -345,13 +345,24 @@ void option_add_int(option_set_t* option, const char* name, char flag, const cha
 }
 
 void option_add_format(option_set_t* option, const char* name, char flag, const char* description, const char* format_description, const char* fmt, ...){
+#ifndef ARCH_AMD64
 	void** fmtbuf = NULL;
 	int args = 0;
+#endif /* ARCH_AMD64 */
 
 	argument_format_t* arg = (argument_format_t*)argument_allocate(sizeof(argument_format_t), arg_fmt, name, flag, description);
 	arg->format_description = format_description;
 	arg->fmt = fmt;
 
+#ifdef ARCH_AMD64
+	/* On AMD64 it is safe (and required) to copy the va_list */
+	{
+		va_list ap;
+		va_start(ap, fmt);
+		va_copy(arg->dst, ap);
+		va_end(ap);
+	}
+#else  /* ARCH_AMD64 */
 	/* The va_list cannot be copied directly since it might just be a pointer
 	 * to the stack, in which case it will probably be overwritten by the time
 	 * it is actually used. Therefore a buffer is manually allocated and filled
@@ -380,7 +391,8 @@ void option_add_format(option_set_t* option, const char* name, char flag, const 
 		}
 	}
 
-	arg->dst = fmtbuf;
+	arg->dst = (va_list)fmtbuf;
+#endif /* ARCH_AMD64 */
 
 	option_add_argument(option, (argument_t*)arg);
 }

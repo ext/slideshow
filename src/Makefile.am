@@ -6,7 +6,7 @@ bin_PROGRAMS = slideshow xquery
 warning_flags = -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
 
 AM_LDFLAGS = -shared -module -avoid-version
-AM_CPPFLAGS = -I${top_srcdir}/include -pipe ${warning_flags}
+AM_CPPFLAGS = -I${top_srcdir}/include -pipe $(ARCH_FLAGS) ${warning_flags}
 
 libipc_a_CPPFLAGS = -I${top_srcdir}/include
 libipc_a_SOURCES = 
