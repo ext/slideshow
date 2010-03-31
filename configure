@@ -752,8 +752,8 @@ SDL_LIBS
 SDL_CFLAGS
 SDL_CONFIG
 MYSQL_LIBS
-MYSQL_FALSE
-MYSQL_TRUE
+WITH_MYSQL_FALSE
+WITH_MYSQL_TRUE
 WITH_XLIB_FALSE
 WITH_XLIB_TRUE
 xrandr_LIBS
@@ -17077,11 +17077,11 @@ done
 fi
 
  if test "x$with_mysql" != xno; then
-  MYSQL_TRUE=
-  MYSQL_FALSE='#'
+  WITH_MYSQL_TRUE=
+  WITH_MYSQL_FALSE='#'
 else
-  MYSQL_TRUE='#'
-  MYSQL_FALSE=
+  WITH_MYSQL_TRUE='#'
+  WITH_MYSQL_FALSE=
 fi
 
 
@@ -17498,8 +17498,8 @@ if test -z "${WITH_XLIB_TRUE}" && test -z "${WITH_XLIB_FALSE}"; then
   as_fn_error "conditional \"WITH_XLIB\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${MYSQL_TRUE}" && test -z "${MYSQL_FALSE}"; then
-  as_fn_error "conditional \"MYSQL\" was never defined.
+if test -z "${WITH_MYSQL_TRUE}" && test -z "${WITH_MYSQL_FALSE}"; then
+  as_fn_error "conditional \"WITH_MYSQL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WITH_SDL_TRUE}" && test -z "${WITH_SDL_FALSE}"; then

@@ -191,7 +191,7 @@ AS_IF([test "x$with_mysql" != xno],
 		])],
 	[])
 
-AM_CONDITIONAL([MYSQL], [test "x$with_mysql" != xno])
+AM_CONDITIONAL([WITH_MYSQL], [test "x$with_mysql" != xno])
 AC_SUBST(MYSQL_LIBS)
 
 dnl #######################################################################
