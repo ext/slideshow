@@ -57,8 +57,15 @@ int SDLBackend::init(const Vector2ui &resolution, bool fullscreen){
 	}
 
 	_fullscreen = fullscreen;
-	SDL_Init(SDL_INIT_VIDEO);
-	SDL_SetVideoMode(resolution.width, resolution.height, 0, flags);
+	
+	if ( SDL_Init(SDL_INIT_VIDEO) < 0 ){
+		throw exception("Unable to init SDL: %s", SDL_GetError());
+	}
+
+	if ( SDL_SetVideoMode(resolution.width, resolution.height, 0, flags) == NULL ){
+		throw exception("Unable to init SDL: %s", SDL_GetError());
+	}
+
 	SDL_EnableUNICODE(1);
 
 #ifdef WIN32
