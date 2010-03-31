@@ -12,8 +12,8 @@ libipc_a_CPPFLAGS = -I${top_srcdir}/include
 libipc_a_SOURCES = 
 
 if WITH_DBUS
-	libipc_a_CPPFLAGS += ${dbus_CFLAGS}
-	libipc_a_SOURCES += IPC/dbus.cpp IPC/dbus.h
+libipc_a_CPPFLAGS += ${dbus_CFLAGS}
+libipc_a_SOURCES += IPC/dbus.cpp IPC/dbus.h
 endif
 
 libfsm_a_SOURCES = \
@@ -66,9 +66,9 @@ slideshow_LDADD = \
 	${xxf86vm_LIBS} \
 	${xrandr_LIBS}
 
-if MYSQL
-	slideshow_SOURCES += browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
-	slideshow_LDADD += ${MYSQL_LIBS}
+if WITH_MYSQL
+slideshow_SOURCES += browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
+slideshow_LDADD += ${MYSQL_LIBS}
 endif
 
 libmodule_loader_a_SOURCES = module_loader.c ${top_srcdir}/include/module_loader.h

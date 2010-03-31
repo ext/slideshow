@@ -35,6 +35,10 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = slideshow$(EXEEXT) xquery$(EXEEXT)
+@WITH_DBUS_TRUE@am__append_1 = ${dbus_CFLAGS}
+@WITH_DBUS_TRUE@am__append_2 = IPC/dbus.cpp IPC/dbus.h
+@WITH_MYSQL_TRUE@am__append_3 = browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
+@WITH_MYSQL_TRUE@am__append_4 = ${MYSQL_LIBS}
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -68,7 +72,9 @@ am_libfsm_a_OBJECTS = InitialState.$(OBJEXT) SwitchState.$(OBJEXT) \
 libfsm_a_OBJECTS = $(am_libfsm_a_OBJECTS)
 libipc_a_AR = $(AR) $(ARFLAGS)
 libipc_a_LIBADD =
-am_libipc_a_OBJECTS =
+am__libipc_a_SOURCES_DIST = IPC/dbus.cpp IPC/dbus.h
+@WITH_DBUS_TRUE@am__objects_1 = libipc_a-dbus.$(OBJEXT)
+am_libipc_a_OBJECTS = $(am__objects_1)
 libipc_a_OBJECTS = $(am_libipc_a_OBJECTS)
 libmodule_loader_a_AR = $(AR) $(ARFLAGS)
 libmodule_loader_a_LIBADD =
@@ -76,6 +82,23 @@ am_libmodule_loader_a_OBJECTS = module_loader.$(OBJEXT)
 libmodule_loader_a_OBJECTS = $(am_libmodule_loader_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
+am__slideshow_SOURCES_DIST = ${top_srcdir}/include/Browser.h \
+	${top_srcdir}/include/config.h \
+	${top_srcdir}/include/ErrorCodes.h \
+	${top_srcdir}/include/Exceptions.h ${top_srcdir}/include/IPC.h \
+	${top_srcdir}/include/OS.h ${top_srcdir}/include/Transition.h \
+	${top_srcdir}/include/argument_parser.h backend/factory.cpp \
+	backend/SDLbackend.cpp argument_parser.c browser_context.cpp \
+	Browser.cpp DaemonApp.cpp ${top_srcdir}/include/DaemonApp.h \
+	exception.cpp ${top_srcdir}/include/exception.h \
+	ForegroundApp.cpp ${top_srcdir}/include/ForegroundApp.h \
+	Graphics.cpp ${top_srcdir}/include/Graphics.h Kernel.cpp \
+	${top_srcdir}/include/Kernel.h Log.cpp \
+	${top_srcdir}/include/Log.h main.cpp path.c \
+	${top_srcdir}/include/path.h browsers/dummybrowser.cpp \
+	browsers/dummybrowser.h browsers/mysqlbrowser.cpp \
+	browsers/mysqlbrowser.h
+@WITH_MYSQL_TRUE@am__objects_2 = slideshow-mysqlbrowser.$(OBJEXT)
 am_slideshow_OBJECTS = slideshow-factory.$(OBJEXT) \
 	slideshow-SDLbackend.$(OBJEXT) \
 	slideshow-argument_parser.$(OBJEXT) \
@@ -85,15 +108,16 @@ am_slideshow_OBJECTS = slideshow-factory.$(OBJEXT) \
 	slideshow-ForegroundApp.$(OBJEXT) slideshow-Graphics.$(OBJEXT) \
 	slideshow-Kernel.$(OBJEXT) slideshow-Log.$(OBJEXT) \
 	slideshow-main.$(OBJEXT) slideshow-path.$(OBJEXT) \
-	slideshow-dummybrowser.$(OBJEXT)
+	slideshow-dummybrowser.$(OBJEXT) $(am__objects_2)
 slideshow_OBJECTS = $(am_slideshow_OBJECTS)
 am__DEPENDENCIES_1 =
+@WITH_MYSQL_TRUE@am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
 slideshow_DEPENDENCIES = libmodule_loader.a libipc.a libfsm.a \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
@@ -142,8 +166,8 @@ am__v_GEN_0 = @echo "  GEN   " $@;
 SOURCES = $(libfsm_a_SOURCES) $(libipc_a_SOURCES) \
 	$(libmodule_loader_a_SOURCES) $(slideshow_SOURCES) \
 	$(xquery_SOURCES)
-DIST_SOURCES = $(libfsm_a_SOURCES) $(libipc_a_SOURCES) \
-	$(libmodule_loader_a_SOURCES) $(slideshow_SOURCES) \
+DIST_SOURCES = $(libfsm_a_SOURCES) $(am__libipc_a_SOURCES_DIST) \
+	$(libmodule_loader_a_SOURCES) $(am__slideshow_SOURCES_DIST) \
 	$(xquery_SOURCES)
 RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	html-recursive info-recursive install-data-recursive \
@@ -343,8 +367,8 @@ noinst_LIBRARIES = libmodule_loader.a libipc.a libfsm.a
 warning_flags = -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
 AM_LDFLAGS = -shared -module -avoid-version
 AM_CPPFLAGS = -I${top_srcdir}/include -pipe $(ARCH_FLAGS) ${warning_flags}
-libipc_a_CPPFLAGS = -I${top_srcdir}/include
-libipc_a_SOURCES = 
+libipc_a_CPPFLAGS = -I${top_srcdir}/include $(am__append_1)
+libipc_a_SOURCES = $(am__append_2)
 libfsm_a_SOURCES = \
 	state/State.h \
 	state/InitialState.cpp state/InitialState.h \
@@ -354,46 +378,26 @@ libfsm_a_SOURCES = \
 
 slideshow_CPPFLAGS = ${AM_CPPFLAGS} ${libdaemon_CFLAGS} -DBUILD_DAEMON
 slideshow_CFLAGS = ${AM_CPPFLAGS}
-slideshow_SOURCES = \
-	${top_srcdir}/include/Browser.h \
+slideshow_SOURCES = ${top_srcdir}/include/Browser.h \
 	${top_srcdir}/include/config.h \
 	${top_srcdir}/include/ErrorCodes.h \
-	${top_srcdir}/include/Exceptions.h \
-	${top_srcdir}/include/IPC.h \
-	${top_srcdir}/include/OS.h \
-	${top_srcdir}/include/Transition.h \
-	${top_srcdir}/include/argument_parser.h \
-	backend/factory.cpp \
-	backend/SDLbackend.cpp \
-	argument_parser.c \
-	browser_context.cpp \
-	Browser.cpp ${top_srcdir}/include/Browser.h \
-	DaemonApp.cpp ${top_srcdir}/include/DaemonApp.h \
-	exception.cpp ${top_srcdir}/include/exception.h \
-	ForegroundApp.cpp ${top_srcdir}/include/ForegroundApp.h \
-	Graphics.cpp ${top_srcdir}/include/Graphics.h \
-	Kernel.cpp ${top_srcdir}/include/Kernel.h \
-	Log.cpp ${top_srcdir}/include/Log.h\
-	main.cpp \
-	path.c ${top_srcdir}/include/path.h \
-	browsers/dummybrowser.cpp browsers/dummybrowser.h
-
-slideshow_LDADD = \
-	libmodule_loader.a \
-	libipc.a \
-	libfsm.a \
-	-lltdl \
-	-lGLEW \
-	${libportable_LIBS} \
-	${libdaemon_LIBS} \
-	${dbus_LIBS} \
-	${GL_LIBS} \
-	${DEVIL_LIBS} \
-	${SDL_LIBS} \
-	${X11_LIBS} \
-	${xxf86vm_LIBS} \
-	${xrandr_LIBS}
-
+	${top_srcdir}/include/Exceptions.h ${top_srcdir}/include/IPC.h \
+	${top_srcdir}/include/OS.h ${top_srcdir}/include/Transition.h \
+	${top_srcdir}/include/argument_parser.h backend/factory.cpp \
+	backend/SDLbackend.cpp argument_parser.c browser_context.cpp \
+	Browser.cpp ${top_srcdir}/include/Browser.h DaemonApp.cpp \
+	${top_srcdir}/include/DaemonApp.h exception.cpp \
+	${top_srcdir}/include/exception.h ForegroundApp.cpp \
+	${top_srcdir}/include/ForegroundApp.h Graphics.cpp \
+	${top_srcdir}/include/Graphics.h Kernel.cpp \
+	${top_srcdir}/include/Kernel.h Log.cpp \
+	${top_srcdir}/include/Log.h main.cpp path.c \
+	${top_srcdir}/include/path.h browsers/dummybrowser.cpp \
+	browsers/dummybrowser.h $(am__append_3)
+slideshow_LDADD = libmodule_loader.a libipc.a libfsm.a -lltdl -lGLEW \
+	${libportable_LIBS} ${libdaemon_LIBS} ${dbus_LIBS} ${GL_LIBS} \
+	${DEVIL_LIBS} ${SDL_LIBS} ${X11_LIBS} ${xxf86vm_LIBS} \
+	${xrandr_LIBS} $(am__append_4)
 libmodule_loader_a_SOURCES = module_loader.c ${top_srcdir}/include/module_loader.h
 xquery_SOURCES = xquery.c
 xquery_LDADD = ${X11_LIBS} ${xrandr_LIBS}
@@ -506,6 +510,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SwitchState.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TransitionState.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ViewState.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libipc_a-dbus.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/module_loader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-Browser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-DaemonApp.Po@am__quote@
@@ -520,6 +525,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-exception.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-factory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-mysqlbrowser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/slideshow-path.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xquery.Po@am__quote@
 
@@ -666,6 +672,22 @@ ViewState.obj: state/ViewState.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='state/ViewState.cpp' object='ViewState.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ViewState.obj `if test -f 'state/ViewState.cpp'; then $(CYGPATH_W) 'state/ViewState.cpp'; else $(CYGPATH_W) '$(srcdir)/state/ViewState.cpp'; fi`
+
+libipc_a-dbus.o: IPC/dbus.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libipc_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libipc_a-dbus.o -MD -MP -MF $(DEPDIR)/libipc_a-dbus.Tpo -c -o libipc_a-dbus.o `test -f 'IPC/dbus.cpp' || echo '$(srcdir)/'`IPC/dbus.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libipc_a-dbus.Tpo $(DEPDIR)/libipc_a-dbus.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='IPC/dbus.cpp' object='libipc_a-dbus.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libipc_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libipc_a-dbus.o `test -f 'IPC/dbus.cpp' || echo '$(srcdir)/'`IPC/dbus.cpp
+
+libipc_a-dbus.obj: IPC/dbus.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libipc_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libipc_a-dbus.obj -MD -MP -MF $(DEPDIR)/libipc_a-dbus.Tpo -c -o libipc_a-dbus.obj `if test -f 'IPC/dbus.cpp'; then $(CYGPATH_W) 'IPC/dbus.cpp'; else $(CYGPATH_W) '$(srcdir)/IPC/dbus.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libipc_a-dbus.Tpo $(DEPDIR)/libipc_a-dbus.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='IPC/dbus.cpp' object='libipc_a-dbus.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libipc_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libipc_a-dbus.obj `if test -f 'IPC/dbus.cpp'; then $(CYGPATH_W) 'IPC/dbus.cpp'; else $(CYGPATH_W) '$(srcdir)/IPC/dbus.cpp'; fi`
 
 slideshow-factory.o: backend/factory.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-factory.o -MD -MP -MF $(DEPDIR)/slideshow-factory.Tpo -c -o slideshow-factory.o `test -f 'backend/factory.cpp' || echo '$(srcdir)/'`backend/factory.cpp
@@ -858,6 +880,22 @@ slideshow-dummybrowser.obj: browsers/dummybrowser.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='browsers/dummybrowser.cpp' object='slideshow-dummybrowser.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o slideshow-dummybrowser.obj `if test -f 'browsers/dummybrowser.cpp'; then $(CYGPATH_W) 'browsers/dummybrowser.cpp'; else $(CYGPATH_W) '$(srcdir)/browsers/dummybrowser.cpp'; fi`
+
+slideshow-mysqlbrowser.o: browsers/mysqlbrowser.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-mysqlbrowser.o -MD -MP -MF $(DEPDIR)/slideshow-mysqlbrowser.Tpo -c -o slideshow-mysqlbrowser.o `test -f 'browsers/mysqlbrowser.cpp' || echo '$(srcdir)/'`browsers/mysqlbrowser.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/slideshow-mysqlbrowser.Tpo $(DEPDIR)/slideshow-mysqlbrowser.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='browsers/mysqlbrowser.cpp' object='slideshow-mysqlbrowser.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o slideshow-mysqlbrowser.o `test -f 'browsers/mysqlbrowser.cpp' || echo '$(srcdir)/'`browsers/mysqlbrowser.cpp
+
+slideshow-mysqlbrowser.obj: browsers/mysqlbrowser.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT slideshow-mysqlbrowser.obj -MD -MP -MF $(DEPDIR)/slideshow-mysqlbrowser.Tpo -c -o slideshow-mysqlbrowser.obj `if test -f 'browsers/mysqlbrowser.cpp'; then $(CYGPATH_W) 'browsers/mysqlbrowser.cpp'; else $(CYGPATH_W) '$(srcdir)/browsers/mysqlbrowser.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/slideshow-mysqlbrowser.Tpo $(DEPDIR)/slideshow-mysqlbrowser.Po
+@am__fastdepCXX_FALSE@	$(AM_V_CXX) @AM_BACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='browsers/mysqlbrowser.cpp' object='slideshow-mysqlbrowser.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(slideshow_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o slideshow-mysqlbrowser.obj `if test -f 'browsers/mysqlbrowser.cpp'; then $(CYGPATH_W) 'browsers/mysqlbrowser.cpp'; else $(CYGPATH_W) '$(srcdir)/browsers/mysqlbrowser.cpp'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1181,12 +1219,6 @@ uninstall-am: uninstall-binPROGRAMS
 	pdf pdf-am ps ps-am tags tags-recursive uninstall uninstall-am \
 	uninstall-binPROGRAMS
 
-
-@WITH_DBUS_TRUE@	libipc_a_CPPFLAGS += ${dbus_CFLAGS}
-@WITH_DBUS_TRUE@	libipc_a_SOURCES += IPC/dbus.cpp IPC/dbus.h
-
-@MYSQL_TRUE@	slideshow_SOURCES += browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
-@MYSQL_TRUE@	slideshow_LDADD += ${MYSQL_LIBS}
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
