@@ -54,7 +54,7 @@ class Slides extends Module {
 
 		$resolution = $settings->virtual_resolution();
 
-		$template = new SlideTemplate('../slide_default_template.xml', $resolution[0], $resolution[1]);
+		$template = new SlideTemplate('../nitroxy.xml', $resolution[0], $resolution[1]);
 		$data = array();
 
 		foreach ( $template->fields() as $count => $field ){
@@ -77,7 +77,7 @@ class Slides extends Module {
 			}
 
 			if ( $_POST['submit'] == 'Upload' ){
-				$slide = Slide::create_text('../slide_default_template.xml', $title, $data);
+				$slide = Slide::create_text('../nitroxy.xml', $title, $data);
 				$slide->resample($settings->resolution_as_string());
 				$slide->resample('200x200');
 				
@@ -170,7 +170,7 @@ class Slides extends Module {
 
 		$resolution = $settings->virtual_resolution();
 
-		$template = new SlideTemplate('../slide_default_template.xml', $resolution[0], $resolution[1]);
+		$template = new SlideTemplate('../nitroxy.xml', $resolution[0], $resolution[1]);
 		$template->render(NULL, $data);
 
 		exit();
@@ -288,11 +288,11 @@ class Slides extends Module {
 			return;
 		}
 
-		$row = mysql_fetch_assoc(q("SELECT id, fullpath FROM slides WHERE id = $id"));
+		$row = mysql_fetch_assoc(q("SELECT id, fullpath, active, type, title FROM slides WHERE id = $id"));
 
 		return array(
 			'id' => $id,
-			'fullpath' => $row['fullpath'],
+			'slide' => Slide::from_row($row),
 			'filename' => basename($row['fullpath'])
 		);
 	}

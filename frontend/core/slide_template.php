@@ -113,13 +113,21 @@ class Field {
 
 			// Hexadecimal RGA[A]
 			case 1:
+				$r = '';
+				$g = '';
+				$b = '';
+				$a = '';
+				sscanf(substr($string, 1), "%2s%2s%2s%2s", $r, $g, $b, $a);
+				$this->color = array(hexdec($r), hexdec($g), hexdec($b), hexdec($a));
+				
+				break;
 
 			// Named color
 			case 2:
 				switch ( strtolower($string) ){
 					case 'red': $this->color = array(255, 0, 0, 0); break;
-					case 'blue': $this->color = array(0, 255, 0, 0); break;
-					case 'green': $this->color = array(0, 0, 255, 0); break;
+					case 'green': $this->color = array(0, 255, 0, 0); break;
+					case 'blue': $this->color = array(0, 0, 255, 0); break;
 					case 'yellow': $this->color = array(255, 255, 0, 0); break;
 					default:
 						throw new Exception("Parse error: $string is not a valid color");
@@ -414,10 +422,14 @@ class SlideTemplate {
 					continue;
 			}
 		}
-
+		
 		$im  = imagecreatetruecolor($this->width, $this->height);
+		$bg  = imagecreatefrompng($this->background);
+		
 		$black  = imagecolorallocate($im, 0, 0, 0);
 		imagefilledrectangle($im, 0, 0, $this->width, $this->height, $black);
+		
+		imagecopyresized  ($im, $bg, 0, 0, 0, 0, imagesx($bg), imagesy($bg), $this->width, $this->height);
 
 		$x = $y = 0;
 

@@ -22,8 +22,8 @@ class error extends Module {
 		return array(
 			'message' => $exception->getMessage(),
 			'code' => $exception->getCode(),
-			'rc' => $exception->get_rc(),
-			'stdout' => $exception->get_stdout(),
+			'rc' => method_exists($exception, 'get_rc') ? $exception->get_rc() : -1,
+			'stdout' => method_exists($exception, 'get_stdout') ? $exception->get_stdout() : '',
 		);
 	}
 }

@@ -23,7 +23,7 @@
 			<h2><a href="<?=href()?>">Slideshow</a> &gt; Delete slide</h2>
 		</div>
 		
-		<p>Confirm that you want to delete '<?=$fullpath?>' <a href="?confirm">yes</a> / <a href="<?=href()?>">no</a></p>
-  		<img src="/image/<?=$filename?>" width="800" height="600" />
+		<p>Confirm that you want to delete '<?=$slide->fullpath()?>' <a href="?confirm">yes</a> / <a href="<?=href()?>">no</a></p>
+  		<img src="/<?=$slide->image_url()?>" width="800" height="600" />
   		
 	</div>
