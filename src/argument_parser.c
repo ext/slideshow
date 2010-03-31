@@ -68,7 +68,7 @@ typedef struct {
 	ARGUMENT_HEAD;
 	const char* format_description;
 	const char* fmt;
-	va_list dst;
+	void** dst;
 } argument_format_t;
 
 typedef struct argument_node_t {
@@ -380,7 +380,7 @@ void option_add_format(option_set_t* option, const char* name, char flag, const 
 		}
 	}
 
-	arg->dst = (va_list)fmtbuf;
+	arg->dst = fmtbuf;
 
 	option_add_argument(option, (argument_t*)arg);
 }
