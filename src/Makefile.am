@@ -26,6 +26,10 @@ libfsm_a_SOURCES = \
 slideshow_CPPFLAGS = ${AM_CPPFLAGS} ${libdaemon_CFLAGS} -DBUILD_DAEMON
 slideshow_CFLAGS   = ${AM_CPPFLAGS}
 
+if WITH_DBUS
+slideshow_CPPFLAGS += ${dbus_CFLAGS}
+endif
+
 slideshow_SOURCES = \
 	${top_srcdir}/include/Browser.h \
 	${top_srcdir}/include/config.h \
