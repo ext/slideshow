@@ -17,7 +17,9 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-class Slide {
+ require_once('slide.php');
+ 
+/*class Slide {
 	private $id;
 	private $name;
 	private $fullpath;
@@ -65,7 +67,7 @@ class Slide {
 	function title(){
 		return $this->title;
 	}
-}
+}*/
 
 class Bin implements Iterator {
 	private $slides;
@@ -146,10 +148,10 @@ class BinCollection implements Iterator, ArrayAccess {
 			}
 
 			if ( $row['id'] != NULL ){
-				$bin[] = new Slide( $row );
+				$bin[] = Slide::from_row($row);
 			}
 		}
-
+		
 		$this->collection[] = new Bin( $bin, $prevbin_id, $bin_name );
 	}
 
