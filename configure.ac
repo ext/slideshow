@@ -24,6 +24,18 @@ AC_CONFIG_FILES([
 	src/transitions/Makefile
 ])
 
+AC_MSG_CHECKING([host architecture])
+case "$host" in
+	x86_64-*)
+		AC_MSG_RESULT([amd64])
+		AC_SUBST(ARCH_FLAGS, [-DARCH_AMD64=1]) ;;
+	i[3456]86-*)
+		AC_MSG_RESULT([x86])
+		AC_SUBST(ARCH_FLAGS, [-DARCH_X86=1]) ;;
+	*)
+		AC_MSG_RESULT([unknown]) ;;
+esac
+
 dnl #######################################################################
 dnl # Paths
 dnl #######################################################################
