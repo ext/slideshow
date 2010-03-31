@@ -27,7 +27,7 @@ class Log {
 		static void deinitialize();
 
 		enum Severity {
-			Debug,
+			Debug = 0,
 			Verbose,
 			Info,
 			Warning,

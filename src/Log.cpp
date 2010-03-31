@@ -35,6 +35,17 @@
 #	include "win32.h"
 #endif
 
+#ifdef HAVE_SYSLOG
+#	include <syslog.h>
+int syslog_severity[5] = {
+	LOG_DEBUG,
+	LOG_INFO,
+	LOG_NOTICE,
+	LOG_WARNING,
+	LOG_ERR
+};
+#endif /* HAVE_SYSLOG */
+
 Log::Severity Log::_level = Info;
 FILE* Log::_file = NULL;
 
@@ -43,10 +54,18 @@ void Log::initialize(const char* filename){
 		fprintf(stderr, "Failed to open logfile '%s' ! Fatal error!\n", filename);
 		exit(1);
 	}
+
+#ifdef HAVE_SYSLOG
+	openlog(PACKAGE, 0, LOG_DAEMON);
+#endif /* HAVE_SYSLOG */
 }
 
 void Log::deinitialize(){
 	fclose(_file);
+#ifdef HAVE_SYSLOG
+	closelog();
+#endif /* HAVE_SYSLOG */
+
 }
 
 void Log::message(Severity severity, const char* fmt, ...){
@@ -65,6 +84,10 @@ void Log::vmessage(Severity severity, const char* fmt, va_list ap){
 	if ( severity >= _level ){
 		fputs(line.get(), stdout);
 	}
+
+#ifdef HAVE_SYSLOG
+	vsyslog(syslog_severity[severity], fmt, ap);
+#endif /* HAVE_SYSLOG */
 
 	fputs(line.get(), _file);
 }
