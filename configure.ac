@@ -21,8 +21,6 @@ AX_CHECK_GLU
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
-	src/IPC/Makefile
-	src/state/Makefile
 	src/transitions/Makefile
 ])
 
