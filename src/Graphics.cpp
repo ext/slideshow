@@ -30,6 +30,7 @@
 #include "gl.h"
 
 #include <cstdlib>
+#include <cstring>
 #include <memory>
 
 #include <portable/string.h>
@@ -207,18 +208,34 @@ static char* from_tchar(const TCHAR* src){
 }
 #endif /* WIN32 */
 
+static bool is_slide(const char* name){
+	const char* ext = ".slide";
+	size_t len = strlen(name);
+
+	if ( len < 6 ){
+		return false;
+	}
+
+	return strcmp(name + len - 6, ext) == 0;
+}
+
 void Graphics::load_image(const char* name){
 	swap_textures();
 
 	glBindTexture(GL_TEXTURE_2D, _texture[0]);
 
 	if ( name ){
+		std::auto_ptr<char> real_name(strdup(name));
+		if ( is_slide(name) ){
+			real_name.reset(asprintf2("%s/samples/%dx%d.png", name, _width, _height));
+		}
+
 #ifdef UNICODE
-		char* tmp = real_path(name);
+		char* tmp = real_path(real_name.get());
 		std::auto_ptr<wchar_t> path(to_tchar(tmp));
 		free(tmp);
 #else /* UNICODE */
-		std::auto_ptr<char> path(real_path(name));
+		std::auto_ptr<char> path(real_path(real_name.get()));
 #endif /* UNICODE */
 
 		ILuint devilID;
