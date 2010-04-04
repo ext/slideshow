@@ -83,6 +83,7 @@ void Log::vmessage(Severity severity, const char* fmt, va_list ap){
 
 	if ( severity >= _level ){
 		fputs(line.get(), stdout);
+		fflush(stdout);
 	}
 
 #ifdef HAVE_SYSLOG
@@ -90,6 +91,7 @@ void Log::vmessage(Severity severity, const char* fmt, va_list ap){
 #endif /* HAVE_SYSLOG */
 
 	fputs(line.get(), _file);
+	fflush(_file);
 }
 
 static Log::Severity last_severity;
