@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE template SYSTEM "slide_template.dtd">
 <template>
-	<background fit="scale">../bg.png</background>
-	<font name="font" default="true">/usr/share/fonts/corefonts/arial.ttf</font>
+	<background fit="scale">../nxgroen.png</background>
+	<font name="font" default="true">/home/ext/slideshow-src/frontend/Eurostile.ttf</font>
 
 	<!--
 		Units:
@@ -33,8 +33,8 @@
 		 * static: Insert static text at given position
 	 -->
 	<fields>
-		<text name="title" font="font" size="36" color="#54a42d" align="center" position="50% 50" />
-		<textarea name="content" font="font" color="#54a42d" size="48" align="center" boxsize="90% 80%" position="50% 47%" />
+		<text name="title" font="font" size="36" color="#18ff1c" align="center" position="50% 50" />
+		<textarea name="content" font="font" color="#18ff1c" size="48" align="center" boxsize="90% 80%" position="50% 47%" />
 	</fields>
 
 </template>

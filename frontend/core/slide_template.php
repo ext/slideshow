@@ -492,7 +492,7 @@ class SlideTemplate {
 
 				if ( $next_width > $width ){
 					imagefttext( $im, $ctx->size, 0, $x - $current_width / 2, $row, $ctx->color, $ctx->font, $words );
-					$words = $next_word;
+					$words = '';//$next_word;
 					$current_width = $this->get_string_width($ctx->size, $ctx->font, $words);
 					$row += (int)($ctx->size * 1.5);
 				}
