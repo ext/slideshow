@@ -33,10 +33,14 @@ class Maintenance extends Module {
 	function index(){
 		global $settings, $daemon;
 
+		$arguments = $this->_get_arguments_from_settings();
+
 		$ret =  array(
 			'log' => array(),
 			'activity' => array(),
 			'status' => $daemon->get_status(),
+			'cmd' => $daemon->generate_cmd($arguments, false),
+			'cwd' => $arguments->basepath()
 		);
 
 		try {

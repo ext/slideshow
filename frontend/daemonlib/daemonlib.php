@@ -74,6 +74,28 @@ class SlideshowInst {
 		return $names[$this->get_status()];
 	}
 
+	public function generate_cmd($arguments, $show_passwd=true){
+	  global $settings;
+
+	  $core_cmd = 'ulimit -c unlimited';
+
+	  $password_cmd = "echo '***passwd***'";
+	  if ( $show_passwd ){
+	    $password_cmd = "echo '{$arguments->password()}'";
+	  }
+	  $env = '';
+	  
+	  foreach ( $settings->environment() as $key => $value ){
+	    $env .= "SLIDESHOW_$key=\"$value\" ";
+	  }
+	  
+	  return $core_cmd . ';' .
+	    $password_cmd . '|' .
+	    $env .
+	    'DISPLAY="' . $settings->display() . '" ' .
+	    "$this->binary {$arguments->as_string()} 2>&1";		
+	}
+
 	function start($arguments, $force = false){
 		if ( !($arguments instanceof DaemonArguments) ){
 			die("Argument 1 is not an instance of DaemonArguments");
@@ -89,20 +111,7 @@ class SlideshowInst {
 		}
 
 		global $settings;
-
-		$core_cmd = 'ulimit -c unlimited';
-		$password_cmd = "echo '{$arguments->password()}'";
-		$env = '';
-
-		foreach ( $settings->environment() as $key => $value ){
-			$env .= "SLIDESHOW_$key=\"$value\" ";
-		}
-
-		$cmd = 	$core_cmd . ';' .
-				$password_cmd . '|' .
-				$env .
-				'DISPLAY="' . $settings->display() . '" ' .
-				"$this->binary {$arguments->as_string()} 2>&1";
+		$cmd = $this->generate_cmd($arguments);
 
 		$old_wd = getcwd();
 		chdir( $arguments->basepath() );
