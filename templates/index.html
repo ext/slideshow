@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
+	xmlns:py="http://genshi.edgewall.org/" py:strip="">
+
+	<py:match path="head" once="true">
+	<head py:attrs="select('@*')">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link rel="stylesheet" href="/static/css/common.css" type="text/css" media="screen" />
+		<link rel="stylesheet" href="/static/css/main.css" type="text/css" media="screen" />
+		<script src="/js/jquery-1.2.6.js" type="text/javascript"></script>
+		<script src="/js/ui.core.js" type="text/javascript"></script>
+		<script src="/js/ui.sortable.js" type="text/javascript"></script>
+		<title py:with="title = list(select('title/text()'))">Slideshow<py:if test="title"> &gt; ${title}</py:if></title>
+		${select('*[local-name()!="title"]')}
+	</head>
+	</py:match>
+	
+	<py:match path="body" once="true">
+	<body py:attrs="select('@*')">
+		<div id="header">
+			<h1>Slideshow</h1>
+		</div>
+	
+		<div id="bar">
+			<span class="daemonstatus">Status: Unknown</span>
+	
+			<div id="menu">
+				<h2>Menu</h2>
+				<ul>
+					<li class="first bajs"><a class="menu_main" href="/slides/list">Main</a></li>
+					<li ><a class="menu_slide" href="/slides/upload">Slides</a></li>
+					<li><a class="menu_video" href="/video">Video</a></li>
+	
+					<li><a class="menu_bins" href="/queue">Queues</a></li>
+					<li class="last"><a class="menu_maintenance" href="/maintenance">Maintenance</a></li>
+				</ul>
+			</div>
+		</div>
+	
+		<div id="content">
+			${select('*|text()')}
+		</div>
+	
+		<div id="footer">
+			Powered by <a href="http://sidvind.com:8000/slideshow">Slideshow 0.2.0</a>
+		</div>
+	
+	</body>
+	</py:match>
+
+</html>

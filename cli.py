@@ -20,8 +20,9 @@ class ipc_call2:
 
     def __call__(outer_self, func):
         def __ipc_call_wrapper(self, *args, **kwargs):
-            self._socket.send(outer_self._name)
-            rc, reply = json.loads(self._socket.recv(1024))
+            self._socket.send(json.dumps((outer_self._name,) + args))
+            x = json.loads(self._socket.recv(1024))
+            rc, reply = x
             if rc < 0: # exception
                 for line in reply:
                     print line,
@@ -33,6 +34,26 @@ class Client:
     def __init__(self, file='.ipc'):
         self._socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         self._socket.connect(file)
+
+    def rpc(self, func, *args):
+        call = (func,)
+        print call
+        print len(args)
+        print args
+        if len(args) > 0:
+            print 'appending args'
+            call += args
+        print call
+        call_str = json.dumps(call)
+        print call_str
+        self._socket.send(call_str)
+        x = json.loads(self._socket.recv(1024))
+        rc, reply = x
+        if rc < 0: # exception
+            for line in reply:
+                print line,
+        else: # ok
+            print reply
 
     @ipc_call
     def list_queues(self):
@@ -46,6 +67,14 @@ class Client:
 
     @ipc_call2('get_status')
     def get_status(self):
+        pass
+
+    @ipc_call2('start')
+    def start(self):
+        pass
+
+    @ipc_call2('stop')
+    def stop(self):
         pass
 
 class SlideshowCmd(cmd.Cmd):
@@ -74,6 +103,13 @@ Type:  '?' or 'help' for help on commands.
 
     def do_status(self, arg):
         self.client.get_status()
+
+    def do_start(self, args):
+        print 'args', args
+        self.client.rpc('start', *args)
+
+    def do_stops(self, arg):
+        self.client.stop()
 
     def do_EOF(self, *arg):
         sys.exit()
