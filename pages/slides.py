@@ -11,6 +11,6 @@ class Handler(object):
 		return template.render()
 	
 	@cherrypy.expose
-	@template.output('slides/upload.html')
+	@template.output('slides/upload.html', parent='slides')
 	def upload(self):
 		return template.render()

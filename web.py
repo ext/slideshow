@@ -5,7 +5,7 @@ import os
 import cherrypy
 import sqlite3
 from lib import template
-import slides
+from pages import slides
 
 def connect(*args):
 	cherrypy.thread_data.db = sqlite3.connect('site.db')

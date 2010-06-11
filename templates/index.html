@@ -16,6 +16,33 @@
 	</head>
 	</py:match>
 	
+	<?python
+		class Menu:
+			def __init__(self, *items):
+				self.items = items
+			
+			def attrs_li(self, i):
+				c = []
+				if i == 0:
+					c.append('first')
+				if i == len(self.items) - 1:
+					c.append('last')
+				if self.items[i][0] == parent:
+					c.append('selection')
+				
+				return {'class': ' '.join(c)}
+			
+			def attrs_a(self, i):
+				return {'class': 'menu_' + self.items[i][0]}
+			
+		menu = Menu(
+			('main', _('main'), '/'),
+			('slides', _('slides'), '/slides/upload'),
+			('video', _('video'), '/video'),
+			('queues', _('queues'), '/queue'),
+			('maintenance', _('maintenance'), '/maintenance'))
+	?>
+	
 	<py:match path="body" once="true">
 	<body py:attrs="select('@*')">
 		<div id="header">
@@ -24,16 +51,15 @@
 	
 		<div id="bar">
 			<span class="daemonstatus">Status: Unknown</span>
-	
+
 			<div id="menu">
 				<h2>Menu</h2>
 				<ul>
-					<li class="first bajs"><a class="menu_main" href="/slides/list">Main</a></li>
-					<li ><a class="menu_slide" href="/slides/upload">Slides</a></li>
-					<li><a class="menu_video" href="/video">Video</a></li>
-	
-					<li><a class="menu_bins" href="/queue">Queues</a></li>
-					<li class="last"><a class="menu_maintenance" href="/maintenance">Maintenance</a></li>
+					<py:for each="(i, (_, title, url)) in enumerate(menu.items)">
+					<li py:attrs="menu.attrs_li(i)">
+						<a href="${url}" py:attrs="menu.attrs_a(i)">${title}</a>
+					</li>
+					</py:for>
 				</ul>
 			</div>
 		</div>

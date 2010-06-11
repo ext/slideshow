@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" 
 	xmlns:py="http://genshi.edgewall.org/" 
 	xmlns:xi="http://www.w3.org/2001/XInclude" 
@@ -7,43 +5,10 @@
 	<xi:include href="../index.html" />
 
 <head>
-	<title>Upload slides</title>
 </head>
 
 <body>
-	<div id="breadcrumb">
-
-		<h2><a href="/index.php">Slideshow</a> &gt; Upload slide</h2>
-	</div>
-
-	<h2>Image</h2>
-
-	<form action="/index.php/slides/submit_image" method="post" enctype="multipart/form-data">
-		<fieldset>
-
-			<p>Using this option you can upload an existing image. The image will be scaled to fit the screen but will keep the aspect ratio.</p>
-			<input type="file" id="filename" name="filename" accept="image/*" />
-			<input type="submit" value="Upload" />
-		</fieldset>
-	</form>
-
-	<h2>Text</h2>
-
-	<form action="/index.php/slides/upload" method="post" accept-charset="utf-8">
-
-		<fieldset>
-			<p>Using this option you can create new slides with text only. The text will be applied to the predefined background if specified in the configuration.</p>
-			<label for="slide-title">Title</label><br/>
-			<input type="text" id="slide-title" name="title" size="70" value="" /><br/>
-			<label for="slide-content">Content</label><br/>
-			<textarea id="slide-content" name="content" cols="60" rows="15"></textarea><br/>
-			<br/>
-
-			<input type="submit" name="submit" value="Preview" />
-			<input type="submit" name="submit" value="Upload" /><br/>
-		</fieldset>
-	</form>
-
+	<h2>Current slides</h2>
 </body>
 
 </html>
