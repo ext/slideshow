@@ -16,7 +16,7 @@
 			<div class="queue" id="queue_${queue.id}">
 				<py:for each="slide in queue.slides">
 					<div class="slide" id="slide_${slide.id}">
-						<img src="/slides/show/${slide.id}/200x200" />
+						<img src="/slides/show/${slide.id}/200/200" />
 						<div class="menu">
 							<span class="zoom"><a href="/slides/show/${slide.id}">Full</a></span>
 							<span class="edit" py:if="slide.assembler.is_editable()"><a href="/slides/edit/${slide.id}">Edit</a></span>

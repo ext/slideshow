@@ -18,11 +18,21 @@ class Slide:
 		if not os.path.exists(path):
 			raise ValueError, "could not locate '{path}' in '{root}'".format(path=path, root=image_path)
 	
-	def _raster_path(self, size):
-		return os.path.join(image_path, self._path, 'raster', '%dx%d' % size)
+	def default_size(self, width=None):
+		return self.assembler.default_size(slide=self, src=self._data, width=width)
+	
+	def raster_path(self, size):
+		return os.path.join(image_path, self._path, 'raster', '%dx%d.png' % size)
+	
+	def src_path(self, item=None):
+		return os.path.join(image_path, self._path, 'src', item)
 	
 	def _has_raster(self, size):
-		return os.path.exists(self._raster_path(size))
+		return os.path.exists(self.raster_path(size))
+	
+	def rasterize(self, size):
+		if not self._has_raster(size):
+			self.assembler.rasterize(slide=self, src=self._data, size=size)
 
 def from_id(c, id):
 	row = c.execute("""
