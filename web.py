@@ -6,6 +6,7 @@ import cherrypy
 import sqlite3
 from lib import template
 from pages import slides
+from pages import maintenance
 
 def connect(*args):
 	cherrypy.thread_data.db = sqlite3.connect('site.db')
@@ -14,12 +15,9 @@ def connect(*args):
 
 cherrypy.engine.subscribe('start_thread', connect)
 
-class Admin(object):
-	pass
-
 class Root(object):
 	slides = slides.Handler()
-	admin = Admin()
+	maintenance = maintenance.Handler()
 	
 	@cherrypy.expose
 	def index(self):
