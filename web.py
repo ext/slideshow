@@ -9,6 +9,8 @@ from pages import slides
 
 def connect(*args):
 	cherrypy.thread_data.db = sqlite3.connect('site.db')
+	cherrypy.thread_data.db.row_factory = sqlite3.Row
+	cherrypy.thread_data.db.cursor().execute('PRAGMA foreign_keys = ON')
 
 cherrypy.engine.subscribe('start_thread', connect)
 
@@ -21,7 +23,7 @@ class Root(object):
 	
 	@cherrypy.expose
 	def index(self):
-		raise cherrypy.InternalRedirect('/slides/view')
+		raise cherrypy.InternalRedirect('/slides/list')
 
 application = cherrypy.tree.mount(Root(), '/', config='test.conf')
 application.config.update({

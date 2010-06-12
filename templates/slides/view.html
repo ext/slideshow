@@ -9,6 +9,35 @@
 
 <body>
 	<h2>Current slides</h2>
+	
+	<py:for each="queue in queues">
+		<div class="queuewrapper">
+			<span class="title">${queue.name}</span><br/>
+			<div class="queue" id="queue_${queue.id}">
+				<py:for each="slide in queue.slides">
+					<div class="slide" id="slide_${slide.id}">
+						<img src="/slides/show/${slide.id}/200x200" />
+						<div class="menu">
+							<span class="zoom"><a href="/slides/show/${slide.id}">Full</a></span>
+							<span class="edit" py:if="slide.assembler.is_editable()"><a href="/slides/edit/${slide.id}">Edit</a></span>
+							<span class="hide" py:if="slide.active"><a href="/slides/deactivate/${slide.id}">Hide</a></span>
+							<span class="show" py:if="not slide.active"><a href="/slides/activate/${slide.id}">Show</a></span>
+							<span class="delete"><a href="/slides/delete/${slide.id}">Delete</a></span>
+
+							<noscript>
+								<form action="/slides/move/${slide.id}" method="post">
+								<select name="to_bin">
+									<option py:for="x in queues" value="${x.id}">${queue.name}</option>
+								</select>
+								<input type="submit" value="Move" />
+							</form>
+							</noscript>
+						</div>
+					</div>
+				</py:for>
+			</div>
+		</div>
+	</py:for>
 </body>
 
 </html>

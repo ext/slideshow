@@ -109,14 +109,14 @@
 	border-bottom: 1px solid black;
 }
 
-.binwrapper {
+.queuewrapper {
 	margin-top: 10px;
 	margin-bottom: 10px;
 	border: 1px solid #ccc;
 	padding: 0px 10px 10px 10px;
 }
 
-.binwrapper .title {
+.queuewrapper .title {
 	margin: 0 0 0 10px;
 	padding: 0 10px;
 	background: white;
@@ -124,13 +124,13 @@
 	display: inline;
 }
 
-.bin {
+.queue {
 	float: left;
 	width: 100%;
 	min-height: 50px;
 }
 
-.bin.hover {
+.queue.hover {
 	background: #ccc;
 }
 
