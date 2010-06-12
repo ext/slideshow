@@ -25,6 +25,7 @@ class Handler(object):
 		
 		s.rasterize(size)
 		
+		# @todo static.serve_file
 		f = open(s.raster_path(size), 'rb')
 		bytes = f.read()
 		f.close()
@@ -35,3 +36,23 @@ class Handler(object):
 	@template.output('slides/upload.html', parent='slides')
 	def upload(self):
 		return template.render()
+
+	@cherrypy.expose
+	def submit(self, assembler, **kwargs):
+		try:
+			s = slide.create(cherrypy.thread_data.db.cursor(), assembler, kwargs)
+			cherrypy.thread_data.db.commit()
+		except:
+			cherrypy.thread_data.db.rollback()
+			raise
+		raise cherrypy.HTTPRedirect('/')
+	
+	@cherrypy.expose
+	def delete(self, id):
+		try:
+			slide.delete(cherrypy.thread_data.db.cursor(), id)
+			cherrypy.thread_data.db.commit()
+		except:
+			cherrypy.thread_data.db.rollback()
+			raise
+		raise cherrypy.HTTPRedirect('/')

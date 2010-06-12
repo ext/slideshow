@@ -4,8 +4,13 @@
 import subprocess
 
 class Assembler:
+	name = '' # automatically set in factory initialization
+	
 	def is_editable(self):
 		return False
+	
+	def assemble(self, slide, **kwargs):
+		raise NotImplementedError
 	
 	def rasterize(self, slide, src, size):
 		raise NotImplementedError
@@ -16,6 +21,20 @@ class Assembler:
 class ImageAssembler(Assembler):
 	def is_editable(self):
 		return False
+	
+	def assemble(self, slide, filename):
+		print dir(filename)
+		print filename.filename
+		dst = open(slide.src_path(filename.filename), 'wb')
+		
+		while True:
+			chunk = filename.file.read(8192)
+			if not chunk:
+				break
+			dst.write(chunk)
+		
+		return filename.filename
+
 	
 	def rasterize(self, slide, src, size):
 		retcode = subprocess.call([
@@ -43,6 +62,10 @@ _assemblers = {
 	'text': TextAssembler(),
 	'image': ImageAssembler()
 }
+
+# setup reverse names
+for k,v in _assemblers.items():
+	v.name = k
 
 def get(name):
 	return _assemblers[name]
