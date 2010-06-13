@@ -1,0 +1,46 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:py="http://genshi.edgewall.org/" 
+	xmlns:xi="http://www.w3.org/2001/XInclude" 
+	lang="en"> 
+	<xi:include href="../index.html" />
+
+<head>
+	<link rel="stylesheet" href="/static/css/config.css" type="text/css" media="screen" />
+</head>
+
+<body>
+	<div id="breadcrumb">
+		<h2><a href="/">Slideshow</a> &gt; <a href="/maintenance">Maintenance</a> &gt; Configuration</h2>
+	</div>
+	
+	<h2>Configuration</h2>
+
+	<div class="conf">
+		<form id="form" method="post" action="/maintenance/config/save">
+			<py:for each="group in settings">
+				<fieldset title="${group.name}">
+					<legend>${group.name}</legend>
+					<p>${group.description}</p>
+					
+					<py:for each="item in group">
+						<label for="${item.name}">
+							${item.name}
+							<span>${item.description}</span>
+						</label>
+						${Markup(item)}
+						<br/>
+					</py:for>
+					
+				</fieldset>
+			</py:for>
+			<fieldset title="Environmental variables">
+				<legend>Environmental variables</legend>
+				<p>Place each variable in the form key=value with each variable on a separate line. Note that SLIDESHOW_ will be prepended to each variable to prevent abuse.</p>
+				<textarea name="Env"></textarea>
+			</fieldset>
+		</form>
+	</div>
+		
+</body>
+
+</html>
