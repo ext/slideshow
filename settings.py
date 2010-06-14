@@ -10,12 +10,35 @@ try:
 except ImportError:
 	import htmlentitydefs  as entities
 
+# Works like a dictionary but preserves order (well it's more like a list but
+# with lookup.
+class OrderDict:
+	def __init__(self):
+		self._list = []
+		self._dict = {}
+	
+	def __setitem__(self, k, v):
+		self._list.append((k,v))
+		self._dict[k] = v
+	
+	def __getitem__(self, k):
+		return self._dict[k]
+
+	def values(self):
+		return [v for k,v in self._list]
+	
+	def keys(self):
+		return [k for k,v in self._list]
+	
+	def items(self):
+		return self._list
+
 class Group:
 	def __init__(self, name, description, hidden):
 		self.name = name
 		self.description = description
 		self.hidden = hidden
-		self.items = {}
+		self.items = OrderDict()
 	
 	def add(self, item):
 		self.items[item.name] = item
@@ -121,7 +144,7 @@ for k,v in itemfactory.items():
 class Settings:
 	def __init__(self, base, config_file=None):
 		doc = minidom.parse(base)
-		self.groups = {}
+		self.groups = OrderDict()
 		self.enviroment = []
 		self.config_file = config_file
 		
