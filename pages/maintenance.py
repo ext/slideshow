@@ -7,12 +7,12 @@ from settings import Settings
 
 class Handler(object):
 	@cherrypy.expose
-	@template.output('maintenance/index.html')
+	@template.output('maintenance/index.html', parent='maintenance')
 	def index(self):
 		return template.render()
 
 	@cherrypy.expose
-	@template.output('maintenance/config.html')
+	@template.output('maintenance/config.html', parent='maintenance')
 	def config(self, action=None, **kwargs):
 		settings = Settings('settings.xml', 'settings.json')
 		
