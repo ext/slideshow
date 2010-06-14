@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE settings SYSTEM "settings.dtd">
+<settings>
+	<group name="Path">
+		<description>The base directory is the homedirectory of the frontend. All other paths are relative to it.</description>
+		
+		<item name="BasePath" title="Base directory" type="directory"></item>
+		<item name="Image" type="directory">image</item>
+		<item name="Video" type="directory">video</item>
+		<item name="Temp" type="directory">tmp</item>
+	</group>
+	
+	<group name="Files">
+		<description>All file paths are either relative to BasePath or an absolute path.</description>
+		
+		<item name="BinaryPath" title="Exectuable path" description="Path where slideshow binaries exist." type="file"></item>
+		<item name="BaseLog" title="Logfile" type="file">slideshow.log</item>
+		<item name="ActivityLog" title="Activity logfile" type="file">activity.log</item>
+		<item name="PID" type="file">slideshow.pid</item>
+		<item name="MOTD" type="file" description="Message of the day">motd</item>
+		<item name="convert" title="ImageMagick convert" type="file" description="ImageMagick is used to scale and convert the slides"></item>
+	</group>
+	
+	<group name="Apparence">
+		<description>If the display forces another resolution or aspect ratio than X uses (e.g some widescreen projectors) set the virtual resolution the resolution used by the display and the regular resolution to the resolution used by X. However, be careful using virtual resolution as the slides will be stretched. It is suggested to use a resolution which matches either dimension and is an as close match as possible.</description>
+		
+		<item name="Background" type="file" description="Background image used when creating text slides"></item>
+		<item name="Font" type="file" description="Font used when creating text slides"></item>
+		<item name="Resolution" type="resolution" description="Resolution of the daemon">800x600</item>
+		<item name="VirtualResolution" title="Virtual resolution" type="resolution"></item>
+		<item name="TransitionTime" title="Transition time" type="float" description="Time in sec it takes to change slide">3.0</item>
+		<item name="SwitchTime" title="Switch time" type="float" description="Time in sec each slide will be shown">10.0</item>
+		<item name="Display" title="Display" type="display" description="X display to use">:0.0</item>
+	</group>
+	
+	<group name="Database">
+		<description>Database settings. Leave the password blank unless you need to change it.</description>
+		
+		<item name="Username" type="string"></item>
+		<item name="Password" type="password"></item>
+		<item name="Hostname" type="string">localhost</item>
+		<item name="Name" type="string"></item>
+	</group>
+	
+	<group name="Slideshow">
+		<description>These settings only affects the webGUI.</description>
+		
+		<item name="Title" type="string" description="WebGUI title">Slideshow</item>
+	</group>
+	
+	<group name="Runtime" hidden="1">
+		<description>This is settings just for storage, like which current queue is run (so it will persist between runs)</description>
+		<item name="queue" type="integer">1</item>
+	</group>
+</settings>

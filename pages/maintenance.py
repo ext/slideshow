@@ -13,7 +13,14 @@ class Handler(object):
 
 	@cherrypy.expose
 	@template.output('maintenance/config.html')
-	def config(self, action=None):
+	def config(self, action=None, **kwargs):
 		settings = Settings('settings.xml', 'settings.json')
+		
+		if action == 'save':
+			for k,v in kwargs.items():
+				settings[k] = v
+			
+			settings.persist()
+			raise cherrypy.HTTPRedirect('/maintenance/config')
 		
 		return template.render(settings=settings)

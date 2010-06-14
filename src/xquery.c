@@ -40,7 +40,7 @@ static PyObject* xquery_screens(PyObject *self, PyObject *args) {
 	char buf[16];
 
 	if ( !dpy ){
-		/* @todo set exception object */
+		PyErr_SetString(PyExc_RuntimeError, "Failed to open X Display");
 		return NULL;
 	}
 
@@ -72,7 +72,7 @@ static PyObject* xquery_resolution(PyObject *self, PyObject *args) {
 	}
 
 	if ( !dpy ){
-		/* @todo set exception object */
+		PyErr_SetString(PyExc_RuntimeError, "Failed to open X Display");
 		return NULL;
 	}
 
@@ -109,5 +109,5 @@ PyMODINIT_FUNC initxquery(void) {
 		return;
 	}
 
-	//dpy = XOpenDisplay(NULL);
+	dpy = XOpenDisplay(NULL);
 }
