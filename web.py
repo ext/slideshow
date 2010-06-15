@@ -7,6 +7,7 @@ import sqlite3
 from lib import template
 from pages import slides
 from pages import maintenance
+import daemon
 
 def connect(*args):
 	cherrypy.thread_data.db = sqlite3.connect('site.db')
@@ -35,7 +36,9 @@ application.config.update({
 cherrypy.config.update({'sessionFilter.on': True}) 
 
 if __name__ == '__main__':
+	#print daemon.instance
 	cherrypy.config.update('test.conf')
+	daemon.subscribe(cherrypy.engine)
 
 	if hasattr(cherrypy.engine, 'block'):
 	    # 3.1 syntax

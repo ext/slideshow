@@ -269,6 +269,7 @@ class Settings:
 			for k,v in c.items():
 				if k == 'Env':
 					self.enviroment = v
+					continue
 				try:
 					group = self.groups[k]
 				except KeyError:
@@ -279,8 +280,10 @@ class Settings:
 					try:
 						item = group[name]
 						item.set(value, rollback=True)
-					except ValueError:
-						print name, k, 'contains illegal data, resetting to default'
+					except ValueError as e:
+						# @todo sometimes they depend on settings not yet found and fail because of that.
+						# e.g. path1 depends on path2, but path1 is set before path2 is set, so it fails.
+						print name, k, 'contains illegal data ("%s": %s), resetting to default' % (value, str(e))
 					except KeyError:
 						print name, k, 'found in config but is not defined in xml'
 			

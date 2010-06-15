@@ -4,6 +4,7 @@
 import cherrypy
 from lib import queue, slide, template
 from settings import Settings
+import daemon
 
 class Handler(object):
 	@cherrypy.expose
@@ -32,3 +33,8 @@ class Handler(object):
 				raise cherrypy.HTTPRedirect('/maintenance/config')
 		
 		return template.render(settings=settings)
+	
+	@cherrypy.expose
+	def start(self):
+		daemon.start('', '')
+		raise cherrypy.HTTPRedirect('/maintenance')

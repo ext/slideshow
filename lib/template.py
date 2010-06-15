@@ -10,6 +10,7 @@ from genshi.template import Context, TemplateLoader
 from genshi.filters import Translator, Transformer
 from genshi.filters.transform import StreamBuffer
 import gettext
+import daemon
 
 #trans = gettext.GNUTranslations(open("po/sv.mo"))
 
@@ -61,6 +62,8 @@ def render(*args, **kwargs):
     ctxt = Context(url=cherrypy.url)
     ctxt.push(kwargs)
     ctxt['parent'] = cherrypy.thread_data.parent
+    ctxt['daemon'] = daemon.state()
+    ctxt['daemonstr'] = daemon.statename(daemon.state())
     
     ctxt['_'] = lambda x: x # trans.ugettext
 	
