@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from xml.dom import minidom
+import os, os.path, stat, traceback
 import json, xquery
 
 try:
@@ -52,33 +53,120 @@ class Group:
 class Item:
 	typename = '' # automatically set
 	
-	def __init__(self, group, name, title, description):
+	def __init__(self, group, name, title, description, rel):
 		self.group = group
 		self.name = name
 		self.title = title
 		self.description = description
-		self.value = self.default
+		self.rel = rel
+		self._value = self.default
 	
 	def _values(self):
-		return dict(group=self.group.name, name=self.name, type=self.typename, value=unicode(self.value))
+		return dict(group=self.group.name, name=self.name, type=self.typename, value=unicode(self._value))
 	
 	def __str__(self):
 		return '<input type="text" name="{group}.{name}" type="{type}" value="{value}"/>'.format(**self._values())
+	
+	def set(self, value, rollback=False):
+		self._value = value
+	
+	def get(self):
+		return self._value
 
 class ItemDirectory(Item):
 	default = ''
+	
+	def set(self, value, rollback=False):
+		tmp = self._value
+		self._value = value
+		path = self.fullpath()
+		
+		try:
+			try:
+				statinfo = os.stat(path)
+			except OSError:
+				raise ValueError, 'Directory not found ' + path
+			
+			if not stat.S_ISDIR(statinfo.st_mode):
+				raise ValueError, 'Not a directory'
+			if not os.access(path, os.W_OK):
+				raise ValueError, 'Need write-permission'
+		except:
+			if rollback:
+				self._value = tmp
+			raise
+	
+	def fullpath(self):
+		# quick sanity check
+		if self._value == '':
+			return self._value
+		
+		# is no relative path is specified it is always considered absolute
+		if not self.rel:
+			return self._value
+		
+		# absolute path is not relative
+		if self._value[0] == '/':
+			return self._value
+		
+		# join relative path with it's parent
+		return os.path.join(self.rel.fullpath(), self._value)
 
 class ItemFile(Item):
 	default = ''
+	
+	def fullpath(self):
+		# quick sanity check
+		if self._value == '':
+			return self._value
+		
+		# is no relative path is specified it is always considered absolute
+		if not self.rel:
+			return self._value
+		
+		# absolute path is not relative
+		if self._value[0] == '/':
+			return self._value
+		
+		# join relative path with it's parent
+		return os.path.join(self.rel.fullpath(), self._value)
 
 class ItemString(Item):
 	default = ''
 
 class ItemInteger(Item):
 	default = 0
+	
+	def set(self, value, rollback=False):
+		tmp = self._value
+		self._value = value
+		
+		try:
+			try:
+				self._value = int(value)
+			except ValueError:
+				raise ValueError, 'Not a valid integer'
+		except:
+			if rollback:
+				self._value = tmp
+			raise
 
 class ItemFloat(Item):
 	default = 0.0
+	
+	def set(self, value, rollback=False):
+		tmp = self._value
+		self._value = value
+		
+		try:
+			try:
+				self._value = float(value)
+			except ValueError:
+				raise ValueError, 'Not a valid float'
+		except:
+			if rollback:
+				self._value = tmp
+			raise
 
 class ItemPassword(Item):
 	default = ''
@@ -160,11 +248,20 @@ class Settings:
 				title = item.getAttribute('title')
 				desc  = item.getAttribute('description')
 				type  = item.hasAttribute('type') and item.getAttribute('type') or None
+				rel   = item.hasAttribute('rel') and item.getAttribute('rel') or None # deferred resolving
 				
-				item = itemfactory[type](g, name, title, desc)
+				item = itemfactory[type](g, name, title, desc, rel)
 				g.add(item)
 			
 			self.groups[grpname] = g
+		
+		# resolve relative paths
+		for group in self:
+			for item in group:
+				if not item.rel:
+					continue
+				
+				item.rel = self[item.rel]
 		
 		# load stored settings
 		with open(config_file, 'r') as f:
@@ -181,7 +278,9 @@ class Settings:
 				for name, value in v.items():
 					try:
 						item = group[name]
-						item.value = value
+						item.set(value, rollback=True)
+					except ValueError:
+						print name, k, 'contains illegal data, resetting to default'
 					except KeyError:
 						print name, k, 'found in config but is not defined in xml'
 			
@@ -204,14 +303,14 @@ class Settings:
 			return
 		
 		item = self[key]
-		item.value = value
+		item.set(value)
 	
 	def persist(self, dst=None):
 		c = {}
 		for group in self:
 			d = {}
 			for item in group:
-				d[item.name] = item.value
+				d[item.name] = item.get()
 			c[group.name] = d
 		c['Env'] = self.enviroment
 		

@@ -25,7 +25,10 @@
 					<py:for each="item in group">
 						<label for="${item.name}">
 							${item.name}
-							<span>${item.description}</span>
+							<py:choose test="hasattr(item, 'message')">
+								<span py:when="True" class="error">${item.message}</span>
+								<span py:when="False">${item.description}</span>
+							</py:choose>
 						</label>
 						${Markup(item)}
 						<br/>

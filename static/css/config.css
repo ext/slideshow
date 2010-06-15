@@ -40,6 +40,10 @@ label span {
 	margin-bottom: 10px;
 }
 
+label .error {
+	color: #f00;
+}
+
 input, select, textarea {
 	font-size:12px;
 	padding:4px 2px;
