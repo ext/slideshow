@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -27,7 +27,7 @@ class Log {
 		static void deinitialize();
 
 		enum Severity {
-			Debug,
+			Debug = 0,
 			Verbose,
 			Info,
 			Warning,
@@ -35,7 +35,8 @@ class Log {
 		};
 
 		static void set_level(Severity level){ _level = level; }
-		static void message(Severity severity, const char* fmt, ...);
+		static void  message(Severity severity, const char* fmt, ...);
+		static void vmessage(Severity severity, const char* fmt, va_list ap);
 
 		static void message_begin(Severity severity);
 		static void message_ex(const char* str);

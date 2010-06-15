@@ -18,18 +18,24 @@
 
 #include "module.h"
 #include "Transition.h"
-#include <GL/gl.h>
+#include "gl.h"
 #include <math.h>
+
+#ifndef M_PI
+#	define M_PI           3.14159265358979323846 /* pi */
+#endif
 
 MODULE_INFO("Spin", TRANSITION_MODULE, "David Sveningsson");
 
-int module_init(){
+int EXPORT module_init(){
+	return 0;
 }
 
-int module_cleanup(){
+int EXPORT module_cleanup(){
+	return 0;
 }
 
-void render(transition_context_t* context){
+void EXPORT render(transition_context_t* context){
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glPushMatrix();

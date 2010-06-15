@@ -1,54 +1,83 @@
-#include "Exceptions.h"
+/**
+ * This file is part of Slideshow.
+ * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
+ *
+ * Slideshow is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Slideshow is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
+#include "exception.h"
+#include <stdexcept>
+#include <cstdarg>
 #include <cstdlib>
-#include <cstdio>
 
-BaseException::BaseException(const char* message): std::exception(), _msg(NULL) {
-	if ( message ){
-		verify( asprintf(&_msg, "%s", message) >= 0 );
+#include <portable/asprintf.h>
+
+#undef exception
+
+exception::exception(const char* file, unsigned int line, const char* fmt, ...)
+	: _file(file)
+	, _line(line)
+	, _buf(NULL) {
+
+	va_list arg;
+	va_start(arg, fmt);
+	create_string(fmt, arg);
+	va_end(arg);
+}
+
+exception::exception(const char* file, unsigned int line, const char* fmt, va_list arg)
+	: _file(file)
+	, _line(line)
+	, _buf(NULL) {
+
+	create_string(fmt, arg);
+}
+
+exception::~exception() throw (){
+	free(_buf);
+}
+
+const char* exception::what() const throw (){
+	return _buf;
+}
+
+const char* exception::file() const throw(){
+	return _file;
+}
+
+unsigned int exception::line() const throw(){
+	return _line;
+}
+
+void exception::create_string(const char* fmt, va_list arg){
+	if ( vasprintf(&_buf, fmt, arg) == -1 ){
+		free(_buf);
 	}
 }
 
-BaseException::BaseException(const BaseException& e): std::exception(), _msg(NULL) {
-	if ( e._msg ){
-		verify( asprintf(&_msg, "%s", e._msg) >= 0 );
-	}
+ExitException::ExitException(ErrorCode code)
+	: _code(code) {
 }
 
-BaseException::~BaseException() throw() {
-	free(_msg);
-}
-
-const char* BaseException::what() const throw() {
-	return _msg;
-}
-
-void BaseException::set_message(const char* fmt, va_list va){
-	if ( _msg ){
-		free(_msg);
-	}
-
-	verify( vasprintf(&_msg, fmt, va) >= 0);
-}
-
-FatalException::FatalException(ErrorCode code, const char* message): BaseException(message), _code(code){
+ExitException::~ExitException() throw() {
 
 }
 
-FatalException::FatalException(const FatalException& e): BaseException(e), _code(e._code) {
-}
-
-FatalException::~FatalException() throw() {
-
-}
-
-ErrorCode FatalException::code(){
+ErrorCode ExitException::code() const throw(){
 	return _code;
 }
-
-ADD_EXCEPTION_IMPLEMENTATION(XlibException, XLIB_ERROR);
-ADD_EXCEPTION_IMPLEMENTATION(KernelException, KERNEL_ERROR);
-ADD_EXCEPTION_IMPLEMENTATION(ArgumentException, ARGUMENT_ERROR);
-ADD_EXCEPTION_IMPLEMENTATION(BrowserException, BROWSER_ERROR);
-ADD_EXCEPTION_IMPLEMENTATION(IPCException, IPC_ERROR);
-ADD_EXCEPTION_IMPLEMENTATION(GraphicsException, GRAPHICS_ERROR);
-ADD_EXCEPTION_IMPLEMENTATION(DaemonException, DAEMON_ERROR);

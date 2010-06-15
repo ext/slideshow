@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -24,9 +24,19 @@ enum module_type_t {
 	ASSEMBLER_MODULE
 };
 
+#ifdef WIN32
+#	ifdef BUILD_DLL
+#		define EXPORT __declspec(dllexport)
+#	else /* BUILD_DLL */
+#		define EXPORT __declspec(dllimport)
+#	endif /* BUILD_DLL */
+#else /* WIN32 */
+#	define EXPORT
+#endif
+
 #define MODULE_INFO(name, type, author) \
-	const char const * __module_name = name; \
-	const enum module_type_t __module_type = type; \
-	const char const * __module_author = author
+	EXPORT const char *             __module_name = name; \
+	EXPORT const enum module_type_t __module_type = type; \
+	EXPORT const char *             __module_author = author
 
 #endif // SLIDESHOW_MODULE_H

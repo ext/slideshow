@@ -18,7 +18,7 @@
 
 #include "dbus.h"
 #include "Log.h"
-#include "Exceptions.h"
+#include "exception.h"
 #include "Kernel.h"
 
 static const char* dbus_rule = "type='signal',interface='com.slideshow.dbus.Signal'";
@@ -34,7 +34,7 @@ DBus::DBus(Kernel* kernel, int timeout):
 
 	if (!_bus) {
 		Log::message(Log::Fatal, "D-Bus: %s\n", _error.message);
-		throw IPCException("D-Bus: %s", _error.message);
+		throw exception("D-Bus: %s", _error.message);
 	}
 
 	dbus_bus_add_match (_bus, dbus_rule, &_error);

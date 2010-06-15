@@ -1,23 +1,34 @@
-SUBDIRS = IPC state transitions assembler
+SUBDIRS = transitions
 
-noinst_LIBRARIES = libmodule_loader.a
-lib_LTLIBRARIES = libslide.la
-bin_PROGRAMS = slideshow xquery slidetool
+noinst_LIBRARIES = libmodule_loader.a libipc.a libfsm.a
+bin_PROGRAMS = slideshow xquery
 
-if GCCPARSER
-.cpp.o:
-	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $< 2>&1 | gccparser
-	mv -f $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+warning_flags = -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
+
+AM_LDFLAGS = -shared -module -avoid-version
+AM_CPPFLAGS = -I${top_srcdir}/include -pipe $(ARCH_FLAGS) ${warning_flags}
+
+libipc_a_CPPFLAGS = -I${top_srcdir}/include
+libipc_a_SOURCES = 
+
+if WITH_DBUS
+libipc_a_CPPFLAGS += ${dbus_CFLAGS}
+libipc_a_SOURCES += IPC/dbus.cpp IPC/dbus.h
 endif
 
-AM_CFLAGS = \
-	-I${top_srcdir}/include asdf
+libfsm_a_SOURCES = \
+	state/State.h \
+	state/InitialState.cpp state/InitialState.h \
+	state/SwitchState.cpp state/SwitchState.h \
+	state/TransitionState.cpp state/TransitionState.h \
+	state/ViewState.cpp state/ViewState.h
 
-slideshow_CXXFLAGS = \
-	${dbus_CFLAGS} \
-	${libdaemon_CFLAGS} \
-	-I${top_srcdir}/include \
-	-pipe -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
+slideshow_CPPFLAGS = ${AM_CPPFLAGS} ${libdaemon_CFLAGS} -DBUILD_DAEMON
+slideshow_CFLAGS   = ${AM_CPPFLAGS}
+
+if WITH_DBUS
+slideshow_CPPFLAGS += ${dbus_CFLAGS}
+endif
 
 slideshow_SOURCES = \
 	${top_srcdir}/include/Browser.h \
@@ -28,52 +39,43 @@ slideshow_SOURCES = \
 	${top_srcdir}/include/OS.h \
 	${top_srcdir}/include/Transition.h \
 	${top_srcdir}/include/argument_parser.h \
+	backend/factory.cpp \
+	backend/SDLbackend.cpp \
 	argument_parser.c \
 	browser_context.cpp \
-	exception.cpp \
 	Browser.cpp ${top_srcdir}/include/Browser.h \
 	DaemonApp.cpp ${top_srcdir}/include/DaemonApp.h \
+	exception.cpp ${top_srcdir}/include/exception.h \
 	ForegroundApp.cpp ${top_srcdir}/include/ForegroundApp.h \
 	Graphics.cpp ${top_srcdir}/include/Graphics.h \
 	Kernel.cpp ${top_srcdir}/include/Kernel.h \
 	Log.cpp ${top_srcdir}/include/Log.h\
 	main.cpp \
 	path.c ${top_srcdir}/include/path.h \
-	OS_Linux.cpp \
 	browsers/dummybrowser.cpp browsers/dummybrowser.h
 
 slideshow_LDADD = \
-	-lslide \
 	libmodule_loader.a \
-	IPC/libipc.a \
-	state/libfsm.a \
+	libipc.a \
+	libfsm.a \
 	-lltdl \
+	-lGLEW \
 	${libportable_LIBS} \
 	${libdaemon_LIBS} \
 	${dbus_LIBS} \
 	${GL_LIBS} \
-	${FREEIMAGE_LIBS} \
+	${DEVIL_LIBS} \
+	${SDL_LIBS} \
 	${X11_LIBS} \
 	${xxf86vm_LIBS} \
 	${xrandr_LIBS}
 
-if MYSQL
+if WITH_MYSQL
 slideshow_SOURCES += browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
 slideshow_LDADD += ${MYSQL_LIBS}
 endif
 
-libmodule_loader_a_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra -I${top_srcdir}/include
 libmodule_loader_a_SOURCES = module_loader.c ${top_srcdir}/include/module_loader.h
 
-libslide_la_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra ${wand_CFLAGS} -I${top_srcdir}/include
-libslide_la_SOURCES = slidelib.c
-libslide_la_LIBADD = ${json_LIBS} ${wand_LIBS}
-libslide_la_LDFLAGS = -shared -avoid-version
-
-xquery_CFLAGS = -pipe -Wall -Wextra -I${top_srcdir}/include
 xquery_SOURCES = xquery.c
 xquery_LDADD = ${X11_LIBS} ${xrandr_LIBS}
-
-slidetool_CFLAGS = -D_GNU_SOURCE -pipe -Wall -Wextra -I${top_srcdir}/include
-slidetool_SOURCES = slidetool.c module_loader.c path.c
-slidetool_LDADD = -lslide libmodule_loader.a

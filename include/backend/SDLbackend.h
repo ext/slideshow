@@ -1,6 +1,7 @@
 /**
  * This file is part of Slideshow.
  * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
+ *                         Pernilla Sveningsson <estel@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,26 +17,31 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef HAVE_CONFIG_H
-#	include "config.h"
-#endif
+#ifndef SDLBACKEND_H
+#define SDLBACKEND_H
 
-#include "ViewState.h"
-#include "SwitchState.h"
+#include "backend/platform.h"
+#include <SDL/SDL.h>
 
-double ViewState::view_time = 1.0;
+class SDLBackend:public PlatformBackend {
+	public:
+		static void register_factory();
 
-State* ViewState::action(bool &flip){
-	if ( age() > view_time ){
-		return new SwitchState(this);
-	}
+		SDLBackend();
+		virtual ~SDLBackend();
 
-	if ( ipc() ){
-		ipc()->poll();
-	}
+		virtual int init(const Vector2ui &resolution, bool fullscreen);
+		virtual void cleanup();
 
-	// Sleep for a while
-	wait( 0.1f );
+		virtual void poll(bool& running);
 
-	return this;
-}
+		virtual void swap_buffers() const;
+
+		virtual void lock_mouse(bool state);
+
+	private:
+		bool _lock;
+		bool _fullscreen;
+};
+
+#endif /* SDLBACKEND_H */

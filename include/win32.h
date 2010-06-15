@@ -16,26 +16,23 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef HAVE_CONFIG_H
-#	include "config.h"
-#endif
+#define VC_EXTRALEAN
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#define NOCOMM
+#define NOSOUND
+#include <windows.h>
 
-#include "ViewState.h"
-#include "SwitchState.h"
+// undef shit defined by windows.h, seriously, whats wrong with this header?
+#undef near
+#undef far
 
-double ViewState::view_time = 1.0;
+// POSIX name "compability"-fixes
+#define strdup _strdup
+#define fileno _fileno
 
-State* ViewState::action(bool &flip){
-	if ( age() > view_time ){
-		return new SwitchState(this);
-	}
-
-	if ( ipc() ){
-		ipc()->poll();
-	}
-
-	// Sleep for a while
-	wait( 0.1f );
-
-	return this;
-}
+// Simple security enhancements fixes
+#define scanf scanf_s
+#define sscanf sscanf_s
+#define strtok_r strtok_s
+#define strncpy(dst, src, n) strncpy_s(dst, n, src, _TRUNCATE)

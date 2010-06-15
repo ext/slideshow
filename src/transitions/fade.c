@@ -18,17 +18,19 @@
 
 #include "module.h"
 #include "Transition.h"
-#include <GL/gl.h>
+#include "gl.h"
 
 MODULE_INFO("Fade", TRANSITION_MODULE, "David Sveningsson");
 
-int module_init(){
+int EXPORT module_init(){
+	return 0;
 }
 
-int module_cleanup(){
+int EXPORT module_cleanup(){
+	return 0;
 }
 
-void render(transition_context_t* context){
+void EXPORT render(transition_context_t* context){
 	glColor4f(1,1,1,1);
 	glBindTexture(GL_TEXTURE_2D, context->texture[1]);
 	glBegin( GL_QUADS );

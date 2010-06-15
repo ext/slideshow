@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -19,12 +19,11 @@
 #ifndef KERNEL_H
 #define KERNEL_H
 
-#include <sys/select.h>
-
 class Graphics;
 class Browser;
 class IPC;
 class State;
+class PlatformBackend;
 
 class Kernel {
 	public:
@@ -52,7 +51,7 @@ class Kernel {
 
 		static void print_transitions();
 
-		Kernel(const argument_set_t& arg);
+		Kernel(const argument_set_t& arg, PlatformBackend* backend);
 		virtual ~Kernel();
 
 		virtual void init();
@@ -78,6 +77,10 @@ class Kernel {
 	protected:
 		static const char* pidpath();
 
+		void print_config() const;
+		void print_licence_statement() const;
+		void print_cli_arguments(int argc, const char* argv[]) const;
+
 	private:
 
 		void create_pidpath();
@@ -86,19 +89,19 @@ class Kernel {
 		void transition_state(double t);
 		void switch_state(double t);
 
-		void print_licence_statement();
-		void print_cli_arguments(int argc, const char* argv[]);
-
 		Browser* browser(){ return _browser; }
 
 		void load_transition(const char* name);
 
 		char* get_password();
 
+		void init_backend();
 		void init_graphics();
 		void init_IPC();
 		void init_browser();
 		void init_fsm();
+
+		void cleanup_backend();
 
 		argument_set_t _arg;
 
@@ -109,6 +112,7 @@ class Kernel {
 		Graphics* _graphics;
 		Browser* _browser;
 		IPC* _ipc;
+		PlatformBackend* _backend;
 
 		bool _running;
 };

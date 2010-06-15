@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,17 +16,28 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
 #include "argument_parser.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <portable/vscanf.h>
+
+#ifdef WIN32
+#	include "win32.h"
+#endif
 
 #define ARGUMENT_HEAD \
-	const char* name; \
-	char flag; \
-	const char* description; \
-	int type;
+	struct { \
+		const char* name; \
+		char flag; \
+		const char* description; \
+		int type; \
+	}
 
 #define arg_flag 1
 #define arg_string 2
@@ -34,7 +45,7 @@
 #define arg_fmt 4
 
 typedef struct {
-	ARGUMENT_HEAD
+	ARGUMENT_HEAD;
 } argument_t;
 
 typedef struct {
@@ -86,12 +97,15 @@ void option_initialize(option_set_t* option, int argc, const char* const* argv){
 }
 
 void option_finalize(option_set_t* option){
+	argument_node_t* ptr = NULL;
+	argument_node_t* next = NULL;
+
 	free(option->description);
 
-	argument_node_t* ptr = option->argument;
+	ptr = option->argument;
 	while ( ptr ){
 		argument_free(ptr);
-		struct argument_node_t* next = ptr->next;
+		next = ptr->next;
 		free(ptr);
 		ptr = next;
 	}
@@ -135,9 +149,12 @@ static int format_argument_count(const char* fmt){
 	return n;
 }
 
-int option_parse(option_set_t* option){
-	int argc = option->argc;
-	const char* const* argv = option->argv;
+int option_parse(option_set_t* option_set){
+	int argc = option_set->argc;
+	const char* const* argv = option_set->argv;
+
+	const argument_node_t* node = NULL;
+	const argument_t* extracted_option = NULL;
 
 	int i = 1;
 
@@ -159,17 +176,18 @@ int option_parse(option_set_t* option){
 
 		// The --help option was passed, display help (and exit).
 		if ( is_help_option(arg) ){
-			option_display_help(option);
+			option_display_help(option_set);
 		}
 
-		const argument_node_t* node = option->argument;
-		const argument_t* option = 0;
+		node = option_set->argument;
+		extracted_option = NULL;
+
 		if ( is_long_option(arg) ){
 			const char* name = extract_long_option(arg);
 
 			for ( ; node; node = node->next ){
 				if ( strcmp(name, node->argument->name) == 0 ){
-					option = node->argument;
+					extracted_option = node->argument;
 					break;
 				}
 			}
@@ -178,19 +196,19 @@ int option_parse(option_set_t* option){
 
 			for ( ; node; node = node->next ){
 				if ( flag == node->argument->flag ){
-					option = node->argument;
+					extracted_option = node->argument;
 					break;
 				}
 			}
 		}
 
-		if ( !option ){
+		if ( !extracted_option ){
 			printf("%s: unrecognized option '%s'\n", argv[0], arg);
 			printf("Try `%s --help' for more information.\n", argv[0]);
 			return -2;
 		}
 
-		if ( option->type != arg_flag ){
+		if ( extracted_option->type != arg_flag ){
 			i++;
 			if ( i == argc ){
 				printf("%s: missing argument to option '%s'\n", argv[0], arg);
@@ -199,33 +217,32 @@ int option_parse(option_set_t* option){
 			}
 		}
 
-		switch ( option->type ){
+		switch ( extracted_option->type ){
 			case arg_flag:
 			{
-				const argument_flag_t* real_option = (const argument_flag_t*)option;
+				const argument_flag_t* real_option = (const argument_flag_t*)extracted_option;
 				*(real_option->dst) = real_option->value;
 				break;
 			}
 
 			case arg_string:
 			{
-				const argument_string_t* real_option = (const argument_string_t*)option;
+				const argument_string_t* real_option = (const argument_string_t*)extracted_option;
 				free(*(real_option->dst));
-				*(real_option->dst) = (char*)malloc(strlen(argv[i])+1);
-				strcpy(*(real_option->dst), argv[i]);
+				*real_option->dst = strdup(argv[i]);
 				break;
 			}
 
 			case arg_int:
 			{
-				const argument_int_t* real_option = (const argument_int_t*)option;
+				const argument_int_t* real_option = (const argument_int_t*)extracted_option;
 				sscanf(argv[i], "%d", real_option->dst);
 				break;
 			}
 
 			case arg_fmt:
 			{
-				const argument_format_t* real_option = (const argument_format_t*)option;
+				const argument_format_t* real_option = (const argument_format_t*)extracted_option;
 				int n = format_argument_count(real_option->fmt);
 				int r = vsscanf(argv[i], real_option->fmt, real_option->dst);
 
@@ -246,11 +263,12 @@ int option_parse(option_set_t* option){
 }
 
 void option_set_description(option_set_t* option, const char* description){
-	option->description = (char*)malloc(strlen(description) + 1);
-	strcpy(option->description, description);
+	option->description = strdup(description);
 }
 
 void option_display_help(option_set_t* option){
+	argument_node_t* node = option->argument;
+
 	printf("Usage: %s [options]\n", option->argv[0]);
 
 	if ( option->description ){
@@ -258,8 +276,7 @@ void option_display_help(option_set_t* option){
 	}
 
 	printf("Options:\n");
-
-	argument_node_t* node = option->argument;
+	
 	while ( node ){
 		argument_t* arg = node->argument;
 
@@ -328,10 +345,55 @@ void option_add_int(option_set_t* option, const char* name, char flag, const cha
 }
 
 void option_add_format(option_set_t* option, const char* name, char flag, const char* description, const char* format_description, const char* fmt, ...){
+#ifndef ARCH_AMD64
+	void** fmtbuf = NULL;
+	int args = 0;
+#endif /* ARCH_AMD64 */
+
 	argument_format_t* arg = (argument_format_t*)argument_allocate(sizeof(argument_format_t), arg_fmt, name, flag, description);
 	arg->format_description = format_description;
 	arg->fmt = fmt;
-	va_start(arg->dst, fmt);
+
+#ifdef ARCH_AMD64
+	/* On AMD64 it is safe (and required) to copy the va_list */
+	{
+		va_list ap;
+		va_start(ap, fmt);
+		va_copy(arg->dst, ap);
+		va_end(ap);
+	}
+#else  /* ARCH_AMD64 */
+	/* The va_list cannot be copied directly since it might just be a pointer
+	 * to the stack, in which case it will probably be overwritten by the time
+	 * it is actually used. Therefore a buffer is manually allocated and filled
+	 * with the passed pointers. */
+
+	/* allocate argument buffer */
+	{
+		const char* ch = fmt;
+
+		while ( *ch ){
+			if ( *ch++ == '%' ) args++;
+		}
+
+		/* @todo memory leak */
+		fmtbuf = (void**)malloc(args * sizeof(void*));
+	}
+
+	/* fill argument buffer */
+	{
+		int i;
+		va_list ap;
+		va_start(ap, fmt);
+
+		for ( i = 0; i < args; i++ ){
+			fmtbuf[i] = va_arg(ap, void*);
+		}
+	}
+
+	arg->dst = (va_list)fmtbuf;
+#endif /* ARCH_AMD64 */
+
 	option_add_argument(option, (argument_t*)arg);
 }
 

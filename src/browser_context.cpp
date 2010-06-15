@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,10 +16,18 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
 #include "Browser.h"
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
+
+#ifdef WIN32
+#	include "win32.h"
+#endif
 
 static const int state_provider = 0;
 static const int state_user = 1;
@@ -34,7 +42,7 @@ static int extract_part(char* dst, const char* src, int offset, int n){
 		return offset;
 	}
 
-	strncpy(dst, &src[offset], n);
+	strncpy(dst, &src[offset], n+1);
 	dst[n] = '\0';
 
 	// We move the offset past the extracted string AND the delimiter.

@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -20,12 +20,12 @@
 #define DAEMON_APP_H
 
 #include "Kernel.h"
-#include "Exceptions.h"
+#include "exception.h"
 #include <sys/select.h>
 
 class DaemonApp: public Kernel {
 	public:
-		DaemonApp(const argument_set_t& arg);
+		DaemonApp(const argument_set_t& arg, PlatformBackend* backend);
 		~DaemonApp();
 
 		virtual void init();
@@ -37,7 +37,8 @@ class DaemonApp: public Kernel {
 		void daemon_poll();
 		void daemon_stop();
 
-		void pass_exception(const BaseException &e);
+		void pass_exception(const exception &e);
+		void pass_exception(const ExitException &e);
 
 	private:
 		int fd;

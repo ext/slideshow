@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,56 +16,46 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
-#include "Exceptions.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
+#include "exception.h"
 #include "Graphics.h"
 #include "Kernel.h"
 #include "OS.h"
 #include "Log.h"
 #include "Transition.h"
 #include "path.h"
-#include <GL/gl.h>
+#include "gl.h"
+
 #include <cstdlib>
+#include <cstring>
+#include <memory>
 
 #include <portable/string.h>
-#include <FreeImage.h>
 
-#include "slidelib.h"
+/* hack to get opengl functions, does not seem to be used in header even when
+ * built with opengl support. */
+#define ILUT_USE_OPENGL
 
-static void FreeImageErrorHandler(FREE_IMAGE_FORMAT fif, const char *message) {
-	const char* format = fif != FIF_UNKNOWN ? FreeImage_GetFormatFromFIF(fif) : "Unknown";
-	Log::message(Log::Verbose, "FreeImage: An error occured while loading an image\n");
-    Log::message(Log::Debug, "FreeImage: Format: %s Message: %s\n", format, message);
-}
+#include <IL/il.h>
+#include <IL/ilu.h>
+#include <IL/ilut.h>
 
-static FIBITMAP* GenericLoader(const char* lpszPathName, int flag = 0) {
-    FREE_IMAGE_FORMAT fif = FreeImage_GetFileType(lpszPathName, 0);
-
-    if ( fif == FIF_UNKNOWN ) {
-    	fif = FreeImage_GetFIFFromFilename(lpszPathName);
-	}
-
-    if ( fif == FIF_UNKNOWN ) {
-    	throw GraphicsException("FreeImage: unknown format, or FreeImage does not handle it.");
-    }
-
-    if ( !FreeImage_FIFSupportsReading(fif) ){
-    	throw GraphicsException("FreeImage: cannot read this format.");
-    }
-
-    return FreeImage_Load(fif, lpszPathName, flag);
-}
 Graphics::Graphics(int width, int height, bool fullscreen):
 	_transition(NULL),
-	_texture_0(0),
-	_texture_1(0),
 	_width(width),
 	_height(height){
 
-	OS::init_view(width, height, fullscreen);
+	for ( unsigned int i = 0; i < 2; i++ ){
+		_texture[i] = 0;
+	}
+
 	Log::message(Log::Verbose, "Graphics: Using resoultion %dx%d\n", width, height);
 
-	freeimage_init();
+	glew_init();
+	imageloader_init();
 	gl_setup();
 	gl_set_matrices();
 	gl_init_textures();
@@ -73,24 +63,51 @@ Graphics::Graphics(int width, int height, bool fullscreen):
 
 Graphics::~Graphics(){
 	gl_cleanup_textures();
-	freeimage_cleanup();
+	imageloader_cleanup();
+	glew_cleanup();
 
 	if ( _transition && _transition->cleanup ){
 		_transition->cleanup();
 	}
 
 	free(_transition);
-
-	OS::cleanup();
 }
 
-void Graphics::freeimage_init(){
-	FreeImage_Initialise();
-	FreeImage_SetOutputMessage(FreeImageErrorHandler);
+void Graphics::glew_init(){
+	GLenum err = glewInit();
+
+	if (GLEW_OK != err){
+		throw exception("Failed to initialize glew");
+	}
+
+	if (GLEW_VERSION_2_0){
+		Log::message(Log::Warning, "Graphics card does not support OpenGL 2.0+\n");
+	}
+
+	if (!GLEW_ARB_texture_non_power_of_two){
+		Log::message(Log::Warning, "Graphics card does not support ARB_texture_non_power_of_two, performance will suffer\n");
+	}
 }
 
-void Graphics::freeimage_cleanup(){
-	FreeImage_DeInitialise();
+void Graphics::glew_cleanup(){
+
+}
+
+void Graphics::imageloader_init(){
+	ilInit();
+
+	ILuint devilError = ilGetError();
+
+	if (devilError != IL_NO_ERROR) {
+		throw exception("Devil Error (ilInit: %s)", iluErrorString(devilError));
+	}
+
+	iluInit();
+	ilutRenderer(ILUT_OPENGL);
+}
+
+void Graphics::imageloader_cleanup(){
+
 }
 
 void Graphics::gl_setup(){
@@ -125,93 +142,138 @@ void Graphics::gl_set_matrices(){
 }
 
 void Graphics::gl_init_textures(){
-	glGenTextures(1, &_texture_0);
-	glGenTextures(1, &_texture_1);
+	glGenTextures(2, _texture);
+
+	for ( unsigned int i = 0; i < 2; i++ ){
+		glBindTexture(GL_TEXTURE_2D, _texture[i]);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	}
 }
 
 void Graphics::gl_cleanup_textures(){
-	glDeleteTextures(1, &_texture_0);
-	glDeleteTextures(1, &_texture_1);
+	glDeleteTextures(2, _texture);
 }
 
 void Graphics::render(float state){
 	transition_context_t context;
 
-	context.texture[0] = _texture_0;
-	context.texture[1] = _texture_1;
+	context.texture[0] = _texture[0];
+	context.texture[1] = _texture[1];
 	context.state = state;
 
 	if ( _transition ){
 		_transition->render(&context);
 	}
+}
 
-	OS::swap_gl_buffers();
+#ifdef WIN32
+/* convert to LPCTSTR, release memory with free */
+static TCHAR* to_tchar(const char* src){
+	size_t len = 0;
+	TCHAR* buf = NULL;
+
+	if ( mbstowcs_s(&len, NULL, 0, src, _TRUNCATE) != 0 ){
+		return NULL;
+	}
+
+	buf = (TCHAR*)malloc(sizeof(TCHAR) * (len+1));
+
+	if ( mbstowcs_s(&len, buf, len+1, src, _TRUNCATE) != 0 ){
+		return NULL;
+	}
+
+	return buf;
+}
+
+/* convert from LPCTSTR, release memory with free */
+static char* from_tchar(const TCHAR* src){
+	size_t len = 0;
+	char* buf = NULL;
+
+	if ( wcstombs_s(&len, NULL, 0, src, _TRUNCATE) != 0 ){
+		return NULL;
+	}
+
+	buf = (char*)malloc(sizeof(char) * (len+1));
+
+	if ( wcstombs_s(&len, buf, len+1, src, _TRUNCATE) != 0 ){
+		return NULL;
+	}
+
+	return buf;
+}
+#endif /* WIN32 */
+
+static bool is_slide(const char* name){
+	const char* ext = ".slide";
+	size_t len = strlen(name);
+
+	if ( len < 6 ){
+		return false;
+	}
+
+	return strcmp(name + len - 6, ext) == 0;
 }
 
 void Graphics::load_image(const char* name){
 	swap_textures();
 
-	BYTE black[] = {
-		0, 0, 0
-	};
-	BYTE *pixels = black;
-	FIBITMAP* dib_resized = NULL;
-
-	int width = 1;
-	int height = 1;
-
-	glBindTexture(GL_TEXTURE_2D, _texture_0);
+	glBindTexture(GL_TEXTURE_2D, _texture[0]);
 
 	if ( name ){
-		char* path = real_path(name);
-
-		slide_t* slide = slide_from_name(path);
-		if ( slide ){
-			free(path);
-			resolution_t resolution = {_width, _height};
-			path = slide_sample(slide, &resolution);
-		}
-		FIBITMAP* dib = GenericLoader(path);
-
-		if( !dib ){
-			GraphicsException e = GraphicsException("Failed to load image '%s'", path);
-			free(path);
-			throw e;
+		std::auto_ptr<char> real_name(strdup(name));
+		if ( is_slide(name) ){
+			real_name.reset(asprintf2("%s/samples/%dx%d.png", name, _width, _height));
 		}
 
-		free(path);
+#ifdef UNICODE
+		char* tmp = real_path(real_name.get());
+		std::auto_ptr<wchar_t> path(to_tchar(tmp));
+		free(tmp);
+#else /* UNICODE */
+		std::auto_ptr<char> path(real_path(real_name.get()));
+#endif /* UNICODE */
 
-		FreeImage_FlipVertical(dib);
+		ILuint devilID;
 
-		FIBITMAP* dib32 = FreeImage_ConvertTo24Bits(dib);
+		ilGenImages(1, &devilID);
+		ilBindImage(devilID);
+		ilLoadImage(path.get());
+		ILuint devilError = ilGetError();
 
-		width = 1024;
-		height = 1024;
+		if( devilError != IL_NO_ERROR ){
+#ifdef UNICODE
+			const wchar_t* asdf = iluErrorString (devilError);
+			const char* error = from_tchar(asdf);
+#else /* UNICODE */
+			const char* error = iluErrorString (devilError);
+#endif /* UNICODE */
+			throw exception("Failed to load image '%s' (ilLoadImage: %s)", path.get(), error);
+		}
 
-		dib_resized = FreeImage_Rescale(dib32, width, height, FILTER_BILINEAR);
+		ILubyte* pixels = ilGetData();
+		int width  = ilGetInteger(IL_IMAGE_WIDTH);
+		int height = ilGetInteger(IL_IMAGE_HEIGHT);
+		int format = ilGetInteger(IL_IMAGE_FORMAT);
 
-		pixels = (BYTE*)FreeImage_GetBits(dib_resized);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, pixels);
+	} else {
+		static const unsigned char black[] = {
+			0, 0, 0
+		};
 
-		FreeImage_Unload(dib);
-		FreeImage_Unload(dib32);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, black);
 	}
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, pixels);
-
-    if ( name ){
-    	FreeImage_Unload(dib_resized);
-    }
 }
 
 void Graphics::swap_textures(){
-	unsigned int tmp = _texture_0;
-	_texture_0 = _texture_1;
-	_texture_1 = tmp;
+	unsigned int tmp = _texture[0];
+	_texture[0] = _texture[1];
+	_texture[1] = tmp;
 }
 
 void Graphics::set_transition(transition_module_t* module){

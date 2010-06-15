@@ -1,5 +1,5 @@
 /**
- * This file is part of Slideshow.
+ * This file is part -2010of Slideshow.
  * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify

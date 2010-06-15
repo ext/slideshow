@@ -18,7 +18,6 @@
 
 #include "config.h"
 #include "DaemonApp.h"
-#include "Exceptions.h"
 #include "Log.h"
 #include <libdaemon/daemon.h>
 #include <cstring>
@@ -26,8 +25,8 @@
 #include <errno.h>
 #include <csignal>
 
-DaemonApp::DaemonApp(const argument_set_t& arg):
-	Kernel(arg){
+DaemonApp::DaemonApp(const argument_set_t& arg, PlatformBackend* backend):
+	Kernel(arg, backend){
 
 }
 
@@ -39,15 +38,15 @@ void DaemonApp::init(){
 
 	try {
 		Kernel::init();
-	} catch ( FatalException& e ){
-		Log::message(Log::Fatal, "Error 0x%02x: %s\n", e.code(), e.what());
+	} catch ( ExitException& e ){
+		Log::message(Log::Fatal, "Error 0x%02x: %s\n", e.code());
 
 		pass_exception(e);
 		daemon_retval_send(e.code());
 
 		daemon_stop();
 		exit(0);
-	} catch ( BaseException& e ){
+	} catch ( exception& e ){
 		Log::message(Log::Fatal, "Unhandled exception: %s\n", e.what());
 
 		pass_exception(e);
@@ -65,7 +64,13 @@ void DaemonApp::cleanup(){
 	Kernel::cleanup();
 }
 
-void DaemonApp::pass_exception(const BaseException &e){
+void DaemonApp::pass_exception(const exception &e){
+	size_t size = 0;
+
+	verify( write(_writefd, &size, sizeof(size)) >= 0 );
+}
+
+void DaemonApp::pass_exception(const ExitException &e){
 	size_t size = strlen(e.what());
 
 	// @todo Errors should be handled properly
@@ -87,12 +92,12 @@ void DaemonApp::daemon_start(){
 
     /* Reset signal handlers */
     if (daemon_reset_sigs(-1) < 0) {
-    	throw KernelException("Kernel: failed to reset all signal handlers: %s\n", strerror(errno));
+    	throw exception("Kernel: failed to reset all signal handlers: %s\n", strerror(errno));
     }
 
     /* Unblock signals */
     if (daemon_unblock_sigs(-1) < 0) {
-    	throw KernelException("Kernel: failed to unblock all signals: %s\n", strerror(errno));
+    	throw exception("Kernel: failed to unblock all signals: %s\n", strerror(errno));
     }
 
     /* Set indetification string for the daemon for both syslog and PID file */
@@ -101,7 +106,7 @@ void DaemonApp::daemon_start(){
 
     /* Check that the daemon is not rung twice a the same time */
 	if ((pid = daemon_pid_file_is_running()) >= 0) {
-		throw KernelException("Kernel: daemon already running on PID file %u\n", pid);
+		throw exception("Kernel: daemon already running on PID file %u\n", pid);
 	}
 
 	/* Prepare for return value passing from the initialization procedure of the daemon process */
@@ -111,7 +116,7 @@ void DaemonApp::daemon_start(){
 	{
 		int pipefd[2];
 		if ( pipe(pipefd) == -1 ){
-			throw KernelException("Kernel: failed to create pipe: %s\n", strerror(errno));
+			throw exception("Kernel: failed to create pipe: %s\n", strerror(errno));
 		}
 		_readfd = pipefd[0];
 		_writefd = pipefd[1];
@@ -122,7 +127,7 @@ void DaemonApp::daemon_start(){
 
 		/* Exit on error */
 		daemon_retval_done();
-		throw KernelException("Kernel: fork failed.\n");
+		throw exception("Kernel: fork failed.\n");
 
 	} else if (pid) { /* The parent */
 		close(_writefd);
@@ -131,7 +136,7 @@ void DaemonApp::daemon_start(){
 
 		/* Wait for 20 seconds for the return value passed from the daemon process */
 		if ((ret = daemon_retval_wait(20)) < 0) {
-			throw KernelException("Kernel: could not receive return value from daemon process: %s\n", strerror(errno));
+			throw exception("Kernel: could not receive return value from daemon process: %s\n", strerror(errno));
 		}
 
 		if ( ret != 0 ){
@@ -140,13 +145,16 @@ void DaemonApp::daemon_start(){
 			// @todo Errors should be handled properly
 			verify( read(_readfd, &size, sizeof(size_t)) == sizeof(size_t) );
 
-			char buf[size+1];
-			// @todo Errors should be handled properly
-			verify( read(_readfd, buf, size) == size );
-			close(_readfd);
-			buf[size] = '\0';
+			if ( size > 0 ){
+				char buf[size+1];
+				// @todo Errors should be handled properly
+				verify( read(_readfd, buf, size) == size );
+				close(_readfd);
+				buf[size] = '\0';
+				printf("DaemonApp exception: %s\n", buf);
+			}
 
-			throw FatalException((ErrorCode)ret, buf);
+			throw ExitException((ErrorCode)ret);
 		} else {
 			close(_readfd);
 			throw ExitException();

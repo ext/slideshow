@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,18 +16,26 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
 #include "path.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include <portable/asprintf.h>
+
+#ifdef WIN32
+#	include "win32.h"
+#endif
+
 char* real_path(const char* filename){
 	char* dst;
 
-	if ( filename[0] == '/' ){
-		dst = (char*)malloc(strlen(filename)+1);
-		strcpy(dst, filename);
+	if ( filename[0] == '/' || filename[1] == ':' ){
+		dst = strdup(filename);
 	} else {
 		if ( asprintf(&dst, "%s/%s", datapath(), filename) == -1 ){
 			fprintf(stderr, "out-of-memory\n");

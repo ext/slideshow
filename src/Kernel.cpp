@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,8 +16,9 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Internal
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
 #include "argument_parser.h"
 #include "module.h"
@@ -27,11 +28,13 @@
 #include "OS.h"
 #include "path.h"
 #include "Log.h"
-#include "Exceptions.h"
+#include "exception.h"
 #include "Transition.h"
 
 // IPC
-#include "IPC/dbus.h"
+#ifdef HAVE_DBUS
+#	include "IPC/dbus.h"
+#endif /* HAVE_DBUS */
 
 // FSM
 #include "state/State.h"
@@ -40,9 +43,14 @@
 #include "state/TransitionState.h"
 #include "state/ViewState.h"
 
+// Backend
+#include "backend/platform.h"
+
 // libportable
 #include <portable/Time.h>
-#include <portable/string.h>
+#include <portable/asprintf.h>
+#include <portable/scandir.h>
+#include <portable/cwd.h>
 
 // libc
 #include <cstdlib>
@@ -50,25 +58,31 @@
 #include <cstring>
 
 // Platform
-#include <sys/wait.h>
-#include <signal.h>
-#include <X11/Xlib.h>
-#include <dirent.h>
-#include <fnmatch.h>
-
-#ifdef LINUX
-//#include <sys/time.h>
+#ifdef __GNUC__
+#	include <sys/wait.h>
 #endif
 
 #ifdef WIN32
-#include <windows.h>
+#	include "win32.h"
+#	include <direct.h>
+#	define getcwd _getcwd
+#	define PATH_MAX _MAX_PATH
 #endif
 
 static char* pidfile = NULL;
 
-Kernel::Kernel(const argument_set_t& arg):
-	_arg(arg),
-	_password(NULL){
+Kernel::Kernel(const argument_set_t& arg, PlatformBackend* backend)
+	: _arg(arg)
+	, _password(NULL)
+	, _state(NULL)
+	, _graphics(NULL)
+	, _browser(NULL)
+	, _ipc(NULL)
+	, _backend(backend)
+	, _running(false) {
+
+	verify(_backend);
+
 	create_pidpath();
 	_password = get_password();
 }
@@ -80,6 +94,7 @@ Kernel::~Kernel(){
 void Kernel::init(){
 	Log::message(Log::Info, "Kernel: Starting slideshow\n");
 
+	init_backend();
 	init_graphics();
 	init_IPC();
 	init_browser();
@@ -94,6 +109,8 @@ void Kernel::cleanup(){
 	free(pidfile);
 	free(_password);
 
+	cleanup_backend();
+
 	_state = NULL;
 	_browser = NULL;
 	_graphics = NULL;
@@ -101,13 +118,23 @@ void Kernel::cleanup(){
 	pidfile = NULL;
 }
 
+void Kernel::init_backend(){
+	_backend->init(Vector2ui(_arg.width, _arg.height), _arg.fullscreen > 0);
+}
+
+void Kernel::cleanup_backend(){
+	_backend->cleanup();
+}
+
 void Kernel::init_graphics(){
-	_graphics = new Graphics(_arg.width, _arg.height, _arg.fullscreen);
+	_graphics = new Graphics(_arg.width, _arg.height, _arg.fullscreen > 0);
 	load_transition( _arg.transition_string ? _arg.transition_string : "fade" );
 }
 
 void Kernel::init_IPC(){
+#ifdef HAVE_DBUS
 	_ipc = new DBus(this, 50);
+#endif /* HAVE_DBUS */
 }
 
 void Kernel::init_browser(){
@@ -139,7 +166,10 @@ void Kernel::init_fsm(){
 
 void Kernel::load_transition(const char* name){
 	Log::message(Log::Warning, "Loading %s\n", name);
-	struct module_context_t* context = module_open(name);
+
+	char* fullname = asprintf2("%s%s", name, SO_SUFFIX);
+	struct module_context_t* context = module_open(fullname);
+	free(fullname);
 
 	if ( !context ){
 		Log::message(Log::Info, "Transition plugin not found\n");
@@ -156,22 +186,55 @@ void Kernel::load_transition(const char* name){
 }
 
 void Kernel::poll(){
-	OS::poll_events(_running);
+	_backend->poll(_running);
 }
 
 void Kernel::action(){
-	_state = _state->action();
+	if ( !_state ){
+		return;
+	}
+
+	bool flip = false;
+
+	try {
+		_state = _state->action(flip);
+	} catch ( exception& e ){
+		Log::message(Log::Warning, "State exception: %s\n", e.what());
+		_state = NULL;
+	}
+
+	if ( flip ){
+		_backend->swap_buffers();
+	}
 }
 
-void Kernel::print_licence_statement(){
-	printf("Slideshow  Copyright (C) 2008 David Sveningsson <ext@sidvind.com>\n");
+void Kernel::print_config() const {
+	char* cwd = get_current_dir_name();
+
+	printf("Slideshow configuration\n");
+	printf("  cwd: %s\n", cwd);
+	printf("  pidfile: %s\n", pidfile);
+	printf("  datapath: %s\n", datapath());
+	printf("  pluginpath: %s\n", pluginpath());
+	printf("  resolution: %dx%d (%s)\n", _arg.width, _arg.height, _arg.fullscreen ? "fullscreen" : "windowed");
+	printf("  transition time: %0.3fs\n", _arg.transition_time);
+	printf("  switch time: %0.3fs\n", _arg.switch_time);
+	printf("  connection string: %s\n", _arg.connection_string);
+	printf("  transition: %s\n", _arg.transition_string);
+	printf("\n");
+
+	free(cwd);
+}
+
+void Kernel::print_licence_statement() const {
+	printf("Slideshow  Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>\n");
 	printf("This program comes with ABSOLUTELY NO WARRANTY.\n");
 	printf("This is free software, and you are welcome to redistribute it\n");
 	printf("under certain conditions; see COPYING or <http://www.gnu.org/licenses/>\n");
-	printf("for details.\n");
+	printf("for details.\n\n");
 }
 
-void Kernel::print_cli_arguments(int argc, const char* argv[]){
+void Kernel::print_cli_arguments(int argc, const char* argv[]) const {
 	Log::message_begin(Log::Verbose);
 	Log::message_ex("Starting with \"");
 
@@ -185,7 +248,7 @@ void Kernel::print_cli_arguments(int argc, const char* argv[]){
 }
 
 static int filter(const struct dirent* el){
-	return fnmatch("*.la", el->d_name, 0) == 0;
+	return fnmatch("*" SO_SUFFIX , el->d_name, 0) == 0;
 }
 
 void Kernel::print_transitions(){
@@ -195,9 +258,10 @@ void Kernel::print_transitions(){
 	int n;
 
 	char* path_list = strdup(pluginpath());
-	char* path = strtok(path_list, ":");
+	char* ctx;
+	char* path = strtok_r(path_list, ":", &ctx);
 	while ( path ){
-		n = scandir(path, &namelist, filter, alphasort);
+		n = scandir(path, &namelist, filter, NULL);
 		if (n < 0){
 			perror("scandir");
 		} else {
@@ -220,7 +284,7 @@ void Kernel::print_transitions(){
 			free(namelist);
 		}
 
-		path = strtok(NULL, ":");
+		path = strtok_r(NULL, ":", &ctx);
 	}
 
 	free(path_list);
@@ -261,6 +325,7 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 }
 
 void Kernel::play_video(const char* fullpath){
+#ifndef WIN32
 	Log::message(Log::Info, "Kernel: Playing video \"%s\"\n", fullpath);
 
 	int status;
@@ -271,6 +336,9 @@ void Kernel::play_video(const char* fullpath){
 	}
 
 	::wait(&status);
+#else /* WIN32 */
+	Log::message(Log::Warning, "Kernel: Video playback is not supported on this platform (skipping \"%s\")\n", fullpath);
+#endif /* WIN32 */
 }
 
 void Kernel::start(){

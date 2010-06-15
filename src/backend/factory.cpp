@@ -20,22 +20,42 @@
 #	include "config.h"
 #endif
 
-#include "ViewState.h"
-#include "SwitchState.h"
+#include "backend/platform.h"
+#include <map>
+#include <cstring>
 
-double ViewState::view_time = 1.0;
+#ifdef HAVE_SDL
+#	include "backend/SDLbackend.h"
+#endif
 
-State* ViewState::action(bool &flip){
-	if ( age() > view_time ){
-		return new SwitchState(this);
+struct ltstr {
+	bool operator()(const char* s1, const char* s2) const {
+		return strcmp(s1, s2) < 0;
+	}
+};
+
+typedef std::map<const char*, PlatformBackend::factory_callback, ltstr> map;
+typedef std::pair<const char*, PlatformBackend::factory_callback> pair;
+typedef map::iterator iterator;
+
+static map factories;
+
+PlatformBackend* PlatformBackend::factory(const char* name){
+	iterator it = factories.find(name);
+
+	if ( it == factories.end() ){
+		return NULL;
 	}
 
-	if ( ipc() ){
-		ipc()->poll();
-	}
+	return it->second();
+}
 
-	// Sleep for a while
-	wait( 0.1f );
+void PlatformBackend::register_factory(const char* name, factory_callback callback){
+	factories.insert(pair(name, callback));
+}
 
-	return this;
+void PlatformBackend::register_all(){
+#ifdef HAVE_SDL
+	SDLBackend::register_factory();
+#endif
 }
