@@ -291,18 +291,19 @@ class Settings:
 		if key == 'Env':
 			return self.enviroment
 		
-		print key
 		[groupname, itemname] = key.split('.')
 		item = self.groups[groupname][itemname]
 		
-		return item
+		return item._value
 	
 	def __setitem__(self, key, value):
 		if key == 'Env':
 			self.enviroment = value
 			return
 		
-		item = self[key]
+		[groupname, itemname] = key.split('.')
+		item = self.groups[groupname][itemname]
+		
 		item.set(value)
 	
 	def persist(self, dst=None):
