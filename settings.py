@@ -261,31 +261,45 @@ class Settings:
 				if not item.rel:
 					continue
 				
-				item.rel = self[item.rel]
+				item.rel = self.item(item.rel)
 		
 		# load stored settings
 		with open(config_file, 'r') as f:
 			c = json.load(f)
-			for k,v in c.items():
-				if k == 'Env':
-					self.enviroment = v
-					continue
-				try:
-					group = self.groups[k]
-				except KeyError:
-					print 'group', k, 'found in config but is not defined xml'
-					continue
+			
+			# Because of dependencies between items and no guarantee of the
+			# order they arrive in we keep iterating through all items that are 
+			# left until either no more changes was made or until no more items
+			# are left.
+			p = 0
+			while True:
+				p += 1 # pass
+				n = 0  # nr of changes
 				
-				for name, value in v.items():
+				for k,v in c.items():
+					if k == 'Env':
+						self.enviroment = v
+						del c[k]
+						continue
 					try:
-						item = group[name]
-						item.set(value, rollback=True)
-					except ValueError as e:
-						# @todo sometimes they depend on settings not yet found and fail because of that.
-						# e.g. path1 depends on path2, but path1 is set before path2 is set, so it fails.
-						print name, k, 'contains illegal data ("%s": %s), resetting to default' % (value, str(e))
+						group = self.groups[k]
 					except KeyError:
-						print name, k, 'found in config but is not defined in xml'
+						print 'group', k, 'found in config but is not defined xml'
+						continue
+					
+					for name, value in v.items():
+						try:
+							item = group[name]
+							item.set(value, rollback=True)
+							del v[name] # drop from list
+							n += 1
+						except ValueError as e:
+							print name, k, 'contains illegal data ("%s": %s), resetting to default' % (value, str(e))
+						except KeyError:
+							print name, k, 'found in config but is not defined in xml'
+				
+				if n == 0:
+					break
 			
 	def __iter__(self):
 		return self.groups.values().__iter__()

@@ -20,6 +20,19 @@ class Handler(object):
 		if action == 'save':
 			error = False
 			
+			# hack for environmental variables
+			env = {}
+			if 'Env' in kwargs:
+				try:
+					env = kwargs['Env'].split("\r\n")
+					env = filter(lambda x: len(x) > 0, env)
+					env = map(lambda x: tuple(x.split('=')), env)
+					env = dict(env)
+				except:
+					raise ValueError, 'Malformed environment variables'
+				finally:
+					kwargs['Env'] = env
+			
 			for k,v in kwargs.items():
 				try:
 					settings[k] = v
