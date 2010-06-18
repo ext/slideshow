@@ -211,40 +211,28 @@ void Kernel::action(){
 void Kernel::print_config() const {
 	char* cwd = get_current_dir_name();
 
-	printf("Slideshow configuration\n");
-	printf("  cwd: %s\n", cwd);
-	printf("  pidfile: %s\n", pidfile);
-	printf("  datapath: %s\n", datapath());
-	printf("  pluginpath: %s\n", pluginpath());
-	printf("  resolution: %dx%d (%s)\n", _arg.width, _arg.height, _arg.fullscreen ? "fullscreen" : "windowed");
-	printf("  transition time: %0.3fs\n", _arg.transition_time);
-	printf("  switch time: %0.3fs\n", _arg.switch_time);
-	printf("  connection string: %s\n", _arg.connection_string);
-	printf("  transition: %s\n", _arg.transition_string);
-	printf("\n");
+	Log::message(Log::Info, "Slideshow configuration\n");
+	Log::message(Log::Info, "  cwd: %s\n", cwd);
+	Log::message(Log::Info, "  pidfile: %s\n", pidfile);
+	Log::message(Log::Info, "  datapath: %s\n", datapath());
+	Log::message(Log::Info, "  pluginpath: %s\n", pluginpath());
+	Log::message(Log::Info, "  resolution: %dx%d (%s)\n", _arg.width, _arg.height, _arg.fullscreen ? "fullscreen" : "windowed");
+	Log::message(Log::Info, "  transition time: %0.3fs\n", _arg.transition_time);
+	Log::message(Log::Info, "  switch time: %0.3fs\n", _arg.switch_time);
+	Log::message(Log::Info, "  connection string: %s\n", _arg.connection_string);
+	Log::message(Log::Info, "  transition: %s\n", _arg.transition_string);
+	Log::message(Log::Info, "\n");
 
 	free(cwd);
 }
 
 void Kernel::print_licence_statement() const {
-	printf("Slideshow  Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>\n");
-	printf("This program comes with ABSOLUTELY NO WARRANTY.\n");
-	printf("This is free software, and you are welcome to redistribute it\n");
-	printf("under certain conditions; see COPYING or <http://www.gnu.org/licenses/>\n");
-	printf("for details.\n\n");
-}
-
-void Kernel::print_cli_arguments(int argc, const char* argv[]) const {
-	Log::message_begin(Log::Verbose);
-	Log::message_ex("Starting with \"");
-
-	for ( int i = 1; i < argc; i++ ){
-		if ( i > 1 ){
-			Log::message_ex(" ");
-		}
-		Log::message_ex_fmt("%s", argv[i]);
-	}
-	Log::message_ex("\n");
+	Log::message(Log::Info, "Slideshow  Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>\n");
+	Log::message(Log::Info, "This program comes with ABSOLUTELY NO WARRANTY.\n");
+	Log::message(Log::Info, "This is free software, and you are welcome to redistribute it\n");
+	Log::message(Log::Info, "under certain conditions; see COPYING or <http://www.gnu.org/licenses/>\n");
+	Log::message(Log::Info, "for details.\n");
+	Log::message(Log::Info, "\n");
 }
 
 static int filter(const struct dirent* el){
@@ -252,7 +240,7 @@ static int filter(const struct dirent* el){
 }
 
 void Kernel::print_transitions(){
-	printf("Available transitions: \n");
+	Log::message(Log::Info, "Available transitions: \n");
 
 	struct dirent **namelist;
 	int n;
@@ -277,7 +265,7 @@ void Kernel::print_transitions(){
 					continue;
 				}
 
-				printf(" * %s\n", module_get_name(context));
+				Log::message(Log::Info, " * %s\n", module_get_name(context));
 
 				module_close(context);
 			}

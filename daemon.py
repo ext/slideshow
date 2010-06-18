@@ -49,10 +49,19 @@ class _Daemon(threading.Thread):
 		self._state = STARTING
 		settings = Settings('settings.xml', 'settings.json')
 		
-		print settings['Files.BinaryPath']
-		#self._instance = subprocess.Popen([], bufsize=0, executable=None, stdin=None, stdout=None, stderr=None, preexec_fn=None, close_fds=False, shell=False, cwd=None, env=None, universal_newlines=False, startupinfo=None, creationflags=0)
+		cmd = settings['Files.BinaryPath']
+		args = []
+		env = dict(
+			TERM='xterm'
+		)
+		print cmd
+		self._instance = subprocess.Popen(
+			[cmd] + args,
+			stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+			cwd=settings['Path.BasePath'], env=None
+		)
 		
-		self._state = CRASHED
+		self._state = RUNNING
 	
 	def state(self):
 		self._state_lock.acquire()
@@ -66,6 +75,16 @@ class _Daemon(threading.Thread):
 	def run(self):
 		self._running = True
 		while self._running:
+			if self._instance:
+				if self._instance.poll():
+					self._state = CRASHED
+				
+				for line in self._instance.stdout:
+					print 'stdout:', line, 
+				for line in self._instance.stderr:
+					print 'stderr:', line, 
+			
+			# check if any commands has been issued
 			if not self._sem.acquire(timeout=1.0):
 				continue
 			

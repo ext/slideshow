@@ -290,12 +290,15 @@ class Settings:
 	def __iter__(self):
 		return self.groups.values().__iter__()
 	
+	def item(self, key):
+		[groupname, itemname] = key.split('.')
+		return self.groups[groupname][itemname]
+	
 	def __getitem__(self, key):
 		if key == 'Env':
 			return self.enviroment
 		
-		[groupname, itemname] = key.split('.')
-		item = self.groups[groupname][itemname]
+		item = self.item(key)
 		
 		return item._value
 	
@@ -304,8 +307,7 @@ class Settings:
 			self.enviroment = value
 			return
 		
-		[groupname, itemname] = key.split('.')
-		item = self.groups[groupname][itemname]
+		item = self.item(key)
 		
 		item.set(value)
 	

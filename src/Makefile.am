@@ -1,7 +1,8 @@
 SUBDIRS = transitions
 
 noinst_LIBRARIES = libmodule_loader.a libipc.a libfsm.a
-bin_PROGRAMS = slideshow xquery
+bin_PROGRAMS = slideshow
+lib_LTLIBRARIES = xquery.la 
 
 warning_flags = -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
 
@@ -77,5 +78,7 @@ endif
 
 libmodule_loader_a_SOURCES = module_loader.c ${top_srcdir}/include/module_loader.h
 
-xquery_SOURCES = xquery.c
-xquery_LDADD = ${X11_LIBS} ${xrandr_LIBS}
+xquery_la_SOURCES = xquery.c
+xquery_la_CFLAGS = -Wall -Wstrict-prototypes -I/usr/include/python2.6
+xquery_la_LDFLAGS = -module -export-dynamic ${LDFLAGS}
+xquery_la_LIBADD = ${X11_LIBS} ${xrandr_LIBS}

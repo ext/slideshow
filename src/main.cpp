@@ -70,8 +70,13 @@ int main( int argc, const char* argv[] ){
 		moduleloader_init(pluginpath());
 		PlatformBackend::register_all();
 
-		Log::initialize("slideshow.log");
-		Log::set_level( (Log::Severity)arguments.loglevel );
+		Log::initialize();
+		Log::add_destination(new FileDestination(stdout));
+		Log::add_destination(new FileDestination("slideshow.log"));
+#ifdef HAVE_SYSLOG
+		Log::add_destination(new SyslogDestination());
+#endif /* HAVE_SYSLOG */
+		//Log::set_level( (Log::Severity)arguments.loglevel );
 
 		Kernel* application = NULL;
 
@@ -85,7 +90,7 @@ int main( int argc, const char* argv[] ){
 			case Kernel::ForegroundMode:
 				application = new ForegroundApp(arguments, backend);
 				break;
-			case Kernel::DaemonMode: 
+			case Kernel::DaemonMode:
 #ifdef BUILD_DAEMON
 				application = new DaemonApp(arguments, backend); break;
 #else /* BUILD_DAEMON */
@@ -106,7 +111,7 @@ int main( int argc, const char* argv[] ){
 
 		moduleloader_cleanup();
 
-		Log::deinitialize();
+		Log::cleanup();
 
 	} catch ( ExitException &e ){
 		return e.code();

@@ -20,11 +20,57 @@
 #define LOG_H
 
 #include <cstdio>
+#include <vector>
+
+class Destination {
+	public:
+		/**
+		 * Write to destination
+		 * @param content Original content.
+		 * @param decorated Decorated content (timestamp etc)
+		 */
+		virtual void write(const char* content, const char* decorated) const = 0;
+};
+
+class FileDestination: public Destination {
+	public:
+		/**
+		 * Open by filename.
+		 */
+		FileDestination(const char* filename);
+
+		/**
+		 * Open by file stream, caller must call fclose if needed.
+		 */
+		FileDestination(FILE* fp);
+
+		virtual ~FileDestination();
+		virtual void write(const char* content, const char* decorated) const;
+
+	private:
+		FILE* _fp;
+		bool _autoclose;
+};
+
+#ifdef HAVE_SYSLOG
+class SyslogDestination: public Destination {
+	public:
+		SyslogDestination();
+		virtual ~SyslogDestination()
+		virtual void write(const char* content, const char* decorated) const;
+};
+#endif /* HAVE_SYSLOG */
 
 class Log {
 	public:
-		static void initialize(const char* filename);
-		static void deinitialize();
+		static void initialize();
+		static void cleanup();
+
+		/**
+		 * Add a logging destination.
+		 * @param dst Memory will be release using delete.
+		 */
+		static void add_destination(Destination* dst);
 
 		enum Severity {
 			Debug = 0,
@@ -34,19 +80,8 @@ class Log {
 			Fatal
 		};
 
-		static void set_level(Severity level){ _level = level; }
 		static void  message(Severity severity, const char* fmt, ...);
 		static void vmessage(Severity severity, const char* fmt, va_list ap);
-
-		static void message_begin(Severity severity);
-		static void message_ex(const char* str);
-		static void message_ex_fmt(const char* fmt, ...);
-
-		static void flush();
-
-		// Get the FD, this is needed by the daemon as it automatically closes all
-		// FD's unless explicitly specified.
-		static int file_no();
 
 	private:
 		Log(){}
@@ -54,9 +89,10 @@ class Log {
 		static char *timestring(char *buffer, int bufferlen);
 		static const char* severity_string(Severity severity);
 
-		static Severity _level;
-		static FILE* _file;
-		static FILE* _dfile;
+		typedef std::vector<Destination*> vector;
+		typedef vector::iterator iterator;
+
+		static vector _dst;
 };
 
 #endif // LOG_H
