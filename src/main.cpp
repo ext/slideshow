@@ -70,8 +70,13 @@ int main( int argc, const char* argv[] ){
 		moduleloader_init(pluginpath());
 		PlatformBackend::register_all();
 
-		Log::initialize("slideshow.log");
-		Log::set_level( (Log::Severity)arguments.loglevel );
+		Log::initialize();
+		Log::add_destination(new FileDestination(stdout));
+		Log::add_destination(new FileDestination("slideshow.log"));
+#ifdef HAVE_SYSLOG
+		Log::add_destination(new SyslogDestination());
+#endif /* HAVE_SYSLOG */
+		//Log::set_level( (Log::Severity)arguments.loglevel );
 
 		Kernel* application = NULL;
 

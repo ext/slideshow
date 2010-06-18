@@ -234,19 +234,6 @@ void Kernel::print_licence_statement() const {
 	printf("for details.\n\n");
 }
 
-void Kernel::print_cli_arguments(int argc, const char* argv[]) const {
-	Log::message_begin(Log::Verbose);
-	Log::message_ex("Starting with \"");
-
-	for ( int i = 1; i < argc; i++ ){
-		if ( i > 1 ){
-			Log::message_ex(" ");
-		}
-		Log::message_ex_fmt("%s", argv[i]);
-	}
-	Log::message_ex("\n");
-}
-
 static int filter(const struct dirent* el){
 	return fnmatch("*" SO_SUFFIX , el->d_name, 0) == 0;
 }

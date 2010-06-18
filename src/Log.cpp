@@ -46,26 +46,58 @@ int syslog_severity[5] = {
 };
 #endif /* HAVE_SYSLOG */
 
-Log::Severity Log::_level = Info;
-FILE* Log::_file = NULL;
+Log::vector Log::_dst;
 
-void Log::initialize(const char* filename){
-	if ( fopen_s(&_file, filename, "a") != 0 ){
+FileDestination::FileDestination(const char* filename)
+	: _fp(NULL)
+	, _autoclose(true) {
+
+	if ( fopen_s(&_fp, filename, "a") != 0 ){
 		fprintf(stderr, "Failed to open logfile '%s' ! Fatal error!\n", filename);
 		exit(1);
 	}
+}
+FileDestination::FileDestination(FILE* fp)
+	: _fp(fp)
+	, _autoclose(false) {
+
+}
+FileDestination::~FileDestination(){
+	if ( _autoclose ){
+		fclose(_fp);
+	}
+}
+void FileDestination::write(const char* content, const char* decorated) const {
+	fputs(decorated, _fp);
+	fflush(_fp);
+}
 
 #ifdef HAVE_SYSLOG
+SyslogDestination::SyslogDestination(){
+	/* @todo only a single instance of syslog may be opened */
 	openlog(PACKAGE, 0, LOG_DAEMON);
+}
+SyslogDestination::~SyslogDestination(){
+	closelog();
+}
+void SyslogDestination::write(const char* content, const char* decorated) const {
+	syslog(syslog_severity[severity], content);
+}
 #endif /* HAVE_SYSLOG */
+
+void Log::initialize(){
+
 }
 
 void Log::cleanup(){
-	fclose(_file);
-#ifdef HAVE_SYSLOG
-	closelog();
-#endif /* HAVE_SYSLOG */
+	for ( iterator it = _dst.begin(); it != _dst.end(); ++it ){
+		delete *it;
+	}
+	_dst.clear();
+}
 
+void Log::add_destination(Destination* dst){
+	_dst.push_back(dst);
 }
 
 void Log::message(Severity severity, const char* fmt, ...){
@@ -79,64 +111,12 @@ void Log::vmessage(Severity severity, const char* fmt, va_list ap){
 	static char buf[255]; /* this isn't thread-safe anyway, might as well make it static */
 
 	std::auto_ptr<char> content( vasprintf2(fmt, ap) );
-	std::auto_ptr<char> line( asprintf2("(%s) [%s] %s", severity_string(severity), timestring(buf, 255), content.get()) );
+	std::auto_ptr<char> decorated( asprintf2("(%s) [%s] %s", severity_string(severity), timestring(buf, 255), content.get()) );
 
-	if ( severity >= _level ){
-		fputs(line.get(), stdout);
-		fflush(stdout);
+	for ( iterator it = _dst.begin(); it != _dst.end(); ++it ){
+		Destination* dst = *it;
+		dst->write(content.get(), decorated.get());
 	}
-
-#ifdef HAVE_SYSLOG
-	vsyslog(syslog_severity[severity], fmt, ap);
-#endif /* HAVE_SYSLOG */
-
-	fputs(line.get(), _file);
-	fflush(_file);
-}
-
-static Log::Severity last_severity;
-
-void Log::message_begin(Severity severity){
-	last_severity = severity;
-
-	char buf[255];
-	timestring(buf, 255);
-
-	if ( severity >= _level ){
-		fprintf(stdout, "(%s) [%s] ", severity_string(severity), buf);
-		fflush(stdout);
-	}
-
-	fprintf(_file, "(%s) [%s] ", severity_string(severity), buf);
-	fflush(_file);
-}
-
-void Log::message_ex(const char* str){
-	if ( last_severity >= _level ){
-		fprintf(stdout, "%s", str);
-		fflush(stdout);
-	}
-
-	fprintf(_file, "%s", str);
-	fflush(_file);
-}
-
-void Log::message_ex_fmt(const char* fmt, ...){
-	va_list arg;
-	va_start(arg, fmt);
-
-	char* line;
-	verify( vasprintf(&line, fmt, arg) >= 0 );
-
-	if ( last_severity >= _level ){
-		fprintf(stdout, "%s", line);
-		fflush(stdout);
-	}
-
-	fprintf(_file, "%s", line);
-	fflush(_file);
-
-	free(line);
 }
 
 char* Log::timestring(char *buffer, int bufferlen) {
@@ -164,13 +144,4 @@ const char* Log::severity_string(Severity severity){
 		case Fatal: return "!!";
 	}
 	return NULL;
-}
-
-void Log::flush(){
-	fflush(stdout);
-	fflush(_file);
-}
-
-int Log::file_no(){
-	return fileno(_file);
 }

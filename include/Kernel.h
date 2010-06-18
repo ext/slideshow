@@ -79,7 +79,6 @@ class Kernel {
 
 		void print_config() const;
 		void print_licence_statement() const;
-		void print_cli_arguments(int argc, const char* argv[]) const;
 
 	private:
 
