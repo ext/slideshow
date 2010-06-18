@@ -28,6 +28,10 @@
 #include <memory> /* for auto_ptr */
 #include <errno.h>
 #include <time.h>
+#include <sys/types.h>
+#include <sys/un.h>
+#include <sys/stat.h>
+#include <sys/socket.h>
 #include <portable/asprintf.h>
 #include <portable/file.h>
 
@@ -72,6 +76,42 @@ void FileDestination::write(const char* content, const char* decorated) const {
 	fflush(_fp);
 }
 
+FIFODestination::FIFODestination(const char* filename)
+	: _filename(NULL)
+	, _fp(NULL) {
+
+	_filename = strdup(filename);
+	mkfifo(filename, 0600);
+
+	if ( fopen_s(&_fp, filename, "w") != 0 ){
+		fprintf(stderr, "Failed to open logfile '%s' ! Fatal error!\n", filename);
+		exit(1);
+	}
+}
+
+FIFODestination::~FIFODestination(){
+	fclose(_fp);
+	unlink(_filename);
+	free(_filename);
+}
+void FIFODestination::write(const char* content, const char* decorated) const {
+	fputs(decorated, _fp);
+	fflush(_fp);
+}
+
+SocketDestination::SocketDestination(int socket)
+	: _socket(socket) {
+
+}
+
+SocketDestination::~SocketDestination(){
+	close(_socket);
+}
+
+void SocketDestination::write(const char* content, const char* decorated) const {
+	send(_socket, decorated, strlen(decorated), 0);
+}
+
 #ifdef HAVE_SYSLOG
 SyslogDestination::SyslogDestination(){
 	/* @todo only a single instance of syslog may be opened */
@@ -84,6 +124,46 @@ void SyslogDestination::write(const char* content, const char* decorated) const 
 	syslog(syslog_severity[severity], content);
 }
 #endif /* HAVE_SYSLOG */
+
+UDSServer::UDSServer(const char* filename)
+	: _filename(NULL)
+	, _socket(-1) {
+
+	_filename = strdup(filename);
+
+	struct sockaddr_un address;
+	socklen_t address_length;
+
+	_socket = socket(PF_UNIX, SOCK_STREAM, 0);
+
+	unlink(filename);
+	address.sun_family = AF_UNIX;
+	address_length = (socklen_t)sizeof(address.sun_family) +
+		(socklen_t)sprintf(address.sun_path, "%s", filename);
+
+	bind(_socket, (struct sockaddr *) &address, address_length);
+	listen(_socket, 5);
+}
+
+UDSServer::~UDSServer(){
+	unlink(_filename);
+	free(_filename);
+}
+
+bool UDSServer::accept(struct timeval *timeout) const {
+	fd_set rfds;
+	FD_ZERO(&rfds);
+	FD_SET(_socket, &rfds);
+
+	if ( select(_socket+1, &rfds, NULL, NULL, timeout) <= 0 ){
+		return false;
+	}
+
+	int client = ::accept(_socket, NULL, NULL);
+	Log::add_destination(new SocketDestination(client));
+
+	return true;
+}
 
 void Log::initialize(){
 

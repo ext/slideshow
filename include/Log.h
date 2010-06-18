@@ -24,6 +24,8 @@
 
 class Destination {
 	public:
+		virtual ~Destination(){}
+
 		/**
 		 * Write to destination
 		 * @param content Original content.
@@ -50,6 +52,47 @@ class FileDestination: public Destination {
 	private:
 		FILE* _fp;
 		bool _autoclose;
+};
+
+class FIFODestination: public Destination {
+	public:
+		/**
+		 * Named pipe
+		 */
+		FIFODestination(const char* filename);
+
+		virtual ~FIFODestination();
+		virtual void write(const char* content, const char* decorated) const;
+
+	private:
+		char* _filename;
+		FILE* _fp;
+};
+
+class SocketDestination: public Destination {
+	public:
+		SocketDestination(int socket);
+		virtual ~SocketDestination();
+
+		virtual void write(const char* content, const char* decorated) const;
+
+	private:
+		int _socket;
+};
+
+/**
+ * Unix Doman Sockets Server
+ */
+class UDSServer {
+	public:
+		UDSServer(const char* filename);
+		~UDSServer();
+
+		bool accept(struct timeval *timeout) const;
+
+	private:
+		char* _filename;
+		int _socket;
 };
 
 #ifdef HAVE_SYSLOG

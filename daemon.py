@@ -2,16 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import multiprocessing, subprocess, sys, threading, traceback
-import time
+import time, os.path, socket
+from select import select
 from settings import Settings
 
 _states = {
 	1<<0: 'STOPPED',
-	1<<1: 'FINISHED',
-	1<<2: 'STOPPING',
-	1<<3: 'STARTING',
-	1<<4: 'RUNNING',
-	1<<5: 'CRASHED'
+	1<<1: 'STOPPING',
+	1<<2: 'STARTING',
+	1<<3: 'RUNNING',
+	1<<4: 'CRASHED'
 }
 
 # the reverse of k,v is deliberate
@@ -24,12 +24,26 @@ def statename(state):
 class StateError(Exception):
 	pass
 
+class _Log:
+	def __init__(self, size=5):
+		self.size = size
+		self.lines = []
+	
+	def push(self, line):
+		self.lines.append(line)
+		if len(self.lines) > self.size:
+			self.lines.pop(0)
+	
+	def __iter__(self):
+		return self.lines.__iter__()
+
 class _Daemon(threading.Thread):
 	def __init__(self):
 		threading.Thread.__init__(self)
 		self._pid = None
 		self._ipc = None
 		self._instance = None
+		self.log = _Log(size=50)
 		
 		self._state = STOPPED
 		self._state_lock = threading.Lock()
@@ -38,28 +52,51 @@ class _Daemon(threading.Thread):
 		self._sem = multiprocessing.Semaphore(0) # not using threading.Semaphore since it doesn't support timeouts
 		
 		self._running = False
+	
+	def __del__(self):
+		print '__del__'
+		self._instance = None
 		
 	def stop(self):
 		self._running = False
 	
 	def do_start(self, pid, ipc):
-		if not self._state in [STOPPED, FINISHED, CRASHED]:
+		if not self._state in [STOPPED, CRASHED]:
 			raise StateError, 'Cannot start daemon while in state ' + statename(self._state)
 	
 		self._state = STARTING
 		settings = Settings('settings.xml', 'settings.json')
 		
 		cmd = settings['Files.BinaryPath']
-		args = []
+		args = [
+			'--uds-log', 'slideshow.sock'
+		]
 		env = dict(
 			TERM='xterm'
 		)
 		print cmd
-		self._instance = subprocess.Popen(
+		instance = subprocess.Popen(
 			[cmd] + args,
 			stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
 			cwd=settings['Path.BasePath'], env=None
 		)
+		
+		self._logobj = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+		
+		n = 0
+		while True:
+			n += 1
+			
+			if n == 20:
+				raise RuntimeError, "Failed to connect log"
+			
+			try:
+				self._logobj.connect(os.path.join(settings['Path.BasePath'], 'slideshow.sock'))
+				break
+			except:
+				time.sleep(0.1)
+		
+		self._instance = instance
 		
 		self._state = RUNNING
 	
@@ -76,13 +113,20 @@ class _Daemon(threading.Thread):
 		self._running = True
 		while self._running:
 			if self._instance:
-				if self._instance.poll():
-					self._state = CRASHED
+				self._instance.poll()
 				
-				for line in self._instance.stdout:
-					print 'stdout:', line, 
-				for line in self._instance.stderr:
-					print 'stderr:', line, 
+				(rd, _, _) = select([self._logobj], [], [], 0)
+				if len(rd) > 0:
+					for line in self._logobj.recv(4096).split("\n"):
+						self.log.push(line)
+				
+				if self._instance.returncode != None:
+					if self._instance.returncode == 0:
+						self._state = STOPPED
+					else:
+						self._state = CRASHED
+					
+					self._instance = None
 			
 			# check if any commands has been issued
 			if not self._sem.acquire(timeout=1.0):
@@ -135,3 +179,6 @@ def start(pid, ipc):
 
 def state():
 	return _daemon.state()
+
+def log():
+	return _daemon.log

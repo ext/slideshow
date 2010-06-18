@@ -88,7 +88,6 @@ Kernel::Kernel(const argument_set_t& arg, PlatformBackend* backend)
 }
 
 Kernel::~Kernel(){
-
 }
 
 void Kernel::init(){
@@ -294,6 +293,8 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 	option_add_string(&options,	"transition",		't', "Set slide transition plugin [fade]", &arg.transition_string);
 	option_add_int(&options,	"collection-id",	'c', "ID of the collection to display", &arg.collection_id);
 	option_add_format(&options,	"resolution",		'r', "Resolution", "WIDTHxHEIGHT", "%dx%d", &arg.width, &arg.height);
+	option_add_string(&options,	"fifo-log",			 0,  "Log to a named pipe", &arg.fifo);
+	option_add_string(&options,	"uds-log",			 0,  "Log to a unix domain socket", &arg.domain);
 
 	int n = option_parse(&options);
 	option_finalize(&options);

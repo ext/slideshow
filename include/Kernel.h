@@ -24,6 +24,7 @@ class Browser;
 class IPC;
 class State;
 class PlatformBackend;
+class UDSServer;
 
 class Kernel {
 	public:
@@ -39,6 +40,8 @@ class Kernel {
 			float switch_time;
 			char* connection_string;
 			char* transition_string;
+			char* fifo;   /* log: named pipe */
+			char* domain; /* log: unix domain socket */
 		} argument_set_t;
 
 		enum Mode {

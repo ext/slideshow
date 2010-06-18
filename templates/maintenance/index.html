@@ -34,7 +34,11 @@
 	<h2>Log</h2>
 	
 	<div id="log">
-	
+		<p>
+			<py:for each="line in log">
+				${line}<br/>
+			</py:for>
+		</p>
 	</div>
 	
 	<h2>Activity</h2>

@@ -58,7 +58,9 @@ int main( int argc, const char* argv[] ){
 			3.0f,					// transition_time;
 			5.0f,					// switch_time;
 			NULL,					// connection_string
-			NULL					// transition_string
+			NULL,					// transition_string
+			NULL,					// pipe log
+			NULL					// unix domain socket log
 		};
 
 		// Parse the cli arguments, overriding the defaults
@@ -71,8 +73,25 @@ int main( int argc, const char* argv[] ){
 		PlatformBackend::register_all();
 
 		Log::initialize();
-		Log::add_destination(new FileDestination(stdout));
+
+		/* only log to stdout if no other destination has been set */
+		if ( !(arguments.fifo || arguments.domain) ){
+			Log::add_destination(new FileDestination(stdout));
+		}
+
 		Log::add_destination(new FileDestination("slideshow.log"));
+
+		/* setup named pipe log */
+		if ( arguments.fifo ){
+			Log::add_destination(new FIFODestination(arguments.fifo));
+		}
+
+		/* setup unix domain socket log */
+		if ( arg.domain ){
+			UDSServer d(arg.domain);
+			d.accept(NULL);
+		}
+
 #ifdef HAVE_SYSLOG
 		Log::add_destination(new SyslogDestination());
 #endif /* HAVE_SYSLOG */
@@ -114,6 +133,7 @@ int main( int argc, const char* argv[] ){
 		Log::cleanup();
 
 	} catch ( ExitException &e ){
+		printf("exit exception\n");
 		return e.code();
 
 	} catch ( exception &e ){
