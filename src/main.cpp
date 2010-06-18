@@ -87,8 +87,8 @@ int main( int argc, const char* argv[] ){
 		}
 
 		/* setup unix domain socket log */
-		if ( arg.domain ){
-			UDSServer d(arg.domain);
+		if ( arguments.domain ){
+			UDSServer d(arguments.domain);
 			d.accept(NULL);
 		}
 

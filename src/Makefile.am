@@ -43,7 +43,7 @@ slideshow_SOURCES = \
 	backend/factory.cpp \
 	backend/SDLbackend.cpp \
 	argument_parser.c \
-	browser_context.cpp \
+	browser_context.rl \
 	Browser.cpp ${top_srcdir}/include/Browser.h \
 	DaemonApp.cpp ${top_srcdir}/include/DaemonApp.h \
 	exception.cpp ${top_srcdir}/include/exception.h \
@@ -82,3 +82,8 @@ xquery_la_SOURCES = xquery.c
 xquery_la_CFLAGS = -Wall -Wstrict-prototypes -I/usr/include/python2.6
 xquery_la_LDFLAGS = -module -export-dynamic ${LDFLAGS}
 xquery_la_LIBADD = ${X11_LIBS} ${xrandr_LIBS}
+
+SUFFIXES = .rl
+
+.rl.cpp:
+	$(AM_V_GEN)$(RAGEL) $(RAGELFLAGS) -C $< -o $@
