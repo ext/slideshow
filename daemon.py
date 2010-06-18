@@ -72,13 +72,15 @@ class _Daemon(threading.Thread):
 			'--uds-log', 'slideshow.sock'
 		]
 		env = dict(
-			TERM='xterm'
+			#TERM='xterm'
+			DISPLAY=settings['Apparence.Display']
 		)
-		print cmd
+		env.update(settings['Env'])
+		print cmd, args, env
 		instance = subprocess.Popen(
 			[cmd] + args,
 			stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-			cwd=settings['Path.BasePath'], env=None
+			cwd=settings['Path.BasePath'], env=env
 		)
 		
 		self._logobj = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
