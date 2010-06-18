@@ -76,6 +76,11 @@ slideshow_SOURCES += browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
 slideshow_LDADD += ${MYSQL_LIBS}
 endif
 
+if WITH_SQLITE3
+slideshow_SOURCES += browsers/sqlite.cpp
+slideshow_LDADD += ${sqlite3_LIBS}
+endif
+
 libmodule_loader_a_SOURCES = module_loader.c ${top_srcdir}/include/module_loader.h
 
 xquery_la_SOURCES = xquery.c

@@ -196,6 +196,24 @@ AM_CONDITIONAL([WITH_MYSQL], [test "x$with_mysql" != xno])
 AC_SUBST(MYSQL_LIBS)
 
 dnl #######################################################################
+dnl # SQLite3
+dnl #######################################################################
+
+AC_ARG_WITH([sqlite3],
+	[AS_HELP_STRING([--with-sqlite3], [support for SQLite3])],
+	[],
+	[with_sqlite3=no])
+
+AS_IF([test "x$with_sqlite3" != xno],
+	[
+		PKG_CHECK_MODULES(sqlite3, [sqlite3])
+	],
+	[])
+
+AM_CONDITIONAL([WITH_SQLITE3], [test "x$with_sqlite3" != xno])
+AC_SUBST(sqlite3_LIBS)
+
+dnl #######################################################################
 dnl # SDL
 dnl #######################################################################
 AC_ARG_WITH([sdl],

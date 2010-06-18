@@ -70,7 +70,8 @@ class _Daemon(threading.Thread):
 		cmd = settings['Files.BinaryPath']
 		args = [
 			'--uds-log', 'slideshow.sock', 
-			'--browser', 'sqlite://%s' % (os.path.abspath('site.db'))
+			'--browser', 'sqlite://%s' % (os.path.abspath('site.db')),
+			'--collection-id', str(1)
 		]
 		env = dict(
 			#TERM='xterm'
