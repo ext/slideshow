@@ -60,7 +60,7 @@ void Log::initialize(const char* filename){
 #endif /* HAVE_SYSLOG */
 }
 
-void Log::deinitialize(){
+void Log::cleanup(){
 	fclose(_file);
 #ifdef HAVE_SYSLOG
 	closelog();

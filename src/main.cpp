@@ -85,7 +85,7 @@ int main( int argc, const char* argv[] ){
 			case Kernel::ForegroundMode:
 				application = new ForegroundApp(arguments, backend);
 				break;
-			case Kernel::DaemonMode: 
+			case Kernel::DaemonMode:
 #ifdef BUILD_DAEMON
 				application = new DaemonApp(arguments, backend); break;
 #else /* BUILD_DAEMON */
@@ -106,7 +106,7 @@ int main( int argc, const char* argv[] ){
 
 		moduleloader_cleanup();
 
-		Log::deinitialize();
+		Log::cleanup();
 
 	} catch ( ExitException &e ){
 		return e.code();
