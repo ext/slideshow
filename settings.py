@@ -53,10 +53,10 @@ class Group:
 class Item:
 	typename = '' # automatically set
 	
-	def __init__(self, group, name, title, description, rel):
+	def __init__(self, group, name, title=None, description='', rel=None):
 		self.group = group
 		self.name = name
-		self.title = title
+		self.title = title or name
 		self.description = description
 		self.rel = rel
 		self._value = self.default
@@ -261,13 +261,16 @@ class Settings:
 			g = Group(name=grpname, description=grpdesc, hidden=hidden)
 			
 			for item in group.getElementsByTagName('item'):
-				name  = item.getAttribute('name')
-				title = item.getAttribute('title')
-				desc  = item.getAttribute('description')
-				type  = item.hasAttribute('type') and item.getAttribute('type') or None
-				rel   = item.hasAttribute('rel') and item.getAttribute('rel') or None # deferred resolving
+				attrs = {}
+				for i in range(0, item.attributes.length):
+					k = item.attributes.item(i).name
+					v = item.getAttribute(k)
+					attrs[k] = v
 				
-				item = itemfactory[type](group=g, name=name, title=title, description=desc, rel=rel)
+				type  = attrs['type']
+				del attrs['type']
+				
+				item = itemfactory[type](group=g, **attrs)
 				g.add(item)
 			
 			self.groups[grpname] = g
