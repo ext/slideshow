@@ -45,7 +45,6 @@ class Handler(object):
 					settings[k] = v
 				except ValueError as e:
 					settings.item(k).message = str(e)
-					#print settings[k].message, hasattr(settings[k], 'message')
 					error = True
 			
 			if not error:
