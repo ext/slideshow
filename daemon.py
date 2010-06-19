@@ -19,6 +19,18 @@ _states = {
 for v,k in _states.items():
 	sys.modules[__name__].__dict__[k] = v
 
+html_escape_table = {
+	"&": "&amp;",
+	'"': "&quot;",
+	"'": "&apos;",
+	">": "&gt;",
+	"<": "&lt;",
+	" ": "&nbsp;",
+}
+
+def html_escape(text):
+	return "".join(html_escape_table.get(c,c) for c in text)
+
 def statename(state):
 	return _states[state]
 
@@ -31,7 +43,7 @@ class _Log:
 		self.lines = []
 	
 	def push(self, line):
-		self.lines.append(line)
+		self.lines.append(html_escape(line))
 		if len(self.lines) > self.size:
 			self.lines.pop(0)
 	

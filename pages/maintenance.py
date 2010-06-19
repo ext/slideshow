@@ -8,8 +8,8 @@ import daemon
 
 class Ajax(object):
 	@cherrypy.expose
-	def test(self):
-		return '<br/>\n'.join(daemon.log())
+	def log(self):
+		return '<p>' + '<br/>\n'.join(daemon.log()) + '</p>'
 
 class Handler(object):
 	ajax = Ajax()

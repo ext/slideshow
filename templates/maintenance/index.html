@@ -5,6 +5,16 @@
 	<xi:include href="../index.html" />
 
 <head>
+	<script type="text/javascript">
+		function query_log(id){
+			$.get('/maintenance/ajax/log', function(data) {
+				$(id).html(data);
+				//elem = document.getElementById(id);
+				//elem.innerHTML = data;
+			});
+		}
+		window.setInterval("query_log('#log')", 5000);
+	</script>
 </head>
 <?python import daemon ?>
 
@@ -42,7 +52,7 @@
 
 	<h2>Debug</h2>
 	
-	<div id="log">
+	<div id="debug">
 	  <p>CWD: <br/>CMD: </p>
 	</div>
 	
@@ -55,7 +65,7 @@
 	<div id="log">
 		<p>
 			<py:for each="line in log">
-				${line}<br/>
+				${Markup(line)}<br/>
 			</py:for>
 		</p>
 	</div>
