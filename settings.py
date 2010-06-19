@@ -200,8 +200,15 @@ class ItemResolution(Item):
 	values = []
 	
 	def __str__(self):
+		def f(x):
+			if self._value == x:
+				return '<option value="{key}" selected="selected">{value}</option>'
+			else:
+				return '<option value="{key}">{value}</option>'
+		
+		options = [f(k).format(key=k, value=v) for k,v in self.values]
 		head = '<select name="{group}.{name}">'.format(**self._values())
-		content = '\n'.join(['<option value="{key}">{value}</option>'.format(key=k, value=v) for k,v in self.values])
+		content = '\n'.join(options)
 		tail = '</select>'
 		
 		return head + content + tail
