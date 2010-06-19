@@ -62,7 +62,13 @@ class Item:
 		self._value = self.default
 	
 	def _values(self):
-		return dict(group=self.group.name, name=self.name, type=self.typename, value=unicode(self._value))
+		return dict(
+			group=self.group.name,
+			name=self.name,
+			title=self.title, 
+			type=self.typename,
+			value=unicode(self._value)
+		)
 	
 	def __str__(self):
 		return '<input type="text" name="{group}.{name}" type="{type}" value="{value}"/>'.format(**self._values())
