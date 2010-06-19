@@ -130,7 +130,6 @@ class _Daemon(threading.Thread):
 				
 				if self._instance.returncode != None:
 					# poll std{out,err}
-					print 'poll stdout'
 					for line in self._instance.stdout:
 						print line
 						self.log.push('stdout: ' + line)
