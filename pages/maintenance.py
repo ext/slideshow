@@ -53,6 +53,11 @@ class Handler(object):
 		
 		return template.render(settings=settings)
 	
+	@cherrypy.expose(alias='start')
+	def forcestart(self):
+		daemon.start('', '')
+		raise cherrypy.HTTPRedirect('/maintenance')
+	
 	@cherrypy.expose
 	def start(self):
 		daemon.start('', '')

@@ -85,7 +85,7 @@ class _Daemon(threading.Thread):
 		print cmd, args, env
 		instance = subprocess.Popen(
 			[cmd] + args,
-			stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+			stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
 			cwd=settings['Path.BasePath'], env=env
 		)
 		
@@ -129,6 +129,12 @@ class _Daemon(threading.Thread):
 						self.log.push(line)
 				
 				if self._instance.returncode != None:
+					# poll std{out,err}
+					print 'poll stdout'
+					for line in self._instance.stdout:
+						print line
+						self.log.push('stdout: ' + line)
+					
 					if self._instance.returncode == 0:
 						self._state = STOPPED
 					else:
