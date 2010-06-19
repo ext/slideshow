@@ -189,13 +189,15 @@ def _calc_aspect(w,h):
 			return '%d:%d' % (x,y)
 	return ''
 
-_resolutions = [(w,h,r,_calc_aspect(w,h)) for (w,h,r) in xquery.resolutions(':0.1')]
-_resolution_keys = ['{width}x{height}'.format(width=w, height=h, refresh=r) for (w,h,r,a) in _resolutions]
-_resolution_names = ['{width}x{height} ({aspect})'.format(width=w, height=h, aspect=a) for (w,h,r,a) in _resolutions]
+def resolutions(dpy):
+	all = [(w,h,r,_calc_aspect(w,h)) for (w,h,r) in xquery.resolutions(dpy)]
+	k = ['{width}x{height}'.format(width=w, height=h, refresh=r) for (w,h,r,a) in all]
+	v = ['{width}x{height} ({aspect})'.format(width=w, height=h, aspect=a) for (w,h,r,a) in all]
+	return zip(k, v)
 
 class ItemResolution(Item):
 	default = None
-	values = zip(_resolution_keys, _resolution_names)
+	values = []
 	
 	def __str__(self):
 		head = '<select name="{group}.{name}">'.format(**self._values())
@@ -300,7 +302,9 @@ class Settings:
 				
 				if n == 0:
 					break
-			
+		
+		ItemResolution.values = resolutions(self['Apparence.Display'])
+		
 	def __iter__(self):
 		return self.groups.values().__iter__()
 	
