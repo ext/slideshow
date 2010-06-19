@@ -3,6 +3,7 @@
 
 import multiprocessing, subprocess, sys, threading, traceback
 import time, os.path, socket
+import dbus, dbus.service
 from select import select
 from settings import Settings
 
@@ -71,7 +72,8 @@ class _Daemon(threading.Thread):
 		args = [
 			'--uds-log', 'slideshow.sock', 
 			'--browser', 'sqlite://%s' % (os.path.abspath('site.db')),
-			'--collection-id', str(1)
+			'--collection-id', str(1),
+			'--resolution', settings['Apparence.Resolution']
 		]
 		env = dict(
 			#TERM='xterm'
@@ -121,7 +123,7 @@ class _Daemon(threading.Thread):
 				
 				(rd, _, _) = select([self._logobj], [], [], 0)
 				if len(rd) > 0:
-					for line in self._logobj.recv(4096).split("\n"):
+					for line in self._logobj.recv(4096).split("\n")[:-1]:
 						self.log.push(line)
 				
 				if self._instance.returncode != None:
@@ -149,7 +151,31 @@ class _Daemon(threading.Thread):
 		self._queue.append((func, args, kwargs, sem, ret))
 		self._sem.release()
 
+class _DBus(dbus.service.Object):
+	def __init__(self):
+		dbus.service.Object.__init__(self, dbus.SystemBus(), '/com/slideshow/dbus/ping')
+
+	@dbus.service.signal(dbus_interface='com.slideshow.dbus.Signal', signature='')
+	def Ping(self):
+		pass
+	
+	@dbus.service.signal(dbus_interface='com.slideshow.dbus.Signal', signature='')
+	def Reload(self):
+		pass
+	
+	@dbus.service.signal(dbus_interface='com.slideshow.dbus.Signal', signature='')
+	def Debug_DumpQueue(self):
+		pass
+	
+	@dbus.service.signal(dbus_interface='com.slideshow.dbus.Signal', signature='i')
+	def ChangeQueue(self, id):
+		pass
+
+from dbus.mainloop.glib import DBusGMainLoop
+DBusGMainLoop(set_as_default=True)
+
 _daemon = _Daemon()
+ipc = _DBus()
 
 def subscribe(engine):
 	engine.subscribe('start', _daemon.start)

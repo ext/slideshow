@@ -73,7 +73,7 @@ DBusHandlerResult DBus::signal_filter (DBusConnection* bus, DBusMessage* message
 		{ handle_ping, "Ping" },
 		{ handle_playvideo, "PlayVideo" },
 		{ handle_debug_dumpqueue, "Debug_DumpQueue" },
-		{ handle_change_bin, "ChangeBin" },
+		{ handle_change_bin, "ChangeQueue" },
 		{ NULL, NULL }
 	};
 

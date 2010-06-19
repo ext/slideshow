@@ -227,7 +227,7 @@ void Graphics::load_image(const char* name){
 	if ( name ){
 		std::auto_ptr<char> real_name(strdup(name));
 		if ( is_slide(name) ){
-			real_name.reset(asprintf2("%s/samples/%dx%d.png", name, _width, _height));
+			real_name.reset(asprintf2("%s/raster/%dx%d.png", name, _width, _height));
 		}
 
 #ifdef UNICODE

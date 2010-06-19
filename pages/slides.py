@@ -3,6 +3,7 @@
 
 import cherrypy
 from lib import queue, slide, template
+import daemon
 
 class Handler(object):
 	@cherrypy.expose
@@ -41,6 +42,7 @@ class Handler(object):
 	def submit(self, assembler, **kwargs):
 		try:
 			s = slide.create(cherrypy.thread_data.db.cursor(), assembler, kwargs)
+			daemon.ipc.Reload()
 			cherrypy.thread_data.db.commit()
 		except:
 			cherrypy.thread_data.db.rollback()

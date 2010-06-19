@@ -6,7 +6,14 @@ from lib import queue, slide, template
 from settings import Settings
 import daemon
 
+class Ajax(object):
+	@cherrypy.expose
+	def test(self):
+		return '<br/>\n'.join(daemon.log())
+
 class Handler(object):
+	ajax = Ajax()
+	
 	@cherrypy.expose
 	@template.output('maintenance/index.html', parent='maintenance')
 	def index(self):
@@ -50,4 +57,14 @@ class Handler(object):
 	@cherrypy.expose
 	def start(self):
 		daemon.start('', '')
+		raise cherrypy.HTTPRedirect('/maintenance')
+	
+	@cherrypy.expose
+	def ping(self):
+		daemon.ipc.Ping()
+		raise cherrypy.HTTPRedirect('/maintenance')
+	
+	@cherrypy.expose
+	def dumpqueue(self):
+		daemon.ipc.Debug_DumpQueue()
 		raise cherrypy.HTTPRedirect('/maintenance')
