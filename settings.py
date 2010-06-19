@@ -199,6 +199,14 @@ class ItemResolution(Item):
 	default = None
 	values = []
 	
+	def __init__(self, allow_empty=False, **kwargs):
+		Item.__init__(self, **kwargs)
+		
+		self._extra = []
+		
+		if allow_empty:
+			self._extra.append(('',''))
+		
 	def __str__(self):
 		def f(x):
 			if self._value == x:
@@ -206,7 +214,7 @@ class ItemResolution(Item):
 			else:
 				return '<option value="{key}">{value}</option>'
 		
-		options = [f(k).format(key=k, value=v) for k,v in self.values]
+		options = [f(k).format(key=k, value=v) for k,v in self._extra + self.values]
 		head = '<select name="{group}.{name}">'.format(**self._values())
 		content = '\n'.join(options)
 		tail = '</select>'
@@ -248,7 +256,7 @@ class Settings:
 		for group in doc.getElementsByTagName('group'):
 			grpname = group.getAttribute('name')
 			hidden  = group.hasAttribute('hidden') and group.getAttribute('hidden') == '1'
-			grpdesc = group.getElementsByTagName('description')[0].childNodes[0].data
+			grpdesc = ''.join([x.toxml() for x in group.getElementsByTagName('description')[0].childNodes])
 			
 			g = Group(name=grpname, description=grpdesc, hidden=hidden)
 			
@@ -259,7 +267,7 @@ class Settings:
 				type  = item.hasAttribute('type') and item.getAttribute('type') or None
 				rel   = item.hasAttribute('rel') and item.getAttribute('rel') or None # deferred resolving
 				
-				item = itemfactory[type](g, name, title, desc, rel)
+				item = itemfactory[type](group=g, name=name, title=title, description=desc, rel=rel)
 				g.add(item)
 			
 			self.groups[grpname] = g

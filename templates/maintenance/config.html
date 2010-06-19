@@ -20,7 +20,7 @@
 			<py:for each="group in settings">
 				<fieldset title="${group.name}">
 					<legend>${group.name}</legend>
-					<p>${group.description}</p>
+					<p>${Markup(group.description)}</p>
 					
 					<py:for each="item in group">
 						<label for="${item.name}">
@@ -38,7 +38,11 @@
 			</py:for>
 			<fieldset title="Environmental variables">
 				<legend>Environmental variables</legend>
-				<p>Place each variable in the form key=value with each variable on a separate line. Note that SLIDESHOW_ will be prepended to each variable to prevent abuse.</p>
+				<p>
+					Place each variable in the form key=value with each variable
+					on a separate line. Note that SLIDESHOW_ will be prepended
+					to each variable to prevent abuse.
+				</p>
 				<textarea name="Env"><py:for each="k,v in settings['Env'].items()">${k}=${v}${Markup("\n")}</py:for></textarea>
 			</fieldset>
 			<input type="submit" value="Save" />

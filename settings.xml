@@ -22,12 +22,25 @@
 	</group>
 	
 	<group name="Apparence">
-		<description>If the display forces another resolution or aspect ratio than X uses (e.g some widescreen projectors) set the virtual resolution the resolution used by the display and the regular resolution to the resolution used by X. However, be careful using virtual resolution as the slides will be stretched. It is suggested to use a resolution which matches either dimension and is an as close match as possible.</description>
+		<description>
+			The resolution is best left unset, which means to use the currently
+			used by X, which is preferably set to match the native resolution of
+			the display. In general, what is important is the aspect ratio but
+			using the native resolution for X and slideshow ensures that pixels
+			aren't scaled in any way.<br/>
+			<br/>
+			If the display forces another resolution or aspect ratio than X uses
+			(e.g some widescreen projectors) set the virtual resolution to the
+			resolution used by the display and the regular resolution to the
+			resolution used by X. However, be careful using virtual resolution
+			as the slides will be stretched. It is suggested to use a resolution
+			which matches either dimension and is an as close match as possible.
+		</description>
 		
 		<item name="Background" type="file" description="Background image used when creating text slides"></item>
 		<item name="Font" type="file" description="Font used when creating text slides"></item>
-		<item name="Resolution" type="resolution" description="Resolution of the daemon">800x600</item>
-		<item name="VirtualResolution" title="Virtual resolution" type="resolution"></item>
+		<item name="Resolution" type="resolution" description="Display resolution">800x600</item>
+		<item name="VirtualResolution" title="Virtual resolution" type="resolution" description="Window resolution"></item>
 		<item name="TransitionTime" title="Transition time" type="float" description="Time in sec it takes to change slide">3.0</item>
 		<item name="SwitchTime" title="Switch time" type="float" description="Time in sec each slide will be shown">10.0</item>
 		<item name="Display" title="Display" type="display" description="X display to use">:0.0</item>
