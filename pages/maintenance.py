@@ -17,7 +17,7 @@ class Handler(object):
 	@cherrypy.expose
 	@template.output('maintenance/index.html', parent='maintenance')
 	def index(self):
-		return template.render(log=daemon.log())
+		return template.render(log=daemon.log(), state=daemon.state())
 
 	@cherrypy.expose
 	@template.output('maintenance/config.html', parent='maintenance')
@@ -56,6 +56,11 @@ class Handler(object):
 	@cherrypy.expose
 	def start(self):
 		daemon.start('', '')
+		raise cherrypy.HTTPRedirect('/maintenance')
+	
+	@cherrypy.expose
+	def stop(self):
+		daemon.stop()
 		raise cherrypy.HTTPRedirect('/maintenance')
 	
 	@cherrypy.expose

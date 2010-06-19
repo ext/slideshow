@@ -6,16 +6,35 @@
 
 <head>
 </head>
+<?python import daemon ?>
 
 <body>
 	<div id="breadcrumb">
 		<h2><a href="/">Slideshow</a> &gt; Maintenance</h2>
 	</div>
 	
+	<py:if test="state == daemon.CRASHED">
+		<p>The slideshow daemon crashed. Please follow these steps: </p>
+		<ol>
+			<li>Download the <a href="/maintenance/coredump">coredump</a>.</li>
+			<li>
+				File a ticket at <a href="http://sidvind.com:8000/slideshow">http://sidvind.com:8000/slideshow</a>.
+				<ul>
+					<li>Include the latest entries from the log with debug entries.</li>
+					<li>Attach the coredump.</li>
+					<li>(You can skip most of the fields in ticket properties)</li>
+				</ul>
+			</li>
+			<li>Go bug <a href="mailto:ext@sidvind.com">ext</a> about it.</li>
+			<li><a href="/maintenance/forcestart">Force restart</a>.</li>
+		</ol>
+	</py:if>
+	
 	<h2>Menu</h2>
 	
 	<ul>
-		<li><a href="/maintenance/start">Start daemon</a></li>
+		<li py:if="state == daemon.STOPPED"><a href="/maintenance/start">Start daemon</a></li>
+		<li py:if="state == daemon.RUNNING"><a href="/maintenance/stop">Stop daemon</a></li>
 		<li><a href="/maintenance/ping">Ping daemon</a></li>
 		<li><a href="/maintenance/debug/kill_mplayer">Kill mplayer</a></li>
 		<li><a href="/maintenance/config">Configuration</a></li>

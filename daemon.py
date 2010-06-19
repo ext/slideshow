@@ -55,8 +55,10 @@ class _Daemon(threading.Thread):
 		self._running = False
 	
 	def __del__(self):
-		print '__del__'
-		self._instance = None
+		ipc.Quit()
+		while self._instance:
+			print 'waiting for instance to terminate'
+			time.sleep(1)
 		
 	def stop(self):
 		self._running = False
@@ -156,6 +158,10 @@ class _DBus(dbus.service.Object):
 		dbus.service.Object.__init__(self, dbus.SystemBus(), '/com/slideshow/dbus/ping')
 
 	@dbus.service.signal(dbus_interface='com.slideshow.dbus.Signal', signature='')
+	def Quit(self):
+		pass
+	
+	@dbus.service.signal(dbus_interface='com.slideshow.dbus.Signal', signature='')
 	def Ping(self):
 		pass
 	
@@ -201,11 +207,16 @@ def _call(func, *args, **kwargs):
 		exc_info = ret.get().exc_info
 		raise exc_info[0], exc_info[1], exc_info[2]
 	
-	print 'return', ret.get()
 	return ret.get()
 
 def start(pid, ipc):
 	return _call(_Daemon.do_start, pid, ipc)
+
+def stop():
+	ipc.Quit()
+	while _daemon._instance:
+			print 'waiting for instance to terminate'
+			time.sleep(1)
 
 def state():
 	return _daemon.state()
