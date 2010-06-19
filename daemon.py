@@ -54,13 +54,11 @@ class _Daemon(threading.Thread):
 		
 		self._running = False
 	
-	def __del__(self):
+	def stop(self):
 		ipc.Quit()
 		while self._instance:
 			print 'waiting for instance to terminate'
 			time.sleep(1)
-		
-	def stop(self):
 		self._running = False
 	
 	def do_start(self, pid, ipc):
