@@ -3,9 +3,10 @@
 	xmlns:xi="http://www.w3.org/2001/XInclude" 
 	lang="en"> 
 	<xi:include href="../index.html" />
+<?python import daemon ?>
 
 <head>
-	<script type="text/javascript">
+	<script type="text/javascript" py:if="state == daemon.RUNNING">
 		function query_log(id){
 			$.get('/maintenance/ajax/log', function(data) {
 				$(id).html(data);
@@ -16,7 +17,6 @@
 		window.setInterval("query_log('#log')", 5000);
 	</script>
 </head>
-<?python import daemon ?>
 
 <body>
 	<div id="breadcrumb">
