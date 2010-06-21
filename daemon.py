@@ -97,33 +97,40 @@ class _Daemon(threading.Thread):
 		if not self._state in [STOPPED, CRASHED]:
 			raise StateError, 'Cannot start daemon while in state ' + statename(self._state)
 	
-		self._state = STARTING
-		cmd, args, env, cwd = settings()
-		
-		instance = subprocess.Popen(
-			[cmd] + args,
-			stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-			cwd=cwd, env=env
-		)
-		
-		self._logobj = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-		
-		n = 0
-		while True:
-			n += 1
+		try:
+			self._state = STARTING
+			cmd, args, env, cwd = settings()
 			
-			if n == 20:
-				raise RuntimeError, "Failed to connect log"
+			instance = subprocess.Popen(
+				[cmd] + args,
+				stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+				cwd=cwd, env=env
+			)
 			
-			try:
-				self._logobj.connect(os.path.join(cwd, 'slideshow.sock'))
-				break
-			except:
-				time.sleep(0.1)
-		
-		self._instance = instance
-		
-		self._state = RUNNING
+			self._logobj = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+			
+			n = 0
+			while True:
+				n += 1
+				
+				if n == 20:
+					raise RuntimeError, "Failed to connect log"
+				
+				if instance.returncode != None:
+					raise RuntimeError, "Instance crashed before log was connected"
+				
+				try:
+					self._logobj.connect(os.path.join(cwd, 'slideshow.sock'))
+					break
+				except socket.error:
+					time.sleep(0.1)
+			
+			self._instance = instance
+			
+			self._state = RUNNING
+		except:
+			self._state = CRASHED
+			raise
 	
 	def state(self):
 		self._state_lock.acquire()
