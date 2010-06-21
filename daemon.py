@@ -37,6 +37,15 @@ def statename(state):
 class StateError(Exception):
 	pass
 
+class StartError(Exception):
+	def __init__(self, message, stdout):
+		Exception.__init__(self, message)
+		self.stdout = stdout
+		
+	def __str__(self):
+		stdout = ''.join(self.stdout)
+		return self.message + '\n\n' + stdout
+
 def settings():
 	settings = Settings('settings.xml', 'settings.json')
 	
@@ -48,7 +57,8 @@ def settings():
 		'--resolution', settings['Apparence.Resolution']
 	]
 	env = dict(
-		DISPLAY=settings['Apparence.Display']
+		DISPLAY=settings['Apparence.Display'],
+		SLIDESHOW_NO_ABORT=''
 	)
 	for k,v in settings['Env'].items():
 		env['SLIDESHOW_' + k] = v
@@ -123,7 +133,8 @@ class _Daemon(threading.Thread):
 			instance.poll()
 			
 			if instance.returncode != None:
-				raise RuntimeError, "Instance crashed before log was connected"
+				error = StartError('Instance crashed before log was connected', instance.stdout.readlines())
+				raise error
 			
 			try:
 				s.connect(os.path.join(cwd, 'slideshow.sock'))
