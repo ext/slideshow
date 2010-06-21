@@ -3,6 +3,7 @@
 
 import subprocess
 import array, cairo, json
+from xml.dom import minidom
 
 class Assembler:
 	name = '' # automatically set in factory initialization
@@ -55,7 +56,8 @@ class ImageAssembler(Assembler):
 
 class Template:
 	def __init__(self, filename):
-		pass
+		doc = minidom.parse(filename)
+		print doc
 	
 	def rasterize(self, dst, size, params):
 		w,h = size
@@ -99,9 +101,10 @@ class TextAssembler(Assembler):
 	def assemble(self, slide, **kwargs):
 		return kwargs
 	
-	def rasterize(self, slide, size, **kwargs):
+	def rasterize(self, size, slide=None, file=None, **kwargs):
+		dst = slide and slide.raster_path(size) or file
 		template = Template('nitroxy.xml')
-		template.rasterize(dst=slide.raster_path(size), size=size, params=kwargs)
+		template.rasterize(dst=dst, size=size, params=kwargs)
 
 _assemblers = {
 	'text': TextAssembler(),

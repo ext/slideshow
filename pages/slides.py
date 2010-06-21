@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import cherrypy
+import cherrypy, urllib
 from lib import queue, slide, template
 import daemon
 
@@ -35,11 +35,15 @@ class Handler(object):
 	
 	@cherrypy.expose
 	@template.output('slides/upload.html', parent='slides')
-	def upload(self):
-		return template.render()
+	def upload(self, **kwargs):
+		return template.render(preview=kwargs)
 
 	@cherrypy.expose
 	def submit(self, assembler, submit, **kwargs):
+		print 'submit:', submit
+		if submit == 'preview':
+			raise cherrypy.HTTPRedirect('/slides/upload?' + urllib.urlencode(kwargs))
+		
 		try:
 			s = slide.create(cherrypy.thread_data.db.cursor(), assembler, kwargs)
 			daemon.ipc.Reload()
@@ -48,6 +52,22 @@ class Handler(object):
 			cherrypy.thread_data.db.rollback()
 			raise
 		raise cherrypy.HTTPRedirect('/')
+	
+	@cherrypy.expose
+	@cherrypy.tools.response_headers(headers=[('Content-Type', 'image/png')])
+	def preview(self, **kwargs):
+		from lib.assembler import TextAssembler
+		import cStringIO
+		
+		dst = cStringIO.StringIO()
+		asm = TextAssembler()
+		asm.rasterize(file=dst, size=(800,600), **kwargs)
+		
+		content = dst.getvalue()
+		dst.close()
+		
+		return content
+
 	
 	@cherrypy.expose
 	def delete(self, id):

@@ -36,8 +36,11 @@
 			<textarea id="slide-content" name="content" cols="60" rows="15"></textarea><br/>
 			<br/>
 
-			<input type="submit" name="submit" value="Preview" />
-			<input type="submit" name="submit" value="Upload" /><br/>
+			<input type="submit" name="submit" value="preview" />
+			<input type="submit" name="submit" value="upload" /><br/>
+			
+			<?python import urllib ?>
+			<img width="800" height="600" src="/slides/preview?${urllib.urlencode(preview)}" py:if="preview"/>
 		</fieldset>
 	</form>
 
