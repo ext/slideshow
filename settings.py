@@ -353,6 +353,16 @@ class Settings:
 		
 		item.set(value)
 	
+	def resolution(self):
+		r = self['Apparence.Resolution']
+		if r:
+			w,h = r.split('x')
+			w = int(w)
+			h = int(h)
+			return (w,h)
+		else:
+			return xquery.current_resolution(use_rotation=True)
+	
 	def persist(self, dst=None):
 		c = {}
 		for group in self:
