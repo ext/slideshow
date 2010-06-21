@@ -32,6 +32,7 @@
 #include "module_loader.h"
 #include "path.h"
 #include <cstring>
+#include <cstdlib>
 #include <limits.h>
 #include <portable/Time.h>
 #include "backend/platform.h"
@@ -147,26 +148,33 @@ int main( int argc, const char* argv[] ){
 			cwd[0] = '\0';
 		}
 
-		printf(" *** slideshow unhandled exception ***\n");
-		printf("\tcwd:     %s\n", cwd);
-		printf("\tSource:  %s:%d\n", e.file(), e.line());
-		printf("\tMessage: %s\n\n", e.what());
-		printf("Troubleshooting:\n");
-		printf(" - Make sure that all required dll's are installed.\n");
-		printf(" - Make sure that the cwd is correct.\n\n");
-		printf("If the problem persists report the bug at\n"
+		fprintf(stderr, " *** slideshow unhandled exception ***\n");
+		fprintf(stderr, "\tcwd:     %s\n", cwd);
+		fprintf(stderr, "\tSource:  %s:%d\n", e.file(), e.line());
+		fprintf(stderr, "\tMessage: %s\n\n", e.what());
+		fprintf(stderr, "Troubleshooting:\n");
+		fprintf(stderr, " - Make sure that all required dll's are installed.\n");
+		fprintf(stderr, " - Make sure that the cwd is correct.\n\n");
+		fprintf(stderr, "If the problem persists report the bug at\n"
 				"http://sidvind.com:8000/slideshow/newticket\n"
 				"and copy the entire output from the console.\n\n");
-		printf("This is a fatal error, the application will now terminate!\n\n");
+		fprintf(stderr, "This is a fatal error, the application will now terminate!\n\n");
 
+		fflush(stderr);
+
+		if ( getenv("SLIDESHOW_NO_ABORT") ) {
+			return -1;
+		} else {
 #ifdef WIN32
-		__debugbreak();
+			__debugbreak();
 #elif defined(__GNUC__)
-		__builtin_trap();
+			__builtin_trap();
 #else
-		abort();
+			abort();
 #endif
+		}
 
+		/* silence compiler warnings */
 		return -1;
 	}
 
