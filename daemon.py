@@ -91,7 +91,9 @@ class _Daemon(threading.Thread):
 			#TERM='xterm'
 			DISPLAY=settings['Apparence.Display']
 		)
-		env.update(settings['Env'])
+		for k,v in settings['Env'].items():
+			env['SLIDESHOW_' + k] = v
+		
 		print cmd, args, env
 		instance = subprocess.Popen(
 			[cmd] + args,
