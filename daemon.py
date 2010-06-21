@@ -47,7 +47,8 @@ class StartError(Exception):
 		stdout = ''.join(self.stdout)
 		return self.message + '\n\n' + stdout
 
-def settings():
+def settings(resolution=None, fullscreen=True):
+	print 'settings:', resolution
 	settings = Settings('settings.xml', 'settings.json')
 	
 	cmd = settings['Files.BinaryPath']
@@ -55,9 +56,20 @@ def settings():
 		'--uds-log', 'slideshow.sock', 
 		'--browser', 'sqlite://%s' % (os.path.abspath('site.db')),
 		'--collection-id', str(1),
-		'--resolution', '%dx%d' % settings.resolution(),
-		'--fullscreen'
 	]
+	
+	args.append('--resolution')
+	if resolution:
+		print 'using custom resolution'
+		args.append(str(resolution))
+	else:
+		args.append('%dx%d' % settings.resolution())
+	
+	if isinstance(fullscreen, basestring):
+		fullscreen = fullscreen in ['1', 'True', 'true']
+	
+	if fullscreen:
+		args.append('--fullscreen')
 	
 	env = dict(
 		DISPLAY=settings['Apparence.Display'],
@@ -162,13 +174,19 @@ class _Daemon(threading.Thread):
 			time.sleep(1)
 		self._running = False
 	
-	def do_start(self, pid, ipc):
+	def do_start(self, resolution, fullscreen):
+		print 'do_start:', resolution
+		
 		if not self._state in [STOPPED, CRASHED]:
 			raise StateError, 'Cannot start daemon while in state ' + statename(self._state)
 	
 		try:
 			self._state = STARTING
-			cmd, args, env, cwd = settings()
+			cmd, args, env, cwd = settings(resolution, fullscreen)
+			print cmd
+			print args
+			print env
+			print cwd
 			
 			instance = subprocess.Popen(
 				[cmd] + args,
@@ -312,8 +330,9 @@ def _call(func, *args, **kwargs):
 	
 	return ret.get()
 
-def start(pid, ipc):
-	return _call(_Daemon.do_start, pid, ipc)
+def start(resolution=None, fullscreen=True):
+	print 'daemon.start:', resolution
+	return _call(_Daemon.do_start, resolution, fullscreen)
 
 def stop():
 	ipc.Quit()

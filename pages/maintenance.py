@@ -60,8 +60,8 @@ class Handler(object):
 		raise cherrypy.HTTPRedirect('/maintenance')
 	
 	@cherrypy.expose
-	def start(self):
-		daemon.start('', '')
+	def start(self, resolution=None, fullscreen=True):
+		daemon.start(resolution, fullscreen)
 		raise cherrypy.HTTPRedirect('/maintenance')
 	
 	@cherrypy.expose

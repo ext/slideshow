@@ -43,7 +43,7 @@
 	<h2>Menu</h2>
 	
 	<ul>
-		<li py:if="state == daemon.STOPPED"><a href="/maintenance/start">Start daemon</a></li>
+		<li py:if="state == daemon.STOPPED"><a href="/maintenance/start">Start daemon</a> (<a href="/maintenance/start?resolution=800x600&amp;fullscreen=0">windowed</a>)</li>
 		<li py:if="state == daemon.RUNNING"><a href="/maintenance/stop">Stop daemon</a></li>
 		<li><a href="/maintenance/ping">Ping daemon</a></li>
 		<li><a href="/maintenance/debug/kill_mplayer">Kill mplayer</a></li>

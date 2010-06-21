@@ -78,7 +78,8 @@ def create(c, assembler, params):
 	slide = Slide(id=None, queue=None, path=dst, active=False, assembler=assembler, data=None, stub=True)
 	slide._data = slide.assemble(params)
 	
-	slide.rasterize((200,200))
+	slide.rasterize((200,200)) # thumbnail
+	slide.rasterize((800,600)) # windowed mode (debug)
 	slide.rasterize(settings.resolution())
 	
 	c.execute("""
