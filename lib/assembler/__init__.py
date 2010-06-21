@@ -23,8 +23,6 @@ class ImageAssembler(Assembler):
 		return False
 	
 	def assemble(self, slide, filename):
-		print dir(filename)
-		print filename.filename
 		dst = open(slide.src_path(filename.filename), 'wb')
 		
 		while True:

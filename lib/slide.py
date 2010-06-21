@@ -4,6 +4,7 @@
 import os, os.path
 import assembler as asm
 import shutil, uuid
+from settings import Settings
 
 image_path = os.path.expanduser('~/slideshow/image')
 
@@ -35,7 +36,7 @@ class Slide:
 	def raster_path(self, size):
 		return os.path.join(image_path, self._path, 'raster', '%dx%d.png' % size)
 	
-	def src_path(self, item=None):
+	def src_path(self, item):
 		return os.path.join(image_path, self._path, 'src', item)
 	
 	def _has_raster(self, size):
@@ -66,6 +67,7 @@ def from_id(c, id):
 	return Slide(queue=None, stub=False, **row)
 
 def create(c, assembler, params):
+	settings = Settings('settings.xml', 'settings.json')
 	name = '{uuid}.slide'.format(uuid=uuid.uuid1().hex)
 	dst = os.path.join(image_path, name)
 	
@@ -74,8 +76,10 @@ def create(c, assembler, params):
 	os.mkdir(os.path.join(dst, 'src'))
 	
 	slide = Slide(id=None, queue=None, path=dst, active=False, assembler=assembler, data=None, stub=True)
-	data = slide.assemble(params)
-	print 'data:', data
+	slide._data = slide.assemble(params)
+	
+	slide.rasterize((200,200))
+	slide.rasterize(settings.resolution())
 	
 	c.execute("""
 		INSERT INTO slide (
@@ -89,7 +93,7 @@ def create(c, assembler, params):
 			:assembler,
 			:data
 		)
-	""", dict(path=slide._path, assembler=slide.assembler.name, data=data))
+	""", dict(path=slide._path, assembler=slide.assembler.name, data=slide._data))
 	
 	return slide
 
