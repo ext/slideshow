@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os, os.path
+import os, os.path, json
 import assembler as asm
 import shutil, uuid
 from settings import Settings
@@ -18,7 +18,7 @@ class Slide:
 		self._path = path
 		self.active = active
 		self.assembler = asm.get(assembler)
-		self._data = data
+		self._data = data and json.loads(data) or None
 		
 		# Tells if this is a full slide (which database entry) or if it is being
 		# constructed or is otherwise not complete.
@@ -28,7 +28,7 @@ class Slide:
 			raise ValueError, "could not locate '{path}' in '{root}'".format(path=path, root=image_path)
 	
 	def assemble(self, params):
-		return self.assembler.assemble(self, **params)
+		return json.dumps(self.assembler.assemble(self, **params))
 	
 	def default_size(self, width=None):
 		return self.assembler.default_size(slide=self, src=self._data, width=width)
@@ -44,7 +44,7 @@ class Slide:
 	
 	def rasterize(self, size):
 		if not self._has_raster(size):
-			self.assembler.rasterize(slide=self, src=self._data, size=size)
+			self.assembler.rasterize(slide=self, size=size, **self._data)
 
 def from_id(c, id):
 	row = c.execute("""
@@ -76,7 +76,7 @@ def create(c, assembler, params):
 	os.mkdir(os.path.join(dst, 'src'))
 	
 	slide = Slide(id=None, queue=None, path=dst, active=False, assembler=assembler, data=None, stub=True)
-	slide._data = slide.assemble(params)
+	slide._data = json.loads(slide.assemble(params))
 	
 	slide.rasterize((200,200)) # thumbnail
 	slide.rasterize((800,600)) # windowed mode (debug)
@@ -94,7 +94,7 @@ def create(c, assembler, params):
 			:assembler,
 			:data
 		)
-	""", dict(path=slide._path, assembler=slide.assembler.name, data=slide._data))
+	""", dict(path=slide._path, assembler=slide.assembler.name, data=json.dumps(slide._data)))
 	
 	return slide
 

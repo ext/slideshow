@@ -39,7 +39,7 @@ class Handler(object):
 		return template.render()
 
 	@cherrypy.expose
-	def submit(self, assembler, **kwargs):
+	def submit(self, assembler, submit, **kwargs):
 		try:
 			s = slide.create(cherrypy.thread_data.db.cursor(), assembler, kwargs)
 			daemon.ipc.Reload()
