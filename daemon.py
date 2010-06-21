@@ -55,16 +55,14 @@ def settings():
 		'--uds-log', 'slideshow.sock', 
 		'--browser', 'sqlite://%s' % (os.path.abspath('site.db')),
 		'--collection-id', str(1),
+		'--resolution', '%dx%d' % settings.resolution(),
+		'--fullscreen'
 	]
-	
-	# Only add --resolution if it is set
-	if settings['Apparence.Resolution']:
-		args.append('--resolution')
-		args.append(settings['Apparence.Resolution'])
 	
 	env = dict(
 		DISPLAY=settings['Apparence.Display'],
-		SLIDESHOW_NO_ABORT=''
+		SLIDESHOW_NO_ABORT='',
+		SDL_VIDEO_X11_XRANDR='0'
 	)
 	for k,v in settings['Env'].items():
 		env['SLIDESHOW_' + k] = v
@@ -87,24 +85,35 @@ class _Log:
 		self.size = size
 		
 	def push(self, line):
-		c = cherrypy.thread_data.db.cursor()
-		severity, stampstr, message = re.match('\((..)\) \[(.*)\] (.*)', line).groups()
-		stamp = time.mktime(time.strptime(stampstr, '%Y-%m-%d %H:%M:%S'))
-		
-		c.execute("""
-			INSERT INTO log (
-				type,
-				severity,
-				stamp,
-				message
-			) VALUES (
-				0,
-				:severity,
-				:stamp,
-				:message
-			)
-		""", dict(severity=self.severity_lut.get(severity, 2), stamp=stamp, message=html_escape(message)))
-		cherrypy.thread_data.db.commit()
+		try:
+			c = cherrypy.thread_data.db.cursor()
+			match = re.match('\((..)\) \[(.*)\] (.*)', line)
+			
+			severity = 2
+			stamp = time.mktime(time.localtime())
+			message = line
+			
+			if match:
+				severity, stampstr, message = match.groups()
+				stamp = time.mktime(time.strptime(stampstr, '%Y-%m-%d %H:%M:%S'))
+			
+			
+			c.execute("""
+				INSERT INTO log (
+					type,
+					severity,
+					stamp,
+					message
+				) VALUES (
+					0,
+					:severity,
+					:stamp,
+					:message
+				)
+			""", dict(severity=self.severity_lut.get(severity, 2), stamp=stamp, message=html_escape(message)))
+			cherrypy.thread_data.db.commit()
+		except:
+			traceback.print_exc()
 	
 	def __iter__(self):
 		c = cherrypy.thread_data.db.cursor()
@@ -221,8 +230,7 @@ class _Daemon(threading.Thread):
 				if self._instance.returncode != None:
 					# poll std{out,err}
 					for line in self._instance.stdout:
-						print line
-						self.log.push('stdout: ' + line)
+						self.log.push(line)
 					
 					if self._instance.returncode == 0:
 						self._state = STOPPED
