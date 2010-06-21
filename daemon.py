@@ -120,6 +120,8 @@ class _Daemon(threading.Thread):
 		s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 		
 		for n in range(0, 20):
+			instance.poll()
+			
 			if instance.returncode != None:
 				raise RuntimeError, "Instance crashed before log was connected"
 			
