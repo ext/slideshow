@@ -50,7 +50,7 @@ class Handler(object):
 			
 			if not error:
 				settings.persist()
-				raise cherrypy.HTTPRedirect('/maintenance/config')
+				raise cherrypy.HTTPRedirect('/maintenance')
 		
 		return template.render(settings=settings)
 	
