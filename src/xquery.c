@@ -1,6 +1,7 @@
+#include <Python.h>
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
-#include <Python.h>
+
 
 static Display* dpy = NULL;
 
@@ -93,13 +94,51 @@ static PyObject* xquery_resolution(PyObject *self, PyObject *args) {
 	return l;
 }
 
+static PyObject* xquery_current_resolution(PyObject* self, PyObject* args, PyObject* kwargs) {
+	char* string = NULL;
+	char use_rotation;
+	int screen, num_sizes;
+	XRRScreenSize* xrrs;
+	Rotation rotation;
+	int width, height;
+
+	static char* kwlist[] = {"screen", "use_rotation", NULL};
+	if ( !PyArg_ParseTupleAndKeywords(args, kwargs, "|sb", kwlist, &string, &use_rotation) ){
+		return NULL;
+	}
+
+	if ( !dpy ){
+		PyErr_SetString(PyExc_RuntimeError, "Failed to open X Display");
+		return NULL;
+	}
+
+	screen = parse_screen(string);
+
+	xrrs = XRRSizes(dpy, screen, &num_sizes);
+	XRRRotations(dpy, screen, &rotation);
+
+	width = xrrs->width;
+	height = xrrs->height;
+
+	/* if the screen is rotated and use_rotation is True it will flip width and
+	 * height so they reflect the rotated resolution.*/
+	if ( use_rotation ){
+		if ( rotation & (RR_Rotate_90|RR_Rotate_270) ){
+			width = xrrs->height;
+			height = xrrs->width;
+		}
+	}
+
+	return Py_BuildValue("(ii)", width, height);
+}
+
 //Method table
 static PyMethodDef XQueryMethods[] = {
 	{"screens", xquery_screens, METH_VARARGS, "List all screens"},
 	{"resolutions", xquery_resolution, METH_VARARGS, "List all resolutions for a screen. Defaults to current screen"},
+	{"current_resolution", (PyCFunction)xquery_current_resolution,  METH_VARARGS|METH_KEYWORDS, "Get current resolution for a screen. Defaults to current screen"},
 	{NULL, NULL, 0, NULL}
 };
-
 
 PyMODINIT_FUNC initxquery(void) {
 	PyObject* m;
