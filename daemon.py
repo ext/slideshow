@@ -37,6 +37,26 @@ def statename(state):
 class StateError(Exception):
 	pass
 
+def settings():
+	settings = Settings('settings.xml', 'settings.json')
+	
+	cmd = settings['Files.BinaryPath']
+	args = [
+		'--uds-log', 'slideshow.sock', 
+		'--browser', 'sqlite://%s' % (os.path.abspath('site.db')),
+		'--collection-id', str(1),
+		'--resolution', settings['Apparence.Resolution']
+	]
+	env = dict(
+		DISPLAY=settings['Apparence.Display']
+	)
+	for k,v in settings['Env'].items():
+		env['SLIDESHOW_' + k] = v
+	
+	cwd = settings['Path.BasePath']
+	
+	return (cmd, args, env, cwd)
+
 class _Log:
 	def __init__(self, size=5):
 		self.size = size
@@ -73,32 +93,12 @@ class _Daemon(threading.Thread):
 			time.sleep(1)
 		self._running = False
 	
-	def settings(self):
-		settings = Settings('settings.xml', 'settings.json')
-		
-		cmd = settings['Files.BinaryPath']
-		args = [
-			'--uds-log', 'slideshow.sock', 
-			'--browser', 'sqlite://%s' % (os.path.abspath('site.db')),
-			'--collection-id', str(1),
-			'--resolution', settings['Apparence.Resolution']
-		]
-		env = dict(
-			DISPLAY=settings['Apparence.Display']
-		)
-		for k,v in settings['Env'].items():
-			env['SLIDESHOW_' + k] = v
-		
-		cwd = settings['Path.BasePath']
-		
-		return (cmd, args, env, cwd)
-	
 	def do_start(self, pid, ipc):
 		if not self._state in [STOPPED, CRASHED]:
 			raise StateError, 'Cannot start daemon while in state ' + statename(self._state)
 	
 		self._state = STARTING
-		cmd, args, env, cwd = self.settings()
+		cmd, args, env, cwd = settings()
 		
 		instance = subprocess.Popen(
 			[cmd] + args,

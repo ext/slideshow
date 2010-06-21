@@ -17,7 +17,8 @@ class Handler(object):
 	@cherrypy.expose
 	@template.output('maintenance/index.html', parent='maintenance')
 	def index(self):
-		return template.render(log=daemon.log(), state=daemon.state())
+		cmd, args, env, cwd = daemon.settings()
+		return template.render(log=daemon.log(), state=daemon.state(), cmd=cmd, args=args, env=env, cwd=cwd)
 
 	@cherrypy.expose
 	@template.output('maintenance/config.html', parent='maintenance')

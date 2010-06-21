@@ -50,19 +50,9 @@
 		<li><a href="/maintenance/config">Configuration</a></li>
 	</ul>
 
-	<h2>Debug</h2>
-	
-	<div id="debug">
-	  <p>CWD: <br/>CMD: </p>
-	</div>
-	
-	<ul>
-		<li><a href="/maintenance/dumpqueue">Dump queue</a></li>
-	</ul>
-	
 	<h2>Log</h2>
 	
-	<div id="log">
+	<div id="log" class="mono">
 		<p>
 			<py:for each="line in log">
 				${Markup(line)}<br/>
@@ -74,6 +64,21 @@
 	
 	<div id="log">
 	</div>
+	
+	<h2>Debug</h2>
+	
+	<div id="debug" class="mono">
+		<p>
+			CWD: ${cwd}<br/>
+			ENV: ${' '.join(['%s=%s' % (k,v) for k,v in env.items()])}<br/>
+			CMD: ${cmd} ${' '.join(args)}<br/>
+		</p>
+	</div>
+	
+	<ul>
+		<li><a href="/maintenance/dumpqueue">Dump queue</a></li>
+	</ul>
+	
 	
 </body>
 
