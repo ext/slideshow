@@ -107,30 +107,29 @@ class _Daemon(threading.Thread):
 				cwd=cwd, env=env
 			)
 			
-			self._logobj = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-			
-			n = 0
-			while True:
-				n += 1
-				
-				if n == 20:
-					raise RuntimeError, "Failed to connect log"
-				
-				if instance.returncode != None:
-					raise RuntimeError, "Instance crashed before log was connected"
-				
-				try:
-					self._logobj.connect(os.path.join(cwd, 'slideshow.sock'))
-					break
-				except socket.error:
-					time.sleep(0.1)
-			
+			self._logobj = self._connect_log(instance, cwd)
 			self._instance = instance
 			
 			self._state = RUNNING
 		except:
 			self._state = CRASHED
 			raise
+	
+	@staticmethod
+	def _connect_log(instance, cwd):
+		s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+		
+		for n in range(0, 20):
+			if instance.returncode != None:
+				raise RuntimeError, "Instance crashed before log was connected"
+			
+			try:
+				s.connect(os.path.join(cwd, 'slideshow.sock'))
+				return s
+			except socket.error:
+				time.sleep(0.1)
+		
+		raise RuntimeError, "Failed to connect log"
 	
 	def state(self):
 		self._state_lock.acquire()
