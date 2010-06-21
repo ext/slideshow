@@ -73,11 +73,7 @@ class _Daemon(threading.Thread):
 			time.sleep(1)
 		self._running = False
 	
-	def do_start(self, pid, ipc):
-		if not self._state in [STOPPED, CRASHED]:
-			raise StateError, 'Cannot start daemon while in state ' + statename(self._state)
-	
-		self._state = STARTING
+	def settings(self):
 		settings = Settings('settings.xml', 'settings.json')
 		
 		cmd = settings['Files.BinaryPath']
@@ -88,17 +84,26 @@ class _Daemon(threading.Thread):
 			'--resolution', settings['Apparence.Resolution']
 		]
 		env = dict(
-			#TERM='xterm'
 			DISPLAY=settings['Apparence.Display']
 		)
 		for k,v in settings['Env'].items():
 			env['SLIDESHOW_' + k] = v
 		
-		print cmd, args, env
+		cwd = settings['Path.BasePath']
+		
+		return (cmd, args, env, cwd)
+	
+	def do_start(self, pid, ipc):
+		if not self._state in [STOPPED, CRASHED]:
+			raise StateError, 'Cannot start daemon while in state ' + statename(self._state)
+	
+		self._state = STARTING
+		cmd, args, env, cwd = self.settings()
+		
 		instance = subprocess.Popen(
 			[cmd] + args,
 			stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-			cwd=settings['Path.BasePath'], env=env
+			cwd=cwd, env=env
 		)
 		
 		self._logobj = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -111,7 +116,7 @@ class _Daemon(threading.Thread):
 				raise RuntimeError, "Failed to connect log"
 			
 			try:
-				self._logobj.connect(os.path.join(settings['Path.BasePath'], 'slideshow.sock'))
+				self._logobj.connect(os.path.join(cwd, 'slideshow.sock'))
 				break
 			except:
 				time.sleep(0.1)
