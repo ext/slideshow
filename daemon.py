@@ -54,8 +54,13 @@ def settings():
 		'--uds-log', 'slideshow.sock', 
 		'--browser', 'sqlite://%s' % (os.path.abspath('site.db')),
 		'--collection-id', str(1),
-		'--resolution', settings['Apparence.Resolution']
 	]
+	
+	# Only add --resolution if it is set
+	if settings['Apparence.Resolution']:
+		args.append('--resolution')
+		args.append(settings['Apparence.Resolution'])
+	
 	env = dict(
 		DISPLAY=settings['Apparence.Display'],
 		SLIDESHOW_NO_ABORT=''
