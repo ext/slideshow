@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import multiprocessing, subprocess, sys, threading, traceback
-import time, os.path, socket
+import time, os.path, re, socket, sqlite3
 import dbus, dbus.service
+import cherrypy
 from select import select
 from settings import Settings
 
@@ -73,21 +74,65 @@ def settings():
 	return (cmd, args, env, cwd)
 
 class _Log:
+	severity_lut = {
+		'!!': 0,
+		'WW': 1,
+		'  ': 2,
+		'--': 3,
+		'DD': 4
+	}
+	severity_revlut = dict([(v,k) for k,v in severity_lut.items()])
+	
 	def __init__(self, size=5):
 		self.size = size
-		self.lines = []
-	
+		
 	def push(self, line):
-		self.lines.append(html_escape(line))
-		if len(self.lines) > self.size:
-			self.lines.pop(0)
+		c = cherrypy.thread_data.db.cursor()
+		severity, stampstr, message = re.match('\((..)\) \[(.*)\] (.*)', line).groups()
+		stamp = time.mktime(time.strptime(stampstr, '%Y-%m-%d %H:%M:%S'))
+		
+		c.execute("""
+			INSERT INTO log (
+				type,
+				severity,
+				stamp,
+				message
+			) VALUES (
+				0,
+				:severity,
+				:stamp,
+				:message
+			)
+		""", dict(severity=self.severity_lut.get(severity, 2), stamp=stamp, message=html_escape(message)))
+		cherrypy.thread_data.db.commit()
 	
 	def __iter__(self):
-		return self.lines.__iter__()
+		c = cherrypy.thread_data.db.cursor()
+		lines = c.execute("""
+			SELECT
+				log.severity as severity,
+				user.name as user,
+				log.stamp as stamp,
+				log.message as message
+			FROM
+				log,
+				user
+			WHERE
+				log.user_id = user.id
+			ORDER BY
+				log.stamp DESC,
+				log.id DESC
+			LIMIT :limit;
+		""", dict(limit=self.size)).fetchall()
+		lines.reverse()
+		lines = ['{severity} {stamp} {user} {message}'.format(**x) for x in lines]
+		
+		return lines.__iter__()
 
 class _Daemon(threading.Thread):
 	def __init__(self):
 		threading.Thread.__init__(self)
+	
 		self._pid = None
 		self._ipc = None
 		self._instance = None
@@ -159,6 +204,10 @@ class _Daemon(threading.Thread):
 		return '<daemon id="{id}" />'.format(id=id(self))
 
 	def run(self):
+		cherrypy.thread_data.db = sqlite3.connect('site.db')
+		cherrypy.thread_data.db.row_factory = sqlite3.Row
+		cherrypy.thread_data.db.cursor().execute('PRAGMA foreign_keys = ON')
+		
 		self._running = True
 		while self._running:
 			if self._instance:
