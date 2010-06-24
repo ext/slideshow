@@ -186,7 +186,7 @@ class Template:
 		
 		ctx = pangocairo.CairoContext(cr)
 		layout = ctx.create_layout()
-		layout.set_font_description(pango.FontDescription('%s %d' % (font, fontsize)))
+		layout.set_font_description(pango.FontDescription('%s %f' % (font, fontsize)))
 		layout.set_width(w * pango.SCALE)
 		
 		if alignment == 'center':
