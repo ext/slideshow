@@ -214,7 +214,7 @@ class Template:
 		elif alignment == 'justify':
 			layout.set_justify(True)
 		
-		layout.set_text(text);
+		layout.set_markup(text);
 		ctx.show_layout(layout)
 
 class TextAssembler(Assembler):
