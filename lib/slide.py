@@ -42,9 +42,21 @@ class Slide:
 	def _has_raster(self, size):
 		return os.path.exists(self.raster_path(size))
 	
-	def rasterize(self, size):
-		if not self._has_raster(size):
-			self.assembler.rasterize(slide=self, size=size, **self._data)
+	def rasterize(self, size, reference):
+		"""
+		Rasterizes the slide for the given resolution, if needed.
+		:param size: Size of the raster
+		:param reference: The current resolution (some slides are only valid at
+		                  a single resolution, eg text slides, and must be
+		                  re-rasterized if the resolution is changed.
+		"""
+		if not self._raster_is_valid(size, reference):
+			self.assembler.rasterize(slide=self, size=size, resolution=reference, **self._data)
+	
+	def _raster_is_valid(self, size, reference):
+		has_raster = self._has_raster(size)
+		is_valid = self.assembler.raster_is_valid(slide=self, size=size, reference=reference, **self._data)
+		return has_raster and is_valid
 
 def from_id(c, id):
 	row = c.execute("""
@@ -74,6 +86,9 @@ def create(c, assembler, params):
 	os.mkdir(dst)
 	os.mkdir(os.path.join(dst, 'raster'))
 	os.mkdir(os.path.join(dst, 'src'))
+	
+	# reference resolution
+	params['resolution'] = settings.resolution()
 	
 	slide = Slide(id=None, queue=None, path=dst, active=False, assembler=assembler, data=None, stub=True)
 	slide._data = json.loads(slide.assemble(params))

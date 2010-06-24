@@ -20,6 +20,9 @@ class Assembler:
 	
 	def default_size(self, slide, src, width=None):
 		raise NotImplementedError
+	
+	def raster_is_valid(**kwargs):
+		return True
 
 class ImageAssembler(Assembler):
 	def is_editable(self):
@@ -123,7 +126,17 @@ class Template:
 		doc = minidom.parse(self._filename)
 		template = doc.getElementsByTagName('template')[0]
 		
-		w,h = size
+		resolution = list(params['resolution'])
+		aspect = float(resolution[0]) / resolution[1]
+		
+		# fit resolution in size by scaling
+		w = int(size[1] * aspect)
+		h = size[1]
+		realsize = (w,h)
+		
+		# scale constant
+		scale = float(w) / resolution[0]
+		
 		data = array.array('c', chr(0) * w * h * 4)
 		surface = cairo.ImageSurface.create_for_data(data, cairo.FORMAT_ARGB32, w, h, w*4)
 		cr = cairo.Context(surface)
@@ -141,21 +154,23 @@ class Template:
 			cr.save()
 			try:
 				if item.tagName == 'text':
-					self._text(size, cr, item, params[item.getAttribute('name')])
+					self._text(size, realsize, scale, cr, item, params[item.getAttribute('name')])
 				elif item.tagName == 'textarea':
-					self._textarea(size, cr, item, params[item.getAttribute('name')])
+					self._textarea(size, realsize, scale, cr, item, params[item.getAttribute('name')])
 			finally:
 				cr.restore()
 			
 		surface.write_to_png(dst)
 	
 	@staticmethod
-	def _text(size, cr, item, text):
+	def _text(size, realsize, scale, cr, item, text):
 		font = item.getAttribute('font') or 'Sans'
 		fontsize = float(item.getAttribute('size') or '36.0')
 		r,g,b,a = decode_color(item.getAttribute('color')) or (0,0,0,1)
-		x,y = decode_position(item.getAttribute('position'), size) or (0,0)
+		x,y = decode_position(item.getAttribute('position'), realsize) or (0,0)
 		alignment = item.getAttribute('align')
+		
+		fontsize *= scale
 		
 		cr.select_font_face (font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
 		cr.set_font_size(fontsize)
@@ -173,13 +188,16 @@ class Template:
 		cr.show_text(text)
 	
 	@staticmethod
-	def _textarea(size, cr, item, text):
+	def _textarea(size, realsize, scale, cr, item, text):
+		#realsize = (size[0] * scale, size[1] * scale)
 		font = item.getAttribute('font') or 'Sans'
 		fontsize = float(item.getAttribute('size') or '36.0')
 		r,g,b,a = decode_color(item.getAttribute('color')) or (0,0,0,1)
-		x,y = decode_position(item.getAttribute('position'), size) or (0,0)
-		w,h = decode_position(item.getAttribute('boxsize'), size) or size
+		x,y = decode_position(item.getAttribute('position'), realsize) or (0,0)
+		w,h = decode_position(item.getAttribute('boxsize'), realsize) or size
 		alignment = item.getAttribute('align')
+		
+		fontsize *= scale
 		
 		cr.set_source_rgba(r,g,b,a)
 		cr.move_to(x-w/2.0, y-h/2.0)
@@ -187,7 +205,7 @@ class Template:
 		ctx = pangocairo.CairoContext(cr)
 		layout = ctx.create_layout()
 		layout.set_font_description(pango.FontDescription('%s %f' % (font, fontsize)))
-		layout.set_width(w * pango.SCALE)
+		layout.set_width(int(w * pango.SCALE))
 		
 		if alignment == 'center':
 			layout.set_alignment(pango.ALIGN_CENTER)
@@ -210,6 +228,9 @@ class TextAssembler(Assembler):
 		dst = slide and slide.raster_path(size) or file
 		template = Template('nitroxy.xml')
 		template.rasterize(dst=dst, size=size, params=kwargs)
+	
+	def raster_is_valid(reference, resolution, **kwargs):
+		return reference == resolution
 
 _assemblers = {
 	'text': TextAssembler(),

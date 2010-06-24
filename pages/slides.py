@@ -3,6 +3,7 @@
 
 import cherrypy, urllib
 from lib import queue, slide, template
+from settings import Settings
 import daemon
 
 class Handler(object):
@@ -61,6 +62,10 @@ class Handler(object):
 		
 		dst = cStringIO.StringIO()
 		asm = TextAssembler()
+		
+		settings = Settings('settings.xml', 'settings.json')
+		kwargs['resolution'] = settings.resolution()
+		
 		asm.rasterize(file=dst, size=(800,600), **kwargs)
 		
 		content = dst.getvalue()
