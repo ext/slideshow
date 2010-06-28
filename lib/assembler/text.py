@@ -87,7 +87,11 @@ class Template:
 					self._textarea(size, realsize, scale, cr, item, params[item.getAttribute('name')])
 			finally:
 				cr.restore()
-				
+		
+		# write_to_png doesn't accept unicode string, yet
+		if isinstance(dst, basestring):
+			dst = str(dst)
+		
 		surface.write_to_png(dst)
 	
 	@staticmethod
