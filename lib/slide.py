@@ -5,6 +5,7 @@ import os, os.path, json
 import assembler as asm
 import shutil, uuid
 from settings import Settings
+import event
 
 image_path = os.path.expanduser('~/slideshow/image')
 
@@ -116,3 +117,11 @@ def delete(c, id):
 	""", dict(id=s.id))
 	
 	shutil.rmtree(s._path)
+
+@event.listener
+class EventListener:
+	@event.callback('config.resolution_changed')
+	def resolution_changed(*args, **kwargs):
+		print 'resolution is changed', args, kwargs
+
+_listener = EventListener()

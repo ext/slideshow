@@ -6,6 +6,7 @@ import os, os.path, stat, traceback
 import json, xquery
 import pprint
 import threading
+import event
 
 try:
 	# python 3.0
@@ -327,6 +328,10 @@ class Settings(object):
 			return
 		
 		item = self.item(key)
+		
+		if key == 'Apparence.Resolution' and item._value != value:
+			event.trigger('config.resolution_changed', value)
+		
 		item.set(value)
 	
 	def resolution(self):
