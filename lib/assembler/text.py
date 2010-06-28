@@ -75,14 +75,20 @@ class Template:
 		# scale constant
 		scale = float(w) / resolution[0]
 		
-		data = array.array('c', chr(0) * w * h * 4)
-		surface = cairo.ImageSurface.create_for_data(data, cairo.FORMAT_ARGB32, w, h, w*4)
+		data = array.array('c', chr(0) * size[0] * size[1] * 4)
+		surface = cairo.ImageSurface.create_for_data(data, cairo.FORMAT_ARGB32, size[0], size[1], size[0]*4)
 		cr = cairo.Context(surface)
 		
+		cr.translate((size[0]-realsize[0])*0.5, (size[1]-realsize[1])*0.5)
+		
 		cr.save()
-		cr.set_source_rgba(0,0,0,1)
+		cr.set_source_rgba(1,0,1,1)
 		cr.set_operator(cairo.OPERATOR_SOURCE)
 		cr.paint()
+		
+		cr.set_source_rgba(0,0,0,1)
+		cr.rectangle(0, 0, w, h)
+		cr.fill()
 		cr.restore()
 		
 		for item in template.childNodes:
