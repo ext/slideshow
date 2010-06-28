@@ -41,7 +41,6 @@ class Handler(object):
 
 	@cherrypy.expose
 	def submit(self, assembler, submit, **kwargs):
-		print 'submit:', submit
 		if submit == 'preview':
 			raise cherrypy.HTTPRedirect('/slides/upload?' + urllib.urlencode(kwargs))
 		
