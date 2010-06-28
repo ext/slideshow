@@ -145,7 +145,13 @@ class _Log:
 			LIMIT :limit;
 		""", dict(limit=self.size)).fetchall()
 		lines.reverse()
-		lines = ['{severity} {stamp} {user} {message}'.format(**x) for x in lines]
+		
+		def f(severity, user, stamp, message):
+			severity_str = self.severity_revlut[severity].replace(' ', '&nbsp;')
+			formated_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stamp))
+			return '({severity}) {stamp} {user} {message}'.format(severity=severity_str, user=user, stamp=formated_time, message=message)
+		
+		lines = [f(**x) for x in lines]
 		
 		return lines.__iter__()
 
