@@ -162,7 +162,7 @@ class _Daemon(threading.Thread):
 		self._pid = None
 		self._ipc = None
 		self._instance = None
-		self.log = _Log(size=50)
+		self.log = _Log(size=25)
 		
 		self._state = STOPPED
 		self._state_lock = threading.Lock()
