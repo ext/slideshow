@@ -7,6 +7,7 @@ import sqlite3
 from lib import template
 from pages import slides
 from pages import maintenance
+from settings import Settings
 import daemon
 
 def connect(*args):
@@ -34,6 +35,8 @@ application.config.update({
 })
 
 cherrypy.config.update({'sessionFilter.on': True}) 
+settings = Settings()
+settings.load('settings.xml', 'settings.json')
 
 if __name__ == '__main__':
 	#print daemon.instance

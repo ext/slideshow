@@ -4,6 +4,7 @@
 from xml.dom import minidom
 import os, os.path, stat, traceback
 import json, xquery
+import pprint
 
 try:
 	# python 3.0
@@ -207,7 +208,6 @@ class ItemResolution(Item):
 	
 	def __init__(self, allow_empty=False, **kwargs):
 		Item.__init__(self, **kwargs)
-		
 		self._extra = []
 		
 		if allow_empty:
@@ -266,8 +266,65 @@ itemfactory = {
 for k,v in itemfactory.items():
 	v.typename = k
 
-class Settings:
-	def __init__(self, base, config_file=None):
+class Settings(object):
+	__singleton = None
+	
+	def __new__(cls, *args, **kwargs):
+		if cls != type(cls.__singleton):
+			cls.__singleton = object.__new__(cls)
+		return cls.__singleton
+	
+	def __init__(self):
+		pass
+		
+	def __iter__(self):
+		return self.groups.values().__iter__()
+	
+	def item(self, key):
+		[groupname, itemname] = key.split('.')
+		return self.groups[groupname][itemname]
+	
+	def __str__(self):
+		pp = pprint.PrettyPrinter(indent=4)
+		return pp.pformat(self.all())
+	
+	def all(self):
+		c = {}
+		for group in self:
+			d = {}
+			for item in group:
+				d[item.name] = item.get()
+			c[group.name] = d
+		c['Env'] = self.enviroment
+		return c
+	
+	def __getitem__(self, key):
+		if key == 'Env':
+			return self.enviroment
+		
+		item = self.item(key)
+		
+		return item._value
+	
+	def __setitem__(self, key, value):
+		if key == 'Env':
+			self.enviroment = value
+			return
+		
+		item = self.item(key)
+		item.set(value)
+	
+	def resolution(self):
+		r = self['Apparence.Resolution']
+		if r:
+			w,h = r.split('x')
+			w = int(w)
+			h = int(h)
+			return (w,h)
+		else:
+			return xquery.current_resolution(use_rotation=True)
+	
+	def load(self, base, config_file=None):
 		doc = minidom.parse(base)
 		self.groups = OrderDict()
 		self.enviroment = []
@@ -342,49 +399,7 @@ class Settings:
 					break
 		
 		ItemResolution.values = resolutions(self['Apparence.Display'])
-		
-	def __iter__(self):
-		return self.groups.values().__iter__()
-	
-	def item(self, key):
-		[groupname, itemname] = key.split('.')
-		return self.groups[groupname][itemname]
-	
-	def __getitem__(self, key):
-		if key == 'Env':
-			return self.enviroment
-		
-		item = self.item(key)
-		
-		return item._value
-	
-	def __setitem__(self, key, value):
-		if key == 'Env':
-			self.enviroment = value
-			return
-		
-		item = self.item(key)
-		
-		item.set(value)
-	
-	def resolution(self):
-		r = self['Apparence.Resolution']
-		if r:
-			w,h = r.split('x')
-			w = int(w)
-			h = int(h)
-			return (w,h)
-		else:
-			return xquery.current_resolution(use_rotation=True)
 	
 	def persist(self, dst=None):
-		c = {}
-		for group in self:
-			d = {}
-			for item in group:
-				d[item.name] = item.get()
-			c[group.name] = d
-		c['Env'] = self.enviroment
-		
 		with open(self.config_file, 'w') as fp:
-			json.dump(c, fp, indent=4)
+			json.dump(self.all(), fp, indent=4)

@@ -48,8 +48,7 @@ class StartError(Exception):
 		return self.message + '\n\n' + stdout
 
 def settings(resolution=None, fullscreen=True):
-	print 'settings:', resolution
-	settings = Settings('settings.xml', 'settings.json')
+	settings = Settings()
 	
 	cmd = settings['Files.BinaryPath']
 	args = [

@@ -63,7 +63,7 @@ class Handler(object):
 		dst = cStringIO.StringIO()
 		asm = TextAssembler()
 		
-		settings = Settings('settings.xml', 'settings.json')
+		settings = Settings()
 		kwargs['resolution'] = settings.resolution()
 		
 		asm.rasterize(file=dst, size=(800,600), **kwargs)

@@ -71,7 +71,7 @@ def from_id(c, id):
 	return Slide(queue=None, stub=False, **row)
 
 def create(c, assembler, params):
-	settings = Settings('settings.xml', 'settings.json')
+	settings = Settings()
 	name = '{uuid}.slide'.format(uuid=uuid.uuid1().hex)
 	dst = os.path.join(image_path, name)
 	
