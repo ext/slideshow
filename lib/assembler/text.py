@@ -41,11 +41,11 @@ def decode_position(str, size):
 	
 	# create tuple
 	return tuple(p)
-	
+
+color_parser = ColorParser(components=4)
+decode_color = color_parser.parse
+
 class Template:
-	color_parser = ColorParser()
-	decode_color = color_parser.parse
-	
 	def __init__(self, filename):
 		self._filename = filename
 	
