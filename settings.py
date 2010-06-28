@@ -5,6 +5,7 @@ from xml.dom import minidom
 import os, os.path, stat, traceback
 import json, xquery
 import pprint
+import threading
 
 try:
 	# python 3.0
@@ -275,7 +276,8 @@ class Settings(object):
 		return cls.__singleton
 	
 	def __init__(self):
-		pass
+		self._locked = False
+		self._lock = threading.Lock()
 		
 	def __iter__(self):
 		return self.groups.values().__iter__()
@@ -298,6 +300,16 @@ class Settings(object):
 		c['Env'] = self.enviroment
 		return c
 	
+	def __enter__(self):
+		self._lock.acquire()
+		self._locked = True
+	
+	def __exit__(self, type, value, traceback):
+		ItemResolution.values = resolutions(self['Apparence.Display'])
+		
+		self._locked = False
+		self._lock.release()
+	
 	def __getitem__(self, key):
 		if key == 'Env':
 			return self.enviroment
@@ -307,6 +319,9 @@ class Settings(object):
 		return item._value
 	
 	def __setitem__(self, key, value):
+		if not self._locked:
+			raise RuntimeError, 'Cannot assign settings while not locked'
+		
 		if key == 'Env':
 			self.enviroment = value
 			return
