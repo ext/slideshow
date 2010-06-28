@@ -58,9 +58,19 @@ class Template:
 		aspect = float(resolution[0]) / resolution[1]
 		
 		# fit resolution in size by scaling
-		w = int(size[1] * aspect)
-		h = size[1]
+		if resolution[0] > resolution[1]:
+			w = size[0]
+			h = int(size[0] / aspect)
+		else:
+			w = int(size[1] / aspect)
+			h = size[1]
+		
 		realsize = (w,h)
+		
+		# ensure the scaling is proper
+		assert realsize[0] <= size[0]
+		assert realsize[1] <= size[1]
+		assert abs((float(realsize[0]) / realsize[1]) - aspect) < 0.01
 		
 		# scale constant
 		scale = float(w) / resolution[0]
