@@ -46,6 +46,50 @@ def decode_position(str, size):
 color_parser = ColorParser(components=4)
 decode_color = color_parser.parse
 
+class Resolution:
+    def __init__(self, w,h):
+        self.w = float(w)
+        self.h = float(h)
+    
+    def aspect(self):
+        return self.w / self.h
+    
+    def __iter__(self):
+    	return (self.w, self.h).__iter__()
+    
+    def __str__(self):
+        return '%dx%d %.4f' % (self.w, self.h, self.aspect())
+
+def validate(func):
+    def decorate(input, max):
+        ret = func(input, max)
+        
+        try:
+            assert ret.w <= max.w
+            assert ret.h <= max.h
+            assert abs(input.aspect() - ret.aspect()) < 0.01
+        except:
+            print 'input: ', input
+            print 'size:  ', max
+            print 'return:', ret
+            raise
+        
+        return ret
+    return decorate
+
+@validate
+def fit(input, max):
+    input_aspect = input.aspect();
+    max_aspect = max.aspect()
+
+    new_size = Resolution(max.w, max.h)
+    if input_aspect > max_aspect:
+        new_size.h = max.w * (input.h / input.w)
+    else:
+        new_size.w = max.h * (input.w / input.h)
+    
+    return new_size
+
 class Template:
 	def __init__(self, filename):
 		self._filename = filename
@@ -54,32 +98,19 @@ class Template:
 		doc = minidom.parse(self._filename)
 		template = doc.getElementsByTagName('template')[0]
 		
-		resolution = list(params['resolution'])
-		aspect = float(resolution[0]) / resolution[1]
-		
-		# fit resolution in size by scaling
-		if resolution[0] > resolution[1]:
-			w = size[0]
-			h = int(size[0] / aspect)
-		else:
-			w = int(size[1] / aspect)
-			h = size[1]
-		
-		realsize = (w,h)
-		
-		# ensure the scaling is proper
-		assert realsize[0] <= size[0]
-		assert realsize[1] <= size[1]
-		assert abs((float(realsize[0]) / realsize[1]) - aspect) < 0.01
+		resolution = params['resolution']
+		resolution = Resolution(resolution[0], resolution[1])
+		size = Resolution(size[0], size[1])
+		realsize = fit(resolution, size)
 		
 		# scale constant
-		scale = float(w) / resolution[0]
+		scale = float(realsize.w) / resolution.w
 		
-		data = array.array('c', chr(0) * size[0] * size[1] * 4)
-		surface = cairo.ImageSurface.create_for_data(data, cairo.FORMAT_ARGB32, size[0], size[1], size[0]*4)
+		data = array.array('c', chr(0) * int(size.w) * int(size.h) * 4)
+		surface = cairo.ImageSurface.create_for_data(data, cairo.FORMAT_ARGB32, int(size.w), int(size.h), int(size.w)*4)
 		cr = cairo.Context(surface)
 		
-		cr.translate((size[0]-realsize[0])*0.5, (size[1]-realsize[1])*0.5)
+		cr.translate((size.w-realsize.w)*0.5, (size.h-realsize.h)*0.5)
 		
 		cr.save()
 		cr.set_source_rgba(1,0,1,1)
@@ -87,7 +118,7 @@ class Template:
 		cr.paint()
 		
 		cr.set_source_rgba(0,0,0,1)
-		cr.rectangle(0, 0, w, h)
+		cr.rectangle(0, 0, realsize.w, realsize.h)
 		cr.fill()
 		cr.restore()
 		
