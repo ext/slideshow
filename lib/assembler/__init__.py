@@ -23,8 +23,8 @@ import image
 import text
 
 _assemblers = {
-	'text': text.TextAssembler(),
-	'image': image.ImageAssembler()
+	'text': text.TextAssembler,
+	'image': image.ImageAssembler
 }
 
 # setup reverse names
@@ -32,4 +32,4 @@ for k,v in _assemblers.items():
 	v.name = k
 
 def get(name):
-	return _assemblers[name]
+	return _assemblers[name]()
