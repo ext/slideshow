@@ -24,7 +24,6 @@ class Handler(object):
 	@template.output('maintenance/config.html', parent='maintenance')
 	def config(self, action=None, **kwargs):
 		settings = Settings()
-		print settings
 		
 		if action == 'save':
 			error = False
