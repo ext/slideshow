@@ -155,7 +155,13 @@ class Template:
 
 class TextAssembler(Assembler):
 	def default_size(self, slide, src, width=None):
-		return Settings().resolution()
+		resolution = Settings().resolution()
+		if width:
+			aspect = float(resolution[0]) / resolution[1]
+			height = int(float(width) / aspect)
+			return (int(width), height)
+		else:
+			return resolution
 	
 	def is_editable(self):
 		return True
