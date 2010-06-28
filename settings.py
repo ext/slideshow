@@ -229,11 +229,25 @@ class ItemResolution(Item):
 
 class ItemDisplay(Item):
 	default = ':0.0'
-	values = xquery.screens()
+	values = map(lambda x: (x,x), xquery.screens())
+	
+	def __init__(self, allow_empty=False, **kwargs):
+		Item.__init__(self, **kwargs)
+		self._extra = []
+		
+		if allow_empty:
+			self._extra.append(('',''))
 	
 	def __str__(self):
+		def f(x):
+			if self._value == x:
+				return '<option value="{key}" selected="selected">{value}</option>'
+			else:
+				return '<option value="{key}">{value}</option>'
+		
+		options = [f(k).format(key=k, value=v) for k,v in self._extra + self.values]
 		head = '<select name="{group}.{name}">'.format(**self._values())
-		content = '\n'.join(['<option value="{v}">{v}</option>'.format(v=v) for v in self.values])
+		content = '\n'.join(options)
 		tail = '</select>'
 		
 		return head + content + tail
