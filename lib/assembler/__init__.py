@@ -10,7 +10,7 @@ class Assembler:
 	def assemble(self, slide, **kwargs):
 		raise NotImplementedError
 	
-	def rasterize(self, slide, src, size):
+	def rasterize(self, slide, src, size, params):
 		raise NotImplementedError
 	
 	def default_size(self, slide, src, width=None):

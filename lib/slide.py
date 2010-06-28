@@ -49,7 +49,7 @@ class Slide:
 		:param size: Size of the raster
 		"""
 		if not self._has_raster(size):
-			self.assembler.rasterize(slide=self, size=size, **self._data)
+			self.assembler.rasterize(slide=self, size=size, params=self._data)
 
 def from_id(c, id):
 	row = c.execute("""

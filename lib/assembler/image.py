@@ -19,8 +19,8 @@ class ImageAssembler(Assembler):
 		
 		return {'filename': filename.filename}
 	
-	def rasterize(self, slide, filename, size):
-		src = filename
+	def rasterize(self, slide, size, params):
+		src = params['filename']
 		retcode = subprocess.call([
 			"convert", slide.src_path(src),
 			'-resize', '%dx%d' % size,

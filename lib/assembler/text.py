@@ -169,10 +169,10 @@ class TextAssembler(Assembler):
 	def assemble(self, slide, **kwargs):
 		return kwargs
 	
-	def rasterize(self, size, slide=None, file=None, **kwargs):
+	def rasterize(self, size, params, slide=None, file=None):
 		dst = slide and slide.raster_path(size) or file
 		template = Template('nitroxy.xml')
-		template.rasterize(dst=dst, size=size, params=kwargs)
+		template.rasterize(dst=dst, size=size, params=params)
 	
 	def raster_is_valid(reference, resolution, **kwargs):
 		return reference == resolution
