@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from . import Assembler
+from settings import Settings
 import array, cairo, pango, pangocairo, json, re
 import xml
 from xml.dom import minidom
@@ -86,7 +87,7 @@ class Template:
 					self._textarea(size, realsize, scale, cr, item, params[item.getAttribute('name')])
 			finally:
 				cr.restore()
-			
+				
 		surface.write_to_png(dst)
 	
 	@staticmethod
@@ -145,6 +146,9 @@ class Template:
 		ctx.show_layout(layout)
 
 class TextAssembler(Assembler):
+	def default_size(self, slide, src, width=None):
+		return Settings().resolution()
+	
 	def is_editable(self):
 		return True
 	
