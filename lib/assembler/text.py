@@ -5,31 +5,7 @@ from . import Assembler
 import array, cairo, pango, pangocairo, json, re
 import xml
 from xml.dom import minidom
-
-def decode_color(str):
-	if str[0] == '#':
-		str = str[1:]
-	
-	n = len(str)
-	fmt = {
-		3: '([0-9A-Fa-f]{1})' * 3, # shorthand RGB
-		4: '([0-9A-Fa-f]{1})' * 4, # shorthand RGBA
-		6: '([0-9A-Fa-f]{2})' * 3, # RGB
-		8: '([0-9A-Fa-f]{2})' * 3 # RGBA
-	}
-	
-	match = re.match(fmt[n], str)
-	
-	if match:
-		color = match.groups()
-		if len(color) == 3:
-			color += ('ff',) # force RGBA
-		
-		color = tuple([int(x,16)/255.0 for x in color])
-		
-		return color
-	else:
-		return None
+from htmlcolor import Parser as ColorParser
 
 def decode_position(str, size):
 	"""
@@ -67,6 +43,9 @@ def decode_position(str, size):
 	return tuple(p)
 	
 class Template:
+	color_parser = ColorParser()
+	decode_color = color_parser.parse
+	
 	def __init__(self, filename):
 		self._filename = filename
 	
