@@ -8,7 +8,7 @@ class ImageAssembler(Assembler):
 	def is_editable(self):
 		return False
 	
-	def assemble(self, slide, filename):
+	def assemble(self, slide, filename, **kwargs):
 		dst = open(slide.src_path(filename.filename), 'wb')
 		
 		while True:

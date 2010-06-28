@@ -40,7 +40,7 @@ class Handler(object):
 		return template.render(preview=kwargs)
 
 	@cherrypy.expose
-	def submit(self, assembler, submit, **kwargs):
+	def submit(self, assembler=None, submit=None, **kwargs):
 		if submit == 'preview':
 			raise cherrypy.HTTPRedirect('/slides/upload?' + urllib.urlencode(kwargs))
 		
