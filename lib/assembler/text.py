@@ -46,20 +46,6 @@ def decode_position(str, size):
 color_parser = ColorParser(components=4)
 decode_color = color_parser.parse
 
-class Resolution:
-    def __init__(self, w,h):
-        self.w = float(w)
-        self.h = float(h)
-    
-    def aspect(self):
-        return self.w / self.h
-    
-    def __iter__(self):
-    	return (self.w, self.h).__iter__()
-    
-    def __str__(self):
-        return '%dx%d %.4f' % (self.w, self.h, self.aspect())
-
 def validate(func):
     def decorate(input, max):
         ret = func(input, max)
@@ -77,18 +63,30 @@ def validate(func):
         return ret
     return decorate
 
-@validate
-def fit(input, max):
-    input_aspect = input.aspect();
-    max_aspect = max.aspect()
-
-    new_size = Resolution(max.w, max.h)
-    if input_aspect > max_aspect:
-        new_size.h = max.w * (input.h / input.w)
-    else:
-        new_size.w = max.h * (input.w / input.h)
-    
-    return new_size
+class Resolution:
+	def __init__(self, w,h):
+		self.w = float(w)
+		self.h = float(h)
+	
+	def aspect(self):
+		return self.w / self.h
+	
+	def __iter__(self):
+		return (self.w, self.h).__iter__()
+	
+	@validate
+	def fit(self, max):
+		new_size = Resolution(max.w, max.h)
+		
+		if self.aspect() > max.aspect():
+			new_size.h = max.w * (self.h / self.w)
+		else:
+			new_size.w = max.h * (self.w / self.h)
+		
+		return new_size
+	
+	def __str__(self):
+		return '%dx%d %.4f' % (self.w, self.h, self.aspect())
 
 class Template:
 	def __init__(self, filename):
@@ -101,7 +99,7 @@ class Template:
 		resolution = params['resolution']
 		resolution = Resolution(resolution[0], resolution[1])
 		size = Resolution(size[0], size[1])
-		realsize = fit(resolution, size)
+		realsize = resolution.fit(size)
 		
 		# scale constant
 		scale = float(realsize.w) / resolution.w
