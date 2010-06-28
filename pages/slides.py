@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import cherrypy, urllib
-from lib import queue, slide, template
+from lib import assembler, queue, slide, template
 from settings import Settings
 import daemon
 
@@ -57,11 +57,10 @@ class Handler(object):
 	@cherrypy.expose
 	@cherrypy.tools.response_headers(headers=[('Content-Type', 'image/png')])
 	def preview(self, **kwargs):
-		from lib.assembler import TextAssembler
 		import cStringIO
 		
 		dst = cStringIO.StringIO()
-		asm = TextAssembler()
+		asm = assembler.get('text')
 		
 		settings = Settings()
 		kwargs['resolution'] = settings.resolution()
