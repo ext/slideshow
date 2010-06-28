@@ -64,7 +64,7 @@ class Handler(object):
 		settings = Settings()
 		kwargs['resolution'] = settings.resolution()
 		
-		asm.rasterize(file=dst, size=(800,600), **kwargs)
+		asm.rasterize(file=dst, size=(800,600), params=kwargs)
 		
 		content = dst.getvalue()
 		dst.close()

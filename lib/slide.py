@@ -6,6 +6,7 @@ import assembler as asm
 import shutil, uuid
 from settings import Settings
 import event
+import cherrypy
 
 image_path = os.path.expanduser('~/slideshow/image')
 
@@ -121,7 +122,38 @@ def delete(c, id):
 @event.listener
 class EventListener:
 	@event.callback('config.resolution_changed')
-	def resolution_changed(*args, **kwargs):
-		print 'resolution is changed', args, kwargs
+	def resolution_changed(self, resolution):
+		c = cherrypy.thread_data.db.cursor()
+		
+		slides = [Slide(queue=None, **x) for x in c.execute("""
+			SELECT
+				id,
+				path,
+				active,
+				assembler,
+				data
+			FROM
+				slide
+		""").fetchall()]
+		
+		for slide in slides:
+			params = slide._data
+			params['resolution'] = resolution
+			
+			slide._data = json.loads(slide.assemble(params))
+			slide.rasterize((200,200)) # thumbnail
+			slide.rasterize((800,600)) # windowed mode (debug)
+			slide.rasterize(resolution)
+			
+			c.execute("""
+				UPDATE
+					slide
+				SET
+					data = :data
+				WHERE
+					id = :id
+			""", dict(id=slide.id, data=json.dumps(slide._data)))
+		
+		cherrypy.thread_data.db.commit()
 
 _listener = EventListener()

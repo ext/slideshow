@@ -77,7 +77,9 @@ class Item:
         return '<input type="text" name="{group}.{name}" type="{type}" value="{value}"/>'.format(**self._values())
     
     def set(self, value, rollback=False):
+        tmp = self._value
         self._value = value
+        return tmp
     
     def get(self):
         return self._value
@@ -100,6 +102,8 @@ class ItemDirectory(Item):
                 raise ValueError, 'Not a directory'
             if not os.access(path, os.W_OK):
                 raise ValueError, 'Need write-permission'
+            
+            return tmp
         except:
             if rollback:
                 self._value = tmp
@@ -153,6 +157,7 @@ class ItemInteger(Item):
         try:
             try:
                 self._value = int(value)
+                return tmp
             except ValueError:
                 raise ValueError, 'Not a valid integer'
         except:
@@ -170,6 +175,7 @@ class ItemFloat(Item):
         try:
             try:
                 self._value = float(value)
+                return tmp
             except ValueError:
                 raise ValueError, 'Not a valid float'
         except:
@@ -274,9 +280,15 @@ class Settings(object):
     def __new__(cls, *args, **kwargs):
         if cls != type(cls.__singleton):
             cls.__singleton = object.__new__(cls)
+            cls.__singleton.__real_init__()
         return cls.__singleton
     
     def __init__(self):
+        """ NOT SAFE, WILL BE CALLED FOR EACH COPY OF THE SINGLETON! """
+        pass
+    
+    def __real_init__(self):
+        """ Will be called on singleton creation """
         self._locked = False
         self._lock = threading.Lock()
         
@@ -328,11 +340,10 @@ class Settings(object):
             return
         
         item = self.item(key)
+        old = item.set(value)
         
-        if key == 'Apparence.Resolution' and item._value != value:
-            event.trigger('config.resolution_changed', value)
-        
-        item.set(value)
+        if key == 'Apparence.Resolution' and item._value != old:
+            event.trigger('config.resolution_changed', self.resolution())
     
     def resolution(self):
         r = self['Apparence.Resolution']
