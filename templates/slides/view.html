@@ -36,8 +36,29 @@
 					</div>
 				</py:for>
 			</div>
+			<br style="clear: both;" />
 		</div>
 	</py:for>
+	
+	<script type="text/javascript">
+		<py:for each="queue in queues">
+			$$("#queue_${queue.id}").sortable({
+				connectWith: [ ${', '.join(['"#queue_%d"' % q.id for q in queues])} ],
+				placeholder: 'slide_placeholder',
+				tolerance: "pointer",
+				
+				update: function($$e, $$ui){
+					var list = $$(this).sortable('toArray');
+					$$.ajax({
+						type: "POST",
+						url: "/slides/moveajax",
+						data: "queue=" + $$(this).attr('id') + "&amp;slides=" + list
+					 });
+				}
+			});
+		</py:for>
+	</script>
+	
 </body>
 
 </html>
