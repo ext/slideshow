@@ -136,19 +136,24 @@
 
 .slide {
 	float: left;
+	
+	margin: 0;
 	margin-right: 10px;
+	padding: 0;
+	border:1px solid #aaa;
 }
 
 img {
-	border:		1px solid black;
-	margin-bottom: 5px;
+	
 	cursor:		move;
+	margin: 0;
+	padding: 0;
 }
 
 .slide .menu {
+	margin: 0;
 	padding: 5px;
-	width: 191px;
-	border:1px solid #aaa;
+
 	font-size: 0.7em;
 	font-family: sans-serif;
 }
