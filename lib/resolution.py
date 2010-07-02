@@ -51,4 +51,4 @@ class Resolution:
             return Resolution(self.w * self.aspect(), height)
     
     def __str__(self):
-        return '%dx%d %.4f' % (self.w, self.h, self.aspect())
+        return '%dx%d' % (int(self.w), int(self.h))
