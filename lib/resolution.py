@@ -40,5 +40,15 @@ class Resolution:
         
         return new_size
     
+    def scale(self, width=None, height=None):
+        if width and height:
+            raise ValueError, 'both width and height given, can only set one'
+        
+        if width:
+            return Resolution(width, self.h * self.aspect())
+        
+        if height:
+            return Resolution(self.w * self.aspect(), height)
+    
     def __str__(self):
         return '%dx%d %.4f' % (self.w, self.h, self.aspect())
