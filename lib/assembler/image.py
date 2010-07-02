@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from . import Assembler
+from lib.resolution import Resolution
 import subprocess
+import PythonMagick
 
 class ImageAssembler(Assembler):
 	def is_editable(self):
@@ -20,20 +22,30 @@ class ImageAssembler(Assembler):
 		return {'filename': filename.filename}
 	
 	def rasterize(self, slide, size, params):
+		if isinstance(size, tuple):
+			raise ValueError, 'omg'
+		
 		src = params['filename']
 		retcode = subprocess.call([
 			"convert", slide.src_path(src),
-			'-resize', '%dx%d' % size,
+			'-resize', str(size),
 			'-background', 'black',
 			'-gravity', 'center',
-			'-extent', '%dx%d' % size,
+			'-extent', str(size),
 			slide.raster_path(size)
 		])
 		if retcode != 0:
-			raise ValueError, 'failed to resample %s' % (self.raster_path(size))
+			raise ValueError, 'failed to resample %s' % (slide.raster_path(size))
 	
 	def default_size(self, slide, params, width=None):
+		print 'default size'
+		
+		src = params['filename']
+		img = PythonMagick.Image(str(slide.src_path(src)))
+		geom = img.size()
+		size = Resolution(geom.width(), geom.height())
+		
 		if width:
-			raise NotImplementedError
+			return size.scale(width=width)
 		else:
-			return (1024, 768)
+			return size

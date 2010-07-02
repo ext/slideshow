@@ -3,6 +3,7 @@
 
 import cherrypy, urllib
 from lib import assembler, queue, slide, template
+from lib.resolution import Resolution
 from settings import Settings
 import daemon
 
@@ -49,7 +50,7 @@ class Handler(object):
 		elif len(args) == 1:
 			size = s.default_size(args[0])
 		else:
-			size = (int(args[0]), int(args[1]))
+			size = Resolution(float(args[0]), float(args[1]))
 		
 		s.rasterize(size)
 		
@@ -88,9 +89,9 @@ class Handler(object):
 		asm = assembler.get('text')
 		
 		settings = Settings()
-		kwargs['resolution'] = settings.resolution()
+		kwargs['resolution'] = (settings.resolution().w, settings.resolution().h)
 		
-		asm.rasterize(file=dst, size=(800,600), params=kwargs)
+		asm.rasterize(file=dst, size=Resolution(800,600), params=kwargs)
 		
 		content = dst.getvalue()
 		dst.close()

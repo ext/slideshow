@@ -7,6 +7,7 @@ import json, xquery
 import pprint
 import threading
 import event
+from lib.resolution import Resolution
 
 try:
     # python 3.0
@@ -351,9 +352,10 @@ class Settings(object):
             w,h = r.split('x')
             w = int(w)
             h = int(h)
-            return (w,h)
+            return Resolution(w,h)
         else:
-            return xquery.current_resolution(use_rotation=True)
+            size = xquery.current_resolution(use_rotation=True)
+            return Resolution(size[0], size[1])
     
     def load(self, base, config_file=None):
         doc = minidom.parse(base)

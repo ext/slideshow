@@ -5,6 +5,7 @@ import os, os.path, json
 import assembler as asm
 import shutil, uuid
 from settings import Settings
+from lib.resolution import Resolution
 import event
 import cherrypy
 
@@ -36,7 +37,7 @@ class Slide:
 		return self.assembler.default_size(slide=self, params=self._data, width=width)
 	
 	def raster_path(self, size):
-		return os.path.join(image_path, self._path, 'raster', '%dx%d.png' % size)
+		return os.path.join(image_path, self._path, 'raster', str(size))
 	
 	def src_path(self, item):
 		return os.path.join(image_path, self._path, 'src', item)
@@ -87,8 +88,8 @@ def create(c, assembler, params):
 	slide = Slide(id=None, queue=None, path=dst, active=False, assembler=assembler, data=None, stub=True)
 	slide._data = json.loads(slide.assemble(params))
 	
-	slide.rasterize((200,200)) # thumbnail
-	slide.rasterize((800,600)) # windowed mode (debug)
+	slide.rasterize(Resolution(200,200)) # thumbnail
+	slide.rasterize(Resolution(800,600)) # windowed mode (debug)
 	slide.rasterize(settings.resolution())
 	
 	c.execute("""
@@ -141,8 +142,8 @@ class EventListener:
 			params['resolution'] = resolution
 			
 			slide._data = json.loads(slide.assemble(params))
-			slide.rasterize((200,200)) # thumbnail
-			slide.rasterize((800,600)) # windowed mode (debug)
+			slide.rasterize(Resolution(200,200)) # thumbnail
+			slide.rasterize(Resolution(800,600)) # windowed mode (debug)
 			slide.rasterize(resolution)
 			
 			c.execute("""

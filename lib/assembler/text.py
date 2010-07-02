@@ -56,8 +56,6 @@ class Template:
 		template = doc.getElementsByTagName('template')[0]
 		
 		resolution = params['resolution']
-		resolution = Resolution(resolution[0], resolution[1])
-		size = Resolution(size[0], size[1])
 		realsize = resolution.fit(size)
 		
 		# scale constant
@@ -157,9 +155,9 @@ class TextAssembler(Assembler):
 	def default_size(self, slide, params, width=None):
 		resolution = Settings().resolution()
 		if width:
-			aspect = float(resolution[0]) / resolution[1]
-			height = int(float(width) / aspect)
-			return (int(width), height)
+			print resolution.aspect()
+			print resolution.scale(width=width).aspect()
+			return resolution.scale(width=width)
 		else:
 			return resolution
 	
@@ -167,9 +165,14 @@ class TextAssembler(Assembler):
 		return True
 	
 	def assemble(self, slide, **kwargs):
+		kwargs = kwargs.copy()
+		kwargs['resolution'] = (kwargs['resolution'].w, kwargs['resolution'].h)
 		return kwargs
 	
 	def rasterize(self, size, params, slide=None, file=None):
+		params = params.copy()
+		params['resolution'] = Resolution(params['resolution'][0], params['resolution'][1])
+		
 		dst = slide and slide.raster_path(size) or file
 		template = Template('nitroxy.xml')
 		template.rasterize(dst=dst, size=size, params=params)
