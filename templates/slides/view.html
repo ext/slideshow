@@ -51,8 +51,8 @@
 					var list = $$(this).sortable('toArray');
 					$$.ajax({
 						type: "POST",
-						url: "/slides/moveajax",
-						data: "queue=" + $$(this).attr('id') + "&amp;slides=" + list
+						url: "/slides/ajax/move",
+						data: "queue=" + $$(this).attr('id') + "${Markup('&amp;')}slides=" + list
 					 });
 				}
 			});

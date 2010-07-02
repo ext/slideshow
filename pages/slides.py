@@ -6,7 +6,33 @@ from lib import assembler, queue, slide, template
 from settings import Settings
 import daemon
 
+class Ajax(object):
+	@cherrypy.expose
+	def move(self, queue, slides):
+		queue = queue[6:] # remove 'queue_'-prefix
+		slides = [x[6:] for x in slides.split(',')] # remove 'slide_'-prefix
+		c = cherrypy.thread_data.db.cursor()
+		
+		# prepare slides
+		slides = [dict(queue=queue, id=id, order=n) for (n,id) in enumerate(slides)]
+		print slides
+		
+		c.executemany("""
+			UPDATE
+				slide
+			SET
+				queue_id = :queue,
+				sortorder = :order
+			WHERE
+				id = :id
+		""", slides)
+		cherrypy.thread_data.db.commit()
+		
+		return None
+
 class Handler(object):
+	ajax = Ajax()
+	
 	@cherrypy.expose
 	@template.output('slides/view.html')
 	def list(self):
