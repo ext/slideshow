@@ -33,7 +33,7 @@ class Slide:
 		return json.dumps(self.assembler.assemble(self, **params))
 	
 	def default_size(self, width=None):
-		return self.assembler.default_size(slide=self, src=self._data, width=width)
+		return self.assembler.default_size(slide=self, params=self._data, width=width)
 	
 	def raster_path(self, size):
 		return os.path.join(image_path, self._path, 'raster', '%dx%d.png' % size)

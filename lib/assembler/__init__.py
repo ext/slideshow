@@ -13,7 +13,7 @@ class Assembler:
 	def rasterize(self, slide, src, size, params):
 		raise NotImplementedError
 	
-	def default_size(self, slide, src, width=None):
+	def default_size(self, slide, params, width=None):
 		raise NotImplementedError
 	
 	def raster_is_valid(**kwargs):

@@ -154,7 +154,7 @@ class Template:
 		ctx.show_layout(layout)
 
 class TextAssembler(Assembler):
-	def default_size(self, slide, src, width=None):
+	def default_size(self, slide, params, width=None):
 		resolution = Settings().resolution()
 		if width:
 			aspect = float(resolution[0]) / resolution[1]

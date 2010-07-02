@@ -32,7 +32,7 @@ class ImageAssembler(Assembler):
 		if retcode != 0:
 			raise ValueError, 'failed to resample %s' % (self.raster_path(size))
 	
-	def default_size(self, slide, src, width=None):
+	def default_size(self, slide, params, width=None):
 		if width:
 			raise NotImplementedError
 		else:
