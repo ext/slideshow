@@ -45,10 +45,12 @@ class Resolution:
             raise ValueError, 'both width and height given, can only set one'
         
         if width:
-            return Resolution(width, self.h / self.aspect())
+            width = float(width)
+            return Resolution(width, width / self.aspect())
         
         if height:
-            return Resolution(self.w / self.aspect(), height)
+            height = float(height)
+            return Resolution(height * self.aspect(), height)
     
     def __str__(self):
         return '%dx%d' % (int(self.w), int(self.h))
