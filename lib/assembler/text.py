@@ -68,13 +68,9 @@ class Template:
 		cr.translate((size.w-realsize.w)*0.5, (size.h-realsize.h)*0.5)
 		
 		cr.save()
-		cr.set_source_rgba(1,0,1,1)
+		cr.set_source_rgba(0,0,0,1)
 		cr.set_operator(cairo.OPERATOR_SOURCE)
 		cr.paint()
-		
-		cr.set_source_rgba(0,0,0,1)
-		cr.rectangle(0, 0, realsize.w, realsize.h)
-		cr.fill()
 		cr.restore()
 		
 		for item in template.childNodes:
