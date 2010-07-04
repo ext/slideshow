@@ -12,16 +12,15 @@
 
 <body>
 	<div id="breadcrumb">
-		<h2><a href="/">Slideshow</a> &gt; Upload slide</h2>
+		<h2><a href="/">Slideshow</a> &gt; Edit slide</h2>
 	</div>
 
-	<h2>Text</h2>
+	<h2>Edit</h2>
 	<form action="/slides/submit" method="post" accept-charset="utf-8">
 		<input type="hidden" name="assembler" value="text" />
 		<input type="hidden" name="id" value="${id}" />
 		<input type="hidden" name="context" value="edit" />
 		<fieldset>
-			<p>Using this option you can create new slides with text only. The text will be applied to the predefined background if specified in the configuration.</p>
 			<label for="slide-title">Title</label><br/>
 			<input type="text" id="slide-title" name="title" size="70" value="${preview.get('title', '')}" /><br/>
 			<label for="slide-content">Content</label><br/>
