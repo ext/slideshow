@@ -72,10 +72,22 @@ class Template:
 		cr.set_operator(cairo.OPERATOR_SOURCE)
 		cr.paint()
 		
-		cr.set_source_rgba(0,0,0,1)
+		cr.set_source_rgba(0, 0, 0, 1)
 		cr.rectangle(0, 0, realsize.w, realsize.h)
 		cr.fill()
 		cr.restore()
+		
+		background = template.getAttribute('background')
+		if background:
+			image = cairo.ImageSurface.create_from_png(background)
+			w = image.get_width()
+			h = image.get_height()
+			
+			cr.save()
+			cr.scale(realsize.w/w, realsize.h/h)
+			cr.set_source_surface(image, 0, 0)
+			cr.paint()
+			cr.restore()
 		
 		for item in template.childNodes:
 			if not isinstance(item, minidom.Element):
