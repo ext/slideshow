@@ -62,7 +62,7 @@ def settings(resolution=None, fullscreen=True):
 		print 'using custom resolution'
 		args.append(str(resolution))
 	else:
-		args.append('%dx%d' % settings.resolution())
+		args.append(str(settings.resolution()))
 	
 	if isinstance(fullscreen, basestring):
 		fullscreen = fullscreen in ['1', 'True', 'true']
