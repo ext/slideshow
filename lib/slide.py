@@ -36,8 +36,11 @@ class Slide:
 	def default_size(self, width=None):
 		return self.assembler.default_size(slide=self, params=self._data, width=width)
 	
-	def raster_path(self, size):
-		return os.path.join(image_path, self._path, 'raster', str(size))
+	def raster_path(self, size=None):
+		args = [image_path, self._path, 'raster']
+		if size != None:
+			args.append(str(size) + '.png')
+		return os.path.join(*args)
 	
 	def src_path(self, item):
 		return os.path.join(image_path, self._path, 'src', item)
@@ -52,6 +55,11 @@ class Slide:
 		"""
 		if not self._has_raster(size):
 			self.assembler.rasterize(slide=self, size=size, params=self._data)
+	
+	def invalidate(self):
+		path = self.raster_path()
+		for root, dirs, files in os.walk(path):
+			[os.remove(os.path.join(root,x)) for x in files]
 
 def from_id(c, id):
 	row = c.execute("""
@@ -108,6 +116,29 @@ def create(c, assembler, params):
 	
 	return slide
 
+def edit(c, id, assembler, params):
+	settings = Settings()
+	
+	# reference resolution
+	params['resolution'] = settings.resolution()
+	
+	slide = from_id(c, id)
+	slide._data = json.loads(slide.assemble(params))
+	
+	slide.invalidate()
+	slide.rasterize(Resolution(200,200)) # thumbnail
+	slide.rasterize(Resolution(800,600)) # windowed mode (debug)
+	slide.rasterize(settings.resolution())
+	
+	c.execute("""
+		UPDATE
+			slide
+		SET
+			data = :data
+		WHERE
+			id = :id
+	""", dict(id=id, data=json.dumps(slide._data)))
+
 def delete(c, id):
 	s = from_id(c, id)
 	
@@ -142,6 +173,7 @@ class EventListener:
 			params['resolution'] = resolution
 			
 			slide._data = json.loads(slide.assemble(params))
+			slide.invalidate()
 			slide.rasterize(Resolution(200,200)) # thumbnail
 			slide.rasterize(Resolution(800,600)) # windowed mode (debug)
 			slide.rasterize(resolution)

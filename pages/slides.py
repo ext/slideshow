@@ -65,14 +65,33 @@ class Handler(object):
 	@template.output('slides/upload.html', parent='slides')
 	def upload(self, **kwargs):
 		return template.render(preview=kwargs)
-
+	
 	@cherrypy.expose
-	def submit(self, assembler=None, submit=None, **kwargs):
+	@template.output('slides/edit.html', parent='slides')
+	def edit(self, id, **kwargs):
+		s = slide.from_id(cherrypy.thread_data.db.cursor(), id)
+		
+		# @todo using private variable!
+		params = s._data.copy()
+		params.update(kwargs)
+		print 'updated:', params
+		
+		return template.render(id=id, preview=params)
+	
+	@cherrypy.expose
+	def submit(self, id=None, context=None, assembler=None, submit=None, **kwargs):
 		if submit == 'preview':
-			raise cherrypy.HTTPRedirect('/slides/upload?' + urllib.urlencode(kwargs))
+			args = kwargs
+			if id != None:
+				args['id'] = id
+			
+			raise cherrypy.HTTPRedirect('/slides/' + context + '?' + urllib.urlencode(args))
 		
 		try:
-			s = slide.create(cherrypy.thread_data.db.cursor(), assembler, kwargs)
+			if id == None: # new slide
+				s = slide.create(cherrypy.thread_data.db.cursor(), assembler, kwargs)
+			else: #edited slide
+				s = slide.edit(cherrypy.thread_data.db.cursor(), id, assembler, kwargs)
 			daemon.ipc.Reload()
 			cherrypy.thread_data.db.commit()
 		except:
