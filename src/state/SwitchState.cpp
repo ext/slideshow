@@ -23,6 +23,7 @@
 #include "SwitchState.h"
 #include "TransitionState.h"
 #include "ViewState.h"
+#include "exception.h"
 #include "Log.h"
 
 State* SwitchState::action(bool &flip){
@@ -40,8 +41,8 @@ State* SwitchState::action(bool &flip){
 
 	try {
 		gfx()->load_image( filename );
-	} catch ( ... ) {
-		Log::message(Log::Warning, "Kernel: Failed to load image '%s'\n", filename);
+	} catch ( exception& e ) {
+		Log::message(Log::Warning, "Kernel: Failed to load image '%s': %s\n", filename, e.what());
 		return new ViewState(this);
 	}
 
