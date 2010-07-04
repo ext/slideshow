@@ -35,8 +35,6 @@ application.config.update({
 })
 
 cherrypy.config.update({'sessionFilter.on': True}) 
-print cherrypy.config
-print application.config
 settings = Settings()
 settings.load('settings.xml', 'settings.json')
 
