@@ -29,12 +29,12 @@ def callback(event):
         return func
     return decorate
 
-def trigger(event, payload=None):
+def trigger(event, *args, **kwargs):
     if event not in _subscribers:
         return
     
     for func in _subscribers[event]:
-        func(payload)
+        func(*args, **kwargs)
 
 def subscribe(event, callback):
     if event not in _subscribers:

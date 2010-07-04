@@ -5,6 +5,7 @@ import cherrypy
 from lib import queue, slide, template
 from settings import Settings
 import daemon
+import event
 
 class Ajax(object):
 	@cherrypy.expose
@@ -78,3 +79,40 @@ class Handler(object):
 	def dumpqueue(self):
 		daemon.ipc.Debug_DumpQueue()
 		raise cherrypy.HTTPRedirect('/maintenance')
+	
+	@cherrypy.expose
+	def rebuild(self):
+		import sqlite3, threading
+		class Progress(threading.Thread):
+			def __init__(self):
+				threading.Thread.__init__(self)
+				self._sem = threading.Semaphore(value=0)
+				self._content = []
+			
+			def push(self, x):
+				self._content.append(x)
+				self._sem.release()
+			
+			def pop(self):
+				while True:
+					self._sem.acquire()
+					value = self._content.pop()
+					if value == None:
+						break
+					else:
+						yield str(value)
+			
+			def run(self):
+				cherrypy.thread_data.db = sqlite3.connect('site.db')
+				cherrypy.thread_data.db.row_factory = sqlite3.Row
+				cherrypy.thread_data.db.cursor().execute('PRAGMA foreign_keys = ON')
+				
+				event.trigger('maintenance.rebuild', self.push)
+				self.push(None)
+		
+		progress = Progress()
+		progress.start()
+		
+		return progress.pop()
+	rebuild._cp_config = {'response.stream': True}
+

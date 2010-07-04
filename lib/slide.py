@@ -56,10 +56,16 @@ class Slide:
 		if not self._has_raster(size):
 			self.assembler.rasterize(slide=self, size=size, params=self._data)
 	
-	def invalidate(self):
+	def _invalidate(self):
 		path = self.raster_path()
 		for root, dirs, files in os.walk(path):
 			[os.remove(os.path.join(root,x)) for x in files]
+	
+	def rebuild_cache(self, resolution):
+		self._invalidate()
+		self.rasterize(Resolution(200,200)) # thumbnail
+		self.rasterize(Resolution(800,600)) # windowed mode (debug)
+		self.rasterize(resolution)
 
 def from_id(c, id):
 	row = c.execute("""
@@ -95,10 +101,7 @@ def create(c, assembler, params):
 	
 	slide = Slide(id=None, queue=None, path=dst, active=False, assembler=assembler, data=None, stub=True)
 	slide._data = json.loads(slide.assemble(params))
-	
-	slide.rasterize(Resolution(200,200)) # thumbnail
-	slide.rasterize(Resolution(800,600)) # windowed mode (debug)
-	slide.rasterize(settings.resolution())
+	slide.rebuild_cache(settings.resolution())
 	
 	c.execute("""
 		INSERT INTO slide (
@@ -124,11 +127,7 @@ def edit(c, id, assembler, params):
 	
 	slide = from_id(c, id)
 	slide._data = json.loads(slide.assemble(params))
-	
-	slide.invalidate()
-	slide.rasterize(Resolution(200,200)) # thumbnail
-	slide.rasterize(Resolution(800,600)) # windowed mode (debug)
-	slide.rasterize(settings.resolution())
+	slide.rebuild_cache(settings.resolution())
 	
 	c.execute("""
 		UPDATE
@@ -153,6 +152,26 @@ def delete(c, id):
 
 @event.listener
 class EventListener:
+	@event.callback('maintenance.rebuild')
+	def flush(self, progresss):
+		c = cherrypy.thread_data.db.cursor()
+		settings = Settings()
+		
+		slides = [Slide(queue=None, **x) for x in c.execute("""
+			SELECT
+				id,
+				path,
+				active,
+				assembler,
+				data
+			FROM
+				slide
+		""").fetchall()]
+		
+		for n, slide in enumerate(slides):
+			progresss(str(float(n+1) / len(slides) * 100) + '%<br/>\n')
+			slide.rebuild_cache(settings.resolution())
+	
 	@event.callback('config.resolution_changed')
 	def resolution_changed(self, resolution):
 		c = cherrypy.thread_data.db.cursor()
@@ -173,10 +192,7 @@ class EventListener:
 			params['resolution'] = resolution
 			
 			slide._data = json.loads(slide.assemble(params))
-			slide.invalidate()
-			slide.rasterize(Resolution(200,200)) # thumbnail
-			slide.rasterize(Resolution(800,600)) # windowed mode (debug)
-			slide.rasterize(resolution)
+			slide.rebuild_cache(resolution)
 			
 			c.execute("""
 				UPDATE
