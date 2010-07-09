@@ -89,10 +89,7 @@ class Template:
 			cr.paint()
 			cr.restore()
 		
-		for item in self._template.childNodes:
-			if not isinstance(item, minidom.Element):
-				continue
-			
+		for item in self.items():
 			cr.save()
 			try:
 				if item.tagName == 'text':
@@ -162,6 +159,9 @@ class Template:
 		
 		layout.set_markup(text);
 		ctx.show_layout(layout)
+	
+	def items(self):
+		return [x for x in self._template.childNodes if isinstance(x, minidom.Element)]
 
 class TextAssembler(Assembler):
 	def default_size(self, slide, params, width=None):
