@@ -25,7 +25,7 @@ loader = TemplateLoader(
     callback=template_loaded
 )
 
-def output(filename, method='xhtml', encoding='utf-8', parent='main', **options):
+def output(filename, method='xhtml', encoding='utf-8', doctype=None, parent='main', loader=loader, **options):
     """Decorator for exposed methods to specify what template they should use
     for rendering, and which serialization method and options should be
     applied.
@@ -35,10 +35,18 @@ def output(filename, method='xhtml', encoding='utf-8', parent='main', **options)
             cherrypy.thread_data.template = loader.load(filename)
             cherrypy.thread_data.parent = parent
             opt = options.copy()
-            if method == 'html':
-            	opt.setdefault('doctype', 'html')
-            if method == 'xhtml':
-                opt.setdefault('doctype', 'xhtml')
+            
+            # if no doctype is set, try to autodetect
+            # if doctype is False, skip doctype
+            # if doctype is set, use it
+            if doctype is None:
+                if method == 'html':
+                    opt.setdefault('doctype', 'html')
+                if method == 'xhtml':
+                    opt.setdefault('doctype', 'xhtml')
+            elif doctype is not False:
+                opt.setdefault('doctype', doctype)
+            
             serializer = get_serializer(method, **opt)
             stream = func(*args, **kwargs)
             
