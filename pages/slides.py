@@ -27,6 +27,7 @@ class Ajax(object):
 				id = :id
 		""", slides)
 		cherrypy.thread_data.db.commit()
+		daemon.ipc.Reload()
 		
 		return None
 
