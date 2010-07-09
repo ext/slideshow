@@ -52,10 +52,3 @@ class ImageAssembler(Assembler):
 	
 	def title(self):
 		return 'Image'
-	
-	def render(self, content):
-		return """<fieldset>
-			<p>Using this option you can upload an existing image. The image will be scaled to fit the screen but will keep the aspect ratio.</p>
-			<input type="file" id="filename" name="filename" accept="image/*" />
-			<input type="submit" value="Upload" />
-		</fieldset>"""

@@ -1,6 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from genshi.template import TemplateLoader
+from lib import template
+import os.path
+
+loader = TemplateLoader(
+	os.path.join(os.path.dirname(__file__)),
+	auto_reload=True
+)
+
 class Assembler:
 	name = '' # automatically set in factory initialization
 	
@@ -49,7 +58,10 @@ class Assembler:
 		Get html representation of the upload/edit form (should include the
 		fieldset wrapping the fields)
 		"""
-		raise NotImplementedError
+		
+		func = lambda: template.render(**content)
+		file = self.name + '.html'
+		return template.output(file, doctype=False, loader=loader)(func)()
 
 import image
 import text
