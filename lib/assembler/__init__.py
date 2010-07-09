@@ -18,6 +18,9 @@ class Assembler:
 	
 	def raster_is_valid(**kwargs):
 		return True
+	
+	def title(self):
+		raise NotImplementedError
 
 import image
 import text

@@ -191,3 +191,6 @@ class TextAssembler(Assembler):
 	
 	def raster_is_valid(reference, resolution, **kwargs):
 		return reference == resolution
+	
+	def title(self):
+		return 'Text'

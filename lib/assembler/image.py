@@ -49,3 +49,6 @@ class ImageAssembler(Assembler):
 			return size.scale(width=width)
 		else:
 			return size
+	
+	def title(self):
+		return 'Image'
