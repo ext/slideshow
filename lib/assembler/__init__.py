@@ -58,3 +58,6 @@ for k,v in _assemblers.items():
 
 def get(name):
 	return _assemblers[name]()
+
+def all():
+	return dict([(k,v()) for k,v in _assemblers.items()])
