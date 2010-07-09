@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE template SYSTEM "slide_template.dtd">
+<template background="bg.png" fit="scale">
+	<!--
+		Units:
+		All units defaults to pixels, if the unit is suffixed
+		with % it is relative to the size of the slide
+
+		Negative units can be used to count from the opposite
+		side of the slide.
+
+		For instance, an x coordinate of:
+		 * 50;		50 pixels from the right
+		 * -50;		50 pixels from the left
+		 * -5%;		5% of the screen from the left
+	-->
+
+	<!--
+		Colors:
+		There is three ways to select a color:
+		 * Decimal RGB[A]: "255, 0, 135"
+		 * Hexadecimal RGB[A]: "#FF00CC"
+		 * Named color: "red"
+	 -->
+
+	<!--
+		Valid field types:
+		 * text: Single line of text
+		 * textarea: Multiple lines of text
+		 * static: Insert static text at given position
+	 -->
+	<text name="title" title="Title" font="Sans" size="36" color="#ffff00" align="center" position="50% 6%" />
+	<textarea name="content" title="Content" font="Sans" color="#54a42d" size="48" align="center" boxsize="90% 80%" position="50% 47%" />
+</template>
