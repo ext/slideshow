@@ -16,23 +16,11 @@
 	</div>
 
 	<h2>Edit</h2>
-	<form action="/slides/submit" method="post" accept-charset="utf-8">
+	<form action="/slides/submit" method="post" enctype="multipart/form-data" accept-charset="utf-8">
 		<input type="hidden" name="assembler" value="text" />
 		<input type="hidden" name="id" value="${id}" />
 		<input type="hidden" name="context" value="edit" />
-		<fieldset>
-			<label for="slide-title">Title</label><br/>
-			<input type="text" id="slide-title" name="title" size="70" value="${preview.get('title', '')}" /><br/>
-			<label for="slide-content">Content</label><br/>
-			<textarea id="slide-content" name="content" cols="60" rows="15">${preview.get('content', '')}</textarea><br/>
-			<br/>
-
-			<input type="submit" name="submit" value="preview" />
-			<input type="submit" name="submit" value="upload" /><br/>
-			
-			<?python import urllib ?>
-			<img src="/slides/preview?${urllib.urlencode(preview)}" py:if="preview"/>
-		</fieldset>
+		${Markup(assembler.render(content=preview))}
 	</form>
 
 </body>
