@@ -38,7 +38,8 @@ class Handler(object):
 	@template.output('slides/view.html')
 	def list(self):
 		queues = queue.all(cherrypy.thread_data.db.cursor())
-		return template.render(queues=queues)
+		settings = Settings()
+		return template.render(queues=queues, active=settings['Runtime.queue'])
 	
 	@cherrypy.expose
 	@cherrypy.tools.response_headers(headers=[('Content-Type', 'image/png')])

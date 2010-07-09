@@ -110,7 +110,7 @@ def create(c, assembler, params):
 			assembler,
 			data
 		) VALUES (
-			1,
+			0,
 			:path,
 			:assembler,
 			:data

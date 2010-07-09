@@ -54,7 +54,7 @@ def settings(resolution=None, fullscreen=True):
 	args = [
 		'--uds-log', 'slideshow.sock', 
 		'--browser', 'sqlite://%s' % (os.path.abspath('site.db')),
-		'--collection-id', str(1),
+		'--collection-id', str(settings['Runtime.queue']),
 	]
 	
 	args.append('--resolution')

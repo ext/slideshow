@@ -12,7 +12,16 @@
 	
 	<py:for each="queue in queues">
 		<div class="queuewrapper">
-			<span class="title">${queue.name}</span><br/>
+			<span class="title">
+				${queue.name}
+				<py:if test="queue.id != 0">
+					<py:choose test="queue.id == active">
+						<py:when test="True">(active)</py:when>
+						<py:when test="False">(<a href="/queue/activate/${queue.id}">set as active</a>)</py:when>
+					</py:choose>
+				</py:if>
+			</span><br/>
+			
 			<div class="queue" id="queue_${queue.id}">
 				<py:for each="slide in queue.slides">
 					<div class="slide" id="slide_${slide.id}">
