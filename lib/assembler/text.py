@@ -49,10 +49,11 @@ color_parser = ColorParser(components=4)
 decode_color = color_parser.parse
 
 class Item:
-	def __init__(self, name):
+	def __init__(self, name, title):
 		self.name = name
+		self.title = title
 	
-	def render(self):
+	def render(self, content):
 		raise NotImplementedError
 	
 	def raster(self, cr, size, realsize, scale, content):
@@ -82,7 +83,8 @@ class Item:
 
 class TextArea(Item):
 	def __init__(self, element):
-		Item.__init__(self, element.getAttribute('name'))
+		_ = element.getAttribute
+		Item.__init__(self, _('name'), _('title'))
 		
 		self._font      = Item._get(element, 'font', 'Sans')
 		self._fontsize  = Item._get(element, 'size', '36.0', float)
@@ -90,6 +92,11 @@ class TextArea(Item):
 		self._position  = Item._get(element, 'position', '0 0')
 		self._boxsize   = Item._get(element, 'boxsize')
 		self._alignment = Item._get(element, 'align', 'left')
+	
+	def render(self, content):
+		return ('<label for="slide-{name}">{title}</label><br/>' +
+		        '<textarea id="slide-{name}" name="{name}" cols="80" rows="15">{content}</textarea><br/>') \
+		        .format(name=self.name, title=self.title, content=content)
 	
 	def raster(self, cr, size, realsize, scale, content):
 		font = self._font
@@ -119,13 +126,19 @@ class TextArea(Item):
 
 class Label(Item):
 	def __init__(self, element):
-		Item.__init__(self, element.getAttribute('name'))
+		_ = element.getAttribute
+		Item.__init__(self, _('name'), _('title'))
 		
 		self._font      = Item._get(element, 'font', 'Sans')
 		self._fontsize  = Item._get(element, 'size', '36.0', float)
 		self._color     = Item._get(element, 'color', '#000', decode_color)
 		self._position  = Item._get(element, 'position', '0 0')
 		self._alignment = Item._get(element, 'align', 'left')
+	
+	def render(self, content):
+		return ('<label for="slide-{name}">{title}</label><br/>' +
+		        '<input type="text" id="slide-{name}" name="{name}" size="70" value="{content}" /><br/>') \
+		        .format(name=self.name, title=self.title, content=content)
 	
 	def raster(self, cr, size, realsize, scale, content):
 		font = self._font
@@ -244,4 +257,5 @@ class TextAssembler(Assembler):
 		if len(content) > 0:
 			default['preview'] = urllib.urlencode(content)
 		default.update(content)
+		default['template'] = Template('nitroxy.xml')
 		return Assembler.render(self, content=default)
