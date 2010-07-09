@@ -64,7 +64,16 @@ class Handler(object):
 	@cherrypy.expose
 	@template.output('slides/upload.html', parent='slides')
 	def upload(self, **kwargs):
-		return template.render(preview=kwargs)
+		# get all assembers
+		unsorted=assembler.all()
+		
+		# manually place image and text first
+		sorted = [unsorted.pop('image'), unsorted.pop('text')]
+		unsorted = unsorted.items()
+		unsorted.sort()
+		sorted += [v for k,v in unsorted]
+		
+		return template.render(assemblers=sorted, preview=kwargs)
 	
 	@cherrypy.expose
 	@template.output('slides/edit.html', parent='slides')

@@ -43,6 +43,13 @@ class Assembler:
 		Get a pretty name of this type of assembler
 		"""
 		raise NotImplementedError
+	
+	def render(self, content):
+		"""
+		Get html representation of the upload/edit form (should include the
+		fieldset wrapping the fields)
+		"""
+		raise NotImplementedError
 
 import image
 import text

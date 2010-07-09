@@ -8,6 +8,7 @@ import array, cairo, pango, pangocairo, json, re
 import xml
 from xml.dom import minidom
 from htmlcolor import Parser as ColorParser
+import urllib
 
 def decode_position(str, size):
 	"""
@@ -194,3 +195,21 @@ class TextAssembler(Assembler):
 	
 	def title(self):
 		return 'Text'
+	
+	def render(self, content):
+		data = dict(title='', content='', preview=urllib.urlencode(content))
+		data.update(content)
+		
+		return """<fieldset>
+			<p>Using this option you can create new slides with text only. The text will be applied to the predefined background if specified in the configuration.</p>
+			<label for="slide-title">Title</label><br/>
+			<input type="text" id="slide-title" name="title" size="70" value="{title}" /><br/>
+			<label for="slide-content">Content</label><br/>
+			<textarea id="slide-content" name="content" cols="60" rows="15">{content}</textarea><br/>
+			<br/>
+
+			<input type="submit" name="submit" value="preview" />
+			<input type="submit" name="submit" value="upload" /><br/>
+			
+			<img src="/slides/preview?{preview}" />
+		</fieldset>""".format(**data)
