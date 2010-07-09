@@ -7,6 +7,7 @@ import sqlite3
 from lib import template
 from pages import slides
 from pages import maintenance
+from pages import queue
 from settings import Settings
 import daemon
 
@@ -20,6 +21,7 @@ cherrypy.engine.subscribe('start_thread', connect)
 class Root(object):
 	slides = slides.Handler()
 	maintenance = maintenance.Handler()
+	queue = queue.Handler()
 	
 	@cherrypy.expose
 	def index(self):
