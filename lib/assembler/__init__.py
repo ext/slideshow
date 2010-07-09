@@ -5,21 +5,43 @@ class Assembler:
 	name = '' # automatically set in factory initialization
 	
 	def is_editable(self):
+		"""
+		Tells whenever an assembler is editable or not.
+		"""
 		return False
 	
 	def assemble(self, slide, **kwargs):
+		"""
+		Prepares an assembler. It does not rasterize anything.
+		"""
 		raise NotImplementedError
 	
 	def rasterize(self, slide, src, size, params):
+		"""
+		Rasterize a slide to the given resolution. It takes the source data
+		earlier prepared (using assemble) and creates an image of the given
+		resolution.
+		"""
 		raise NotImplementedError
 	
 	def default_size(self, slide, params, width=None):
+		"""
+		It returns the default size for this slide. Eg for an image slide it
+		returns the resolution of the source image, and for a text slide it
+		gives the configured resolution.
+		"""
 		raise NotImplementedError
 	
 	def raster_is_valid(**kwargs):
+		"""
+		Determines whenever the cached raster is valid
+		"""
 		return True
 	
 	def title(self):
+		"""
+		Get a pretty name of this type of assembler
+		"""
 		raise NotImplementedError
 
 import image
