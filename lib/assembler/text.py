@@ -51,11 +51,10 @@ decode_color = color_parser.parse
 class Template:
 	def __init__(self, filename):
 		self._filename = filename
+		self._doc = minidom.parse(self._filename)
+		self._template = self._doc.getElementsByTagName('template')[0]
 	
 	def rasterize(self, dst, size, params):
-		doc = minidom.parse(self._filename)
-		template = doc.getElementsByTagName('template')[0]
-		
 		resolution = params['resolution']
 		realsize = resolution.fit(size)
 		
@@ -78,7 +77,7 @@ class Template:
 		cr.fill()
 		cr.restore()
 		
-		background = template.getAttribute('background')
+		background = self._template.getAttribute('background')
 		if background:
 			image = cairo.ImageSurface.create_from_png(background)
 			w = image.get_width()
@@ -90,7 +89,7 @@ class Template:
 			cr.paint()
 			cr.restore()
 		
-		for item in template.childNodes:
+		for item in self._template.childNodes:
 			if not isinstance(item, minidom.Element):
 				continue
 			
