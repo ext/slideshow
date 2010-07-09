@@ -83,7 +83,6 @@ class Handler(object):
 		# @todo using private variable!
 		params = s._data.copy()
 		params.update(kwargs)
-		print 'updated:', params
 		
 		return template.render(id=id, preview=params)
 	
