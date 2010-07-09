@@ -16,7 +16,6 @@ class Ajax(object):
 		
 		# prepare slides
 		slides = [dict(queue=queue, id=id, order=n) for (n,id) in enumerate(slides)]
-		print slides
 		
 		c.executemany("""
 			UPDATE
