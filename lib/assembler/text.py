@@ -253,7 +253,7 @@ class TextAssembler(Assembler):
 		return 'Text'
 	
 	def render(self, content):
-		default = dict(title='', content='', preview=None)
+		default = dict(preview=None)
 		if len(content) > 0:
 			default['preview'] = urllib.urlencode(content)
 		default.update(content)

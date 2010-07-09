@@ -2,7 +2,7 @@
 	<p>Using this option you can create new slides with text only. The text will be applied to the predefined background if specified in the configuration.</p>
 	
 	<py:for each="item in template.items()">
-		${Markup(item.render(fields[item.name]))}<br/>
+		${Markup(item.render(fields.get(item.name, '')))}<br/>
 	</py:for>
 	
 	<input type="submit" name="submit" value="preview" />
