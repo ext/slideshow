@@ -17,6 +17,7 @@
  */
 
 #include "dummybrowser.h"
+#include <cstring>
 
 DummyBrowser::DummyBrowser(const browser_context_t& context):
 	Browser(context),
@@ -32,6 +33,6 @@ DummyBrowser::~DummyBrowser(){
 
 }
 
-const char* DummyBrowser::get_next_file(){
-	return _img[++n%4];
+char* DummyBrowser::get_next_file(){
+	return strdup(_img[++n%4]);
 }

@@ -31,18 +31,28 @@ State* SwitchState::action(bool &flip){
 		return new ViewState(this);
 	}
 
-	const char* filename = browser()->get_next_file();
+	struct autofree {
+		autofree(char* ptr):
+			ptr(ptr){}
+		~autofree(){
+			free(ptr);
+		}
+		char* ptr;
+	};
 
-	if ( !filename ){
-		Log::message(Log::Warning, "Kernel: Queue is empty\n", filename);
+	/* get next filename */
+	autofree filename(browser()->get_next_file());
+
+	if ( !filename.ptr ){
+		Log::message(Log::Warning, "Kernel: Queue is empty\n", filename.ptr);
 	} else {
-		Log::message(Log::Debug, "Kernel: Switching to image \"%s\"\n", filename);
+		Log::message(Log::Debug, "Kernel: Switching to image \"%s\"\n", filename.ptr);
 	}
 
 	try {
-		gfx()->load_image( filename );
+		gfx()->load_image( filename.ptr );
 	} catch ( exception& e ) {
-		Log::message(Log::Warning, "Kernel: Failed to load image '%s': %s\n", filename, e.what());
+		Log::message(Log::Warning, "Kernel: Failed to load image '%s': %s\n", filename.ptr, e.what());
 		return new ViewState(this);
 	}
 

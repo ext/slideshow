@@ -28,59 +28,74 @@ class SQLiteBrowser: public Browser {
 		SQLiteBrowser(const browser_context_t& context);
 		virtual ~SQLiteBrowser();
 
-		virtual const char* get_next_file();
+		virtual char* get_next_file();
 		virtual void reload();
 
 		virtual void dump_queue();
 
 	private:
-		void clear();
 		void connect();
 		void disconnect();
 
-		typedef std::vector<char*> vector;
+		int _old_id;
 
 		sqlite3* _conn;
 		sqlite3_stmt* _query;
-
-		vector _slides;
-		vector::iterator _current;
 };
 
 REGISTER_BROWSER_FACTORY(SQLiteBrowser, sqlite);
 
 SQLiteBrowser::SQLiteBrowser(const browser_context_t& context)
 	: Browser(context)
+	, _old_id(-1)
 	, _conn(NULL)
 	, _query(NULL) {
 
 	connect();
-	reload();
 }
 
 SQLiteBrowser::~SQLiteBrowser(){
-	clear();
 	disconnect();
 }
 
-void SQLiteBrowser::clear(){
-	for ( vector::iterator it = _slides.begin(); it != _slides.end(); ++it ){
-		free(*it);
-	}
-	_slides.clear();
-	_current = _slides.end();
-}
+char* SQLiteBrowser::get_next_file(){
+	sqlite3_bind_int(_query, 1, current_bin());
+	sqlite3_bind_int(_query, 2, _old_id);
 
-const char* SQLiteBrowser::get_next_file(){
-	if ( _slides.size() == 0 ){
-		return NULL;
+	int ret = sqlite3_step(_query);
+	if ( ret == SQLITE_DONE ){
+		sqlite3_reset(_query);
+		Log::message(Log::Debug, "queue wrapping\n");
+		sqlite3_bind_int(_query, 1, current_bin());
+		sqlite3_bind_int(_query, 2, -1);
+
+		ret = sqlite3_step(_query);
+		if ( ret == SQLITE_DONE ){
+			sqlite3_reset(_query);
+			return NULL;
+		}
 	}
 
-	if ( _current == _slides.end() ){
-		_current = _slides.begin();
+	char* path = NULL;
+
+	switch ( ret ){
+		case SQLITE_ROW:
+			 path = strdup((const char*)sqlite3_column_text(_query, 0));
+			_old_id = sqlite3_column_int(_query, 1);
+
+			Log::message(Log::Info, "slide: %s\n", (char*)path);
+			break;
+		case SQLITE_MISUSE:
+			Log::message(Log::Info, "sqlite3_step failed: SQLITE_MISUSE\n");
+			break;
+		default:
+			Log::message(Log::Info, "sqlite3_step failed: %d\n", ret);
+			break;
 	}
 
-	return *_current++;
+	sqlite3_reset(_query);
+
+	return path;
 }
 
 void SQLiteBrowser::connect(){
@@ -91,13 +106,16 @@ void SQLiteBrowser::connect(){
 
 	const char* q =
 		" SELECT"
-		"	path "
+		"	path, "
+		"	sortorder "
 		"FROM"
 		"	slide "
 		"WHERE"
-		"	queue_id = ? "
+		"	queue_id = ? AND "
+		"	sortorder > ? "
 		"ORDER BY"
-		"	sortorder ";
+		"	sortorder "
+		"LIMIT 1";
 	if ( (ret = sqlite3_prepare_v2(_conn, q, (int)(strlen(q)+1), &_query, NULL)) != SQLITE_OK ){
 		printf("sqlite3_prepare_v2 failed with %d\n", ret);
 	}
@@ -109,26 +127,7 @@ void SQLiteBrowser::disconnect(){
 }
 
 void SQLiteBrowser::reload(){
-	clear();
 
-	sqlite3_bind_int(_query, 1, current_bin());
-
-	int ret;
-	while ( ( ret = sqlite3_step(_query) ) == SQLITE_ROW ){
-		const unsigned char* path = sqlite3_column_text(_query, 0);
-		Log::message(Log::Info, "slide: %s\n", (char*)path);
-		_slides.push_back(strdup((const char*)path));
-	}
-
-	switch ( ret ){
-		case SQLITE_DONE: break;
-		case SQLITE_MISUSE: Log::message(Log::Info, "sqlite3_step failed: SQLITE_MISUSE\n"); break;
-		default: Log::message(Log::Info, "sqlite3_step failed: %d\n", ret);
-	}
-
-	sqlite3_reset(_query);
-
-	_current = _slides.begin();
 }
 
 void SQLiteBrowser::dump_queue(){

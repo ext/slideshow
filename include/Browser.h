@@ -35,7 +35,12 @@ class Browser {
 		Browser(const browser_context_t& context);
 		virtual ~Browser();
 
-		virtual const char* get_next_file() = 0;
+		/**
+		 * Gets the next file from the queue.
+		 * @return A copy of the filename which the caller must deallocate using
+		 *         free.
+		 */
+		virtual char* get_next_file() = 0;
 		virtual void reload() = 0;
 		virtual void dump_queue() = 0;
 
