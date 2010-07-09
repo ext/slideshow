@@ -59,7 +59,7 @@ class Assembler:
 		fieldset wrapping the fields)
 		"""
 		
-		func = lambda: template.render(**content)
+		func = lambda: template.render(fields=content, **content)
 		file = self.name + '.html'
 		return template.output(file, doctype=False, loader=loader)(func)()
 
