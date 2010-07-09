@@ -48,11 +48,113 @@ def decode_position(str, size):
 color_parser = ColorParser(components=4)
 decode_color = color_parser.parse
 
+class Item:
+	def __init__(self, name):
+		self.name = name
+	
+	def render(self):
+		raise NotImplementedError
+	
+	def raster(self, cr, size, realsize, scale, content):
+		raise NotImplementedError
+	
+	@staticmethod
+	def _get(element, key, default=None, parser=None, *args, **kwargs):
+		value = element.getAttribute(key) or default
+		
+		if parser is not None:
+			value = parser(value, *args, **kwargs)
+		
+		return value
+	
+	@staticmethod
+	def factory(element):
+		lut = {
+			'text': Label,
+			'textarea': TextArea
+		}
+		
+		func = lut.get(element.tagName, None)
+		if func is None:
+			return None
+		
+		return func(element)
+
+class TextArea(Item):
+	def __init__(self, element):
+		Item.__init__(self, element.getAttribute('name'))
+		
+		self._font      = Item._get(element, 'font', 'Sans')
+		self._fontsize  = Item._get(element, 'size', '36.0', float)
+		self._color     = Item._get(element, 'color', '#000', decode_color)
+		self._position  = Item._get(element, 'position', '0 0')
+		self._boxsize   = Item._get(element, 'boxsize')
+		self._alignment = Item._get(element, 'align', 'left')
+	
+	def raster(self, cr, size, realsize, scale, content):
+		font = self._font
+		fontsize = self._fontsize * scale
+		r,g,b,a = self._color
+		x,y = decode_position(self._position, realsize)
+		w,h = decode_position(self._boxsize, realsize) or size
+		alignment = self._alignment
+		
+		cr.set_source_rgba(r,g,b,a)
+		cr.move_to(x-w/2.0, y-h/2.0)
+		
+		ctx = pangocairo.CairoContext(cr)
+		layout = ctx.create_layout()
+		layout.set_font_description(pango.FontDescription('%s %f' % (font, fontsize)))
+		layout.set_width(int(w * pango.SCALE))
+		
+		if alignment == 'center':
+			layout.set_alignment(pango.ALIGN_CENTER)
+		elif alignment == 'right':
+			layout.set_alignment(pango.ALIGN_RIGHT)
+		elif alignment == 'justify':
+			layout.set_justify(True)
+		
+		layout.set_markup(content);
+		ctx.show_layout(layout)
+
+class Label(Item):
+	def __init__(self, element):
+		Item.__init__(self, element.getAttribute('name'))
+		
+		self._font      = Item._get(element, 'font', 'Sans')
+		self._fontsize  = Item._get(element, 'size', '36.0', float)
+		self._color     = Item._get(element, 'color', '#000', decode_color)
+		self._position  = Item._get(element, 'position', '0 0')
+		self._alignment = Item._get(element, 'align', 'left')
+	
+	def raster(self, cr, size, realsize, scale, content):
+		font = self._font
+		fontsize = self._fontsize * scale
+		r,g,b,a = self._color
+		x,y = decode_position(self._position, realsize)
+		alignment = self._alignment
+		
+		cr.select_font_face (font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
+		cr.set_font_size(fontsize)
+		cr.set_source_rgba(r,g,b,a)
+		
+		extents = cr.text_extents(content)
+		
+		offset = 0
+		if alignment == "center":
+			x -= extents[4] / 2
+		elif alignment == "right":
+			x -= extents[4]
+		
+		cr.move_to(x, y)
+		cr.show_text(content)
+
 class Template:
 	def __init__(self, filename):
 		self._filename = filename
 		self._doc = minidom.parse(self._filename)
 		self._template = self._doc.getElementsByTagName('template')[0]
+		self._items = [Item.factory(x) for x in self._template.childNodes if isinstance(x, minidom.Element)]
 	
 	def rasterize(self, dst, size, params):
 		resolution = params['resolution']
@@ -92,10 +194,7 @@ class Template:
 		for item in self.items():
 			cr.save()
 			try:
-				if item.tagName == 'text':
-					self._text(size, realsize, scale, cr, item, params[item.getAttribute('name')])
-				elif item.tagName == 'textarea':
-					self._textarea(size, realsize, scale, cr, item, params[item.getAttribute('name')])
+				item.raster(cr, size, realsize, scale, params[item.name])
 			finally:
 				cr.restore()
 		
@@ -105,63 +204,8 @@ class Template:
 		
 		surface.write_to_png(dst)
 	
-	@staticmethod
-	def _text(size, realsize, scale, cr, item, text):
-		font = item.getAttribute('font') or 'Sans'
-		fontsize = float(item.getAttribute('size') or '36.0')
-		r,g,b,a = decode_color(item.getAttribute('color')) or (0,0,0,1)
-		x,y = decode_position(item.getAttribute('position'), realsize) or (0,0)
-		alignment = item.getAttribute('align')
-		
-		fontsize *= scale
-		
-		cr.select_font_face (font, cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-		cr.set_font_size(fontsize)
-		cr.set_source_rgba(r,g,b,a)
-		
-		extents = cr.text_extents(text)
-		
-		offset = 0
-		if alignment == "center":
-			x -= extents[4] / 2
-		elif alignment == "right":
-			x -= extents[4]
-		
-		cr.move_to(x, y)
-		cr.show_text(text)
-	
-	@staticmethod
-	def _textarea(size, realsize, scale, cr, item, text):
-		#realsize = (size[0] * scale, size[1] * scale)
-		font = item.getAttribute('font') or 'Sans'
-		fontsize = float(item.getAttribute('size') or '36.0')
-		r,g,b,a = decode_color(item.getAttribute('color')) or (0,0,0,1)
-		x,y = decode_position(item.getAttribute('position'), realsize) or (0,0)
-		w,h = decode_position(item.getAttribute('boxsize'), realsize) or size
-		alignment = item.getAttribute('align')
-		
-		fontsize *= scale
-		
-		cr.set_source_rgba(r,g,b,a)
-		cr.move_to(x-w/2.0, y-h/2.0)
-		
-		ctx = pangocairo.CairoContext(cr)
-		layout = ctx.create_layout()
-		layout.set_font_description(pango.FontDescription('%s %f' % (font, fontsize)))
-		layout.set_width(int(w * pango.SCALE))
-		
-		if alignment == 'center':
-			layout.set_alignment(pango.ALIGN_CENTER)
-		elif alignment == 'right':
-			layout.set_alignment(pango.ALIGN_RIGHT)
-		elif alignment == 'justify':
-			layout.set_justify(True)
-		
-		layout.set_markup(text);
-		ctx.show_layout(layout)
-	
 	def items(self):
-		return [x for x in self._template.childNodes if isinstance(x, minidom.Element)]
+		return self._items
 
 class TextAssembler(Assembler):
 	def default_size(self, slide, params, width=None):
