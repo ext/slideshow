@@ -345,6 +345,9 @@ class Settings(object):
         
         if key == 'Apparence.Resolution' and item._value != old:
             event.trigger('config.resolution_changed', self.resolution())
+        
+        if key == 'Runtime.queue' and item._value != old:
+            event.trigger('config.queue_changed', item._value)
     
     def resolution(self):
         r = self['Apparence.Resolution']

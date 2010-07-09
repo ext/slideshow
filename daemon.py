@@ -7,6 +7,7 @@ import dbus, dbus.service
 import cherrypy
 from select import select
 from settings import Settings
+import event
 
 _states = {
 	1<<0: 'STOPPED',
@@ -299,7 +300,7 @@ class _DBus(dbus.service.Object):
 	def Debug_DumpQueue(self):
 		pass
 	
-	@dbus.service.signal(dbus_interface='com.slideshow.dbus.Signal', signature='i')
+	@dbus.service.signal(dbus_interface='com.slideshow.dbus.Signal', signature='u')
 	def ChangeQueue(self, id):
 		pass
 
@@ -350,3 +351,11 @@ def state():
 
 def log():
 	return _daemon.log
+
+@event.listener
+class EventListener:
+	@event.callback('config.queue_changed')
+	def queue_changed(self, id):
+		ipc.ChangeQueue(id)
+
+_listener = EventListener()
