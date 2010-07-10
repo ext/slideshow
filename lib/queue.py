@@ -21,6 +21,17 @@ class Queue:
 			ORDER BY
 				sortorder
 		""", {'queue': id}).fetchall()]
+	
+	def rename(self, c, name):
+		c.execute("""
+			UPDATE
+				queue
+			SET
+				name = :name
+			WHERE
+				id = :id
+		""", dict(id=self.id, name=name))
+		self.name = name
 
 def all(c):
 	return [Queue(c, **x) for x in c.execute("""
@@ -41,5 +52,5 @@ def from_id(c, id):
 		WHERE
 			id = :id
 		LIMIT 1
-	""").fetchone()
+	""", dict(id=id)).fetchone()
 	return Queue(c, **row) 

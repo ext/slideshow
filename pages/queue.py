@@ -13,6 +13,19 @@ class Handler(object):
         return template.render(queues=queues)
     
     @cherrypy.expose
+    @template.output('queue/rename.html', parent='queue')
+    def rename(self, id, name=None, submit=None):
+        c = cherrypy.thread_data.db.cursor()
+        q = queue.from_id(c, id)
+        
+        if name is not None:
+            q.rename(c, name)
+            cherrypy.thread_data.db.commit()
+            raise cherrypy.HTTPRedirect('/queue')
+        
+        return template.render(queue=q)
+    
+    @cherrypy.expose
     def activate(self, id):
         settings = Settings()
         
