@@ -8,6 +8,15 @@ from settings import Settings
 class Ajax(object):
     @cherrypy.expose
     def rename(self, id, value):
+        id = int(id[6:]) # remove prefix
+        c = cherrypy.thread_data.db.cursor()
+        q = queue.from_id(c, id)
+        
+        if q is None:
+            return ''
+        
+        q.rename(c, value)
+        cherrypy.thread_data.db.commit()
         return value
     
     @cherrypy.expose
