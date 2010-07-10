@@ -53,6 +53,10 @@ def from_id(c, id):
 			id = :id
 		LIMIT 1
 	""", dict(id=id)).fetchone()
+	
+	if row is None:
+		return None
+	
 	return Queue(c, **row) 
 
 def add(c, name):
