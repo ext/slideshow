@@ -54,3 +54,25 @@ def from_id(c, id):
 		LIMIT 1
 	""", dict(id=id)).fetchone()
 	return Queue(c, **row) 
+
+def delete(c, id):
+	if id <= 0:
+		return False
+	
+	c.execute("""
+		UPDATE
+			slide
+		SET
+			queue_id = 0
+		WHERE
+			queue_id = :id
+	""", dict(id=id))
+	c.execute("""
+		DELETE FROM
+			queue
+		WHERE
+			id = :id
+	""", dict(id=id))
+	
+	return True
+	

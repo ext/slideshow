@@ -8,15 +8,73 @@
 
 <head>
 	<title>Queue</title>
+	
+	<script type="text/javascript">// <![CDATA[
+	
+	$.editable.addInputType('rename', {
+		element : function(settings, original) {
+			var input = $('<input />');
+			
+			$(this).append(input);
+			return(input);
+		},
+		buttons: function(settings, original) {
+			var submit = $('<button type="submit" />');
+			submit.html(settings.submit);
+			
+			var cancel = $('<button type="cancel" />').click(function(event) {
+				original.reset();
+				return false;
+			});
+			cancel.html(settings.cancel);
+			
+			var remove = $('<button type="remove" />').click(function(event) {
+				original.reset();
+				
+				$.getJSON('/queue/ajax/remove/' + original.id.substr(6), function(success) {
+					if ( success ){
+						$(original.parentNode).remove();
+					}
+				});
+				
+				return false;
+			});
+			remove.html(settings.remove);
+			
+			$(this).append(submit);
+			$(this).append(cancel);
+			$(this).append(remove);
+		}
+	});
+	
+	
+	$(document).ready(function() {
+		$('.edit').editable('/queue/ajax/rename', { 
+			type : 'rename',
+			tooltip   : "Click to edit...",
+			cancel    : 'Cancel',
+			submit    : 'OK',
+			remove    : 'Remove',
+			style   : 'display: inline'
+		});
+	});
+	
+	// ]]></script>
+
 </head>
 
 <body>
 	<div id="breadcrumb">
 		<h2><a href="/">Slideshow</a> &gt; Manage queue</h2>
 	</div>
-
+	
 	<ul>
-		<li py:for="queue in queues">${queue.name} <py:if test="queue.id > 0">(<a href="/queue/rename/${queue.id}">Rename</a>, <a href="/queue/delete/${queue.id}">Delete</a>)</py:if></li>
+		<li py:for="queue in queues">
+			<span py:attrs="queue.id > 0 and {'class': 'edit'} or {}" id="queue_${queue.id}">${queue.name}</span>
+			<noscript py:if="queue.id > 0">
+				(<a href="/queue/rename/${queue.id}">Rename</a>, <a href="/queue/delete/${queue.id}">Delete</a>)
+			</noscript>
+		</li>
 	</ul>
 	
 	<form action="/queue/add" method="post">

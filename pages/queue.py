@@ -5,15 +5,33 @@ import cherrypy
 from lib import queue, template
 from settings import Settings
 
-class Handler(object):
+class Ajax(object):
     @cherrypy.expose
-    @template.output('queue/index.html', parent='queue')
+    def rename(self, *args, **kwargs):
+        print args, kwargs
+    
+    @cherrypy.expose
+    def remove(self, id):
+        id = int(id)
+        
+        c = cherrypy.thread_data.db.cursor()
+        if not queue.delete(c, id):
+            return 'false'
+        
+        cherrypy.thread_data.db.commit()
+        return 'true'
+
+class Handler(object):
+    ajax = Ajax()
+    
+    @cherrypy.expose
+    @template.output('queue/index.html', parent='queues')
     def index(self):
         queues = queue.all(cherrypy.thread_data.db.cursor())
         return template.render(queues=queues)
     
     @cherrypy.expose
-    @template.output('queue/rename.html', parent='queue')
+    @template.output('queue/rename.html', parent='queues')
     def rename(self, id, name=None, submit=None):
         c = cherrypy.thread_data.db.cursor()
         q = queue.from_id(c, id)
