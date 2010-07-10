@@ -30,3 +30,16 @@ def all(c):
 		FROM
 			queue
 	""").fetchall()]
+
+def from_id(c, id):
+	row = c.execute("""
+		SELECT
+			id,
+			name
+		FROM
+			queue
+		WHERE
+			id = :id
+		LIMIT 1
+	""").fetchone()
+	return Queue(c, **row) 
