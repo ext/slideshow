@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from slide import Slide
+from settings import Settings
 
 class Queue:
 	def __init__(self, c, id, name):
@@ -70,6 +71,13 @@ def add(c, name):
 			:name
 		)
 	""", dict(name=name))
+	
+	id = c.lastrowid
+	n = int(c.execute("SELECT count(*) as count FROM queue").fetchone()['count'])
+	
+	# if no previous queue (except default) existed, make this the active
+	if n == 2:
+		activate(id)
 
 def delete(c, id):
 	if id <= 0:
@@ -91,4 +99,11 @@ def delete(c, id):
 	""", dict(id=id))
 	
 	return True
+
+def activate(id):
+	settings = Settings()
 	
+	with settings:
+		settings['Runtime.queue'] = id
+	
+	settings.persist()

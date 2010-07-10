@@ -3,7 +3,6 @@
 
 import cherrypy
 from lib import queue, template
-from settings import Settings
 
 class Ajax(object):
     @cherrypy.expose
@@ -61,11 +60,5 @@ class Handler(object):
     
     @cherrypy.expose
     def activate(self, id):
-        settings = Settings()
-        
-        with settings:
-            settings['Runtime.queue'] = id
-        
-        settings.persist()
-        
+        queue.activate(id)
         raise cherrypy.HTTPRedirect('/')
