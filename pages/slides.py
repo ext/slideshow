@@ -39,7 +39,15 @@ class Handler(object):
 	def list(self):
 		queues = queue.all(cherrypy.thread_data.db.cursor())
 		settings = Settings()
-		return template.render(queues=queues, active=settings['Runtime.queue'])
+		
+		id = settings['Runtime.queue']
+		active = queues[0]
+		for q in queues:
+			if q.id == id:
+				active = q
+				break
+		
+		return template.render(queues=queues, active=active)
 	
 	@cherrypy.expose
 	@cherrypy.tools.response_headers(headers=[('Content-Type', 'image/png')])

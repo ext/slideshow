@@ -10,12 +10,26 @@
 <body>
 	<h2>Current slides</h2>
 	
+	<?python empty_queue = active.id == 0 or len(active) == 0 ?>
+	<div id="empty_notice" class="notice" py:attrs="{'style': 'display:' + (empty_queue and 'block' or 'none')}">
+		<script type="text/javascript">
+			document.write("The current active queue is empty. You can create some slides and move them into the active queue.");
+		</script>
+		<noscript py:if="len(active) == 0">
+			The current active queue is empty. You can create some slides and move them into the active queue.
+		</noscript>
+	</div>
+	
+	<!--! These br's is to force linebreaks in non-graphics browsers like links -->
+	<br style="display:none" />
+	<br style="display:none" />
+	
 	<py:for each="queue in queues">
 		<div class="queuewrapper">
 			<span class="title">
 				${queue.name}
 				<py:if test="queue.id != 0">
-					<py:choose test="queue.id == active">
+					<py:choose test="queue.id == active.id">
 						<py:when test="True">(active)</py:when>
 						<py:when test="False">(<a href="/queue/activate/${queue.id}">set as active</a>)</py:when>
 					</py:choose>
