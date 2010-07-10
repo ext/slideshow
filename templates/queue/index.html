@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+	xmlns:py="http://genshi.edgewall.org/" 
+	xmlns:xi="http://www.w3.org/2001/XInclude" 
+	lang="en"> 
+	<xi:include href="../index.html" />
+
+<head>
+	<title>Queue</title>
+</head>
+
+<body>
+	<div id="breadcrumb">
+		<h2><a href="/">Slideshow</a> &gt; Queue</h2>
+	</div>
+
+	<ul>
+		<li py:for="queue in queues">${queue.name} <py:if test="queue.id > 0">(<a href="/queue/rename/${queue.id}">Rename</a>, <a href="/queue/delete/${queue.id}">Delete</a>)</py:if></li>
+	</ul>
+	
+	<form action="/queue/add" method="post">
+		<input type="text" name="name" />
+		<input type="submit" name="submit" value="Create" />
+	</form>
+
+</body>
+
+</html>
