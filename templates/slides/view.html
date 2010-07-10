@@ -64,6 +64,7 @@
 	</py:for>
 	
 	<script type="text/javascript">
+		var notice_visible = ${len(active) == 0 and 'true' or 'false'};
 		<py:for each="queue in queues">
 			$$("#queue_${queue.id}").sortable({
 				connectWith: [ ${', '.join(['"#queue_%d"' % q.id for q in queues])} ],
@@ -76,7 +77,20 @@
 						type: "POST",
 						url: "/slides/ajax/move",
 						data: "queue=" + $$(this).attr('id') + "${Markup('&amp;')}slides=" + list
-					 });
+					});
+					
+					<py:if test="queue.id == active.id">
+						var n = list.length;
+						if ( notice_visible ${Markup('&amp;&amp;')} n ${Markup('&gt;')} 0 ){
+							notice_visible = false;
+							$("#empty_notice").fadeOut("slow");
+						}
+						if ( !notice_visible ${Markup('&amp;&amp;')} n == 0 ){
+							notice_visible = true;
+							$("#empty_notice").fadeIn("slow");
+						}
+					</py:if>
+					 
 				}
 			});
 		</py:for>
