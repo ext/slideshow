@@ -7,8 +7,8 @@ from settings import Settings
 
 class Ajax(object):
     @cherrypy.expose
-    def rename(self, *args, **kwargs):
-        print args, kwargs
+    def rename(self, id, value):
+        return value
     
     @cherrypy.expose
     def remove(self, id):
@@ -29,6 +29,13 @@ class Handler(object):
     def index(self):
         queues = queue.all(cherrypy.thread_data.db.cursor())
         return template.render(queues=queues)
+    
+    @cherrypy.expose
+    def add(self, name, submit):
+        c = cherrypy.thread_data.db.cursor()
+        queue.add(c, name)
+        cherrypy.thread_data.db.commit()
+        raise cherrypy.HTTPRedirect('/queue')
     
     @cherrypy.expose
     @template.output('queue/rename.html', parent='queues')

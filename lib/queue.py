@@ -55,6 +55,15 @@ def from_id(c, id):
 	""", dict(id=id)).fetchone()
 	return Queue(c, **row) 
 
+def add(c, name):
+	c.execute("""
+		INSERT INTO queue (
+			name
+		) VALUES (
+			:name
+		)
+	""", dict(name=name))
+
 def delete(c, id):
 	if id <= 0:
 		return False
