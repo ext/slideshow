@@ -22,6 +22,9 @@ class Queue:
 				sortorder
 		""", {'queue': id}).fetchall()]
 	
+	def __len__(self):
+		return len(self.slides)
+	
 	def rename(self, c, name):
 		c.execute("""
 			UPDATE
