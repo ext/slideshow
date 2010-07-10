@@ -9,6 +9,19 @@
 <head>
 	<title>Queue</title>
 	
+	<style>
+		#content ul {
+			list-style-type:none;
+			margin-left: 1em;
+			padding:0;
+		}
+		#content li {
+			background:url('/static/icon/page_white_edit.png') left center no-repeat;
+			padding-left: 20px; 
+			margin:0;
+		}
+	</style>
+	
 	<script type="text/javascript">// <![CDATA[
 	
 	$.editable.addInputType('rename', {
@@ -68,8 +81,12 @@
 		<h2><a href="/">Slideshow</a> &gt; Manage queue</h2>
 	</div>
 	
+	<script type="text/javascript">// <![CDATA[
+		document.write('<p>Click on the queue you wish to edit.</p>');
+	// ]]></script>
+	
 	<ul>
-		<li py:for="queue in queues">
+		<li py:for="queue in queues" py:attrs="queue.id == 0 and {'style': 'background: none; color: grey;'} or {}">
 			<span py:attrs="queue.id > 0 and {'class': 'edit'} or {}" id="queue_${queue.id}">${queue.name}</span>
 			<noscript py:if="queue.id > 0">
 				(<a href="/queue/rename/${queue.id}">Rename</a>, <a href="/queue/delete/${queue.id}">Delete</a>)
