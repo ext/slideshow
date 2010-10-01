@@ -180,6 +180,11 @@ class _Daemon(threading.Thread):
 			time.sleep(1)
 		self._running = False
 	
+	def reset(self):
+		ipc.Quit()
+		self._running = False
+		self._state = STOPPED
+	
 	def do_start(self, resolution, fullscreen):
 		print 'do_start:', resolution
 		
@@ -345,6 +350,9 @@ def stop():
 	while _daemon._instance:
 			print 'waiting for instance to terminate'
 			time.sleep(1)
+
+def reset():
+	_daemon.reset()
 
 def state():
 	return _daemon.state()
