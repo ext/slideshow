@@ -64,6 +64,11 @@ SQLiteBrowser::~SQLiteBrowser(){
 }
 
 void SQLiteBrowser::change_bin(unsigned int id){
+	/* if we change queue we reset the position back to the start */
+	if ( current_bin() != id ){
+		_old_id = -1;
+	}
+
 	Browser::change_bin(id);
 
 	/* query whenever to loop this queue */
