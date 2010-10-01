@@ -28,6 +28,8 @@ class SQLiteBrowser: public Browser {
 		SQLiteBrowser(const browser_context_t& context);
 		virtual ~SQLiteBrowser();
 
+		virtual void change_bin(unsigned int id);
+
 		virtual char* get_next_file();
 		virtual void reload();
 
@@ -37,16 +39,19 @@ class SQLiteBrowser: public Browser {
 		void connect();
 		void disconnect();
 
+		bool _loop;
 		int _old_id;
 
 		sqlite3* _conn;
 		sqlite3_stmt* _query;
+		sqlite3_stmt* _query_looping;
 };
 
 REGISTER_BROWSER_FACTORY(SQLiteBrowser, sqlite);
 
 SQLiteBrowser::SQLiteBrowser(const browser_context_t& context)
 	: Browser(context)
+	, _loop(true)
 	, _old_id(-1)
 	, _conn(NULL)
 	, _query(NULL) {
@@ -58,6 +63,32 @@ SQLiteBrowser::~SQLiteBrowser(){
 	disconnect();
 }
 
+void SQLiteBrowser::change_bin(unsigned int id){
+	Browser::change_bin(id);
+
+	/* query whenever to loop this queue */
+	sqlite3_bind_int(_query_looping, 1, current_bin());
+	int ret = sqlite3_step(_query_looping);
+
+	_loop = true;
+
+	switch ( ret ){
+		case SQLITE_DONE:
+			break;
+		case SQLITE_ROW:
+			_loop = sqlite3_column_int(_query_looping, 0) == 1;
+			break;
+		case SQLITE_MISUSE:
+			Log::message(Log::Info, "sqlite3_step failed: SQLITE_MISUSE\n");
+			break;
+		default:
+			Log::message(Log::Info, "sqlite3_step failed: %d\n", ret);
+			break;
+	}
+
+	sqlite3_reset(_query_looping);
+}
+
 char* SQLiteBrowser::get_next_file(){
 	sqlite3_bind_int(_query, 1, current_bin());
 	sqlite3_bind_int(_query, 2, _old_id);
@@ -65,6 +96,12 @@ char* SQLiteBrowser::get_next_file(){
 	int ret = sqlite3_step(_query);
 	if ( ret == SQLITE_DONE ){
 		sqlite3_reset(_query);
+
+		if ( !_loop ){
+			Log::message(Log::Debug, "queue finished\n");
+			return NULL;
+		}
+
 		Log::message(Log::Debug, "queue wrapping\n");
 		sqlite3_bind_int(_query, 1, current_bin());
 		sqlite3_bind_int(_query, 2, -1);
@@ -119,9 +156,22 @@ void SQLiteBrowser::connect(){
 	if ( (ret = sqlite3_prepare_v2(_conn, q, (int)(strlen(q)+1), &_query, NULL)) != SQLITE_OK ){
 		printf("sqlite3_prepare_v2 failed with %d\n", ret);
 	}
+
+	q =
+		" SELECT "
+		"	loop "
+		"FROM "
+		"	queue "
+		"WHERE "
+		"	id = ? "
+		"LIMIT 1";
+	if ( (ret = sqlite3_prepare_v2(_conn, q, (int)(strlen(q)+1), &_query_looping, NULL)) != SQLITE_OK ){
+		printf("sqlite3_prepare_v2 failed with %d\n", ret);
+	}
 }
 
 void SQLiteBrowser::disconnect(){
+	sqlite3_finalize(_query_looping);
 	sqlite3_finalize(_query);
 	sqlite3_close(_conn);
 }

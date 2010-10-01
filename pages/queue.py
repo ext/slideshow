@@ -67,4 +67,5 @@ class Handler(object):
     def loop(self, id, state):
     	c = cherrypy.thread_data.db.cursor()
         queue.set_loop(c, id, state)
+        cherrypy.thread_data.db.commit()
         raise cherrypy.HTTPRedirect('/')
