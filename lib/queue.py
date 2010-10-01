@@ -3,6 +3,7 @@
 
 from slide import Slide
 from settings import Settings
+import event
 
 class Queue:
 	def __init__(self, c, id, name, loop):
@@ -120,3 +121,6 @@ def set_loop(c, id, state):
 		WHERE
 			id = :id
 	""", dict(id=id, state=state))
+	
+	# to force reloading of queue settings
+	event.trigger('config.queue_changed', id)
