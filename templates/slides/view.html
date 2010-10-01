@@ -29,10 +29,16 @@
 			<span class="title">
 				${queue.name}
 				<py:if test="queue.id != 0">
+					(
 					<py:choose test="queue.id == active.id">
-						<py:when test="True">(active)</py:when>
-						<py:when test="False">(<a href="/queue/activate/${queue.id}">set as active</a>)</py:when>
+						<py:when test="True">active</py:when>
+						<py:when test="False"><a href="/queue/activate/${queue.id}">set as active</a></py:when>
+					</py:choose>,
+					<py:choose test="queue.loop">
+						<py:when test="True"><a href="/queue/loop/${queue.id}/0">Disable looping</a></py:when>
+						<py:when test="False"><a href="/queue/loop/${queue.id}/1">Enable looping</a></py:when>
 					</py:choose>
+					)
 				</py:if>
 			</span><br/>
 			

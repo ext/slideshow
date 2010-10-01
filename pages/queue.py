@@ -62,3 +62,9 @@ class Handler(object):
     def activate(self, id):
         queue.activate(id)
         raise cherrypy.HTTPRedirect('/')
+    
+    @cherrypy.expose
+    def loop(self, id, state):
+    	c = cherrypy.thread_data.db.cursor()
+        queue.set_loop(c, id, state)
+        raise cherrypy.HTTPRedirect('/')

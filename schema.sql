@@ -16,7 +16,8 @@ CREATE TABLE slide (
 
 CREATE TABLE queue (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,          -- ID of queue
-	name TEXT NOT NULL                             -- Name of queue
+	name TEXT NOT NULL,                            -- Name of queue
+	loop TINYINT NOT NULL DEFAULT 1                -- 1 if looping is enabled, 0 if disabled.
 );
 
 CREATE TABLE log (

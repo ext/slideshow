@@ -5,9 +5,10 @@ from slide import Slide
 from settings import Settings
 
 class Queue:
-	def __init__(self, c, id, name):
+	def __init__(self, c, id, name, loop):
 		self.id = id
 		self.name = name
+		self.loop = loop == 1
 		self.slides = [Slide(queue=self, **x) for x in c.execute("""
 			SELECT
 				id,
@@ -41,7 +42,8 @@ def all(c):
 	return [Queue(c, **x) for x in c.execute("""
 		SELECT
 			id,
-			name
+			name,
+			loop
 		FROM
 			queue
 	""").fetchall()]
@@ -50,7 +52,8 @@ def from_id(c, id):
 	row = c.execute("""
 		SELECT
 			id,
-			name
+			name,
+			loop
 		FROM
 			queue
 		WHERE
@@ -107,3 +110,13 @@ def activate(id):
 		settings['Runtime.queue'] = id
 	
 	settings.persist()
+
+def set_loop(c, id, state):
+	c.execute("""
+		UPDATE
+			queue
+		SET
+			loop = :state
+		WHERE
+			id = :id
+	""", dict(id=id, state=state))
