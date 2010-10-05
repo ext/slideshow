@@ -195,9 +195,11 @@ class _Daemon(threading.Thread):
 		
 		self._running = False
 	
+	# reset is called when the application is crashed, to reset state
 	def reset(self):
-		ipc.Quit()
-		self._running = False
+		if self._state != CRASHED:
+			raise RuntimeError, 'Cannot reset unless crashed'
+		
 		self._state = STOPPED
 	
 	def do_start(self, resolution, fullscreen):
@@ -369,7 +371,6 @@ def _call(func, *args, **kwargs):
 	return ret.get()
 
 def start(resolution=None, fullscreen=True):
-	print 'daemon.start:', resolution
 	return _call(_Daemon.do_start, resolution, fullscreen)
 
 def stop():
