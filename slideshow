@@ -9,10 +9,12 @@
 
 export SLIDESHOW_DATA_DIR="`pwd`/data"
 export SLIDESHOW_PLUGIN_DIR="`pwd`/src/transitions:`pwd`/src/assembler"
+export SDL_VIDEO_X11_XRANDR 0
+export SLIDESHOW_NO_ABORT ""
 
 case `basename $0` in
     slideshow-gdb)
-	exec gdb --args src/slideshow $*
+	exec gdb --cd /home/ext/slideshow --args `pwd`/src/slideshow $*
 	;;
     slideshow-valgrind)
 	exec valgrind $*
