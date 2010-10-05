@@ -175,9 +175,20 @@ class _Daemon(threading.Thread):
 	
 	def stop(self):
 		ipc.Quit()
+		
+		# wait for proper shutdown
 		while self._instance:
+			try:
+				os.kill(self._instance.pid, 0) # try if process accepts signals
+			except OSError:
+				# does not accept signals, process is fubar or lost, cannot continue
+				print 'childprocess is fubar or lost, aborting'
+				self._instance = None
+				break
+			
 			print 'waiting for instance to terminate'
 			time.sleep(1)
+		
 		self._running = False
 	
 	def reset(self):
