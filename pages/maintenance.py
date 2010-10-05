@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import cherrypy
+import cherrypy, os.path
 from lib import queue, slide, template
 from settings import Settings
 import daemon
@@ -79,6 +79,16 @@ class Handler(object):
 	def dumpqueue(self):
 		daemon.ipc.Debug_DumpQueue()
 		raise cherrypy.HTTPRedirect('/maintenance')
+	
+	@cherrypy.expose
+	def coredump(selfs):
+		cherrypy.response.headers['Content-Type'] = 'application/octet-stream'
+		cherrypy.response.headers['Content-Disposition'] = 'attachment; filename=core'
+		
+		settings = Settings()
+		cwd = settings['Path.BasePath']
+		
+		return open(os.path.join(cwd, 'core'))
 	
 	@cherrypy.expose
 	def rebuild(self):
