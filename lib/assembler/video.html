@@ -1,0 +1,7 @@
+<fieldset xmlns:py="http://genshi.edgewall.org/">
+	<p>Upload videos into the video folder and they will appear here.</p>
+	<select id="filename" name="filename">
+		<option py:for="file in files" value="${file}">${file}</option>
+	</select>
+	<input type="submit" value="Prepare" />
+</fieldset>

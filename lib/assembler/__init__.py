@@ -62,13 +62,23 @@ class Assembler:
 		func = lambda: template.render(fields=content, **content)
 		file = self.name + '.html'
 		return template.output(file, doctype=False, loader=loader)(func)()
+	
+	def raster_extension(self):
+		"""
+		By default, all raster use PNG as format but some, like the video
+		thumbnails need GIF, so overrride this if the raster uses something
+		other than PNG.
+		"""
+		return '.png'
 
 import image
 import text
+import video
 
 _assemblers = {
 	'text': text.TextAssembler,
-	'image': image.ImageAssembler
+	'image': image.ImageAssembler,
+	'video': video.VideoAssembler
 }
 
 # setup reverse names

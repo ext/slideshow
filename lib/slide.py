@@ -39,7 +39,7 @@ class Slide:
 	def raster_path(self, size=None):
 		args = [image_path, self._path, 'raster']
 		if size != None:
-			args.append(str(size) + '.png')
+			args.append(str(size) + self.assembler.raster_extension())
 		return os.path.join(*args)
 	
 	def src_path(self, item):
