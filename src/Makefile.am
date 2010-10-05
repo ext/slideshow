@@ -22,6 +22,7 @@ libfsm_a_SOURCES = \
 	state/InitialState.cpp state/InitialState.h \
 	state/SwitchState.cpp state/SwitchState.h \
 	state/TransitionState.cpp state/TransitionState.h \
+	state/VideoState.cpp state/VideoState.h \
 	state/ViewState.cpp state/ViewState.h
 
 slideshow_CPPFLAGS = ${AM_CPPFLAGS} ${libdaemon_CFLAGS} -DBUILD_DAEMON

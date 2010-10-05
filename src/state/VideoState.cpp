@@ -22,6 +22,8 @@
 
 #include "VideoState.h"
 #include "SwitchState.h"
+#include <cstdlib>
+#include <cstring>
 
 VideoState::VideoState(State* state, const char* filename)
 	: State(state)

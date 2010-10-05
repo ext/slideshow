@@ -22,6 +22,7 @@
 
 #include "SwitchState.h"
 #include "TransitionState.h"
+#include "VideoState.h"
 #include "ViewState.h"
 #include "exception.h"
 #include "Log.h"
@@ -64,7 +65,7 @@ State* SwitchState::action(bool &flip){
 		return new TransitionState(this);
 	} else if ( strcmp("video", slide.assembler) == 0 ){
 		Log::message(Log::Debug, "Kernel: Playing video \"%s\"\n", slide.filename);
-		return new ViewState(this);
+		return new VideoState(this, slide.filename);
 	} else {
 		Log::message(Log::Warning, "Unhandled assembler \"%s\" for \"%s\"\n", slide.assembler, slide.filename);
 		return new ViewState(this);

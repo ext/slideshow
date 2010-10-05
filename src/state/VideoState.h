@@ -23,8 +23,8 @@
 
 class VideoState: public State {
 	public:
-		VideoState(State* state, const char* filename): State(state){}
-		virtual ~VideoState(){}
+		VideoState(State* state, const char* filename);
+		virtual ~VideoState();
 
 		virtual State* action(bool &flip);
 
