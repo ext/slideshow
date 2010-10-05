@@ -348,10 +348,11 @@ def _call(func, *args, **kwargs):
 		def get(self):
 			return self.value
 	
-	sem = threading.Semaphore(0)
+	sem = multiprocessing.Semaphore(0)
 	ret = V()
 	_daemon.push(func, args, kwargs, sem, ret)
-	sem.acquire()
+	if not sem.acquire(timeout=10):
+		raise RuntimeError, 'Timeout waiting for call reply'
 	
 	if isinstance(ret.get(), Exception):
 		exc_info = ret.get().exc_info
