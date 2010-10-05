@@ -126,6 +126,7 @@ char* SQLiteBrowser::get_next_file(){
 	char* path = NULL;
 	int sort_order = -1;
 	int queue_id = -1;
+	char* assembler = NULL;
 
 	switch ( ret ){
 		case SQLITE_ROW:
@@ -134,6 +135,7 @@ char* SQLiteBrowser::get_next_file(){
 			path       = strdup((const char*)sqlite3_column_text(_query, 1));
 			sort_order = sqlite3_column_int(_query, 2);
 			queue_id   = sqlite3_column_int(_query, 3);
+			assembler  = strdup((const char*)sqlite3_column_text(_query, 4));
 
 			Log::message(Log::Info, "slide: %s\n", (char*)path);
 			Log::message(Log::Debug, "\tid: %d\n", id);
@@ -194,7 +196,8 @@ void SQLiteBrowser::connect(){
 		"		id, "
 		"		path, "
 		"		sortorder, "
-		"		queue_id "
+		"		queue_id, "
+		"		assembler "
 		"	FROM"
 		"		slide "
 		"	WHERE"
@@ -204,7 +207,8 @@ void SQLiteBrowser::connect(){
 		"		id, "
 		"		path, "
 		"		sortorder, "
-		"		queue_id "
+		"		queue_id, "
+		"		assembler "
 		"	FROM"
 		"		slide "
 		"	WHERE"
