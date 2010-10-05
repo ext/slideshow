@@ -30,7 +30,7 @@ class SQLiteBrowser: public Browser {
 
 		virtual void change_bin(unsigned int id);
 
-		virtual char* get_next_file();
+		virtual slide_context_t get_next_file();
 		virtual void reload();
 
 		virtual void dump_queue();
@@ -97,7 +97,11 @@ void SQLiteBrowser::change_bin(unsigned int id){
 	sqlite3_reset(_query_looping);
 }
 
-char* SQLiteBrowser::get_next_file(){
+slide_context_t SQLiteBrowser::get_next_file(){
+	slide_context_t slide;
+	slide.filename = NULL;
+	slide.assembler = NULL;
+
 	sqlite3_bind_int(_query, 1, current_bin());
 	sqlite3_bind_int(_query, 2, _old_id);
 
@@ -107,7 +111,7 @@ char* SQLiteBrowser::get_next_file(){
 
 		if ( !_loop ){
 			Log::message(Log::Debug, "queue finished\n");
-			return NULL;
+			return slide;
 		}
 
 		Log::message(Log::Debug, "queue wrapping\n");
@@ -118,26 +122,24 @@ char* SQLiteBrowser::get_next_file(){
 		ret = sqlite3_step(_query);
 		if ( ret == SQLITE_DONE ){
 			sqlite3_reset(_query);
-			return NULL;
+			return slide;
 		}
 	}
 
 	int id = -1;
-	char* path = NULL;
 	int sort_order = -1;
 	int queue_id = -1;
-	char* assembler = NULL;
 
 	switch ( ret ){
 		case SQLITE_ROW:
 			/* read columns */
-			id         = sqlite3_column_int(_query, 0);
-			path       = strdup((const char*)sqlite3_column_text(_query, 1));
-			sort_order = sqlite3_column_int(_query, 2);
-			queue_id   = sqlite3_column_int(_query, 3);
-			assembler  = strdup((const char*)sqlite3_column_text(_query, 4));
+			id              = sqlite3_column_int(_query, 0);
+			slide.filename  = strdup((const char*)sqlite3_column_text(_query, 1));
+			sort_order      = sqlite3_column_int(_query, 2);
+			queue_id        = sqlite3_column_int(_query, 3);
+			slide.assembler = strdup((const char*)sqlite3_column_text(_query, 4));
 
-			Log::message(Log::Info, "slide: %s\n", (char*)path);
+			Log::message(Log::Info, "slide: %s\n", slide.filename);
 			Log::message(Log::Debug, "\tid: %d\n", id);
 			Log::message(Log::Debug, "\tsort_order: %d\n", sort_order);
 			Log::message(Log::Debug, "\tqueue_id: %d\n", queue_id);
@@ -147,7 +149,7 @@ char* SQLiteBrowser::get_next_file(){
 				_old_id = sort_order;
 			} else {
 				/* pop intermediate slides back to unsorted */
-				Log::message(Log::Debug, "popping intermediate slide\n", (char*)path, id, queue_id);
+				Log::message(Log::Debug, "popping intermediate slide\n", slide.filename, id, queue_id);
 				pop_intermediate(id);
 			}
 
@@ -164,7 +166,7 @@ char* SQLiteBrowser::get_next_file(){
 
 	sqlite3_reset(_query);
 
-	return path;
+	return slide;
 }
 
 void SQLiteBrowser::pop_intermediate(int id) const {

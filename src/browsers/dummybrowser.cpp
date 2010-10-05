@@ -33,6 +33,9 @@ DummyBrowser::~DummyBrowser(){
 
 }
 
-char* DummyBrowser::get_next_file(){
-	return strdup(_img[++n%4]);
+slide_context_t DummyBrowser::get_next_file(){
+	slide_context_t tmp;
+	tmp.filename = strdup(_img[++n%4]);
+	tmp.assembler = strdup("image");
+	return tmp;
 }

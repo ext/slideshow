@@ -25,36 +25,48 @@
 #include "ViewState.h"
 #include "exception.h"
 #include "Log.h"
+#include <cstring>
 
 State* SwitchState::action(bool &flip){
 	if ( !browser() ){
 		return new ViewState(this);
 	}
 
-	struct autofree {
-		autofree(char* ptr):
-			ptr(ptr){}
-		~autofree(){
-			free(ptr);
+	/* get next slide */
+	slide_context_t slide = browser()->get_next_file();
+
+	struct autofree_t {
+		autofree_t(slide_context_t& s): s(s){}
+		~autofree_t(){
+			free(s.filename);
+			free(s.assembler);
 		}
-		char* ptr;
+		slide_context_t& s;
 	};
 
-	/* get next filename */
-	autofree filename(browser()->get_next_file());
+	autofree_t container(slide);
 
-	if ( !filename.ptr ){
-		Log::message(Log::Warning, "Kernel: Queue is empty\n", filename.ptr);
-	} else {
-		Log::message(Log::Debug, "Kernel: Switching to image \"%s\"\n", filename.ptr);
+	if ( !(slide.filename && slide.assembler) ){
+		Log::message(Log::Warning, "Kernel: Queue is empty\n");
 	}
 
-	try {
-		gfx()->load_image( filename.ptr );
-	} catch ( exception& e ) {
-		Log::message(Log::Warning, "Kernel: Failed to load image '%s': %s\n", filename.ptr, e.what());
+	/* @todo make something factory-like */
+	if ( strcmp("image", slide.assembler) == 0 || strcmp("text", slide.assembler) == 0 ){
+		Log::message(Log::Debug, "Kernel: Switching to image \"%s\"\n", slide.filename);
+
+		try {
+			gfx()->load_image( slide.filename );
+		} catch ( exception& e ) {
+			Log::message(Log::Warning, "Kernel: Failed to load image '%s': %s\n", slide.filename, e.what());
+			return new ViewState(this);
+		}
+
+		return new TransitionState(this);
+	} else if ( strcmp("video", slide.assembler) == 0 ){
+		Log::message(Log::Debug, "Kernel: Playing video \"%s\"\n", slide.filename);
+		return new ViewState(this);
+	} else {
+		Log::message(Log::Warning, "Unhandled assembler \"%s\" for \"%s\"\n", slide.assembler, slide.filename);
 		return new ViewState(this);
 	}
-
-	return new TransitionState(this);
 }

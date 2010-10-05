@@ -26,7 +26,7 @@ class DummyBrowser: public Browser {
 		DummyBrowser(const browser_context_t& context);
 		virtual ~DummyBrowser();
 
-		virtual char* get_next_file();
+		virtual slide_context_t get_next_file();
 
 	private:
 		unsigned int n;

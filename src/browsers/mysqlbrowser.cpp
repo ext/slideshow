@@ -31,7 +31,7 @@ class MySQLBrowser: public Browser {
 		MySQLBrowser(const browser_context_t& context);
 		virtual ~MySQLBrowser();
 
-		virtual char* get_next_file();
+		virtual slide_context_t get_next_file();
 		virtual void reload();
 
 		virtual void dump_queue();
@@ -71,8 +71,11 @@ MySQLBrowser::~MySQLBrowser(){
 	clear_fields();
 }
 
-char* MySQLBrowser::get_next_file(){
-	return strdup(get_field(_current_field++));
+slide_context_t MySQLBrowser::get_next_file(){
+	slide_context_t tmp;
+	tmp.filename = strdup(get_field(_current_field++));
+	tmp.assembler = strdup("image");
+	return tmp;
 }
 
 void MySQLBrowser::connect(){

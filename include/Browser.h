@@ -27,6 +27,11 @@ typedef struct {
 	char* name;
 } browser_context_t;
 
+typedef struct {
+	char* filename;
+	char* assembler;
+} slide_context_t;
+
 browser_context_t get_context(const char* string);
 void free_context(browser_context_t& context);
 
@@ -37,10 +42,10 @@ class Browser {
 
 		/**
 		 * Gets the next file from the queue.
-		 * @return A copy of the filename which the caller must deallocate using
-		 *         free.
+		 * @return A slide context with copies of the strings which the caller
+		 *         must deallocate using free.
 		 */
-		virtual char* get_next_file() = 0;
+		virtual slide_context_t get_next_file() = 0;
 		virtual void reload() = 0;
 		virtual void dump_queue() = 0;
 
