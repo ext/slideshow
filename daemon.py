@@ -8,6 +8,7 @@ import cherrypy
 from select import select
 from settings import Settings
 import event
+import resource
 
 # used to get a pretty name from signal numbers
 _signal_lut = dict((k, v) for v, k in signal.__dict__.iteritems() if v.startswith('SIG') and not v.startswith('SIG_'))
@@ -211,10 +212,14 @@ class _Daemon(threading.Thread):
 			print 'env:', env
 			print 'cwd:', cwd
 			
+			def preexec():
+				resource.setrlimit(resource.RLIMIT_CORE, (-1, -1))
+			
 			instance = subprocess.Popen(
 				[cmd] + args,
 				stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-				cwd=cwd, env=env
+				cwd=cwd, env=env,
+				preexec_fn=preexec
 			)
 			
 			self._logobj = self._connect_log(instance, cwd)
