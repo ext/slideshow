@@ -47,6 +47,11 @@ class Handler(object):
 				active = q
 				break
 		
+		# 'intermediate' queue has id -1 and thus is always first, but we want
+		# it placed at the bottom, swap positions.
+		tmp = queues.pop(0)
+		queues.append(tmp)
+		
 		return template.render(queues=queues, active=active)
 	
 	@cherrypy.expose

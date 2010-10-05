@@ -28,7 +28,7 @@
 		<div class="queuewrapper">
 			<span class="title">
 				${queue.name}
-				<py:if test="queue.id != 0">
+				<py:if test="queue.id > 0">
 					(
 					<py:choose test="queue.id == active.id">
 						<py:when test="True">active</py:when>

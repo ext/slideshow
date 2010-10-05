@@ -86,7 +86,7 @@
 	// ]]></script>
 	
 	<ul>
-		<li py:for="queue in queues" py:attrs="queue.id == 0 and {'style': 'background: none; color: grey;'} or {}">
+		<li py:for="queue in queues" py:attrs="queue.id > 0 and {'style': ''} or {'style': 'background: none; color: grey;'}">
 			<span py:attrs="queue.id > 0 and {'class': 'edit'} or {}" id="queue_${queue.id}">${queue.name}</span>
 			<noscript py:if="queue.id > 0">
 				(<a href="/queue/rename/${queue.id}">Rename</a>, <a href="/queue/delete/${queue.id}">Delete</a>)
