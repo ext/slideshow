@@ -305,6 +305,9 @@ class _Daemon(threading.Thread):
 			sem.release()
 	
 	def push(self, func, args, kwargs, sem, ret):
+		if not self._running:
+			raise RuntimeError, 'Cannot push command while daemon isn\'t running'
+		
 		self._queue.append((func, args, kwargs, sem, ret))
 		self._sem.release()
 
