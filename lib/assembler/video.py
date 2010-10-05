@@ -51,6 +51,13 @@ class VideoAssembler(Assembler):
 		])
 		if retcode != 0:
 			raise ValueError, 'failed to resample %s' % (slide.raster_path(size))
+		
+		# try to create a symlink to the actual file, expected to fail since any
+		# previous rasterisations would had created this symlink already.
+		try:
+			os.symlink(os.path.join(base, video, filename), slide.src_path('video'))
+		except OSError:
+			pass
 	
 	def default_size(self, slide, params, width=None):
 		pass
