@@ -2,12 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import multiprocessing, subprocess, sys, threading, traceback
-import time, os.path, re, socket, sqlite3
+import time, os.path, re, signal, socket, sqlite3
 import dbus, dbus.service
 import cherrypy
 from select import select
 from settings import Settings
 import event
+
+# used to get a pretty name from signal numbers
+_signal_lut = dict((k, v) for v, k in signal.__dict__.iteritems() if v.startswith('SIG') and not v.startswith('SIG_'))
 
 _states = {
 	1<<0: 'STOPPED',
@@ -270,9 +273,15 @@ class _Daemon(threading.Thread):
 					for line in self._instance.stdout:
 						self.log.push(line)
 					
-					if self._instance.returncode == 0:
+					rc = self._instance.returncode
+					if rc == 0:
 						self._state = STOPPED
 					else:
+						global _signal_lut
+						if rc > 0:
+							self.log.push('childprocess exited with abnormal returncode:' + rc)
+						else:
+							self.log.push('childprocess aborted from signal ' + _signal_lut[-rc])
 						self._state = CRASHED
 					
 					self._instance = None
