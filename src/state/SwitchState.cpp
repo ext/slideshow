@@ -49,6 +49,7 @@ State* SwitchState::action(bool &flip){
 
 	if ( !(slide.filename && slide.assembler) ){
 		Log::message(Log::Warning, "Kernel: Queue is empty\n");
+		return new ViewState(this);
 	}
 
 	/* @todo make something factory-like */
