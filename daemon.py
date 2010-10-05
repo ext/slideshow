@@ -198,7 +198,7 @@ class _Daemon(threading.Thread):
 	# reset is called when the application is crashed, to reset state
 	def reset(self):
 		if self._state != CRASHED:
-			raise RuntimeError, 'Cannot reset unless crashed'
+			return
 		
 		self._state = STOPPED
 	
