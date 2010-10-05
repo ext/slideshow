@@ -186,18 +186,16 @@ class _Daemon(threading.Thread):
 		self._state = STOPPED
 	
 	def do_start(self, resolution, fullscreen):
-		print 'do_start:', resolution
-		
 		if not self._state in [STOPPED, CRASHED]:
 			raise StateError, 'Cannot start daemon while in state ' + statename(self._state)
 	
 		try:
 			self._state = STARTING
 			cmd, args, env, cwd = settings(resolution, fullscreen)
-			print cmd
-			print args
-			print env
-			print cwd
+			print 'cmd:', cmd
+			print 'args:', args
+			print 'env:', env
+			print 'cwd:', cwd
 			
 			instance = subprocess.Popen(
 				[cmd] + args,
