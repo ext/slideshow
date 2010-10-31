@@ -65,7 +65,12 @@ FileDestination::FileDestination(FILE* fp)
 	: _fp(fp)
 	, _autoclose(false) {
 
+	if ( !fp ){
+		fprintf(stderr, "Failed to read fp! Fatal error!\n");
+		exit(1);
+	}
 }
+
 FileDestination::~FileDestination(){
 	if ( _autoclose ){
 		fclose(_fp);
