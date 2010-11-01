@@ -67,6 +67,7 @@ int SDLBackend::init(const Vector2ui &resolution, bool fullscreen){
 	}
 
 	SDL_EnableUNICODE(1);
+	SDL_ShowCursor(SDL_DISABLE);
 
 #ifdef WIN32
 	SetConsoleOutputCP(65001);
