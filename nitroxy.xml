@@ -29,6 +29,6 @@
 		 * textarea: Multiple lines of text
 		 * static: Insert static text at given position
 	 -->
-	<text name="title" title="Title" font="Sans" size="36" color="#ffff00" align="center" position="50% 6%" />
-	<textarea name="content" title="Content" font="Sans" color="#54a42d" size="48" align="center" boxsize="90% 80%" position="50% 47%" />
+	<text name="title" title="Title" font="Sans" size="68" color="#ffffff" align="center" position="50% 24%" />
+	<textarea name="content" title="Content" font="Sans" color="#ffffff" size="42" align="center" boxsize="90% 48%" position="50% 50%" />
 </template>
