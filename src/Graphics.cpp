@@ -240,6 +240,7 @@ void Graphics::load_image(const char* name){
 
 		ILuint devilID;
 
+		/* load image @todo Dont generate buffer each time */
 		ilGenImages(1, &devilID);
 		ilBindImage(devilID);
 		ilLoadImage(path.get());
@@ -261,6 +262,9 @@ void Graphics::load_image(const char* name){
 		int format = ilGetInteger(IL_IMAGE_FORMAT);
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, pixels);
+
+		/* free buffer */
+		ilDeleteImages(1, &devilID);
 	} else {
 		static const unsigned char black[] = {
 			0, 0, 0
