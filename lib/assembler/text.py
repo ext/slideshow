@@ -8,6 +8,7 @@ import array, cairo, pango, pangocairo, json, re
 import xml
 from xml.dom import minidom
 from htmlcolor import Parser as ColorParser
+import htmlcolor
 import urllib
 
 def decode_position(str, size):
@@ -45,7 +46,7 @@ def decode_position(str, size):
 	# create tuple
 	return tuple(p)
 
-color_parser = ColorParser(components=4)
+color_parser = ColorParser(components=4, factory=htmlcolor.FloatFactory)
 decode_color = color_parser.parse
 
 class Item:
