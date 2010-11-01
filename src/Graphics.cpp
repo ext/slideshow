@@ -28,6 +28,7 @@
 #include "Transition.h"
 #include "path.h"
 #include "gl.h"
+#include "ptr.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -225,17 +226,17 @@ void Graphics::load_image(const char* name){
 	glBindTexture(GL_TEXTURE_2D, _texture[0]);
 
 	if ( name ){
-		std::auto_ptr<char> real_name(strdup(name));
+		Ptr<char> real_name(strdup(name));
 		if ( is_slide(name) ){
 			real_name.reset(asprintf2("%s/raster/%dx%d.png", name, _width, _height));
 		}
 
 #ifdef UNICODE
 		char* tmp = real_path(real_name.get());
-		std::auto_ptr<wchar_t> path(to_tchar(tmp));
+		Ptr<wchar_t> path(to_tchar(tmp));
 		free(tmp);
 #else /* UNICODE */
-		std::auto_ptr<char> path(real_path(real_name.get()));
+		Ptr<char> path(real_path(real_name.get()));
 #endif /* UNICODE */
 
 		ILuint devilID;
