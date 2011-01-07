@@ -1,4 +1,4 @@
-AC_INIT([slideshow],[0.3.0], [ext@sidvind.com])
+AC_INIT([slideshow],[0.3.1], [ext@sidvind.com])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall 1.11 silent-rules])
 AC_CONFIG_MACRO_DIR([m4])
