@@ -94,10 +94,13 @@ libmodule_loader_a_SOURCES = module_loader.c ${top_srcdir}/include/module_loader
 
 xquery_la_SOURCES = xquery.c
 xquery_la_CFLAGS = -Wall -Wstrict-prototypes -I/usr/include/python2.6
-xquery_la_LDFLAGS = -module -export-dynamic ${LDFLAGS}
+xquery_la_LDFLAGS = -module -export-dynamic -avoid-version -shrext ".pyd" ${LDFLAGS}
 xquery_la_LIBADD = ${X11_LIBS} ${xrandr_LIBS}
 
 SUFFIXES = .rl
 
 .rl.cpp:
 	$(AM_V_GEN)$(RAGEL) $(RAGELFLAGS) -C $< -o $@
+
+install-exec-hook:
+	rm -f ${DESTDIR}/${libdir}/xquery.la
