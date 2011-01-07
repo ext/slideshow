@@ -18,6 +18,7 @@ AC_PROG_CC_C99
 CHECK_RAGEL([src/browser_context.cpp])
 
 AX_CHECK_GLU
+PKG_CHECK_MODULES(glew, [glew])
 
 AC_CONFIG_FILES([
 	Makefile
