@@ -33,16 +33,21 @@ slideshow_CPPFLAGS += ${dbus_CFLAGS}
 endif
 
 slideshow_SOURCES = \
-	${top_srcdir}/include/Browser.h \
-	${top_srcdir}/include/config.h \
-	${top_srcdir}/include/ErrorCodes.h \
-	${top_srcdir}/include/Exceptions.h \
-	${top_srcdir}/include/IPC.h \
-	${top_srcdir}/include/OS.h \
-	${top_srcdir}/include/Transition.h \
+	${top_srcdir}/include/backend/platform.h \
 	${top_srcdir}/include/argument_parser.h \
+	${top_srcdir}/include/assembler.h \
+	${top_srcdir}/include/gl.h \
+	${top_srcdir}/include/IPC.h \
+	${top_srcdir}/include/mathutils.h \
+	${top_srcdir}/include/module.h \
+	${top_srcdir}/include/OS.h \
+	${top_srcdir}/include/ptr.h \
+	${top_srcdir}/include/slidelib.h \
+	${top_srcdir}/include/Transition.h \
+	${top_srcdir}/include/vector.h \
+	${top_srcdir}/include/win32.h \
 	backend/factory.cpp \
-	backend/SDLbackend.cpp \
+	browsers/dummybrowser.cpp browsers/dummybrowser.h \
 	argument_parser.c \
 	browser_context.rl \
 	Browser.cpp ${top_srcdir}/include/Browser.h \
@@ -53,8 +58,7 @@ slideshow_SOURCES = \
 	Kernel.cpp ${top_srcdir}/include/Kernel.h \
 	Log.cpp ${top_srcdir}/include/Log.h\
 	main.cpp \
-	path.c ${top_srcdir}/include/path.h \
-	browsers/dummybrowser.cpp browsers/dummybrowser.h
+	path.c ${top_srcdir}/include/path.h
 
 slideshow_LDADD = \
 	libmodule_loader.a \
@@ -72,8 +76,12 @@ slideshow_LDADD = \
 	${xxf86vm_LIBS} \
 	${xrandr_LIBS}
 
+if WITH_SDL
+slideshow_SOURCES += backend/SDLbackend.cpp ${top_srcdir}/include/backend/SDLbackend.h
+endif
+
 if WITH_MYSQL
-slideshow_SOURCES += browsers/mysqlbrowser.cpp browsers/mysqlbrowser.h
+slideshow_SOURCES += browsers/mysqlbrowser.cpp
 slideshow_LDADD += ${MYSQL_LIBS}
 endif
 
