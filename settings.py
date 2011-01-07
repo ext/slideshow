@@ -3,7 +3,7 @@
 
 from xml.dom import minidom
 import os, os.path, stat, traceback
-import json, xquery
+import json, xorg_query
 import pprint
 import threading
 import event
@@ -206,7 +206,7 @@ def _calc_aspect(w,h):
     return ''
 
 def resolutions(dpy):
-    all = [(w,h,r,_calc_aspect(w,h)) for (w,h,r) in xquery.resolutions(dpy)]
+    all = [(w,h,r,_calc_aspect(w,h)) for (w,h,r) in xorg_query.resolutions(dpy)]
     k = ['{width}x{height}'.format(width=w, height=h, refresh=r) for (w,h,r,a) in all]
     v = ['{width}x{height} ({aspect})'.format(width=w, height=h, aspect=a) for (w,h,r,a) in all]
     return zip(k, v)
@@ -238,7 +238,7 @@ class ItemResolution(Item):
 
 class ItemDisplay(Item):
     default = ':0.0'
-    values = map(lambda x: (x,x), xquery.screens())
+    values = map(lambda x: (x,x), xorg_query.screens())
     
     def __init__(self, allow_empty=False, **kwargs):
         Item.__init__(self, **kwargs)
@@ -357,7 +357,7 @@ class Settings(object):
             h = int(h)
             return Resolution(w,h)
         else:
-            size = xquery.current_resolution(use_rotation=True)
+            size = xorg_query.current_resolution(use_rotation=True)
             return Resolution(size[0], size[1])
     
     def load(self, base, config_file=None):

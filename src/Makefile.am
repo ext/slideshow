@@ -2,7 +2,6 @@ SUBDIRS = transitions
 
 noinst_LIBRARIES = libmodule_loader.a libipc.a libfsm.a
 bin_PROGRAMS = slideshow-daemon
-lib_LTLIBRARIES = xquery.la 
 
 warning_flags = -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
 
@@ -92,15 +91,7 @@ endif
 
 libmodule_loader_a_SOURCES = module_loader.c ${top_srcdir}/include/module_loader.h
 
-xquery_la_SOURCES = xquery.c
-xquery_la_CFLAGS = -Wall -Wstrict-prototypes -I/usr/include/python2.6
-xquery_la_LDFLAGS = -module -export-dynamic -avoid-version -shrext ".pyd" ${LDFLAGS}
-xquery_la_LIBADD = ${X11_LIBS} ${xrandr_LIBS}
-
 SUFFIXES = .rl
 
 .rl.cpp:
 	$(AM_V_GEN)$(RAGEL) $(RAGELFLAGS) -C $< -o $@
-
-install-exec-hook:
-	rm -f ${DESTDIR}/${libdir}/xquery.la
