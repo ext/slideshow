@@ -1,7 +1,7 @@
 SUBDIRS = transitions
 
 noinst_LIBRARIES = libmodule_loader.a libipc.a libfsm.a
-bin_PROGRAMS = slideshow
+bin_PROGRAMS = slideshow-daemon
 lib_LTLIBRARIES = xquery.la 
 
 warning_flags = -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
@@ -25,14 +25,14 @@ libfsm_a_SOURCES = \
 	state/VideoState.cpp state/VideoState.h \
 	state/ViewState.cpp state/ViewState.h
 
-slideshow_CPPFLAGS = ${AM_CPPFLAGS} ${libdaemon_CFLAGS} -DBUILD_DAEMON
-slideshow_CFLAGS   = ${AM_CPPFLAGS}
+slideshow_daemon_CPPFLAGS = ${AM_CPPFLAGS} ${libdaemon_CFLAGS} -DBUILD_DAEMON
+slideshow_daemon_CFLAGS   = ${AM_CPPFLAGS}
 
 if WITH_DBUS
-slideshow_CPPFLAGS += ${dbus_CFLAGS}
+slideshow_daemon_CPPFLAGS += ${dbus_CFLAGS}
 endif
 
-slideshow_SOURCES = \
+slideshow_daemon_SOURCES = \
 	${top_srcdir}/include/backend/platform.h \
 	${top_srcdir}/include/argument_parser.h \
 	${top_srcdir}/include/assembler.h \
@@ -60,7 +60,7 @@ slideshow_SOURCES = \
 	main.cpp \
 	path.c ${top_srcdir}/include/path.h
 
-slideshow_LDADD = \
+slideshow_daemon_LDADD = \
 	libmodule_loader.a \
 	libipc.a \
 	libfsm.a \
@@ -77,17 +77,17 @@ slideshow_LDADD = \
 	${xrandr_LIBS}
 
 if WITH_SDL
-slideshow_SOURCES += backend/SDLbackend.cpp ${top_srcdir}/include/backend/SDLbackend.h
+slideshow_daemon_SOURCES += backend/SDLbackend.cpp ${top_srcdir}/include/backend/SDLbackend.h
 endif
 
 if WITH_MYSQL
-slideshow_SOURCES += browsers/mysqlbrowser.cpp
-slideshow_LDADD += ${MYSQL_LIBS}
+slideshow_daemon_SOURCES += browsers/mysqlbrowser.cpp
+slideshow_daemon_LDADD += ${MYSQL_LIBS}
 endif
 
 if WITH_SQLITE3
-slideshow_SOURCES += browsers/sqlite.cpp
-slideshow_LDADD += ${sqlite3_LIBS}
+slideshow_daemon_SOURCES += browsers/sqlite.cpp
+slideshow_daemon_LDADD += ${sqlite3_LIBS}
 endif
 
 libmodule_loader_a_SOURCES = module_loader.c ${top_srcdir}/include/module_loader.h
