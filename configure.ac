@@ -112,7 +112,7 @@ dnl #######################################################################
 dnl # DevIL
 dnl #######################################################################
 AC_CHECK_HEADERS([IL/il.h], [HAVE_DEVIL=yes], [HAVE_DEVIL=no])
-if test x$HAVE_FREEIMAGE = xno; then
+if test x$HAVE_DEVIL = xno; then
    AC_MSG_ERROR(DevIL development libraries not found);
 else
    DEVIL_LIBS="-lIL -lILU -lILUT"
