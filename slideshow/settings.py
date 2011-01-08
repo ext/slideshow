@@ -363,7 +363,7 @@ class Settings(object):
     def load(self, base, config_file=None):
         doc = minidom.parse(base)
         self.groups = OrderDict()
-        self.enviroment = []
+        self.enviroment = {}
         self.config_file = config_file
         
         for group in doc.getElementsByTagName('group'):
@@ -397,43 +397,46 @@ class Settings(object):
                 item.rel = self.item(item.rel)
         
         # load stored settings
-        with open(config_file, 'r') as f:
-            c = json.load(f)
+        try:
+            with open(config_file, 'r') as f:
+                c = json.load(f)
             
-            # Because of dependencies between items and no guarantee of the
-            # order they arrive in we keep iterating through all items that are 
-            # left until either no more changes was made or until no more items
-            # are left.
-            p = 0
-            while True:
-                p += 1 # pass
-                n = 0  # nr of changes
+                # Because of dependencies between items and no guarantee of the
+                # order they arrive in we keep iterating through all items that are 
+                # left until either no more changes was made or until no more items
+                # are left.
+                p = 0
+                while True:
+                    p += 1 # pass
+                    n = 0  # nr of changes
                 
-                for k,v in c.items():
-                    if k == 'Env':
-                        self.enviroment = v
-                        del c[k]
-                        continue
-                    try:
-                        group = self.groups[k]
-                    except KeyError:
-                        print 'group', k, 'found in config but is not defined xml'
-                        continue
-                    
-                    for name, value in v.items():
+                    for k,v in c.items():
+                        if k == 'Env':
+                            self.enviroment = v
+                            del c[k]
+                            continue
                         try:
-                            item = group[name]
-                            item.set(value, rollback=True)
-                            del v[name] # drop from list
-                            n += 1
-                        except ValueError as e:
-                            print name, k, 'contains illegal data ("%s": %s), resetting to default' % (value, str(e))
+                            group = self.groups[k]
                         except KeyError:
-                            print name, k, 'found in config but is not defined in xml'
-                
-                if n == 0:
-                    break
-        
+                            print 'group', k, 'found in config but is not defined xml'
+                            continue
+                    
+                        for name, value in v.items():
+                            try:
+                                item = group[name]
+                                item.set(value, rollback=True)
+                                del v[name] # drop from list
+                                n += 1
+                            except ValueError as e:
+                                print name, k, 'contains illegal data ("%s": %s), resetting to default' % (value, str(e))
+                            except KeyError:
+                                print name, k, 'found in config but is not defined in xml'
+                                
+                    if n == 0:
+                        break
+        except IOError:
+            pass
+
         ItemResolution.values = resolutions(self['Apparence.Display'])
     
     def persist(self, dst=None):
