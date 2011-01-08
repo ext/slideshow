@@ -75,23 +75,49 @@ class SQLite3(Browser):
 def run():
 	# setup argument parser
 	parser = argparse.ArgumentParser(description='Slideshow frontend')
-	parser.add_argument('-f', '--config-file', default='/etc/slideshow.conf')
+	parser.add_argument('-f', '--config-file', required=True)
 	parser.add_argument('-v', '--verbose', dest='verbose', action='store_true')
 	parser.add_argument('-q', '--quiet', dest='verbose', action='store_false')
 	parser.add_argument('-p', '--port', type=int, default=8000)
+	parser.add_argument('--install', action='store_true')
 	parser.add_argument('--browser', default='sqlite://site.db')
 
 	# parse args
 	args = parser.parse_args()
 
 	try:
+		# create new config if we are bootstraping
+		if args.install:
+			# check if config already exists
+			if os.path.exists(args.config_file):
+				print >> sys.stderr, 'Configuration already exists, cannot install a new one.'
+				print >> sys.stderr, 'If you intend to replace the configuration, please remove the old one first, e.g. `rm %s\'' % args.config_file
+				sys.exit(1)
+
+			# put a dummy config, will be overwritten later
+			with open(args.config_file, 'w') as f:
+				f.write("{}\n")
+
 		# verify that config_file exists
 		if not os.path.exists(args.config_file):
-			raise OSError, 'could not open config_file: %s' % args.config_file
+			print >> sys.stderr, 'Could not open configuration file:', args.config_file
+			print >> sys.stderr, 'You can create a new configuration by adding the --install flag or creating the file yourself.'
+			print >> sys.stderr, 'Note that the file must be writable by the user running slideshow.'
+			sys.exit(1)
+
+		# verify that config_file is writable
+		if not os.access(args.config_file, os.W_OK):
+			print >> sys.stderr, 'Could not write to configuration file:', args.config_file
+			print >> sys.stderr, 'Make sure the user has proper permissions.'
+			sys.exit(1)
 
 		# load slideshow settings
 		settings = Settings()
 		settings.load(get_resource_path('settings.xml'), args.config_file)
+
+		# if creating a new config, the default config is persisted.
+		if args.install:
+			settings.persist()
 
 		# read cherrypy config
 		config = settings['cherrypy']
