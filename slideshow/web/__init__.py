@@ -95,8 +95,13 @@ def run():
 				sys.exit(1)
 
 			# put a dummy config, will be overwritten later
-			with open(args.config_file, 'w') as f:
-				f.write("{}\n")
+			try:
+				with open(args.config_file, 'w') as f:
+					f.write("{}\n")
+			except IOError:
+				print >> sys.stderr, 'Failed to install configuration at', args.config_file
+				print >> sys.stderr, 'Ensure that you have write-permission to the specified location.'
+				sys.exit(1)
 
 		# verify that config_file exists
 		if not os.path.exists(args.config_file):
