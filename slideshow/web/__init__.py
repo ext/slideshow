@@ -90,7 +90,7 @@ def run():
 
 		# load slideshow settings
 		settings = Settings()
-		settings.load(get_resource_path('settings.xml'), 'settings.json')
+		settings.load(get_resource_path('settings.xml'), args.config_file)
 
 		# read cherrypy config
 		config = settings['cherrypy']
