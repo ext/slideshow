@@ -32,7 +32,7 @@ html_escape_table = {
 	">": "&gt;",
 	"<": "&lt;",
 	" ": "&nbsp;",
-	"\t": "&nbsp;&nbsp;&nbsp;&nbsp;",
+	"\t": "&nbsp;" * 4, # 4 is tabwidth
 }
 
 def html_escape(text):
