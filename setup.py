@@ -11,13 +11,13 @@ setup(
     package_data = {
         '': [
             'install/*.sql',
-            'lib/assembler/*.html'
+            'lib/assembler/*.html',
             'static/*/*',
             'templates/*.html',
             'templates/*/*.html',
             'settings.xml',
             'default.xml',
-            'template.dtd'
+            'template.dtd',
             ]},
     
     entry_points = """
