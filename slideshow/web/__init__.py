@@ -66,11 +66,17 @@ class SQLite3(Browser):
 		conn.cursor().execute('PRAGMA foreign_keys = ON')
 		return conn
 	
-def run(config_file='test.conf', browser_string='sqlite://site.db'):
+def run(config_file=None, browser_string='sqlite://site.db'):
 	browser = Browser.from_string(browser_string)
 
 	# make all worker threads connect to the database
 	cherrypy.engine.subscribe('start_thread', browser.connect)
+
+	if config_file and not os.path.exists(config_file):
+		raise OSError, 'could not open config_file: %s', config_file
+
+	if not config_file:
+		print 'Warning! No config file specified, will use defaults'
 
 	# load application config
 	application = cherrypy.tree.mount(Root(), '/', config=config_file)
