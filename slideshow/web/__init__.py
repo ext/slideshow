@@ -4,17 +4,14 @@
 import os
 import cherrypy
 import sqlite3
+import re
+import slideshow
 from slideshow.lib import template
 from slideshow.pages import slides
 from slideshow.pages import maintenance
 from slideshow.pages import queue
 from slideshow.settings import Settings
 import slideshow.daemon as daemon
-
-def connect(*args):
-	cherrypy.thread_data.db = sqlite3.connect('site.db')
-	cherrypy.thread_data.db.row_factory = sqlite3.Row
-	cherrypy.thread_data.db.cursor().execute('PRAGMA foreign_keys = ON')
 
 class Root(object):
 	slides = slides.Handler()
@@ -25,9 +22,57 @@ class Root(object):
 	def index(self):
 		raise cherrypy.InternalRedirect('/slides/list')
 
-def run():
+class Browser:
+	def __init__(self, host, username, password, name):
+		self._host = host
+		self._username = username
+		self._password = password
+		self._name = name
+
+	@staticmethod
+	def from_string(string):
+		m = re.match('([a-z]+)://(.+)', string)
+		if m is None:
+			raise RuntimeError, 'string %s is not a valid browser string!' % string
+
+		# @todo factory
+		vendor = m.group(1)
+		host = m.group(2)
+		if vendor == 'sqlite':
+			return SQLite3(host, None, None, None)
+		else:
+			raise RuntimeError, 'Unsupported browser %s' % str(vendor)
+
+class SQLite3(Browser):
+	def __init__(self, *args, **kwargs):
+		Browser.__init__(self, *args, **kwargs)
+
+		conn = self._connect()
+
+		# check if not previous database is created
+		row = conn.execute('SELECT COUNT(*) FROM sqlite_master WHERE name = \'slide\'').fetchone()[0]
+		if not row or row == 0:
+			# install database schema
+			filename = os.path.join(os.path.dirname(slideshow.__file__), 'install', 'sqlite.sql')
+			lines = "\n".join(open(filename, 'r').readlines())
+			conn.executescript(lines)
+
+	def connect(self, *args):
+		cherrypy.thread_data.db = self._connect()
+
+	def _connect(self):
+		conn = sqlite3.connect(self._host)
+		conn.row_factory = sqlite3.Row
+		conn.cursor().execute('PRAGMA foreign_keys = ON')
+		return conn
+	
+def run(browser_string='sqlite://site.db'):
+	browser = Browser.from_string(browser_string)
+	print browser
+	browser.connect
+
 	# make all worker threads connect to the database
-	cherrypy.engine.subscribe('start_thread', connect)
+	cherrypy.engine.subscribe('start_thread', browser.connect)
 
 	# load cherrypy config
 	application = cherrypy.tree.mount(Root(), '/', config='test.conf')
@@ -42,9 +87,10 @@ def run():
 				'tools.staticdir.on': True,
 				'tools.staticdir.dir': '../static',
 				},
-			'sessionFilter.on': True,
 			})
 	
+	# global cherrypy config
+	cherrypy.config.update({'sessionFilter.on': True})  
 
 	# load slideshow settings
 	settings = Settings()
