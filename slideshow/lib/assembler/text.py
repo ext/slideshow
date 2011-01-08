@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from . import Assembler
-from lib.resolution import Resolution
-from settings import Settings
+from slideshow.lib.resolution import Resolution
+from slideshow.settings import Settings
 import array, cairo, pango, pangocairo, json, re
 import xml
 from xml.dom import minidom

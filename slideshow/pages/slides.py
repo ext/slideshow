@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import cherrypy, urllib
-from lib import assembler, queue, slide, template
-from lib.resolution import Resolution
-from settings import Settings
-import daemon
+from slideshow.lib import assembler, queue, slide, template
+from slideshow.lib.resolution import Resolution
+from slideshow.settings import Settings
+import slideshow.daemon as daemon
 
 class Ajax(object):
 	@cherrypy.expose

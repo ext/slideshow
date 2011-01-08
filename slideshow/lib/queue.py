@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from slide import Slide
-from settings import Settings
-import event
+from slideshow.lib.slide import Slide
+from slideshow.settings import Settings
+import slideshow.event as event
 
 class Queue:
 	def __init__(self, c, id, name, loop):

@@ -10,7 +10,7 @@ from genshi.template import Context, TemplateLoader
 from genshi.filters import Translator, Transformer
 from genshi.filters.transform import StreamBuffer
 import gettext
-import daemon
+import slideshow.daemon as daemon
 
 #trans = gettext.GNUTranslations(open("po/sv.mo"))
 

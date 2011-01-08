@@ -3,7 +3,7 @@
 
 from . import Assembler
 import os, os.path, subprocess
-from settings import Settings
+from slideshow.settings import Settings
 
 class VideoAssembler(Assembler):
 	def is_editable(self):

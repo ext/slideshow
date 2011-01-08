@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import os, os.path, json
-import assembler as asm
+import slideshow.lib.assembler as asm
 import shutil, uuid
-from settings import Settings
-from lib.resolution import Resolution
-import event
+from slideshow.settings import Settings
+from slideshow.lib.resolution import Resolution
+import slideshow.event as event
 import cherrypy
 
 image_path = os.path.expanduser('~/slideshow/image')

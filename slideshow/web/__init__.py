@@ -4,12 +4,12 @@
 import os
 import cherrypy
 import sqlite3
-from lib import template
-from pages import slides
-from pages import maintenance
-from pages import queue
-from settings import Settings
-import daemon
+from slideshow.lib import template
+from slideshow.pages import slides
+from slideshow.pages import maintenance
+from slideshow.pages import queue
+from slideshow.settings import Settings
+import slideshow.daemon as daemon
 
 def connect(*args):
 	cherrypy.thread_data.db = sqlite3.connect('site.db')
@@ -40,16 +40,18 @@ cherrypy.config.update({'sessionFilter.on': True})
 settings = Settings()
 settings.load('settings.xml', 'settings.json')
 
-if __name__ == '__main__':
-	#print daemon.instance
+def run():
 	cherrypy.config.update('test.conf')
 	daemon.subscribe(cherrypy.engine)
-
+	
 	if hasattr(cherrypy.engine, 'block'):
-	    # 3.1 syntax
-	    cherrypy.engine.start()
-	    cherrypy.engine.block()
+		# 3.1 syntax
+		cherrypy.engine.start()
+		cherrypy.engine.block()
 	else:
-	    # 3.0 syntax
-	    cherrypy.server.quickstart()
-	    cherrypy.engine.start()
+		# 3.0 syntax
+		cherrypy.server.quickstart()
+		cherrypy.engine.start()
+		
+if __name__ == '__main__':
+	run()

@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import cherrypy, os.path
-from lib import queue, slide, template
-from settings import Settings
-import daemon
-import event
+from slideshow.lib import queue, slide, template
+from slideshow.settings import Settings
+import slideshow.daemon as daemon
+import slideshow.event as event
 
 class Ajax(object):
 	@cherrypy.expose

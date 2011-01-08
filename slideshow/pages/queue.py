@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import cherrypy
-from lib import queue, template
+from slideshow.lib import queue, template
 
 class Ajax(object):
     @cherrypy.expose

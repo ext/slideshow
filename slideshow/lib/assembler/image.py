@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from . import Assembler
-from lib.resolution import Resolution
+from slideshow.lib.resolution import Resolution
 import subprocess
 import PythonMagick
 

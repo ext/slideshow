@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from genshi.template import TemplateLoader
-from lib import template
+from slideshow.lib import template
 import os.path
 
 loader = TemplateLoader(
