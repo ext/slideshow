@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE template SYSTEM "slide_template.dtd">
+<!DOCTYPE template SYSTEM "template.dtd">
 <template background="bg.png" fit="scale">
 	<!--
 		Units:
