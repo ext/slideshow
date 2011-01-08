@@ -31,8 +31,13 @@ application = cherrypy.tree.mount(Root(), '/', config='test.conf')
 application.config.update({
 	'/': {
 		'tools.staticdir.root': os.path.dirname(os.path.abspath(__file__)),
-		'tools.encode.on':True,
-		'tools.encode.encoding':'utf8',
+		'tools.gzip.on': True,
+		'tools.encode.on': True,
+		'tools.encode.encoding': 'utf8',
+	},
+	'/static': {
+		'tools.staticdir.on': True,
+		'tools.staticdir.dir': '../static',
 	}
 })
 
