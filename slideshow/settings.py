@@ -395,6 +395,23 @@ class Settings(object):
                     continue
                 
                 item.rel = self.item(item.rel)
+
+        # load default settings
+        for group in doc.getElementsByTagName('group'):
+            grpname = group.getAttribute('name')
+
+            for item in group.getElementsByTagName('item'):
+                name = item.getAttribute('name')
+
+                n = len(item.childNodes)
+                if n == 1:
+                    value = item.childNodes[0].data.format(CWD=os.getcwd())
+                    try:
+                        self.groups[grpname][name].set(value)
+                    except:
+                        traceback.print_exc()
+                elif n > 1:
+                    raise RuntimeError, 'Got multiple default values for %s: %s' % (item, item.childNodes)
         
         # load stored settings
         try:
