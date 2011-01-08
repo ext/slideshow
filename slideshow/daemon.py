@@ -32,6 +32,7 @@ html_escape_table = {
 	">": "&gt;",
 	"<": "&lt;",
 	" ": "&nbsp;",
+	"\t": "&nbsp;&nbsp;&nbsp;&nbsp;",
 }
 
 def html_escape(text):
@@ -154,7 +155,7 @@ class _Log:
 		def f(severity, user, stamp, message):
 			severity_str = self.severity_revlut[severity].replace(' ', '&nbsp;')
 			formated_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stamp))
-			return '({severity}) {stamp} {user} {message}'.format(severity=severity_str, user=user, stamp=formated_time, message=message.replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;"))
+			return '({severity}) {stamp} {user} {message}'.format(severity=severity_str, user=user, stamp=formated_time, message=message)
 		
 		lines = [f(**x) for x in lines]
 		
