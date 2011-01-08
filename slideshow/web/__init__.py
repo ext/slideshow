@@ -109,4 +109,4 @@ def run(config_file='test.conf', browser_string='sqlite://site.db'):
 		cherrypy.engine.start()
 		
 if __name__ == '__main__':
-	run()
+	run(*sys.argv[1:])
