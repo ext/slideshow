@@ -37,9 +37,7 @@
 			which matches either dimension and is an as close match as possible.
 		</description>
 		
-		<item name="Background" type="file" description="Background image used when creating text slides"></item>
-		<item name="Font" type="file" description="Font used when creating text slides"></item>
-		<item name="Resolution" type="resolution" description="Display resolution" allow_empty="1">800x600</item>
+		<item name="Resolution" type="resolution" description="Display resolution" allow_empty="1">1280x1024</item>
 		<item name="VirtualResolution" title="Virtual resolution" type="resolution" description="Window resolution" allow_empty="1"></item>
 		<item name="TransitionTime" title="Transition time" type="float" description="Time in sec it takes to change slide">3.0</item>
 		<item name="SwitchTime" title="Switch time" type="float" description="Time in sec each slide will be shown">10.0</item>
@@ -49,10 +47,11 @@
 	<group name="Database">
 		<description>Database settings. Leave the password blank unless you need to change it.</description>
 		
+		<item name="Provider" type="string">sqlite3</item>
 		<item name="Username" type="string"></item>
 		<item name="Password" type="password"></item>
-		<item name="Hostname" type="string">localhost</item>
-		<item name="Name" type="string"></item>
+		<item name="Hostname" type="string"></item>
+		<item name="Name" type="string">site.db</item>
 	</group>
 	
 	<group name="Slideshow">
