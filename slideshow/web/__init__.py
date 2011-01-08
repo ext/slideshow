@@ -76,7 +76,7 @@ def run(config_file=None, browser_string='sqlite://site.db'):
 	cherrypy.engine.subscribe('start_thread', browser.connect)
 
 	if config_file and not os.path.exists(config_file):
-		raise OSError, 'could not open config_file: %s', config_file
+		raise OSError, 'could not open config_file: %s' % config_file
 
 	if not config_file:
 		print 'Warning! No config file specified, will use defaults'
