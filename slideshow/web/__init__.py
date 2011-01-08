@@ -77,6 +77,7 @@ def run(config_file=None, browser_string='sqlite://site.db'):
 
 	if not config_file:
 		print 'Warning! No config file specified, will use defaults'
+		config_file = {}
 
 	# load application config
 	application = cherrypy.tree.mount(Root(), '/', config=config_file)
