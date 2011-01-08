@@ -123,6 +123,8 @@ def run():
 		# if creating a new config, the default config is persisted.
 		if args.install:
 			settings.persist()
+			print >> sys.stderr, 'Configuration installed, restart without --install flag to continue.'
+			sys.exit(0)
 
 		# read cherrypy config
 		config = settings['cherrypy']
