@@ -78,6 +78,7 @@ def run():
 	parser.add_argument('-f', '--config-file', default='/etc/slideshow.conf')
 	parser.add_argument('-v', '--verbose', dest='verbose', action='store_true')
 	parser.add_argument('-q', '--quiet', dest='verbose', action='store_false')
+	parser.add_argument('-p', '--port', type=int, default=8000)
 	parser.add_argument('--browser', default='sqlite://site.db')
 
 	# parse args
@@ -122,8 +123,12 @@ def run():
 			})
 	
 		# cherrypy site config
-		cherrypy.config.update({'sessionFilter.on': True})
-		cherrypy.config.update(config) 
+		cherrypy.config.update({
+				'sessionFilter.on': True,
+				'server.socket_host': "0.0.0.0", 
+				'server.socket_port': args.port
+			})
+		cherrypy.config.update(config)
 	
 		# let daemon subscribe to cherrypy events to help stopping daemon when cherrypy is terminating
 		daemon.subscribe(cherrypy.engine)
