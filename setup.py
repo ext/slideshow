@@ -9,7 +9,7 @@ setup(
 
     packages = find_packages(),
     package_data = {
-        '': ['static/*/*', 'templates/*.html', 'templates/*/*.html', 'install/*.sql', 'settings.xml']
+        '': ['static/*/*', 'templates/*.html', 'templates/*/*.html', 'install/*.sql', 'settings.xml', 'default.xml', 'template.dtd']
     },
     
     entry_points = """
