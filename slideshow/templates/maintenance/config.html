@@ -18,6 +18,7 @@
 	<div class="conf">
 		<form id="form" method="post" action="/maintenance/config/save">
 			<py:for each="group in settings">
+			  <py:if test="not group.hidden">
 				<fieldset title="${group.name}">
 					<legend>${group.name}</legend>
 					<p>${Markup(group.description)}</p>
@@ -35,6 +36,7 @@
 					</py:for>
 					
 				</fieldset>
+			  </py:if>
 			</py:for>
 			<fieldset title="Environmental variables">
 				<legend>Environmental variables</legend>
