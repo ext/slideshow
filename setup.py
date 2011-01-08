@@ -9,8 +9,16 @@ setup(
 
     packages = find_packages(),
     package_data = {
-        '': ['static/*/*', 'templates/*.html', 'templates/*/*.html', 'install/*.sql', 'settings.xml', 'default.xml', 'template.dtd']
-    },
+        '': [
+            'install/*.sql',
+            'lib/assembler/*.html'
+            'static/*/*',
+            'templates/*.html',
+            'templates/*/*.html',
+            'settings.xml',
+            'default.xml',
+            'template.dtd'
+            ]},
     
     entry_points = """
 [console_scripts]
