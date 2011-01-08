@@ -114,7 +114,6 @@ class _Log:
 				severity, stampstr, message = match.groups()
 				stamp = time.mktime(time.strptime(stampstr, '%Y-%m-%d %H:%M:%S'))
 			
-			
 			c.execute("""
 				INSERT INTO log (
 					type,
@@ -155,7 +154,7 @@ class _Log:
 		def f(severity, user, stamp, message):
 			severity_str = self.severity_revlut[severity].replace(' ', '&nbsp;')
 			formated_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stamp))
-			return '({severity}) {stamp} {user} {message}'.format(severity=severity_str, user=user, stamp=formated_time, message=message)
+			return '({severity}) {stamp} {user} {message}'.format(severity=severity_str, user=user, stamp=formated_time, message=message.replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;"))
 		
 		lines = [f(**x) for x in lines]
 		
