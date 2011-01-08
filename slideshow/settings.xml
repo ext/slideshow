@@ -4,7 +4,7 @@
 	<group name="Path">
 		<description>The base directory is the homedirectory of the frontend. All other paths are relative to it.</description>
 		
-		<item name="BasePath" title="Base directory" type="directory"></item>
+		<item name="BasePath" title="Base directory" type="directory">${CWD}</item>
 		<item name="Image" type="directory" rel="Path.BasePath">image</item>
 		<item name="Video" type="directory" rel="Path.BasePath">video</item>
 		<item name="Temp" type="directory" rel="Path.BasePath">tmp</item>
@@ -13,12 +13,12 @@
 	<group name="Files">
 		<description>All file paths are either relative to BasePath or an absolute path.</description>
 		
-		<item name="BinaryPath" title="Exectuable path" description="Path where slideshow binaries exist." type="file"></item>
+		<item name="BinaryPath" title="Exectuable path" description="Path where slideshow binaries exist." type="file">slideshow-daemon</item>
 		<item name="BaseLog" title="Logfile" type="file">slideshow.log</item>
 		<item name="ActivityLog" title="Activity logfile" type="file">activity.log</item>
 		<item name="PID" type="file"  rel="Path.BasePath">slideshow.pid</item>
 		<item name="MOTD" type="file"  rel="Path.BasePath" description="Message of the day">motd</item>
-		<item name="convert" title="ImageMagick convert" type="file" description="ImageMagick is used to scale and convert the slides"></item>
+		<item name="convert" title="ImageMagick convert" type="file" description="ImageMagick is used to scale and convert the slides">/usr/bin/convert</item>
 	</group>
 	
 	<group name="Apparence">
