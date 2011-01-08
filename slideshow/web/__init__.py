@@ -66,16 +66,14 @@ class SQLite3(Browser):
 		conn.cursor().execute('PRAGMA foreign_keys = ON')
 		return conn
 	
-def run(browser_string='sqlite://site.db'):
+def run(config_file='test.conf', browser_string='sqlite://site.db'):
 	browser = Browser.from_string(browser_string)
-	print browser
-	browser.connect
 
 	# make all worker threads connect to the database
 	cherrypy.engine.subscribe('start_thread', browser.connect)
 
-	# load cherrypy config
-	application = cherrypy.tree.mount(Root(), '/', config='test.conf')
+	# load application config
+	application = cherrypy.tree.mount(Root(), '/', config=config_file)
 	application.config.update({
 			'/': {
 				'tools.staticdir.root': os.path.dirname(os.path.abspath(__file__)),
@@ -89,8 +87,9 @@ def run(browser_string='sqlite://site.db'):
 				},
 			})
 	
-	# global cherrypy config
-	cherrypy.config.update({'sessionFilter.on': True})  
+	# cherrypy site config
+	cherrypy.config.update({'sessionFilter.on': True})
+	cherrypy.config.update(config_file) 
 
 	# load slideshow settings
 	settings = Settings()
