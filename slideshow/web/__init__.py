@@ -13,6 +13,9 @@ from slideshow.pages import queue
 from slideshow.settings import Settings
 import slideshow.daemon as daemon
 
+def get_resource_path(*path):
+	return os.path.join(os.path.dirname(slideshow.__file__), *path)
+
 class Root(object):
 	slides = slides.Handler()
 	maintenance = maintenance.Handler()
@@ -53,7 +56,7 @@ class SQLite3(Browser):
 		row = conn.execute('SELECT COUNT(*) FROM sqlite_master WHERE name = \'slide\'').fetchone()[0]
 		if not row or row == 0:
 			# install database schema
-			filename = os.path.join(os.path.dirname(slideshow.__file__), 'install', 'sqlite.sql')
+			filename = get_resource_path('install', 'sqlite.sql')
 			lines = "\n".join(open(filename, 'r').readlines())
 			conn.executescript(lines)
 
@@ -100,7 +103,7 @@ def run(config_file=None, browser_string='sqlite://site.db'):
 
 	# load slideshow settings
 	settings = Settings()
-	settings.load('settings.xml', 'settings.json')
+	settings.load(get_resource_path('settings.xml'), 'settings.json')
 	
 	# let daemon subscribe to cherrypy events to help stopping daemon when cherrypy is terminating
 	daemon.subscribe(cherrypy.engine)
