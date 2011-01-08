@@ -21,7 +21,7 @@
 		<item name="convert" title="ImageMagick convert" type="file" description="ImageMagick is used to scale and convert the slides">/usr/bin/convert</item>
 	</group>
 	
-	<group name="Apparence">
+	<group name="Appearance">
 		<description>
 			The resolution is best left unset, which means to use the currently
 			used by X, which is preferably set to match the native resolution of

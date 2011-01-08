@@ -240,11 +240,13 @@ class TextAssembler(Assembler):
 		return kwargs
 	
 	def rasterize(self, size, params, slide=None, file=None):
+		settings = Settings()
+
 		params = params.copy()
 		params['resolution'] = Resolution(params['resolution'][0], params['resolution'][1])
 		
 		dst = slide and slide.raster_path(size) or file
-		template = Template('nitroxy.xml')
+		template = Template(settings['Appearance.Theme'])
 		template.rasterize(dst=dst, size=size, params=params)
 	
 	def raster_is_valid(reference, resolution, **kwargs):
@@ -254,9 +256,11 @@ class TextAssembler(Assembler):
 		return 'Text'
 	
 	def render(self, content):
+		settings = Settings()
+		
 		default = dict(preview=None)
 		if len(content) > 0:
 			default['preview'] = urllib.urlencode(content)
 		default.update(content)
-		default['template'] = Template('nitroxy.xml')
+		default['template'] = Template(settings['Appearance.Theme'])
 		return Assembler.render(self, content=default)

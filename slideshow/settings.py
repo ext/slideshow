@@ -326,7 +326,7 @@ class Settings(object):
         self._locked = True
     
     def __exit__(self, type, value, traceback):
-        ItemResolution.values = resolutions(self['Apparence.Display'])
+        ItemResolution.values = resolutions(self['Appearance.Display'])
         
         self._locked = False
         self._lock.release()
@@ -359,14 +359,14 @@ class Settings(object):
         item = self.item(key)
         old = item.set(value)
         
-        if key == 'Apparence.Resolution' and item._value != old:
+        if key == 'Appearance.Resolution' and item._value != old:
             event.trigger('config.resolution_changed', self.resolution())
         
         if key == 'Runtime.queue' and item._value != old:
             event.trigger('config.queue_changed', item._value)
     
     def resolution(self):
-        r = self['Apparence.Resolution']
+        r = self['Appearance.Resolution']
         if r:
             w,h = r.split('x')
             w = int(w)
@@ -477,7 +477,7 @@ class Settings(object):
         except IOError:
             pass
 
-        ItemResolution.values = resolutions(self['Apparence.Display'])
+        ItemResolution.values = resolutions(self['Appearance.Display'])
     
     def persist(self, dst=None):
         with open(self.config_file, 'w') as fp:

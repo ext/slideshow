@@ -76,7 +76,7 @@ def settings(resolution=None, fullscreen=True):
 		args.append('--fullscreen')
 	
 	env = dict(
-		DISPLAY=settings['Apparence.Display'],
+		DISPLAY=settings['Appearance.Display'],
 		SLIDESHOW_NO_ABORT='',
 		SDL_VIDEO_X11_XRANDR='0'
 	)
