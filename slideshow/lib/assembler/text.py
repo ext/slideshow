@@ -215,7 +215,11 @@ class Template:
 		
 		background = self._template.getAttribute('background')
 		if background:
-			image = cairo.ImageSurface.create_from_png(background)
+			try:
+				image = cairo.ImageSurface.create_from_png(background)
+			except Exception, e:
+				raise OSError, 'Failed to load background "%s": %s' % (background, e)
+
 			w = image.get_width()
 			h = image.get_height()
 			
