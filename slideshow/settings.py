@@ -39,20 +39,24 @@ class OrderDict:
         return self._list
 
 class Group:
-    def __init__(self, name, description, hidden):
+    def __init__(self, name, description, hidden, ignore):
         self.name = name
         self.description = description
         self.hidden = hidden
-        self.items = OrderDict()
+        self.ignore = ignore
+        self._items = OrderDict()
     
     def add(self, item):
-        self.items[item.name] = item
+        self._items[item.name] = item
     
     def __getitem__(self, k):
-        return self.items[k]
+        return self._items[k]
     
+    def items(self):
+        return self._items.items().__iter__()
+
     def __iter__(self):
-        return self.items.values().__iter__()
+        return self._items.values().__iter__()
 
 class Item:
     typename = '' # automatically set
@@ -84,6 +88,9 @@ class Item:
     
     def get(self):
         return self._value
+
+class ItemDummy(Item):
+    default = None
 
 class ItemDirectory(Item):
     default = ''
@@ -328,9 +335,18 @@ class Settings(object):
         if key == 'Env':
             return self.enviroment
         
-        item = self.item(key)
-        
-        return item._value
+        # full path passed, extract only the specific value
+        if '.' in key:
+            return self.item(key)._value
+
+        # group name was passed, extract a dict with all values in group
+        group = self.groups[key]
+
+        d = {}
+        for k,v in group.items():
+            d[str(k)] = v._value
+
+        return d
     
     def __setitem__(self, key, value):
         if not self._locked:
@@ -369,9 +385,10 @@ class Settings(object):
         for group in doc.getElementsByTagName('group'):
             grpname = group.getAttribute('name')
             hidden  = group.hasAttribute('hidden') and group.getAttribute('hidden') == '1'
+            ignore  = group.hasAttribute('ignore') and group.getAttribute('ignore') == '1'
             grpdesc = ''.join([x.toxml() for x in group.getElementsByTagName('description')[0].childNodes])
             
-            g = Group(name=grpname, description=grpdesc, hidden=hidden)
+            g = Group(name=grpname, description=grpdesc, hidden=hidden, ignore=ignore)
             
             for item in group.getElementsByTagName('item'):
                 attrs = {}
@@ -440,13 +457,19 @@ class Settings(object):
                     
                         for name, value in v.items():
                             try:
-                                item = group[name]
+                                if not group.ignore:
+                                    item = group[name]
+                                else:
+                                    item = ItemDummy(group=group, name=name)
+                                    group.add(item)
+
                                 item.set(value, rollback=True)
                                 del v[name] # drop from list
                                 n += 1
                             except ValueError as e:
                                 print name, k, 'contains illegal data ("%s": %s), resetting to default' % (value, str(e))
                             except KeyError:
+                                traceback.print_exc()
                                 print name, k, 'found in config but is not defined in xml'
                                 
                     if n == 0:

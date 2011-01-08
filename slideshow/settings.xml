@@ -65,4 +65,8 @@
 		<description>This is settings just for storage, like which current queue is run (so it will persist between runs)</description>
 		<item name="queue" type="integer">1</item>
 	</group>
+
+	<group name="cherrypy" hidden="1" ignore="1">
+		<description>Cherrypy settings</description>
+	</group>
 </settings>

@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
+import os, sys
 import cherrypy
 import sqlite3
 import re
+import argparse
+import traceback
+
 import slideshow
 from slideshow.lib import template
 from slideshow.pages import slides
@@ -68,23 +71,44 @@ class SQLite3(Browser):
 		conn.row_factory = sqlite3.Row
 		conn.cursor().execute('PRAGMA foreign_keys = ON')
 		return conn
-	
-def run(config_file=None, browser_string='sqlite://site.db'):
-	browser = Browser.from_string(browser_string)
 
-	# make all worker threads connect to the database
-	cherrypy.engine.subscribe('start_thread', browser.connect)
+def run():
+	# setup argument parser
+	parser = argparse.ArgumentParser(description='Slideshow frontend')
+	parser.add_argument('-f', '--config-file', default='/etc/slideshow.conf')
+	parser.add_argument('-v', '--verbose', dest='verbose', action='store_true')
+	parser.add_argument('-q', '--quiet', dest='verbose', action='store_false')
+	parser.add_argument('--browser', default='sqlite://site.db')
 
-	if config_file and not os.path.exists(config_file):
-		raise OSError, 'could not open config_file: %s' % config_file
+	# parse args
+	args = parser.parse_args()
 
-	if not config_file:
-		print 'Warning! No config file specified, will use defaults'
-		config_file = {}
+	try:
+		# verify that config_file exists
+		if not os.path.exists(args.config_file):
+			raise OSError, 'could not open config_file: %s' % args.config_file
 
-	# load application config
-	application = cherrypy.tree.mount(Root(), '/', config=config_file)
-	application.config.update({
+		# load slideshow settings
+		settings = Settings()
+		settings.load(get_resource_path('settings.xml'), 'settings.json')
+
+		# read cherrypy config
+		config = settings['cherrypy']
+
+		# cherrypy only accepts str, not unicode
+		for k,v in config.items():
+			if isinstance(v, basestring):
+				config[k] = str(v)
+
+		# load browser
+		browser = Browser.from_string(args.browser)
+
+		# make all worker threads connect to the database
+		cherrypy.engine.subscribe('start_thread', browser.connect)
+
+		# load application config
+		application = cherrypy.tree.mount(Root(), '/')
+		application.config.update({
 			'/': {
 				'tools.staticdir.root': os.path.dirname(os.path.abspath(__file__)),
 				'tools.gzip.on': True,
@@ -97,26 +121,36 @@ def run(config_file=None, browser_string='sqlite://site.db'):
 				},
 			})
 	
-	# cherrypy site config
-	cherrypy.config.update({'sessionFilter.on': True})
-	cherrypy.config.update(config_file) 
+		# cherrypy site config
+		cherrypy.config.update({'sessionFilter.on': True})
+		cherrypy.config.update(config) 
+	
+		# let daemon subscribe to cherrypy events to help stopping daemon when cherrypy is terminating
+		daemon.subscribe(cherrypy.engine)
+	
+		# start cherrypy
+		if hasattr(cherrypy.engine, 'block'):
+			# 3.1 syntax
+			cherrypy.engine.start()
+			cherrypy.engine.block()
+		else:
+			# 3.0 syntax
+			cherrypy.server.quickstart()
+			cherrypy.engine.start()
 
-	# load slideshow settings
-	settings = Settings()
-	settings.load(get_resource_path('settings.xml'), 'settings.json')
-	
-	# let daemon subscribe to cherrypy events to help stopping daemon when cherrypy is terminating
-	daemon.subscribe(cherrypy.engine)
-	
-	# start frontend
-	if hasattr(cherrypy.engine, 'block'):
-		# 3.1 syntax
-		cherrypy.engine.start()
-		cherrypy.engine.block()
-	else:
-		# 3.0 syntax
-		cherrypy.server.quickstart()
-		cherrypy.engine.start()
+	except Exception, e: # don't leak any exceptions
+		if args.verbose:
+			traceback.print_exc()
+		else:
+			print >> sys.stderr, e
+		
+		# if this is reached the application crashed
+		sys.exit(1)
+
+	#
+	#if not config_file:
+	#	print 'Warning! No config file specified, will use defaults'
+	#	config_file = {}
 		
 if __name__ == '__main__':
 	run(*sys.argv[1:])
