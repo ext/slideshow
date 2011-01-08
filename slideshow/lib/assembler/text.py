@@ -5,6 +5,7 @@ from . import Assembler
 from slideshow.lib.resolution import Resolution
 from slideshow.settings import Settings
 import array, cairo, pango, pangocairo, json, re
+import os
 import xml
 from xml.dom import minidom
 from htmlcolor import Parser as ColorParser
@@ -165,7 +166,26 @@ class Label(Item):
 
 class Template:
 	def __init__(self, filename):
-		self._filename = filename
+		settings = Settings()
+		import slideshow
+
+		search_path = ['.', os.path.dirname(slideshow.__file__), settings['Path.BasePath']]
+		fullpath = None
+
+		if filename[0] == '/': # absolute path
+			fullpath = filename
+		else: # relative path
+			for path in search_path:
+				test = os.path.abspath(os.path.join(path, filename))
+				print test
+				if os.path.exists(test):
+					fullpath = test
+					break
+
+			if not fullpath:
+				raise RuntimeError, 'Could not find theme-file "%s"' % filename
+
+		self._filename = fullpath
 		self._doc = minidom.parse(self._filename)
 		self._template = self._doc.getElementsByTagName('template')[0]
 		self._items = [Item.factory(x) for x in self._template.childNodes if isinstance(x, minidom.Element)]
