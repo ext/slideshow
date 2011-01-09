@@ -30,6 +30,7 @@ class Root(object):
 
 class Browser:
 	def __init__(self, host, username, password, name):
+		self._provider = self.__class__.provider
 		self._host = host
 		self._username = username
 		self._password = password
@@ -42,14 +43,47 @@ class Browser:
 			raise RuntimeError, 'string %s is not a valid browser string!' % string
 
 		# @todo factory
-		vendor = m.group(1)
-		host = m.group(2)
-		if vendor == 'sqlite':
-			return SQLite3(host, None, None, None)
+		provider = m.group(1)
+		name = m.group(2)
+		if provider == 'sqlite':
+			return SQLite3(None, None, None, name)
 		else:
 			raise RuntimeError, 'Unsupported browser %s' % str(vendor)
 
+	@staticmethod
+	def from_settings(settings):
+		provider = settings['Database.Provider']
+		username = settings['Database.Username']
+		password = settings['Database.Password']
+		hostname = settings['Database.Hostname']
+		name = settings['Database.Name']
+
+		# @todo factory
+		return SQLite3(hostname, username, password, name)
+
+	def __str__(self):
+		return self.string(password=False)
+
+	def string(self, password=False):
+		credentials = ''
+		if self._username != '':
+			credentials = self._username
+
+			# if plain-text password is enable
+			if password and self._password != '':
+				credentials += ':' + self._password
+
+			credentials += '@'
+
+		hostname = self._host
+		if hostname != '':
+			hostname += '/'
+
+		return '{provider}://{credentials}{hostname}{name}'.format(provider=self._provider, credentials=credentials, hostname=hostname, name=self._name)
+
 class SQLite3(Browser):
+	provider = 'sqlite3'
+
 	def __init__(self, *args, **kwargs):
 		Browser.__init__(self, *args, **kwargs)
 
@@ -68,8 +102,13 @@ class SQLite3(Browser):
 
 	def _connect(self):
 		settings = Settings()
+		filename = os.path.join(settings['Path.BasePath'], self._name)
 		
-		conn = sqlite3.connect(os.path.join(settings['Path.BasePath'], self._host))
+		try:
+			conn = sqlite3.connect(filename)
+		except Exception, e:
+			raise IOError, '%s: %s' % (e, filename)
+
 		conn.row_factory = sqlite3.Row
 		conn.cursor().execute('PRAGMA foreign_keys = ON')
 		return conn
@@ -82,7 +121,6 @@ def run():
 	parser.add_argument('-q', '--quiet', dest='verbose', action='store_false')
 	parser.add_argument('-p', '--port', type=int, default=8000)
 	parser.add_argument('--install', default=None)
-	parser.add_argument('--browser', default='sqlite://site.db')
 
 	# parse args
 	args = parser.parse_args()
@@ -158,7 +196,7 @@ def run():
 				config[k] = str(v)
 
 		# load browser
-		browser = Browser.from_string(args.browser)
+		browser = Browser.from_settings(settings)
 
 		# make all worker threads connect to the database
 		cherrypy.engine.subscribe('start_thread', browser.connect)
