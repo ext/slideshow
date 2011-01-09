@@ -218,10 +218,27 @@ def _calc_aspect(w,h):
     return ''
 
 def resolutions(dpy):
-    all = [(w,h,r,_calc_aspect(w,h)) for (w,h,r) in xorg_query.resolutions(dpy)]
-    k = ['{width}x{height}'.format(width=w, height=h, refresh=r) for (w,h,r,a) in all]
-    v = ['{width}x{height} ({aspect})'.format(width=w, height=h, aspect=a) for (w,h,r,a) in all]
-    return zip(k, v)
+    def get_key(w,h,a):
+        return '{width}x{height}'.format(width=w, height=h)
+
+    def get_value(w,h,a):
+        return '{width}x{height} ({aspect})'.format(width=w, height=h, aspect=a)
+
+    # get all available resolution, ignoring refresh-rate
+    all = frozenset([(w,h,_calc_aspect(w,h)) for (w,h,r) in xorg_query.resolutions(dpy)])
+
+    # format resolution, builing a list of ('WxH', 'WxH (A)', W, H) tuples (last elements is used for sorting)
+    formated = [ (get_key(*x), get_value(*x), x[0], x[1]) for x in all]
+
+    # sort comparision function
+    def cmpfn(x,y):
+        w = cmp(x[2], y[2])
+        if w == 0:
+            return cmp(x[3], y[3])
+        return w
+
+    # sort and drop extra element
+    return [(k,v) for (k,v,w,h) in sorted(formated, cmp=cmpfn)]
 
 class ItemResolution(Item):
     default = None
