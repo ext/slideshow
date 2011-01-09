@@ -49,11 +49,11 @@
 		<description>Database settings. Leave the password blank unless you need to change it.</description>
 
 		<item name="String" title="" type="static" cls="browserstring"></item>
-		<item name="Provider" type="string">sqlite3</item>
-		<item name="Username" type="string"></item>
-		<item name="Password" type="password"></item>
-		<item name="Hostname" type="string"></item>
-		<item name="Name" type="string">site.db</item>
+		<item name="Provider" type="string" cls="browserblur">sqlite3</item>
+		<item name="Username" type="string" cls="browserblur"></item>
+		<item name="Password" type="password" cls="browserblur"></item>
+		<item name="Hostname" type="string" cls="browserblur"></item>
+		<item name="Name" type="string" cls="browserblur">site.db</item>
 	</group>
 	
 	<group name="Slideshow">
