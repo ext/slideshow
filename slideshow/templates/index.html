@@ -19,6 +19,8 @@
 	</py:match>
 	
 	<?python
+		from slideshow.settings import Settings
+
 		class Menu:
 			def __init__(self, *items):
 				self.items = items
@@ -48,7 +50,7 @@
 	<py:match path="body" once="true">
 	<body py:attrs="select('@*')">
 		<div id="header">
-			<h1>Slideshow</h1>
+			<h1>${Settings()['Slideshow.Title']}</h1>
 		</div>
 	
 		<div id="bar">
