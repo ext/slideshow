@@ -64,10 +64,13 @@ class Item:
     def __init__(self, group, name, title=None, description='', rel=None):
         self.group = group
         self.name = name
-        self.title = title or name
+        self.title = name
         self.description = description
         self.rel = rel
         self._value = self.default
+
+        if title is not None:
+            self.title = title
     
     def _values(self):
         return dict(
