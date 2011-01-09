@@ -79,11 +79,16 @@ class Browser {
 		char* _hostname;
 };
 
+#define CONCAT2(x,y,z) x ## y ## z
+#define CONCAT(x,y,z) CONCAT2(x,y,z)
+#define FACTORY_CLASS_NAME(classname) CONCAT(classname, _factory_, __LINE__)
+#define FACTORY_INSTANCE_NAME(classname) CONCAT(classname, _factory_inst_, __LINE__)
+
 #define REGISTER_BROWSER_FACTORY(classname, name) \
-class classname ## _factory { \
+class FACTORY_CLASS_NAME(classname) {		  \
 	public: \
-	classname ## _factory(){ \
-			Browser::register_factory(&classname ## _factory::factory, #name); \
+	FACTORY_CLASS_NAME(classname)(){ \
+			Browser::register_factory(&FACTORY_CLASS_NAME(classname)::factory, #name); \
 		} \
 		\
 		static Browser* factory(const browser_context_t& context){ \
@@ -91,6 +96,6 @@ class classname ## _factory { \
 		} \
 }; \
 \
-classname ## _factory classname ## _factory_inst
+FACTORY_CLASS_NAME(classname) FACTORY_INSTANCE_NAME(classname)
 
 #endif // BROWSER_H
