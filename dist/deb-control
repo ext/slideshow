@@ -1,0 +1,6 @@
+Package: slideshow
+Version: 0.3.1
+Architecture: i386
+Maintainer: David Sveningsson [ext@sidvind.com]
+Depends: libportable, libglew1.5, libdevil1c2, libsdl1.2debian
+Description: Slideshow is a kiosk-style application for showing text, image and video in a loop on monitors and projectors.
