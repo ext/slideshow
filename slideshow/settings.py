@@ -268,6 +268,15 @@ class ItemDisplay(Item):
         
         return head + content + tail
 
+class ItemStatic(Item):
+    default = None
+    
+    def set(self, rollback):
+        raise RuntimeError, 'trying to set static field'
+
+    def __str__(self):
+        return '<div class="static">%s</div>' % 'adsf'
+
 itemfactory = {
     'directory': ItemDirectory,
     'file':      ItemFile,
@@ -276,7 +285,8 @@ itemfactory = {
     'float':     ItemFloat,
     'password':  ItemPassword,
     'resolution':ItemResolution,
-    'display':   ItemDisplay
+    'display':   ItemDisplay,
+    'static':    ItemStatic,
 }
 
 for k,v in itemfactory.items():

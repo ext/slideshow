@@ -47,7 +47,8 @@
 	
 	<group name="Database">
 		<description>Database settings. Leave the password blank unless you need to change it.</description>
-		
+
+		<item name="String" title="" type="static"></item>
 		<item name="Provider" type="string">sqlite3</item>
 		<item name="Username" type="string"></item>
 		<item name="Password" type="password"></item>
