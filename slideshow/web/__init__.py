@@ -9,7 +9,7 @@ import argparse
 import traceback
 
 import slideshow
-from slideshow.lib import template
+from slideshow.lib import template, browser as browser_factory
 from slideshow.pages import slides
 from slideshow.pages import maintenance
 from slideshow.pages import queue
@@ -27,91 +27,6 @@ class Root(object):
 	@cherrypy.expose
 	def index(self):
 		raise cherrypy.InternalRedirect('/slides/list')
-
-class Browser:
-	def __init__(self, host, username, password, name):
-		self._provider = self.__class__.provider
-		self._host = host
-		self._username = username
-		self._password = password
-		self._name = name
-
-	@staticmethod
-	def from_string(string):
-		m = re.match('([a-z]+)://(.+)', string)
-		if m is None:
-			raise RuntimeError, 'string %s is not a valid browser string!' % string
-
-		# @todo factory
-		provider = m.group(1)
-		name = m.group(2)
-		if provider == 'sqlite':
-			return SQLite3(None, None, None, name)
-		else:
-			raise RuntimeError, 'Unsupported browser %s' % str(vendor)
-
-	@staticmethod
-	def from_settings(settings):
-		provider = settings['Database.Provider']
-		username = settings['Database.Username']
-		password = settings['Database.Password']
-		hostname = settings['Database.Hostname']
-		name = settings['Database.Name']
-
-		# @todo factory
-		return SQLite3(hostname, username, password, name)
-
-	def __str__(self):
-		return self.string(password=False)
-
-	def string(self, password=False):
-		credentials = ''
-		if self._username != '':
-			credentials = self._username
-
-			# if plain-text password is enable
-			if password and self._password != '':
-				credentials += ':' + self._password
-
-			credentials += '@'
-
-		hostname = self._host
-		if hostname != '':
-			hostname += '/'
-
-		return '{provider}://{credentials}{hostname}{name}'.format(provider=self._provider, credentials=credentials, hostname=hostname, name=self._name)
-
-class SQLite3(Browser):
-	provider = 'sqlite3'
-
-	def __init__(self, *args, **kwargs):
-		Browser.__init__(self, *args, **kwargs)
-
-		conn = self._connect()
-
-		# check if not previous database is created
-		row = conn.execute('SELECT COUNT(*) FROM sqlite_master WHERE name = \'slide\'').fetchone()[0]
-		if not row or row == 0:
-			# install database schema
-			filename = get_resource_path('install', 'sqlite.sql')
-			lines = "\n".join(open(filename, 'r').readlines())
-			conn.executescript(lines)
-
-	def connect(self, *args):
-		cherrypy.thread_data.db = self._connect()
-
-	def _connect(self):
-		settings = Settings()
-		filename = os.path.join(settings['Path.BasePath'], self._name)
-		
-		try:
-			conn = sqlite3.connect(filename)
-		except Exception, e:
-			raise IOError, '%s: %s' % (e, filename)
-
-		conn.row_factory = sqlite3.Row
-		conn.cursor().execute('PRAGMA foreign_keys = ON')
-		return conn
 
 def run():
 	# setup argument parser
@@ -196,7 +111,7 @@ def run():
 				config[k] = str(v)
 
 		# load browser
-		browser = Browser.from_settings(settings)
+		browser = browser_factory.from_settings(settings)
 
 		# make all worker threads connect to the database
 		cherrypy.engine.subscribe('start_thread', browser.connect)
