@@ -278,7 +278,7 @@ class ItemStatic(Item):
         raise RuntimeError, 'trying to set static field'
 
     def __str__(self):
-        return '<div class="static">%s</div>' % 'adsf'
+        return '<div class="static">&nbsp;</div>'
 
 itemfactory = {
     'directory': ItemDirectory,
