@@ -61,13 +61,14 @@ class Group:
 class Item:
     typename = '' # automatically set
     
-    def __init__(self, group, name, title=None, description='', rel=None):
+    def __init__(self, group, name, title=None, description='', rel=None, cls=''):
         self.group = group
         self.name = name
         self.title = name
         self.description = description
         self.rel = rel
         self._value = self.default
+        self.cls = cls
 
         if title is not None:
             self.title = title
@@ -78,11 +79,12 @@ class Item:
             name=self.name,
             title=self.title, 
             type=self.typename,
-            value=unicode(self._value)
+            value=unicode(self._value),
+            cls=self.cls,
         )
     
     def __str__(self):
-        return '<input type="text" name="{group}.{name}" type="{type}" value="{value}"/>'.format(**self._values())
+        return '<input type="text" class="{cls}" name="{group}.{name}" type="{type}" value="{value}"/>'.format(**self._values())
     
     def set(self, value, rollback=False):
         tmp = self._value
@@ -198,7 +200,7 @@ class ItemPassword(Item):
     default = ''
     
     def __str__(self):
-        return '<input type="password" name="{group}.{name}" type="{type}" value=""/>'.format(**self._values())
+        return '<input type="password" class="{cls}" name="{group}.{name}" type="{type}" value=""/>'.format(**self._values())
 
 _aspects = [
     (4, 3),   # Regular 4:3 (VGA, PAL, SVGA, etc)
@@ -240,7 +242,7 @@ class ItemResolution(Item):
                 return '<option value="{key}">{value}</option>'
         
         options = [f(k).format(key=k, value=v) for k,v in self._extra + self.values]
-        head = '<select name="{group}.{name}">'.format(**self._values())
+        head = '<select name="{group}.{name}" class="{cls}">'.format(**self._values())
         content = '\n'.join(options)
         tail = '</select>'
         
@@ -265,7 +267,7 @@ class ItemDisplay(Item):
                 return '<option value="{key}">{value}</option>'
         
         options = [f(k).format(key=k, value=v) for k,v in self._extra + self.values]
-        head = '<select name="{group}.{name}">'.format(**self._values())
+        head = '<select name="{group}.{name}" class="{cls}">'.format(**self._values())
         content = '\n'.join(options)
         tail = '</select>'
         
@@ -278,7 +280,7 @@ class ItemStatic(Item):
         raise RuntimeError, 'trying to set static field'
 
     def __str__(self):
-        return '<div class="static">&nbsp;</div>'
+        return '<div class="static" class="{cls}">&nbsp;</div>'.format(**self._values())
 
 itemfactory = {
     'directory': ItemDirectory,
