@@ -7,6 +7,7 @@ import dbus, dbus.service
 import cherrypy
 from select import select
 from settings import Settings
+from slideshow.lib import browser
 import event
 import resource
 
@@ -53,13 +54,13 @@ class StartError(Exception):
 		stdout = ''.join(self.stdout)
 		return self.message + '\n\n' + stdout
 
-def settings(resolution=None, fullscreen=True):
+def settings(browser, resolution=None, fullscreen=True):
 	settings = Settings()
 	
 	cmd = settings['Files.BinaryPath']
 	args = [
 		'--uds-log', 'slideshow.sock', 
-		'--browser', 'sqlite://%s' % (os.path.abspath('site.db')),
+		'--browser', str(browser),
 		'--collection-id', str(settings['Runtime.queue']),
 	]
 	
@@ -212,10 +213,10 @@ class _Daemon(threading.Thread):
 	def do_start(self, resolution, fullscreen):
 		if not self._state in [STOPPED, CRASHED]:
 			raise StateError, 'Cannot start daemon while in state ' + statename(self._state)
-	
+
 		try:
 			self._state = STARTING
-			cmd, args, env, cwd = settings(resolution, fullscreen)
+			cmd, args, env, cwd = settings(browser.from_settings(Settings()), resolution, fullscreen)
 			print 'cmd:', cmd
 			print 'args:', args
 			print 'env:', env

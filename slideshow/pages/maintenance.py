@@ -1,8 +1,9 @@
+
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import cherrypy, os.path
-from slideshow.lib import queue, slide, template
+from slideshow.lib import queue, slide, template, browser
 from slideshow.settings import Settings
 import slideshow.daemon as daemon
 import slideshow.event as event
@@ -18,7 +19,8 @@ class Handler(object):
 	@cherrypy.expose
 	@template.output('maintenance/index.html', parent='maintenance')
 	def index(self):
-		cmd, args, env, cwd = daemon.settings()
+		settings = Settings()
+		cmd, args, env, cwd = daemon.settings(browser.from_settings(settings))
 		return template.render(log=daemon.log(), state=daemon.state(), cmd=cmd, args=args, env=env, cwd=cwd)
 
 	@cherrypy.expose
