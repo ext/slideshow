@@ -9,8 +9,6 @@ from slideshow.lib.resolution import Resolution
 import slideshow.event as event
 import cherrypy
 
-image_path = os.path.expanduser('~/slideshow/image')
-
 class InvalidSlide(Exception):
 	pass
 
@@ -26,9 +24,12 @@ class Slide:
 		# Tells if this is a full slide (which database entry) or if it is being
 		# constructed or is otherwise not complete.
 		self._stub = stub
-		
+
 		if not os.path.exists(path):
-			raise ValueError, "could not locate '{path}' in '{root}'".format(path=path, root=image_path)
+			settings = Settings()
+			base_path = settings['Path.BasePath']
+			image_path = settings['Path.Image']
+			raise ValueError, "could not locate '{path}' in '{root}'".format(path=path, root=os.path.join(base_path, image_path))
 	
 	def assemble(self, params):
 		return json.dumps(self.assembler.assemble(self, **params))
@@ -37,13 +38,21 @@ class Slide:
 		return self.assembler.default_size(slide=self, params=self._data, width=width)
 	
 	def raster_path(self, size=None):
-		args = [image_path, self._path, 'raster']
+		settings = Settings()
+		base_path = settings['Path.BasePath']
+		image_path = settings['Path.Image']
+		
+		args = [base_path, image_path, self._path, 'raster']
 		if size != None:
 			args.append(str(size) + self.assembler.raster_extension())
 		return os.path.join(*args)
 	
 	def src_path(self, item):
-		return os.path.join(image_path, self._path, 'src', item)
+		settings = Settings()
+		base_path = settings['Path.BasePath']
+		image_path = settings['Path.Image']
+		
+		return os.path.join(base_path, image_path, self._path, 'src', item)
 	
 	def _has_raster(self, size):
 		return os.path.exists(self.raster_path(size))
@@ -89,8 +98,12 @@ def from_id(c, id):
 
 def create(c, assembler, params):
 	settings = Settings()
+
+	base_path = settings['Path.BasePath']
+	image_path = settings['Path.Image']
+
 	name = '{uuid}.slide'.format(uuid=uuid.uuid1().hex)
-	dst = os.path.join(image_path, name)
+	dst = os.path.join(base_path, image_path, name)
 	
 	os.mkdir(dst)
 	os.mkdir(os.path.join(dst, 'raster'))
