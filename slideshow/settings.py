@@ -293,7 +293,7 @@ class ItemDisplay(Item):
 class ItemStatic(Item):
     default = None
     
-    def set(self, rollback):
+    def set(self, value, rollback):
         raise RuntimeError, 'trying to set static field'
 
     def __str__(self):
