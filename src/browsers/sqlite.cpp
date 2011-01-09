@@ -190,7 +190,7 @@ void SQLiteBrowser::pop_intermediate(int id) const {
 void SQLiteBrowser::connect(){
 	int ret;
 	if ( (ret = sqlite3_open(database(), &_conn)) != SQLITE_OK ){
-		printf("sqlite3_open failed with %d\n", ret);
+		Log::message(Log::Fatal, "sqlite3_open failed with %d\n", ret);
 	}
 
 	const char* q =
@@ -221,7 +221,7 @@ void SQLiteBrowser::connect(){
 		"	sortorder "
 		"LIMIT 1";
 	if ( (ret = sqlite3_prepare_v2(_conn, q, (int)(strlen(q)+1), &_query, NULL)) != SQLITE_OK ){
-		printf("query_slide::sqlite3_prepare_v2 failed with %d\n", ret);
+		Log::message(Log::Fatal, "query_slide::sqlite3_prepare_v2 failed with %d\n", ret);
 	}
 
 	q =
@@ -233,7 +233,7 @@ void SQLiteBrowser::connect(){
 		"	id = ? "
 		"LIMIT 1";
 	if ( (ret = sqlite3_prepare_v2(_conn, q, (int)(strlen(q)+1), &_query_looping, NULL)) != SQLITE_OK ){
-		printf("query_loop::sqlite3_prepare_v2 failed with %d\n", ret);
+		Log::message(Log::Fatal, "query_loop::sqlite3_prepare_v2 failed with %d\n", ret);
 	}
 
 	q =
@@ -244,7 +244,7 @@ void SQLiteBrowser::connect(){
 		"WHERE "
 		"	id = ?";
 	if ( (ret = sqlite3_prepare_v2(_conn, q, (int)(strlen(q)+1), &_query_pop_intermediate, NULL)) != SQLITE_OK ){
-		printf("pop_intermediate::sqlite3_prepare_v2 failed with %d\n", ret);
+		Log::message(Log::Fatal, "pop_intermediate::sqlite3_prepare_v2 failed with %d\n", ret);
 	}
 }
 
