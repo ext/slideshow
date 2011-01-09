@@ -162,9 +162,10 @@ class _Log:
 		return lines.__iter__()
 
 class _Daemon(threading.Thread):
-	def __init__(self):
+	def __init__(self, browser):
 		threading.Thread.__init__(self)
 	
+		self._browser = browser
 		self._pid = None
 		self._ipc = None
 		self._instance = None
@@ -267,10 +268,9 @@ class _Daemon(threading.Thread):
 		return '<daemon id="{id}" />'.format(id=id(self))
 
 	def run(self):
-		cherrypy.thread_data.db = sqlite3.connect('site.db')
-		cherrypy.thread_data.db.row_factory = sqlite3.Row
-		cherrypy.thread_data.db.cursor().execute('PRAGMA foreign_keys = ON')
-		
+		# setup database connection inside daemon thread
+		self._browser.connect()
+
 		self._running = True
 		while self._running:
 			if self._instance:
@@ -346,10 +346,15 @@ class _DBus(dbus.service.Object):
 from dbus.mainloop.glib import DBusGMainLoop
 DBusGMainLoop(set_as_default=True)
 
-_daemon = _Daemon()
-ipc = _DBus()
+_daemon = None
+ipc = None
 
-def subscribe(engine):
+def initiate(engine, browser):
+	global _daemon, ipc
+
+	_daemon = _Daemon(browser)
+	ipc = _DBus()
+
 	engine.subscribe('start', _daemon.start)
 	engine.subscribe('stop', _daemon.stop)
 

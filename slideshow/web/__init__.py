@@ -186,8 +186,8 @@ def run():
 			})
 		cherrypy.config.update(config)
 	
-		# let daemon subscribe to cherrypy events to help stopping daemon when cherrypy is terminating
-		daemon.subscribe(cherrypy.engine)
+		# initiate daemon instance
+		daemon.initiate(cherrypy.engine, browser)
 	
 		# start cherrypy
 		if hasattr(cherrypy.engine, 'block'):
