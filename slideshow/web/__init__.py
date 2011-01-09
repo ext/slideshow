@@ -67,7 +67,9 @@ class SQLite3(Browser):
 		cherrypy.thread_data.db = self._connect()
 
 	def _connect(self):
-		conn = sqlite3.connect(self._host)
+		settings = Settings()
+		
+		conn = sqlite3.connect(os.path.join(settings['Path.BasePath'], self._host))
 		conn.row_factory = sqlite3.Row
 		conn.cursor().execute('PRAGMA foreign_keys = ON')
 		return conn
