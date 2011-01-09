@@ -215,18 +215,28 @@ class Template:
 		
 		background = self._template.getAttribute('background')
 		if background:
-			try:
-				image = cairo.ImageSurface.create_from_png(background)
-			except Exception, e:
-				raise OSError, 'Failed to load background "%s": %s' % (background, e)
+			background = background.strip()
 
-			w = image.get_width()
-			h = image.get_height()
-			
 			cr.save()
-			cr.scale(realsize.w/w, realsize.h/h)
-			cr.set_source_surface(image, 0, 0)
-			cr.paint()
+
+			if background[:3] == 'url':
+				url = background[4:-1] # extract filename from "url(filename)"
+				try:
+					image = cairo.ImageSurface.create_from_png(url)
+				except Exception, e:
+					raise OSError, 'Failed to load background "%s": %s' % (url, e)
+
+				w = image.get_width()
+				h = image.get_height()				
+				
+				cr.scale(realsize.w/w, realsize.h/h)
+				cr.set_source_surface(image, 0, 0)
+				cr.paint()
+			else:
+				cr.set_source_rgba(*decode_color(background))
+				cr.rectangle(0, 0, realsize.w, realsize.h)
+				cr.fill()
+
 			cr.restore()
 		
 		for item in self.items():

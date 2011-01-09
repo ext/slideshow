@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE template SYSTEM "template.dtd">
-<template background="bg.png" fit="scale">
+
+<!--
+	Background:
+	If set it may either be a color (se below) or a file using "url(filename)".
+-->
+<template background="#000" fit="scale">
 	<!--
 		Units:
 		All units defaults to pixels, if the unit is suffixed
