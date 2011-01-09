@@ -75,11 +75,11 @@ class SQLite3(Browser):
 def run():
 	# setup argument parser
 	parser = argparse.ArgumentParser(description='Slideshow frontend')
-	parser.add_argument('-f', '--config-file', required=True)
+	parser.add_argument('-f', '--config-file')
 	parser.add_argument('-v', '--verbose', dest='verbose', action='store_true')
 	parser.add_argument('-q', '--quiet', dest='verbose', action='store_false')
 	parser.add_argument('-p', '--port', type=int, default=8000)
-	parser.add_argument('--install', action='store_true')
+	parser.add_argument('--install', default=None)
 	parser.add_argument('--browser', default='sqlite://site.db')
 
 	# parse args
@@ -88,8 +88,21 @@ def run():
 	try:
 		# create new config if we are bootstraping
 		if args.install:
+			from os.path import isdir, join, exists
+
+			# ensure path is a directory
+			if not isdir(args.install):
+				print >> sys.stderr, 'Must point to a directory, not', args.install
+				sys.exit(1)
+
+			for x in ['image', 'video', 'tmp']:
+				os.mkdir(join(args.install, x))
+
+			if not args.config_file:
+				args.config_file = join(args.install, 'settings.conf')
+
 			# check if config already exists
-			if os.path.exists(args.config_file):
+			if exists(args.config_file):
 				print >> sys.stderr, 'Configuration already exists, cannot install a new one.'
 				print >> sys.stderr, 'If you intend to replace the configuration, please remove the old one first, e.g. `rm %s\'' % args.config_file
 				sys.exit(1)
@@ -102,6 +115,22 @@ def run():
 				print >> sys.stderr, 'Failed to install configuration at', args.config_file
 				print >> sys.stderr, 'Ensure that you have write-permission to the specified location.'
 				sys.exit(1)
+
+			settings = Settings()
+			try:
+				settings.load(get_resource_path('settings.xml'), args.config_file)
+			except ValueError:
+				pass
+
+			# if creating a new config, the default config is persisted.
+			if args.install:
+				# store the directory we installed to
+				with settings:
+					settings['Path.BasePath'] = os.path.abspath(args.install)
+
+				settings.persist()
+				print >> sys.stderr, 'Configuration installed, restart without --install flag to continue.'
+				sys.exit(0)
 
 		# verify that config_file exists
 		if not os.path.exists(args.config_file):
@@ -119,12 +148,6 @@ def run():
 		# load slideshow settings
 		settings = Settings()
 		settings.load(get_resource_path('settings.xml'), args.config_file)
-
-		# if creating a new config, the default config is persisted.
-		if args.install:
-			settings.persist()
-			print >> sys.stderr, 'Configuration installed, restart without --install flag to continue.'
-			sys.exit(0)
 
 		# read cherrypy config
 		config = settings['cherrypy']
