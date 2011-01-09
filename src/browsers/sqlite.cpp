@@ -51,6 +51,7 @@ class SQLiteBrowser: public Browser {
 };
 
 REGISTER_BROWSER_FACTORY(SQLiteBrowser, sqlite);
+REGISTER_BROWSER_FACTORY(SQLiteBrowser, sqlite3);
 
 SQLiteBrowser::SQLiteBrowser(const browser_context_t& context)
 	: Browser(context)
