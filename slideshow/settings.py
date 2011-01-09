@@ -293,9 +293,6 @@ class ItemDisplay(Item):
 class ItemStatic(Item):
     default = None
     
-    def set(self, value, rollback):
-        raise RuntimeError, 'trying to set static field'
-
     def __str__(self):
         return '<div class="static {cls}" name="{group}.{name}">&nbsp;</div>'.format(**self._values())
 
