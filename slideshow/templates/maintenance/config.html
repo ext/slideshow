@@ -24,7 +24,7 @@
 					<p>${Markup(group.description)}</p>
 					
 					<py:for each="item in group">
-						<label for="${item.name}">
+						<label for="${group.name}.${item.name}">
 							${item.title}
 							<py:choose test="hasattr(item, 'message')">
 								<span py:when="True" class="error">${item.message}</span>
