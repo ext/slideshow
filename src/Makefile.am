@@ -3,7 +3,7 @@ SUBDIRS = transitions
 noinst_LIBRARIES = libmodule_loader.a libipc.a libfsm.a
 bin_PROGRAMS = slideshow-daemon
 
-warning_flags = -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers -Winline
+warning_flags = -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers
 
 AM_LDFLAGS = -shared -module -avoid-version
 AM_CPPFLAGS = -I${top_srcdir}/include -pipe $(ARCH_FLAGS) ${warning_flags}
