@@ -463,54 +463,59 @@ class Settings(object):
                     raise RuntimeError, 'Got multiple default values for %s: %s' % (item, item.childNodes)
         
         # load stored settings
-        try:
-            with open(config_file, 'r') as f:
-                c = json.load(f)
-            
-                # Because of dependencies between items and no guarantee of the
-                # order they arrive in we keep iterating through all items that are 
-                # left until either no more changes was made or until no more items
-                # are left.
-                p = 0
-                while True:
-                    p += 1 # pass
-                    n = 0  # nr of changes
-                
-                    for k,v in c.items():
-                        if k == 'Env':
-                            self.enviroment = v
-                            del c[k]
-                            continue
-                        try:
-                            group = self.groups[k]
-                        except KeyError:
-                            print 'group', k, 'found in config but is not defined xml'
-                            continue
-                    
-                        for name, value in v.items():
-                            try:
-                                if not group.ignore:
-                                    item = group[name]
-                                else:
-                                    item = ItemDummy(group=group, name=name)
-                                    group.add(item)
+        if config_file:
+            self._load_user(config_file)
 
-                                item.set(value, rollback=True)
-                                del v[name] # drop from list
-                                n += 1
-                            except ValueError as e:
-                                print name, k, 'contains illegal data ("%s": %s), resetting to default' % (value, str(e))
-                            except KeyError:
-                                traceback.print_exc()
-                                print name, k, 'found in config but is not defined in xml'
-                                
-                    if n == 0:
-                        break
-        except IOError:
-            pass
-
+        # read resolution from selected display
         ItemResolution.values = resolutions(self['Appearance.Display'])
+
+    def _load_user(self, config_file):
+        with open(config_file, 'r') as f:
+            c = json.load(f)
+            
+            # Because of dependencies between items and no guarantee of the
+            # order they arrive in we keep iterating through all items that are 
+            # left until either no more changes was made or until no more items
+            # are left.
+            p = 0
+            while True:
+                p += 1 # pass
+                n = 0  # nr of changes
+                
+                for k,v in c.items():
+                    if k == 'Env':
+                        self.enviroment = v
+                        del c[k]
+                        continue
+                    try:
+                        group = self.groups[k]
+                    except KeyError:
+                        print 'group', k, 'found in config but is not defined xml'
+                        continue
+                    
+                    for name, value in v.items():
+                        try:
+                            if not group.ignore:
+                                item = group[name]
+                            else:
+                                item = ItemDummy(group=group, name=name)
+                                group.add(item)
+
+                            item.set(value, rollback=True)
+                            del v[name] # drop from list
+                            n += 1
+                        except ValueError as e:
+                            print name, k, 'contains illegal data ("%s": %s), resetting to default' % (value, str(e))
+                        except KeyError:
+                            traceback.print_exc()
+                            print name, k, 'found in config but is not defined in xml'
+                                
+                if n == 0:
+                    break
     
     def persist(self, dst=None):
-        with open(self.config_file, 'w') as fp:
+        if dst is None:
+            dst = self.config_file
+
+        with open(dst, 'w') as fp:
             json.dump(self.all(), fp, indent=4)

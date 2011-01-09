@@ -116,19 +116,17 @@ def run():
 				print >> sys.stderr, 'Ensure that you have write-permission to the specified location.'
 				sys.exit(1)
 
+			# load default settings
 			settings = Settings()
-			try:
-				settings.load(get_resource_path('settings.xml'), args.config_file)
-			except ValueError:
-				pass
-
+			settings.load(get_resource_path('settings.xml'), None)
+			
 			# if creating a new config, the default config is persisted.
 			if args.install:
 				# store the directory we installed to
 				with settings:
 					settings['Path.BasePath'] = os.path.abspath(args.install)
 
-				settings.persist()
+				settings.persist(dst=args.config_file)
 				print >> sys.stderr, 'Configuration installed, restart without --install flag to continue.'
 				sys.exit(0)
 
