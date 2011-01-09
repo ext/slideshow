@@ -118,7 +118,7 @@ def run():
 
 			# load default settings
 			settings = Settings()
-			settings.load(get_resource_path('settings.xml'), config_file=None, format_keys=dict(install=args.install))
+			settings.load(get_resource_path('settings.xml'), config_file=None, format_keys=dict(basepath=args.install))
 			
 			# if creating a new config, the default config is persisted.
 			if args.install:
@@ -145,7 +145,7 @@ def run():
 
 		# load slideshow settings
 		settings = Settings()
-		settings.load(get_resource_path('settings.xml'), args.config_file)
+		settings.load(get_resource_path('settings.xml'), config_file=args.config_file, format_keys=dict(basepath=os.path.split(args.config_file)[0]))
 
 		# read cherrypy config
 		config = settings['cherrypy']
