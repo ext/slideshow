@@ -4,7 +4,7 @@
 	<group name="Path">
 		<description>The base directory is the homedirectory of the frontend. All other paths are relative to it.</description>
 		
-		<item name="BasePath" title="Base directory" type="directory"></item>
+		<item name="BasePath" title="Base directory" type="directory">{install}</item>
 		<item name="Image" type="directory" rel="Path.BasePath">image</item>
 		<item name="Video" type="directory" rel="Path.BasePath">video</item>
 		<item name="Temp" type="directory" rel="Path.BasePath">tmp</item>

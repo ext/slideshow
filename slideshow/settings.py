@@ -408,7 +408,7 @@ class Settings(object):
             size = xorg_query.current_resolution(use_rotation=True)
             return Resolution(size[0], size[1])
     
-    def load(self, base, config_file=None):
+    def load(self, base, config_file=None, format_keys={}):
         doc = minidom.parse(base)
         self.groups = OrderDict()
         self.enviroment = {}
@@ -454,10 +454,16 @@ class Settings(object):
 
                 n = len(item.childNodes)
                 if n == 1:
-                    value = item.childNodes[0].data.format(CWD=os.getcwd())
+                    # read default value from xml
+                    value = item.childNodes[0].data.format(CWD=os.getcwd(), **format_keys)
+
                     try:
+                        # Try to apply the value.
                         self.groups[grpname][name].set(value)
                     except:
+                        # Failed to apply default value, this shouldn't happen.
+                        # It means the default value specified in the xml is not a legal value
+                        # for the datatype, eg expecting an int but got a string instead.
                         traceback.print_exc()
                 elif n > 1:
                     raise RuntimeError, 'Got multiple default values for %s: %s' % (item, item.childNodes)

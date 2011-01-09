@@ -118,7 +118,7 @@ def run():
 
 			# load default settings
 			settings = Settings()
-			settings.load(get_resource_path('settings.xml'), None)
+			settings.load(get_resource_path('settings.xml'), config_file=None, format_keys=dict(install=args.install))
 			
 			# if creating a new config, the default config is persisted.
 			if args.install:
