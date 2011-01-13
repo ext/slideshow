@@ -28,6 +28,47 @@ class Root(object):
 	def index(self):
 		raise cherrypy.InternalRedirect('/slides/list')
 
+def install(dst, config_file):
+	from os.path import isdir, join, exists
+
+	# ensure path is a directory
+	if not isdir(dst):
+		print >> sys.stderr, 'Must point to a directory, not', dst
+		return 1
+
+	for x in ['image', 'video', 'tmp']:
+		os.mkdir(join(dst, x))
+
+	if not config_file:
+		config_file = join(dst, 'settings.conf')
+
+	# check if config already exists
+	if exists(config_file):
+		print >> sys.stderr, 'Configuration already exists, cannot install a new one.'
+		print >> sys.stderr, 'If you intend to replace the configuration, please remove the old one first, e.g. `rm %s\'' % config_file
+		return 1
+
+	# put a dummy config, will be overwritten later
+	try:
+		with open(config_file, 'w') as f:
+			f.write("{}\n")
+	except IOError:
+		print >> sys.stderr, 'Failed to install configuration at', args.config_file
+		print >> sys.stderr, 'Ensure that you have write-permission to the specified location.'
+		return 1
+
+	# load default settings
+	settings = Settings()
+	settings.load(get_resource_path('settings.xml'), config_file=None, format_keys=dict(basepath=dst))
+			
+	# store the directory we installed to
+	with settings:
+		settings['Path.BasePath'] = os.path.abspath(dst)
+
+	settings.persist(dst=config_file)
+	print >> sys.stderr, 'Configuration installed, restart without --install flag to continue.'
+	return 0
+
 def run():
 	# setup argument parser
 	parser = argparse.ArgumentParser(description='Slideshow frontend')
@@ -43,45 +84,8 @@ def run():
 	try:
 		# create new config if we are bootstraping
 		if args.install:
-			from os.path import isdir, join, exists
-
-			# ensure path is a directory
-			if not isdir(args.install):
-				print >> sys.stderr, 'Must point to a directory, not', args.install
-				sys.exit(1)
-
-			for x in ['image', 'video', 'tmp']:
-				os.mkdir(join(args.install, x))
-
-			if not args.config_file:
-				args.config_file = join(args.install, 'settings.conf')
-
-			# check if config already exists
-			if exists(args.config_file):
-				print >> sys.stderr, 'Configuration already exists, cannot install a new one.'
-				print >> sys.stderr, 'If you intend to replace the configuration, please remove the old one first, e.g. `rm %s\'' % args.config_file
-				sys.exit(1)
-
-			# put a dummy config, will be overwritten later
-			try:
-				with open(args.config_file, 'w') as f:
-					f.write("{}\n")
-			except IOError:
-				print >> sys.stderr, 'Failed to install configuration at', args.config_file
-				print >> sys.stderr, 'Ensure that you have write-permission to the specified location.'
-				sys.exit(1)
-
-			# load default settings
-			settings = Settings()
-			settings.load(get_resource_path('settings.xml'), config_file=None, format_keys=dict(basepath=args.install))
-			
-			# store the directory we installed to
-			with settings:
-				settings['Path.BasePath'] = os.path.abspath(args.install)
-
-			settings.persist(dst=args.config_file)
-			print >> sys.stderr, 'Configuration installed, restart without --install flag to continue.'
-			sys.exit(0)
+			rc = install(args.install, args.config_file)
+			sys.exit(rc)
 
 		# verify that config_file exists
 		if not os.path.exists(args.config_file):
