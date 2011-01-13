@@ -160,11 +160,6 @@ def run():
 		
 		# if this is reached the application crashed
 		sys.exit(1)
-
-	#
-	#if not config_file:
-	#	print 'Warning! No config file specified, will use defaults'
-	#	config_file = {}
 		
 if __name__ == '__main__':
 	run(*sys.argv[1:])

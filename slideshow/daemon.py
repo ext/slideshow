@@ -66,7 +66,6 @@ def settings(browser, resolution=None, fullscreen=True):
 	
 	args.append('--resolution')
 	if resolution:
-		print 'using custom resolution'
 		args.append(str(resolution))
 	else:
 		args.append(str(settings.resolution()))
@@ -193,11 +192,11 @@ class _Daemon(threading.Thread):
 				os.kill(self._instance.pid, 0) # try if process accepts signals
 			except OSError:
 				# does not accept signals, process is fubar or lost, cannot continue
-				print 'childprocess is fubar or lost, aborting'
+				print >> sys.stderr, 'Lost contact with childprocess while trying to kill it, most likely it crashed during the operation.'
 				self._instance = None
 				break
 			
-			print 'waiting for instance to terminate'
+			print >> sys.stderr, 'Waiting for instance to terminate'
 			time.sleep(1)
 			n+=1
 		
@@ -217,10 +216,6 @@ class _Daemon(threading.Thread):
 		try:
 			self._state = STARTING
 			cmd, args, env, cwd = settings(browser.from_settings(Settings()), resolution, fullscreen)
-			print 'cmd:', cmd
-			print 'args:', args
-			print 'env:', env
-			print 'cwd:', cwd
 			
 			def preexec():
 				resource.setrlimit(resource.RLIMIT_CORE, (-1, -1))

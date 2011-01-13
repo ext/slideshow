@@ -177,7 +177,6 @@ class Template:
 		else: # relative path
 			for path in search_path:
 				test = os.path.abspath(os.path.join(path, filename))
-				print test
 				if os.path.exists(test):
 					fullpath = test
 					break
@@ -259,8 +258,6 @@ class TextAssembler(Assembler):
 	def default_size(self, slide, params, width=None):
 		resolution = Settings().resolution()
 		if width:
-			print resolution.aspect()
-			print resolution.scale(width=width).aspect()
 			return resolution.scale(width=width)
 		else:
 			return resolution

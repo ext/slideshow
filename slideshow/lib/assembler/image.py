@@ -38,8 +38,6 @@ class ImageAssembler(Assembler):
 			raise ValueError, 'failed to resample %s' % (slide.raster_path(size))
 	
 	def default_size(self, slide, params, width=None):
-		print 'default size'
-		
 		src = params['filename']
 		img = PythonMagick.Image(str(slide.src_path(src)))
 		geom = img.size()

@@ -493,7 +493,7 @@ class Settings(object):
                     try:
                         group = self.groups[k]
                     except KeyError:
-                        print 'group', k, 'found in config but is not defined xml'
+                        print >> sys.stderr, 'group', k, 'found in config but is not defined xml'
                         continue
                     
                     for name, value in v.items():
@@ -508,10 +508,10 @@ class Settings(object):
                             del v[name] # drop from list
                             n += 1
                         except ValueError as e:
-                            print name, k, 'contains illegal data ("%s": %s), resetting to default' % (value, str(e))
+                            print >> sys.stderr, name, k, 'contains illegal data ("%s": %s), resetting to default' % (value, str(e))
                         except KeyError:
                             traceback.print_exc()
-                            print name, k, 'found in config but is not defined in xml'
+                            print >> sys.stderr, name, k, 'found in config but is not defined in xml'
                                 
                 if n == 0:
                     break
