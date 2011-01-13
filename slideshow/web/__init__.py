@@ -75,15 +75,13 @@ def run():
 			settings = Settings()
 			settings.load(get_resource_path('settings.xml'), config_file=None, format_keys=dict(basepath=args.install))
 			
-			# if creating a new config, the default config is persisted.
-			if args.install:
-				# store the directory we installed to
-				with settings:
-					settings['Path.BasePath'] = os.path.abspath(args.install)
+			# store the directory we installed to
+			with settings:
+				settings['Path.BasePath'] = os.path.abspath(args.install)
 
-				settings.persist(dst=args.config_file)
-				print >> sys.stderr, 'Configuration installed, restart without --install flag to continue.'
-				sys.exit(0)
+			settings.persist(dst=args.config_file)
+			print >> sys.stderr, 'Configuration installed, restart without --install flag to continue.'
+			sys.exit(0)
 
 		# verify that config_file exists
 		if not os.path.exists(args.config_file):
