@@ -3,7 +3,8 @@
   <input type="hidden" name="context" value="${context}" />
   <p>Upload videos into the video folder and they will appear here.</p>
 
-  <select id="filename" name="filename">
+  <select id="${assembler}-filename" name="filename">
+    <option value="">
     <option py:for="file in files" value="${file}">${file}</option>
   </select>
 
