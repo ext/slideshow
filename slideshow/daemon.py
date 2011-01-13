@@ -381,10 +381,7 @@ def start(resolution=None, fullscreen=True):
 	return _call(_Daemon.do_start, resolution, fullscreen)
 
 def stop():
-	ipc.Quit()
-	while _daemon._instance:
-			print 'waiting for instance to terminate'
-			time.sleep(1)
+	_daemon.stop()
 
 def reset():
 	_daemon.reset()
