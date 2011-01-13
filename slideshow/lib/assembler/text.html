@@ -1,13 +1,15 @@
 <fieldset xmlns:py="http://genshi.edgewall.org/">
-	<p>Using this option you can create new slides with text only. The text will be applied to the predefined background if specified in the configuration.</p>
+  <input type="hidden" name="assembler" value="${assembler}" />
+  <input type="hidden" name="context" value="${context}" />
+  <p>Using this option you can create new slides with text only. The text will be applied to the predefined background if specified in the configuration.</p>
 	
-	<py:for each="item in template.items()">
-		${Markup(item.render(fields.get(item.name, '')))}<br/>
-	</py:for>
-	
-	<input type="submit" name="submit" value="preview" />
-	<input type="submit" name="submit" value="upload" /><br/>
-	
-	<?python import urllib ?>
-	<img src="/slides/preview?${preview}"  py:if="preview is not None" />
+  <py:for each="item in template.items()">
+    ${Markup(item.render(fields.get(item.name, '')))}<br/>
+  </py:for>
+  
+  <input type="submit" name="submit" value="preview" />
+  <input type="submit" name="submit" value="upload" /><br/>
+  
+  <?python import urllib ?>
+  <img src="/slides/preview?${preview}"  py:if="preview is not None" />
 </fieldset>

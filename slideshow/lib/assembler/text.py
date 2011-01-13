@@ -286,7 +286,7 @@ class TextAssembler(Assembler):
 	def title(self):
 		return 'Text'
 	
-	def render(self, content):
+	def render(self, content, context):
 		settings = Settings()
 		
 		default = dict(preview=None)
@@ -294,4 +294,4 @@ class TextAssembler(Assembler):
 			default['preview'] = urllib.urlencode(content)
 		default.update(content)
 		default['template'] = Template(settings['Appearance.Theme'])
-		return Assembler.render(self, content=default)
+		return Assembler.render(self, content=default, context=context)

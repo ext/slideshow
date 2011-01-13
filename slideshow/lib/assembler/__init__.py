@@ -53,13 +53,13 @@ class Assembler:
 		"""
 		raise NotImplementedError
 	
-	def render(self, content):
+	def render(self, content, context):
 		"""
 		Get html representation of the upload/edit form (should include the
 		fieldset wrapping the fields)
 		"""
 		
-		func = lambda: template.render(fields=content, **content)
+		func = lambda: template.render(fields=content, assembler=self.name, context=context, **content)
 		file = self.name + '.html'
 		return template.output(file, doctype=False, loader=loader)(func)()
 	

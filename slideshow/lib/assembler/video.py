@@ -68,7 +68,7 @@ class VideoAssembler(Assembler):
 	def raster_extension(self):
 		return '.gif'
 	
-	def render(self, content):
+	def render(self, content, context):
 		content = content.copy()
 		
 		settings = Settings()
@@ -77,4 +77,4 @@ class VideoAssembler(Assembler):
 		videopath = os.path.join(base, video)
 		
 		content['files'] = os.listdir(videopath)
-		return Assembler.render(self, content)
+		return Assembler.render(self, content, context)
