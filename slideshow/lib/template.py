@@ -72,6 +72,7 @@ def render(*args, **kwargs):
     ctxt['parent'] = cherrypy.thread_data.parent
     ctxt['daemon'] = daemon.state()
     ctxt['daemonstr'] = daemon.statename(daemon.state())
+    ctxt['username'] = cherrypy.request.login
     
     ctxt['_'] = lambda x: x # trans.ugettext
 	

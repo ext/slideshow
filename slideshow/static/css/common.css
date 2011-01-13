@@ -4,12 +4,16 @@ body {
 
 #footer {
 	margin-top: 1em;
-	font-size: 0.5em;
+	font-size: 0.8em;
 	color: #888;
 }
 
 #footer a {
 	color: #888;
+}
+
+#footer p { 
+	margin: 0.2em;
 }
 
 .spacer {

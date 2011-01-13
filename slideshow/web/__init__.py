@@ -28,6 +28,14 @@ class Root(object):
 	def index(self):
 		raise cherrypy.InternalRedirect('/slides/list')
 
+	@cherrypy.expose
+	def logout(self):
+		cherrypy.response.headers['www-authenticate'] = 'Digest realm="%s", nonce="foobar", algorithm="MD5", qop="auth"' % cherrypy.request.config['tools.auth_digest.realm']
+		raise cherrypy.HTTPError(401, "Unauthorized") 
+
+	def logout_error_401(self, status, message, traceback, version):
+		return 'You have logged out, please close this window or go back to <a href="/">slideshow</a> (requires relogin).'
+
 def install(dst, config_file):
 	from os.path import isdir, join, exists
 
@@ -119,7 +127,8 @@ def run():
 		cherrypy.engine.subscribe('start_thread', browser.connect)
 
 		# load application config
-		application = cherrypy.tree.mount(Root(), '/')
+		root = Root()
+		application = cherrypy.tree.mount(root, '/')
 		application.config.update({
 			'/': {
 				'tools.staticdir.root': os.path.dirname(os.path.abspath(__file__)),
@@ -142,6 +151,7 @@ def run():
 				'tools.auth_digest.get_ha1': cherrypy.lib.auth_digest.get_ha1_file_htdigest(passwd),
 				'tools.auth_digest.key': None,
 			})
+			application.config['/logout'] = {'error_page.401': root.logout_error_401}
 	
 		# cherrypy site config
 		cherrypy.config.update({
