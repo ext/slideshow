@@ -11,6 +11,9 @@ class ImageAssembler(Assembler):
 		return False
 	
 	def assemble(self, slide, filename, **kwargs):
+		if filename.filename == '':
+			raise RuntimeError, 'No file selected'
+
 		dst = open(slide.src_path(filename.filename), 'wb')
 		
 		while True:
