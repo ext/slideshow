@@ -65,10 +65,11 @@ void Browser::register_factory(const char* name, factory_callback callback){
 	factories.insert(pair(name, callback));
 }
 
+#define REGISTER(x) void x ## _register_factory(); x ## _register_factory()
+
 void Browser::register_all(){
 #ifdef HAVE_SQLITE3
-	void sqlite3_register_factory();
-	sqlite3_register_factory();
+	REGISTER(sqlite3);
 #endif
 }
 
