@@ -18,6 +18,7 @@
 
 #include "module.h"
 #include "Browser.h"
+#include "log_base.h"
 #include <sqlite3.h>
 #include <string.h>
 
@@ -40,7 +41,7 @@ MODULE_CONTEXT(sqlite3_context_t);
 static int connect(sqlite3_context_t* this){
 	int ret;
 	if ( (ret = sqlite3_open(this->base.name, &this->conn)) != SQLITE_OK ){
-		//Log::message(Log::Fatal, "sqlite3_open failed with %d\n", ret);
+		log_message(Log_Fatal, "sqlite3_open failed with %d\n", ret);
 		return ret;
 	}
 
@@ -72,7 +73,7 @@ static int connect(sqlite3_context_t* this){
 		"	sortorder "
 		"LIMIT 1";
 	if ( (ret = sqlite3_prepare_v2(this->conn, q, (int)(strlen(q)+1), &this->query_slide, NULL)) != SQLITE_OK ){
-		//Log::message(Log::Fatal, "query_slide::sqlite3_prepare_v2 failed with %d\n", ret);
+		log_message(Log_Fatal, "query_slide::sqlite3_prepare_v2 failed with %d\n", ret);
 		return ret;
 	}
 
@@ -85,7 +86,7 @@ static int connect(sqlite3_context_t* this){
 		"	id = ? "
 		"LIMIT 1";
 	if ( (ret = sqlite3_prepare_v2(this->conn, q, (int)(strlen(q)+1), &this->query_looping, NULL)) != SQLITE_OK ){
-		//Log::message(Log::Fatal, "query_loop::sqlite3_prepare_v2 failed with %d\n", ret);
+		log_message(Log_Fatal, "query_loop::sqlite3_prepare_v2 failed with %d\n", ret);
 		return ret;
 	}
 
@@ -97,7 +98,7 @@ static int connect(sqlite3_context_t* this){
 		"WHERE "
 		"	id = ?";
 	if ( (ret = sqlite3_prepare_v2(this->conn, q, (int)(strlen(q)+1), &this->query_pop_intermediate, NULL)) != SQLITE_OK ){
-		//Log::message(Log::Fatal, "pop_intermediate::sqlite3_prepare_v2 failed with %d\n", ret);
+		log_message(Log_Fatal, "pop_intermediate::sqlite3_prepare_v2 failed with %d\n", ret);
 		return ret;
 	}
 }
@@ -120,10 +121,10 @@ static int pop_intermediate(sqlite3_context_t* this, int id){
 		case SQLITE_ROW:
 			return 0;
 		case SQLITE_MISUSE:
-			//Log::message(Log::Info, "pop_intermediate::sqlite3_step failed: SQLITE_MISUSE\n");
+			log_message(Log_Info, "pop_intermediate::sqlite3_step failed: SQLITE_MISUSE\n");
 			break;
 		default:
-			//Log::message(Log::Info, "pop_intermediate::sqlite3_step failed: %d\n", ret);
+			log_message(Log_Info, "pop_intermediate::sqlite3_step failed: %d\n", ret);
 			break;
 	}
 
@@ -159,11 +160,11 @@ slide_context_t EXPORT next_slide(sqlite3_context_t* this){
 		sqlite3_reset(this->query_slide);
 
 		if ( !this->loop_queue ){
-			//Log::message(Log::Debug, "queue finished\n");
+			log_message(Log_Debug, "queue finished\n");
 			return slide;
 		}
 
-		//Log::message(Log::Debug, "queue wrapping\n");
+		log_message(Log_Debug, "queue wrapping\n");
 		this->prev_slide_id = -1;
 		sqlite3_bind_int(this->query_slide, 1, this->queue_id);
 		sqlite3_bind_int(this->query_slide, 2, this->prev_slide_id);
@@ -188,28 +189,28 @@ slide_context_t EXPORT next_slide(sqlite3_context_t* this){
 			queue_id        =                     sqlite3_column_int (this->query_slide, 3);
 			slide.assembler = strdup((const char*)sqlite3_column_text(this->query_slide, 4));
 
-			//Log::message(Log::Info, "slide: %s\n", slide.filename);
-			//Log::message(Log::Debug, "\tid: %d\n", id);
-			//Log::message(Log::Debug, "\tsort_order: %d\n", sort_order);
-			//Log::message(Log::Debug, "\tqueue_id: %d\n", queue_id);
+			log_message(Log_Info, "slide: %s\n", slide.filename);
+			log_message(Log_Debug, "\tid: %d\n", id);
+			log_message(Log_Debug, "\tsort_order: %d\n", sort_order);
+			log_message(Log_Debug, "\tqueue_id: %d\n", queue_id);
 
 			/* only update id if it comes from a regular queue, i.e., not from intermediate queue. */
 			if ( queue_id > 0 ){
 				this->prev_slide_id = sort_order;
 			} else {
 				/* pop intermediate slides back to unsorted */
-				//Log::message(Log::Debug, "popping intermediate slide\n", slide.filename, id, queue_id);
+				log_message(Log_Debug, "popping intermediate slide\n", slide.filename, id, queue_id);
 				pop_intermediate(this, id);
 			}
 
 			break;
 		case SQLITE_MISUSE:
-			//Log::message(Log::Info, "query_slide::sqlite3_step failed: SQLITE_MISUSE\n");
-			//Log::message(Log::Debug, "\tqueue_id: %d\n", current_bin());
-			//Log::message(Log::Debug, "\told_id: %d\n", _old_id);
+			log_message(Log_Info, "query_slide::sqlite3_step failed: SQLITE_MISUSE\n");
+			log_message(Log_Debug, "\tqueue_id: %d\n", this->queue_id);
+			log_message(Log_Debug, "\told_id: %d\n", this->prev_slide_id);
 			break;
 		default:
-			//Log::message(Log::Info, "query_slide::sqlite3_step failed: %d\n", ret);
+			log_message(Log_Info, "query_slide::sqlite3_step failed: %d\n", ret);
 			break;
 	}
 
@@ -247,10 +248,10 @@ int EXPORT queue_set(sqlite3_context_t* this, unsigned int id){
 			this->loop_queue = sqlite3_column_int(this->query_looping, 0);
 			break;
 		case SQLITE_MISUSE:
-			//Log::message(Log::Info, "query_loop::sqlite3_step failed: SQLITE_MISUSE\n");
+			log_message(Log_Info, "query_loop::sqlite3_step failed: SQLITE_MISUSE\n");
 			break;
 		default:
-			//Log::message(Log::Info, "query_loop::sqlite3_step failed: %d\n", ret);
+			log_message(Log_Info, "query_loop::sqlite3_step failed: %d\n", ret);
 			break;
 	}
 

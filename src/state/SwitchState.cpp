@@ -48,27 +48,27 @@ State* SwitchState::action(bool &flip){
 	autofree_t container(slide);
 
 	if ( !(slide.filename && slide.assembler) ){
-		Log::message(Log::Warning, "Kernel: Queue is empty\n");
+		Log::message(Log_Warning, "Kernel: Queue is empty\n");
 		return new ViewState(this);
 	}
 
 	/* @todo make something factory-like */
 	if ( strcmp("image", slide.assembler) == 0 || strcmp("text", slide.assembler) == 0 ){
-		Log::message(Log::Debug, "Kernel: Switching to image \"%s\"\n", slide.filename);
+		Log::message(Log_Debug, "Kernel: Switching to image \"%s\"\n", slide.filename);
 
 		try {
 			gfx()->load_image( slide.filename );
 		} catch ( exception& e ) {
-			Log::message(Log::Warning, "Kernel: Failed to load image '%s': %s\n", slide.filename, e.what());
+			Log::message(Log_Warning, "Kernel: Failed to load image '%s': %s\n", slide.filename, e.what());
 			return new ViewState(this);
 		}
 
 		return new TransitionState(this);
 	} else if ( strcmp("video", slide.assembler) == 0 ){
-		Log::message(Log::Debug, "Kernel: Playing video \"%s\"\n", slide.filename);
+		Log::message(Log_Debug, "Kernel: Playing video \"%s\"\n", slide.filename);
 		return new VideoState(this, slide.filename);
 	} else {
-		Log::message(Log::Warning, "Unhandled assembler \"%s\" for \"%s\"\n", slide.assembler, slide.filename);
+		Log::message(Log_Warning, "Unhandled assembler \"%s\" for \"%s\"\n", slide.assembler, slide.filename);
 		return new ViewState(this);
 	}
 }

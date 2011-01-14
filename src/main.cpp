@@ -51,7 +51,7 @@ int main( int argc, const char* argv[] ){
 		// Default arguments
 		Kernel::argument_set_t arguments = {
 			Kernel::ForegroundMode, // mode
-			Log::Info, 				// loglevel
+			Log_Info, 				// loglevel
 			false,					// fullscreen
 			false,					// have_password
 			0, 						// collection_id

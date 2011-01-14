@@ -96,7 +96,7 @@ Kernel::~Kernel(){
 }
 
 void Kernel::init(){
-	Log::message(Log::Info, "Kernel: Starting slideshow\n");
+	Log::message(Log_Info, "Kernel: Starting slideshow\n");
 
 	init_backend();
 	init_graphics();
@@ -150,17 +150,17 @@ void Kernel::init_browser(){
 		context.pass = strdup(_password);
 	}
 
-	Log::message(Log::Debug, "Loading plugin '%s'\n", context.provider);
+	Log::message(Log_Debug, "Loading plugin '%s'\n", context.provider);
 
 	struct module_context_t* module_context = module_open(context.provider);
 
 	if ( !module_context ){
-		Log::message(Log::Warning, "Unknown database provider '%s'\n", context.provider);
+		Log::message(Log_Warning, "Unknown database provider '%s'\n", context.provider);
 		goto error;
 	}
 
 	if ( module_type(module_context) != BROWSER_MODULE ){
-		Log::message(Log::Warning, "Plugin '%s'is not a browser module.\n", context.provider);
+		Log::message(Log_Warning, "Plugin '%s'is not a browser module.\n", context.provider);
 		goto error;
 	}
 
@@ -172,7 +172,7 @@ void Kernel::init_browser(){
 	return;
 
 	error:
-	Log::message(Log::Warning, "No browser selected, you will not see any slides\n");
+	Log::message(Log_Warning, "No browser selected, you will not see any slides\n");
 }
 
 char* Kernel::get_password(){
@@ -193,17 +193,17 @@ void Kernel::init_fsm(){
 }
 
 void Kernel::load_transition(const char* name){
-	Log::message(Log::Warning, "Loading plugin '%s'\n", name);
+	Log::message(Log_Warning, "Loading plugin '%s'\n", name);
 
 	struct module_context_t* context = module_open(name);
 
 	if ( !context ){
-		Log::message(Log::Info, "Transition plugin not found\n");
+		Log::message(Log_Info, "Transition plugin not found\n");
 		return;
 	}
 
 	if ( module_type(context) != TRANSITION_MODULE ){
-		Log::message(Log::Info, "Plugin is not a transition module\n");
+		Log::message(Log_Info, "Plugin is not a transition module\n");
 		return;
 	}
 
@@ -225,7 +225,7 @@ void Kernel::action(){
 	try {
 		_state = _state->action(flip);
 	} catch ( exception& e ){
-		Log::message(Log::Warning, "State exception: %s\n", e.what());
+		Log::message(Log_Warning, "State exception: %s\n", e.what());
 		_state = NULL;
 	}
 
@@ -237,28 +237,28 @@ void Kernel::action(){
 void Kernel::print_config() const {
 	char* cwd = get_current_dir_name();
 
-	Log::message(Log::Info, "Slideshow configuration\n");
-	Log::message(Log::Info, "  cwd: %s\n", cwd);
-	Log::message(Log::Info, "  pidfile: %s\n", pidfile);
-	Log::message(Log::Info, "  datapath: %s\n", datapath());
-	Log::message(Log::Info, "  pluginpath: %s\n", pluginpath());
-	Log::message(Log::Info, "  resolution: %dx%d (%s)\n", _arg.width, _arg.height, _arg.fullscreen ? "fullscreen" : "windowed");
-	Log::message(Log::Info, "  transition time: %0.3fs\n", _arg.transition_time);
-	Log::message(Log::Info, "  switch time: %0.3fs\n", _arg.switch_time);
-	Log::message(Log::Info, "  connection string: %s\n", _arg.connection_string);
-	Log::message(Log::Info, "  transition: %s\n", _arg.transition_string);
-	Log::message(Log::Info, "\n");
+	Log::message(Log_Info, "Slideshow configuration\n");
+	Log::message(Log_Info, "  cwd: %s\n", cwd);
+	Log::message(Log_Info, "  pidfile: %s\n", pidfile);
+	Log::message(Log_Info, "  datapath: %s\n", datapath());
+	Log::message(Log_Info, "  pluginpath: %s\n", pluginpath());
+	Log::message(Log_Info, "  resolution: %dx%d (%s)\n", _arg.width, _arg.height, _arg.fullscreen ? "fullscreen" : "windowed");
+	Log::message(Log_Info, "  transition time: %0.3fs\n", _arg.transition_time);
+	Log::message(Log_Info, "  switch time: %0.3fs\n", _arg.switch_time);
+	Log::message(Log_Info, "  connection string: %s\n", _arg.connection_string);
+	Log::message(Log_Info, "  transition: %s\n", _arg.transition_string);
+	Log::message(Log_Info, "\n");
 
 	free(cwd);
 }
 
 void Kernel::print_licence_statement() const {
-	Log::message(Log::Info, "Slideshow  Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>\n");
-	Log::message(Log::Info, "This program comes with ABSOLUTELY NO WARRANTY.\n");
-	Log::message(Log::Info, "This is free software, and you are welcome to redistribute it\n");
-	Log::message(Log::Info, "under certain conditions; see COPYING or <http://www.gnu.org/licenses/>\n");
-	Log::message(Log::Info, "for details.\n");
-	Log::message(Log::Info, "\n");
+	Log::message(Log_Info, "Slideshow  Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>\n");
+	Log::message(Log_Info, "This program comes with ABSOLUTELY NO WARRANTY.\n");
+	Log::message(Log_Info, "This is free software, and you are welcome to redistribute it\n");
+	Log::message(Log_Info, "under certain conditions; see COPYING or <http://www.gnu.org/licenses/>\n");
+	Log::message(Log_Info, "for details.\n");
+	Log::message(Log_Info, "\n");
 }
 
 static int filter(const struct dirent* el){
@@ -266,7 +266,7 @@ static int filter(const struct dirent* el){
 }
 
 void Kernel::print_transitions(){
-	Log::message(Log::Info, "Available transitions: \n");
+	Log::message(Log_Info, "Available transitions: \n");
 
 	struct dirent **namelist;
 	int n;
@@ -291,7 +291,7 @@ void Kernel::print_transitions(){
 					continue;
 				}
 
-				Log::message(Log::Info, " * %s\n", module_get_name(context));
+				Log::message(Log_Info, " * %s\n", module_get_name(context));
 
 				module_close(context);
 			}
@@ -310,8 +310,8 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 	option_initialize(&options, argc, argv);
 	option_set_description(&options, "Slideshow is an application for showing text and images in a loop on monitors and projectors.");
 
-	option_add_flag(&options,	"verbose",			'v', "Explain what is being done", &arg.loglevel, Log::Debug);
-	option_add_flag(&options,	"quiet",			'q', "Explain what is being done", &arg.loglevel, Log::Warning);
+	option_add_flag(&options,	"verbose",			'v', "Explain what is being done", &arg.loglevel, Log_Debug);
+	option_add_flag(&options,	"quiet",			'q', "Explain what is being done", &arg.loglevel, Log_Warning);
 	option_add_flag(&options,	"fullscreen",		'f', "Start in fullscreen mode", &arg.fullscreen, true);
 	option_add_flag(&options,	"daemon",			'd', "Run in background", &arg.mode, DaemonMode);
 	option_add_flag(&options,	"list-transitions",	 0,  "List available transitions", &arg.mode, ListTransitionMode);
@@ -342,7 +342,7 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 
 void Kernel::play_video(const char* fullpath){
 #ifndef WIN32
-	Log::message(Log::Info, "Kernel: Playing video \"%s\"\n", fullpath);
+	Log::message(Log_Info, "Kernel: Playing video \"%s\"\n", fullpath);
 
 	int status;
 
@@ -353,7 +353,7 @@ void Kernel::play_video(const char* fullpath){
 
 	::wait(&status);
 #else /* WIN32 */
-	Log::message(Log::Warning, "Kernel: Video playback is not supported on this platform (skipping \"%s\")\n", fullpath);
+	Log::message(Log_Warning, "Kernel: Video playback is not supported on this platform (skipping \"%s\")\n", fullpath);
 #endif /* WIN32 */
 }
 
@@ -370,7 +370,7 @@ void Kernel::reload_browser(){
 }
 
 void Kernel::change_bin(unsigned int id){
-	Log::message(Log::Verbose, "Kernel: Switching to queue %d\n", id);
+	Log::message(Log_Verbose, "Kernel: Switching to queue %d\n", id);
 	_browser->queue_set(&_browser->data, id);
 	_browser->queue_reload(&_browser->data);
 }

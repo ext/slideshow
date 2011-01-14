@@ -27,13 +27,13 @@ DBus::DBus(Kernel* kernel, int timeout):
 	IPC(kernel),
 	_timeout(timeout){
 
-	Log::message(Log::Verbose, "D-Bus: Starting\n");
+	Log::message(Log_Verbose, "D-Bus: Starting\n");
 
 	dbus_error_init (&_error);
 	_bus = dbus_bus_get (DBUS_BUS_SYSTEM, &_error);
 
 	if (!_bus) {
-		Log::message(Log::Fatal, "D-Bus: %s\n", _error.message);
+		Log::message(Log_Fatal, "D-Bus: %s\n", _error.message);
 		throw exception("D-Bus: %s", _error.message);
 	}
 
@@ -55,7 +55,7 @@ DBusHandlerResult DBus::signal_filter (DBusConnection* bus, DBusMessage* message
 	Kernel* kernel = static_cast<Kernel*>(user_data);
 
 	if (dbus_message_is_signal(message, DBUS_INTERFACE_LOCAL, "Disconnected")) {
-		Log::message(Log::Verbose, "D-Bus: Disconnected\n");
+		Log::message(Log_Verbose, "D-Bus: Disconnected\n");
 		kernel->ipc_quit();
 		return DBUS_HANDLER_RESULT_HANDLED;
 	}
@@ -87,18 +87,18 @@ DBusHandlerResult DBus::signal_filter (DBusConnection* bus, DBusMessage* message
 		current_command++;
 	}
 
-	Log::message(Log::Verbose, "D-Bus: Unhandled command: %s\n", dbus_message_get_member(message));
+	Log::message(Log_Verbose, "D-Bus: Unhandled command: %s\n", dbus_message_get_member(message));
 
 	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
 
 void DBus::handle_quit(DBusMessage* message, Kernel* kernel){
-	Log::message(Log::Verbose, "IPC: Quit\n");
+	Log::message(Log_Verbose, "IPC: Quit\n");
 	kernel->quit();
 }
 
 void DBus::handle_reload(DBusMessage* message, Kernel* kernel){
-	Log::message(Log::Verbose, "IPC: Reload browser\n");
+	Log::message(Log_Verbose, "IPC: Reload browser\n");
 	kernel->reload_browser();
 }
 
@@ -114,7 +114,7 @@ void DBus::handle_playvideo(DBusMessage* message, Kernel* kernel){
 	);
 
 	if ( !args_ok ) {
-		Log::message(Log::Verbose, "D-Bus: Malformed PlayVideo command: %s\n", error.message);
+		Log::message(Log_Verbose, "D-Bus: Malformed PlayVideo command: %s\n", error.message);
 		return;
 	}
 
@@ -122,12 +122,12 @@ void DBus::handle_playvideo(DBusMessage* message, Kernel* kernel){
 }
 
 void DBus::handle_ping(DBusMessage* message, Kernel* kernel){
-	Log::message(Log::Verbose, "IPC: Ping (reloading)\n");
+	Log::message(Log_Verbose, "IPC: Ping (reloading)\n");
 	kernel->reload_browser();
 }
 
 void DBus::handle_debug_dumpqueue(DBusMessage* message, Kernel* kernel){
-	Log::message(Log::Verbose, "IPC: Debug DumpQueue\n");
+	Log::message(Log_Verbose, "IPC: Debug DumpQueue\n");
 	kernel->debug_dumpqueue();
 }
 
@@ -143,10 +143,10 @@ void DBus::handle_change_bin(DBusMessage* message, Kernel* kernel){
 	);
 
 	if ( !args_ok ) {
-		Log::message(Log::Verbose, "D-Bus: Malformed ChangeBin command: %s\n", error.message);
+		Log::message(Log_Verbose, "D-Bus: Malformed ChangeBin command: %s\n", error.message);
 		return;
 	}
 
-	Log::message(Log::Verbose, "IPC: Changing bin to %d\n", bin_id);
+	Log::message(Log_Verbose, "IPC: Changing bin to %d\n", bin_id);
 	kernel->change_bin(bin_id);
 }

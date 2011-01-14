@@ -16,26 +16,23 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef HAVE_CONFIG_H
-#	include "config.h"
-#endif
-
-#include "InitialState.h"
-#include "TransitionState.h"
-#include "exception.h"
 #include "Log.h"
 
-State* InitialState::action(bool &flip){
-	try {
-		gfx()->load_image(NULL);
-		gfx()->load_image("resources/splash.png");
-	} catch ( exception &e ){
-		Log::message(Log_Warning, "%s\n", e.what());
-		Log::message(Log_Warning, "Failed to load initial resources, check your configuration\n");
-	}
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-	gfx()->render(0.0);
-	flip = true;
-
-	return new TransitionState(this);
+void  log_message(Severity severity, const char* fmt, ...){
+	va_list ap;
+	va_start(ap, fmt);
+	log_vmessage(severity, fmt, ap);
+	va_end(ap);
 }
+
+void log_vmessage(Severity severity, const char* fmt, va_list ap){
+	Log::vmessage(severity, fmt, ap);
+}
+
+#ifdef __cplusplus
+}
+#endif

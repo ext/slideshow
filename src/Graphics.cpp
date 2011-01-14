@@ -53,7 +53,7 @@ Graphics::Graphics(int width, int height, bool fullscreen):
 		_texture[i] = 0;
 	}
 
-	Log::message(Log::Verbose, "Graphics: Using resoultion %dx%d\n", width, height);
+	Log::message(Log_Verbose, "Graphics: Using resoultion %dx%d\n", width, height);
 
 	glew_init();
 	imageloader_init();
@@ -82,11 +82,11 @@ void Graphics::glew_init(){
 	}
 
 	if (GLEW_VERSION_2_0){
-		Log::message(Log::Warning, "Graphics card does not support OpenGL 2.0+\n");
+		Log::message(Log_Warning, "Graphics card does not support OpenGL 2.0+\n");
 	}
 
 	if (!GLEW_ARB_texture_non_power_of_two){
-		Log::message(Log::Warning, "Graphics card does not support ARB_texture_non_power_of_two, performance will suffer\n");
+		Log::message(Log_Warning, "Graphics card does not support ARB_texture_non_power_of_two, performance will suffer\n");
 	}
 }
 

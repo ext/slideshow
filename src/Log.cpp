@@ -223,11 +223,11 @@ char* Log::timestring(char *buffer, int bufferlen) {
 
 const char* Log::severity_string(Severity severity){
 	switch ( severity ){
-		case Debug: return "DD";
-		case Verbose: return "--";
-		case Info: return "  ";
-		case Warning: return "WW";
-		case Fatal: return "!!";
+		case Log_Debug: return "DD";
+		case Log_Verbose: return "--";
+		case Log_Info: return "  ";
+		case Log_Warning: return "WW";
+		case Log_Fatal: return "!!";
 	}
 	return NULL;
 }

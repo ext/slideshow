@@ -16,26 +16,32 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef HAVE_CONFIG_H
-#	include "config.h"
+#ifndef LOG_BASE_H
+#define LOG_BASE_H
+
+/**
+ * c api for logging.
+ */
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-#include "InitialState.h"
-#include "TransitionState.h"
-#include "exception.h"
-#include "Log.h"
+#include <stdarg.h>
 
-State* InitialState::action(bool &flip){
-	try {
-		gfx()->load_image(NULL);
-		gfx()->load_image("resources/splash.png");
-	} catch ( exception &e ){
-		Log::message(Log_Warning, "%s\n", e.what());
-		Log::message(Log_Warning, "Failed to load initial resources, check your configuration\n");
-	}
+enum Severity {
+	Log_Debug = 0,
+	Log_Verbose,
+	Log_Info,
+	Log_Warning,
+	Log_Fatal
+};
 
-	gfx()->render(0.0);
-	flip = true;
+void  log_message(enum Severity severity, const char* fmt, ...);
+void log_vmessage(enum Severity severity, const char* fmt, va_list ap);
 
-	return new TransitionState(this);
+#ifdef __cplusplus
 }
+#endif
+
+#endif /* LOG_BASE_H */

@@ -19,6 +19,7 @@
 #ifndef LOG_H
 #define LOG_H
 
+#include "log_base.h"
 #include <cstdio>
 #include <vector>
 
@@ -114,14 +115,6 @@ class Log {
 		 * @param dst Memory will be release using delete.
 		 */
 		static void add_destination(Destination* dst);
-
-		enum Severity {
-			Debug = 0,
-			Verbose,
-			Info,
-			Warning,
-			Fatal
-		};
 
 		static void  message(Severity severity, const char* fmt, ...);
 		static void vmessage(Severity severity, const char* fmt, va_list ap);
