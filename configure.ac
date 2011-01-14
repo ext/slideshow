@@ -1,7 +1,7 @@
 dnl Remember to bump 'setup.py' and 'slideshow/templates/index.html' as well
 AC_INIT([slideshow],[0.3.3], [ext@sidvind.com])
 AC_CONFIG_AUX_DIR([build-aux])
-AM_INIT_AUTOMAKE([-Wall 1.11 silent-rules])
+AM_INIT_AUTOMAKE([-Wall 1.11 silent-rules subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([include/config.h])
 
@@ -14,7 +14,6 @@ AC_PROG_CXX
 AM_PROG_CC_C_O
 AM_DISABLE_STATIC
 AC_LIBTOOL_DLOPEN
-AC_PROG_LIBTOOL
 LT_INIT
 AC_PROG_CC_C99
 CHECK_RAGEL([src/browser_context.cpp])
@@ -210,6 +209,7 @@ AC_ARG_WITH([sqlite3],
 AS_IF([test "x$with_sqlite3" != xno],
 	[
 		PKG_CHECK_MODULES(sqlite3, [sqlite3])
+		AC_DEFINE(HAVE_SQLITE3, 1, [Define if sqlite3 is available])
 	],
 	[])
 

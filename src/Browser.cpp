@@ -82,39 +82,3 @@ void Browser::set_string(char*& dst, const char* src){
 
 	dst = strdup(src);
 }
-
-void Browser::register_factory(factory_callback callback, const char* name){
-	if ( !factories ){
-		factories = new factory_map;
-	}
-
-	factories->insert(pair(name, callback));
-}
-
-Browser* Browser::factory(const char* string, const char* password){
-	if ( !(factories && string) ){
-		return NULL;
-	}
-
-	browser_context_t context = get_context(string);
-
-	// If the contex doesn't contain a password and a password was passed from stdin (arg password)
-	// we set that as the password in the context.
-	if ( !context.pass && password ){
-		set_string(context.pass, password);
-	}
-
-	for ( iterator it = factories->begin(); it != factories->end(); ++it ){
-		if ( strcmp(context.provider, it->first) == 0){
-			Browser* browser = it->second(context);
-			free_context(context);
-			return browser;
-		}
-	}
-
-	Log::message(Log::Warning, "Unknown database provider '%s'\n", context.provider);
-
-	free_context(context);
-
-	return NULL;
-}

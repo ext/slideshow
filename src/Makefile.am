@@ -46,6 +46,7 @@ slideshow_daemon_SOURCES = \
 	${top_srcdir}/include/vector.h \
 	${top_srcdir}/include/win32.h \
 	backend/factory.cpp \
+	browsers/factory.cpp \
 	browsers/dummybrowser.cpp browsers/dummybrowser.h \
 	argument_parser.c \
 	browser_context.rl \

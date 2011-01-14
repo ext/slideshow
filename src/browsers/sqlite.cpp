@@ -50,8 +50,14 @@ class SQLiteBrowser: public Browser {
 		sqlite3_stmt* _query_pop_intermediate;
 };
 
-REGISTER_BROWSER_FACTORY(SQLiteBrowser, sqlite);
-REGISTER_BROWSER_FACTORY(SQLiteBrowser, sqlite3);
+static Browser* factory(const browser_context_t& context){
+	return new SQLiteBrowser(context);
+}
+
+void sqlite3_register_factory(){
+	Browser::register_factory("sqlite", factory);
+	Browser::register_factory("sqlite3", factory);
+}
 
 SQLiteBrowser::SQLiteBrowser(const browser_context_t& context)
 	: Browser(context)

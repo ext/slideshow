@@ -36,6 +36,7 @@
 #include <limits.h>
 #include <portable/Time.h>
 #include "backend/platform.h"
+#include "Browser.h"
 
 // for getcwd
 #ifdef WIN32
@@ -72,6 +73,7 @@ int main( int argc, const char* argv[] ){
 		initTime();
 		moduleloader_init(pluginpath());
 		PlatformBackend::register_all();
+		Browser::register_all();
 
 		Log::initialize();
 

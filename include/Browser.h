@@ -62,8 +62,10 @@ class Browser {
 		const char* hostname(){ return _hostname; }
 
 		typedef Browser* (*factory_callback)(const browser_context_t& context);
-		static void register_factory(factory_callback callback, const char* name);
 		static Browser* factory(const char* string, const char* password);
+		static void register_factory(const char* name, factory_callback callback);
+		static void register_all();
+		static void register_cleanup();
 
 	protected:
 		unsigned int current_bin(){ return _bin; }
@@ -78,24 +80,5 @@ class Browser {
 		char* _database;
 		char* _hostname;
 };
-
-#define CONCAT2(x,y,z) x ## y ## z
-#define CONCAT(x,y,z) CONCAT2(x,y,z)
-#define FACTORY_CLASS_NAME(classname) CONCAT(classname, _factory_, __LINE__)
-#define FACTORY_INSTANCE_NAME(classname) CONCAT(classname, _factory_inst_, __LINE__)
-
-#define REGISTER_BROWSER_FACTORY(classname, name) \
-class FACTORY_CLASS_NAME(classname) {		  \
-	public: \
-	FACTORY_CLASS_NAME(classname)(){ \
-			Browser::register_factory(&FACTORY_CLASS_NAME(classname)::factory, #name); \
-		} \
-		\
-		static Browser* factory(const browser_context_t& context){ \
-			return new classname(context); \
-		} \
-}; \
-\
-FACTORY_CLASS_NAME(classname) FACTORY_INSTANCE_NAME(classname)
 
 #endif // BROWSER_H
