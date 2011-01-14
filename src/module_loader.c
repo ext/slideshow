@@ -143,7 +143,6 @@ module_t* module_get(struct module_context_t* context){
 			m->init2        = (browser_init_callback)dlsym_abort(context, "module_init");
 
 			module = (module_t*)m;
-			printf("module: %p\n", module);
 		}
 		break;
 
