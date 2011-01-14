@@ -21,6 +21,7 @@
 #endif
 
 #include "Log.h"
+#include "ptr.h"
 #include "exception.h"
 #include <stdarg.h>
 #include <cstdlib>
@@ -195,8 +196,8 @@ void Log::message(Severity severity, const char* fmt, ...){
 void Log::vmessage(Severity severity, const char* fmt, va_list ap){
 	static char buf[255]; /* this isn't thread-safe anyway, might as well make it static */
 
-	std::auto_ptr<char> content( vasprintf2(fmt, ap) );
-	std::auto_ptr<char> decorated( asprintf2("(%s) [%s] %s", severity_string(severity), timestring(buf, 255), content.get()) );
+	Ptr<char> content( vasprintf2(fmt, ap) );
+	Ptr<char> decorated( asprintf2("(%s) [%s] %s", severity_string(severity), timestring(buf, 255), content.get()) );
 
 	for ( iterator it = _dst.begin(); it != _dst.end(); ++it ){
 		Destination* dst = *it;
