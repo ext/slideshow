@@ -180,7 +180,7 @@ void Kernel::load_transition(const char* name){
 	}
 
 	if ( module_type(context) != TRANSITION_MODULE ){
-		Log::message(Log::Info, "Plugin is not a transition module not found\n");
+		Log::message(Log::Info, "Plugin is not a transition module\n");
 		return;
 	}
 
