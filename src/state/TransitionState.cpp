@@ -23,10 +23,10 @@
 #include "TransitionState.h"
 #include "ViewState.h"
 
-double TransitionState::transition_time = 1.0;
+float TransitionState::transition_time = 1.0f;
 
 State* TransitionState::action(bool &flip){
-	double s = age() / transition_time;
+	float s = age() / transition_time;
 
 	gfx()->render( s );
 	flip = true;

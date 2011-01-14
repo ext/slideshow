@@ -27,12 +27,12 @@
 class State {
 	public:
 		State(Browser* browser, Graphics* gfx, IPC* ipc): _browser(browser), _gfx(gfx), _ipc(ipc){
-			_created = getTime();
+			_created = getTimef();
 		}
 		virtual ~State(){}
 
 		State(State* state): _browser(state->_browser), _gfx(state->_gfx), _ipc(state->_ipc){
-			_created = getTime();
+			_created = getTimef();
 			delete state;
 		}
 
@@ -42,13 +42,13 @@ class State {
 		Graphics* gfx(){ return _gfx; }
 		IPC* ipc(){ return _ipc; }
 
-		double age(){ return getTime() - _created; }
+		float age(){ return getTimef() - _created; }
 
 	private:
 		Browser* _browser;
 		Graphics* _gfx;
 		IPC* _ipc;
-		double _created;
+		float _created;
 };
 
 #endif // STATE_H

@@ -28,10 +28,10 @@ class TransitionState: public State {
 
 		virtual State* action(bool &flip);
 
-		static void set_transition_time(double t){ transition_time = t; }
+		static void set_transition_time(float t){ transition_time = t; }
 
 	private:
-		static double transition_time;
+		static float transition_time;
 };
 
 #endif // TRANSITIONSTATE_H
