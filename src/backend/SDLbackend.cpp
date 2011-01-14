@@ -103,7 +103,6 @@ void SDLBackend::poll(bool& running){
 			break;
 			
 		case SDL_VIDEORESIZE:
-			printf("video resize\n");
 			set_resolution(event.resize.w, event.resize.h);
 			break;
 			
