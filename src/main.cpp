@@ -100,6 +100,7 @@ int main( int argc, const char* argv[] ){
 
 		Kernel* application = NULL;
 
+		/* Kernel takes ownership of backend and will release memory when finished */
 		const char* backend_name = "sdl";
 		PlatformBackend* backend = PlatformBackend::factory(backend_name);
 		if ( !backend ){

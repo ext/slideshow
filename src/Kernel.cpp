@@ -88,6 +88,8 @@ Kernel::Kernel(const argument_set_t& arg, PlatformBackend* backend)
 }
 
 Kernel::~Kernel(){
+	delete _backend;
+
 	free( _arg.connection_string );
 	free( _arg.transition_string );
 }
