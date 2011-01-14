@@ -123,6 +123,7 @@ void SDLBackend::lock_mouse(bool state){
 	_lock = state;
 
 	if ( _lock ){
-		SDL_WarpMouse(center().x, center().y);
+		/* casting to Uint16 to silence warning */
+		SDL_WarpMouse((Uint16)center().x, (Uint16)center().y);
 	}
 }
