@@ -29,6 +29,7 @@ class PlatformBackend {
 		static PlatformBackend* factory(const char* name);
 		static void register_factory(const char* name, factory_callback callback);
 		static void register_all();
+		static void register_cleanup();
 
 		PlatformBackend(){}
 		virtual ~PlatformBackend(){}

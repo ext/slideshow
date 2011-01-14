@@ -59,3 +59,7 @@ void PlatformBackend::register_all(){
 	SDLBackend::register_factory();
 #endif
 }
+
+void PlatformBackend::register_cleanup(){
+
+}

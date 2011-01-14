@@ -131,6 +131,7 @@ int main( int argc, const char* argv[] ){
 		delete application;
 
 		moduleloader_cleanup();
+		PlatformBackend::register_cleanup();
 
 		Log::cleanup();
 
