@@ -25,6 +25,7 @@ AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
 	src/transitions/Makefile
+	src/browsers/Makefile
 ])
 
 AC_MSG_CHECKING([host architecture])

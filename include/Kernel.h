@@ -20,11 +20,12 @@
 #define KERNEL_H
 
 class Graphics;
-class Browser;
 class IPC;
 class State;
 class PlatformBackend;
 class UDSServer;
+
+#include "Browser.h"
 
 class Kernel {
 	public:
@@ -91,7 +92,7 @@ class Kernel {
 		void transition_state(double t);
 		void switch_state(double t);
 
-		Browser* browser(){ return _browser; }
+		browser_module_t* browser(){ return _browser; }
 
 		void load_transition(const char* name);
 
@@ -112,7 +113,7 @@ class Kernel {
 		State* _state;
 
 		Graphics* _graphics;
-		Browser* _browser;
+		browser_module_t* _browser;
 		IPC* _ipc;
 		PlatformBackend* _backend;
 

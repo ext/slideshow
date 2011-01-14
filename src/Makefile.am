@@ -1,4 +1,4 @@
-SUBDIRS = transitions
+SUBDIRS = transitions browsers
 
 noinst_LIBRARIES = libmodule_loader.a libipc.a libfsm.a
 bin_PROGRAMS = slideshow-daemon
@@ -47,7 +47,6 @@ slideshow_daemon_SOURCES = \
 	${top_srcdir}/include/win32.h \
 	backend/factory.cpp \
 	browsers/factory.cpp \
-	browsers/dummybrowser.cpp browsers/dummybrowser.h \
 	argument_parser.c \
 	browser_context.rl \
 	Browser.cpp ${top_srcdir}/include/Browser.h \
@@ -85,10 +84,10 @@ slideshow_daemon_SOURCES += browsers/mysqlbrowser.cpp
 slideshow_daemon_LDADD += ${MYSQL_LIBS}
 endif
 
-if WITH_SQLITE3
-slideshow_daemon_SOURCES += browsers/sqlite.cpp
-slideshow_daemon_LDADD += ${sqlite3_LIBS}
-endif
+#if WITH_SQLITE3
+#slideshow_daemon_SOURCES += browsers/sqlite.cpp
+#slideshow_daemon_LDADD += ${sqlite3_LIBS}
+#endif
 
 libmodule_loader_a_SOURCES = module_loader.c ${top_srcdir}/include/module_loader.h
 

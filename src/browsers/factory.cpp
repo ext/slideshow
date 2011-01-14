@@ -22,57 +22,5 @@
 
 #include "Browser.h"
 #include "Log.h"
-#include <map>
 #include <cstring>
 
-struct ltstr {
-	bool operator()(const char* s1, const char* s2) const {
-		return strcmp(s1, s2) < 0;
-	}
-};
-
-typedef std::map<const char*, Browser::factory_callback, ltstr> map;
-typedef std::pair<const char*, Browser::factory_callback> pair;
-typedef map::iterator iterator;
-
-static map factories;
-
-Browser* Browser::factory(const char* string, const char* password){
-	Browser* browser = NULL;
-	browser_context_t context = get_context(string);
-
-	// If the contex doesn't contain a password and a password was passed from stdin (arg password)
-	// we set that as the password in the context.
-	if ( !context.pass && password ){
-		set_string(context.pass, password);
-	}
-
-	iterator it = factories.find(context.provider);
-
-	if ( it == factories.end() ){
-		Log::message(Log::Warning, "Unknown database provider '%s'\n", context.provider);
-		goto fin;
-	}
-
-	browser = it->second(context);
-
-	fin:
-	free_context(context);
-	return browser;
-}
-
-void Browser::register_factory(const char* name, factory_callback callback){
-	factories.insert(pair(name, callback));
-}
-
-#define REGISTER(x) void x ## _register_factory(); x ## _register_factory()
-
-void Browser::register_all(){
-#ifdef HAVE_SQLITE3
-	REGISTER(sqlite3);
-#endif
-}
-
-void Browser::register_cleanup(){
-
-}

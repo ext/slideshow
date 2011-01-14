@@ -26,7 +26,7 @@
 
 class State {
 	public:
-		State(Browser* browser, Graphics* gfx, IPC* ipc): _browser(browser), _gfx(gfx), _ipc(ipc){
+		State(browser_module_t* browser, Graphics* gfx, IPC* ipc): _browser(browser), _gfx(gfx), _ipc(ipc){
 			_created = getTimef();
 		}
 		virtual ~State(){}
@@ -38,14 +38,19 @@ class State {
 
 		virtual State* action(bool &flip) = 0;
 
-		Browser* browser(){ return _browser; }
+		slide_context_t next_slide(){
+			return _browser->next_slide(&_browser->data);
+		}
+
+		browser_module_t* browser(){ return _browser; }
+
 		Graphics* gfx(){ return _gfx; }
 		IPC* ipc(){ return _ipc; }
 
 		float age(){ return getTimef() - _created; }
 
 	private:
-		Browser* _browser;
+		browser_module_t* _browser;
 		Graphics* _gfx;
 		IPC* _ipc;
 		float _created;

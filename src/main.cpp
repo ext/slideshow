@@ -73,7 +73,6 @@ int main( int argc, const char* argv[] ){
 		initTime();
 		moduleloader_init(pluginpath());
 		PlatformBackend::register_all();
-		Browser::register_all();
 
 		Log::initialize();
 

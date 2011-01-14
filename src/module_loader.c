@@ -19,11 +19,13 @@
 #include "config.h"
 #include "module_loader.h"
 #include "assembler.h"
+#include "Browser.h"
 #include "Transition.h"
 #include <ltdl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 struct module_context_t {
 	lt_dlhandle handle;
@@ -94,28 +96,59 @@ void module_close(struct module_context_t* context){
 	free(context);
 }
 
+static void* dlsym_abort(struct module_context_t* context, const char* name){
+	void* ptr;
+
+	if( !(ptr = lt_dlsym(context->handle, name)) ){
+		fprintf(stderr, "module does not implement required function '%s'.", name);
+		abort();
+	}
+
+	return ptr;
+}
+
 module_t* module_get(struct module_context_t* context){
 	module_t* module = NULL;
+
+	unsigned int* custom_size = (unsigned int*)lt_dlsym(context->handle, "__module_context_size");
 
 	switch ( module_type(context) ){
 		case TRANSITION_MODULE:
 		{
-			transition_module_t* m = (transition_module_t*)malloc(sizeof(transition_module_t));
-			m->render = (render_callback)lt_dlsym(context->handle, "render");
+			transition_module_t* m = (transition_module_t*)malloc(custom_size ? *custom_size : sizeof(transition_module_t));
+			m->render = (render_callback)dlsym_abort(context, "render");
 			module = (module_t*)m;
 		}
 		break;
 
 		case ASSEMBLER_MODULE:
 		{
-			assembler_module_t* m = (assembler_module_t*)malloc(sizeof(assembler_module_t));
-			m->assemble = (assemble_callback)lt_dlsym(context->handle, "assemble");
+			assembler_module_t* m = (assembler_module_t*)malloc(custom_size ? *custom_size : sizeof(assembler_module_t));
+			m->assemble = (assemble_callback)dlsym_abort(context, "assemble");
 			module = (module_t*)m;
 		}
 		break;
 
+		case BROWSER_MODULE:
+		{
+			size_t base_size = sizeof(browser_module_t) - sizeof(browser_context_t);
+			size_t context_size = custom_size ? *custom_size : sizeof(browser_context_t);
+
+			browser_module_t* m = (browser_module_t*)malloc(base_size + context_size);
+
+			m->next_slide   = (next_slide_callback)  dlsym_abort(context, "next_slide");
+			m->queue_reload = (queue_reload_callback)dlsym_abort(context, "queue_reload");
+			m->queue_dump   = (queue_dump_callback)  dlsym_abort(context, "queue_dump");
+			m->queue_set    = (queue_set_callback)   dlsym_abort(context, "queue_set");
+			m->init2        = (browser_init_callback)dlsym_abort(context, "module_init");
+
+			module = (module_t*)m;
+			printf("module: %p\n", module);
+		}
+		break;
+
 		default:
-			fprintf(stderr, "Unknown module, type id is %d\n", module_type(context));
+			fprintf(stderr, "module_loader: unknown module, type id is %d\n", module_type(context));
 			return NULL;
 	}
 

@@ -21,7 +21,8 @@
 
 enum module_type_t {
 	TRANSITION_MODULE,
-	ASSEMBLER_MODULE
+	ASSEMBLER_MODULE,
+	BROWSER_MODULE,
 };
 
 #ifdef WIN32
@@ -38,5 +39,7 @@ enum module_type_t {
 	EXPORT const char *             __module_name = name; \
 	EXPORT const enum module_type_t __module_type = type; \
 	EXPORT const char *             __module_author = author
+
+#define MODULE_CONTEXT(structure) EXPORT unsigned int __module_context_size = sizeof(structure)
 
 #endif // SLIDESHOW_MODULE_H

@@ -19,6 +19,8 @@
 #ifndef BROWSER_H
 #define BROWSER_H
 
+#include "module_loader.h"
+
 typedef struct {
 	char* provider;
 	char* user;
@@ -27,58 +29,48 @@ typedef struct {
 	char* name;
 } browser_context_t;
 
+browser_context_t get_context(const char* string);
+void free_context(browser_context_t* context);
+
 typedef struct {
 	char* filename;
 	char* assembler;
 } slide_context_t;
 
-browser_context_t get_context(const char* string);
-void free_context(browser_context_t& context);
+typedef int (*browser_init_callback)(browser_context_t* data);
+/**
+ * Get next slide from queue.
+ * @return A slide context with copies of the strings which the caller must
+ *         deallocate using free.
+ */
+typedef slide_context_t (*next_slide_callback)(browser_context_t* data);
 
-class Browser {
-	public:
-		Browser(const browser_context_t& context);
-		virtual ~Browser();
+/**
+ * Force reload of queue.
+ */
+typedef int (*queue_reload_callback)(browser_context_t* data);
 
-		/**
-		 * Gets the next file from the queue.
-		 * @return A slide context with copies of the strings which the caller
-		 *         must deallocate using free.
-		 */
-		virtual slide_context_t get_next_file() = 0;
-		virtual void reload() = 0;
-		virtual void dump_queue() = 0;
+/**
+ * Dump queue to log.
+ */
+typedef int (*queue_dump_callback)(browser_context_t* data);
 
-		virtual void change_bin(unsigned int id){ _bin = id; }
+/**
+ * Change the active queue.
+ */
+typedef int (*queue_set_callback)(browser_context_t* data, unsigned int id);
 
-		void set_username(const char* username);
-		void set_password(const char* password);
-		void set_database(const char* database);
-		void set_hostname(const char* hostname);
+typedef struct {
+	MODULE_HEAD();
 
-		const char* username(){ return _username; }
-		const char* password(){ return _password; }
-		const char* database(){ return _database; }
-		const char* hostname(){ return _hostname; }
+	next_slide_callback next_slide;
+	queue_reload_callback queue_reload;
+	queue_dump_callback queue_dump;
+	queue_set_callback queue_set;
+	browser_init_callback init2;
 
-		typedef Browser* (*factory_callback)(const browser_context_t& context);
-		static Browser* factory(const char* string, const char* password);
-		static void register_factory(const char* name, factory_callback callback);
-		static void register_all();
-		static void register_cleanup();
-
-	protected:
-		unsigned int current_bin(){ return _bin; }
-
-	private:
-		static void set_string(char*& dst, const char* src);
-
-		unsigned int _bin;
-
-		char* _username;
-		char* _password;
-		char* _database;
-		char* _hostname;
-};
+	/* MUST BE THE LAST FIELD BECAUSE OF VARIABLE STRUCT SIZE */
+	browser_context_t data;
+} browser_module_t;
 
 #endif // BROWSER_H

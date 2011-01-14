@@ -34,7 +34,7 @@ State* SwitchState::action(bool &flip){
 	}
 
 	/* get next slide */
-	slide_context_t slide = browser()->get_next_file();
+	slide_context_t slide = next_slide();
 
 	struct autofree_t {
 		autofree_t(slide_context_t& s): s(s){}

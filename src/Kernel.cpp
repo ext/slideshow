@@ -56,6 +56,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
+#include <cassert>
 
 // Platform
 #ifdef __GNUC__
@@ -141,13 +142,37 @@ void Kernel::init_IPC(){
 }
 
 void Kernel::init_browser(){
-	_browser = Browser::factory(_arg.connection_string, _password);
+	browser_context_t context = get_context(_arg.connection_string);
 
-	if ( browser() ){
-		change_bin(_arg.collection_id);
-	} else {
-		Log::message(Log::Warning, "No browser selected, you will not see any slides\n");
+	// If the contex doesn't contain a password and a password was passed from stdin (arg password)
+	// we set that as the password in the context.
+	if ( !context.pass && _password ){
+		context.pass = strdup(_password);
 	}
+
+	Log::message(Log::Debug, "Loading plugin '%s'\n", context.provider);
+
+	struct module_context_t* module_context = module_open(context.provider);
+
+	if ( !module_context ){
+		Log::message(Log::Warning, "Unknown database provider '%s'\n", context.provider);
+		goto error;
+	}
+
+	if ( module_type(module_context) != BROWSER_MODULE ){
+		Log::message(Log::Warning, "Plugin '%s'is not a browser module.\n", context.provider);
+		goto error;
+	}
+
+	_browser = (browser_module_t*)module_get(module_context); assert(_browser);
+	_browser->data = context;
+	_browser->init2(&_browser->data);
+
+	change_bin(_arg.collection_id);
+	return;
+
+	error:
+	Log::message(Log::Warning, "No browser selected, you will not see any slides\n");
 }
 
 char* Kernel::get_password(){
@@ -168,11 +193,9 @@ void Kernel::init_fsm(){
 }
 
 void Kernel::load_transition(const char* name){
-	Log::message(Log::Warning, "Loading %s\n", name);
+	Log::message(Log::Warning, "Loading plugin '%s'\n", name);
 
-	char* fullname = asprintf2("%s%s", name, SO_SUFFIX);
-	struct module_context_t* context = module_open(fullname);
-	free(fullname);
+	struct module_context_t* context = module_open(name);
 
 	if ( !context ){
 		Log::message(Log::Info, "Transition plugin not found\n");
@@ -343,13 +366,13 @@ void Kernel::quit(){
 }
 
 void Kernel::reload_browser(){
-	_browser->reload();
+	_browser->queue_reload(&_browser->data);
 }
 
 void Kernel::change_bin(unsigned int id){
-	Log::message(Log::Verbose, "Kernel: Switching to collection %d\n", id);
-	_browser->change_bin(id);
-	_browser->reload();
+	Log::message(Log::Verbose, "Kernel: Switching to queue %d\n", id);
+	_browser->queue_set(&_browser->data, id);
+	_browser->queue_reload(&_browser->data);
 }
 
 void Kernel::ipc_quit(){
@@ -358,7 +381,7 @@ void Kernel::ipc_quit(){
 }
 
 void Kernel::debug_dumpqueue(){
-	_browser->dump_queue();
+	_browser->queue_dump(&_browser->data);
 }
 
 void Kernel::create_pidpath(){
