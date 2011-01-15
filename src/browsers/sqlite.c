@@ -26,7 +26,7 @@ typedef struct {
 	struct browser_module_t module;
 
 	int loop_queue;
-	int queue_id;
+	unsigned int queue_id;
 	int prev_slide_id;
 
 	sqlite3* conn;
@@ -137,7 +137,7 @@ static slide_context_t next_slide(sqlite3_context_t* this){
 	slide.filename = NULL;
 	slide.assembler = NULL;
 
-	sqlite3_bind_int(this->query_slide, 1, this->queue_id);
+	sqlite3_bind_int(this->query_slide, 1, (int)this->queue_id);
 	sqlite3_bind_int(this->query_slide, 2, this->prev_slide_id);
 
 	int ret = sqlite3_step(this->query_slide);
@@ -151,7 +151,7 @@ static slide_context_t next_slide(sqlite3_context_t* this){
 
 		log_message(Log_Debug, "queue wrapping\n");
 		this->prev_slide_id = -1;
-		sqlite3_bind_int(this->query_slide, 1, this->queue_id);
+		sqlite3_bind_int(this->query_slide, 1, (int)this->queue_id);
 		sqlite3_bind_int(this->query_slide, 2, this->prev_slide_id);
 
 		ret = sqlite3_step(this->query_slide);
@@ -221,7 +221,7 @@ static int queue_set(sqlite3_context_t* this, unsigned int id){
 	this->queue_id = id;
 
 	/* query whenever to loop this queue */
-	sqlite3_bind_int(this->query_looping, 1, id);
+	sqlite3_bind_int(this->query_looping, 1, (int)id);
 	int ret = sqlite3_step(this->query_looping);
 
 	this->loop_queue = 1;
