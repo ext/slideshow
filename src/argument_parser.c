@@ -243,8 +243,16 @@ int option_parse(option_set_t* option_set){
 			case arg_fmt:
 			{
 				const argument_format_t* real_option = (const argument_format_t*)extracted_option;
+
+				/* copy the va_list since the same option might be passed twice
+				 * and the va_list would then be consumed. */
+				va_list dst;
+				va_copy(dst, real_option->dst);
+
 				int n = format_argument_count(real_option->fmt);
-				int r = vsscanf(argv[i], real_option->fmt, real_option->dst);
+				int r = vsscanf(argv[i], real_option->fmt, dst);
+
+				va_end(dst);
 
 				if ( n != r ){
 					printf("%s: invalid argument to option '%s'\n", argv[0], arg);
