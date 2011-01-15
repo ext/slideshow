@@ -26,6 +26,7 @@ libfsm_a_SOURCES = \
 
 slideshow_daemon_CPPFLAGS = ${AM_CPPFLAGS} ${libdaemon_CFLAGS} -DBUILD_DAEMON
 slideshow_daemon_CFLAGS   = ${AM_CPPFLAGS}
+slideshow_daemon_LDFLAGS  = ${AM_LDFLAGS} -rdynamic
 
 if WITH_DBUS
 slideshow_daemon_CPPFLAGS += ${dbus_CFLAGS}
