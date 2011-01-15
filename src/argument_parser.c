@@ -203,16 +203,16 @@ int option_parse(option_set_t* option_set){
 		}
 
 		if ( !extracted_option ){
-			printf("%s: unrecognized option '%s'\n", argv[0], arg);
-			printf("Try `%s --help' for more information.\n", argv[0]);
+			fprintf(stderr, "%s: unrecognized option '%s'\n", argv[0], arg);
+			fprintf(stderr, "Try `%s --help' for more information.\n", argv[0]);
 			return -2;
 		}
 
 		if ( extracted_option->type != arg_flag ){
 			i++;
 			if ( i == argc ){
-				printf("%s: missing argument to option '%s'\n", argv[0], arg);
-				printf("Try `%s --help' for more information.\n", argv[0]);
+				fprintf(stderr, "%s: missing argument to option '%s'\n", argv[0], arg);
+				fprintf(stderr, "Try `%s --help' for more information.\n", argv[0]);
 				return -2;
 			}
 		}
@@ -255,8 +255,8 @@ int option_parse(option_set_t* option_set){
 				va_end(dst);
 
 				if ( n != r ){
-					printf("%s: invalid argument to option '%s'\n", argv[0], arg);
-					printf("Try `%s --help' for more information.\n", argv[0]);
+					fprintf(stderr, "%s: invalid argument to option '%s'\n", argv[0], arg);
+					fprintf(stderr, "Try `%s --help' for more information.\n", argv[0]);
 					return -2;
 				}
 
