@@ -107,7 +107,7 @@ void Kernel::init(){
 
 void Kernel::cleanup(){
 	delete _state;
-	delete _browser;
+	free(_browser);
 	delete _graphics;
 	delete _ipc;
 	free(pidfile);
