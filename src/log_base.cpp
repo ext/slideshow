@@ -22,14 +22,14 @@
 extern "C" {
 #endif
 
-void  log_message(Severity severity, const char* fmt, ...){
+void  log_message(enum Severity severity, const char* fmt, ...){
 	va_list ap;
 	va_start(ap, fmt);
 	log_vmessage(severity, fmt, ap);
 	va_end(ap);
 }
 
-void log_vmessage(Severity severity, const char* fmt, va_list ap){
+void log_vmessage(enum Severity severity, const char* fmt, va_list ap){
 	Log::vmessage(severity, fmt, ap);
 }
 
