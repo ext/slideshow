@@ -1,0 +1,12 @@
+2011-01-14; David Sveningsson <ext@sidvind.com>
+	* [daemon] Various minor memory-leaks fixed.
+	* [daemon] Browsers implemented as plugins, this removes support for all
+	backends except the sqlite3 backend.
+	* [daemon] Adding a C-API for accessing the logging mechanism, so
+	plugins are now able to write to the log-files as well.
+
+2011-01-13; David Sveningsson <ext@sidvind.com>
+	* [frontend] Adding optional support for HTTP Digest Authentication
+	using apache htdigest files. (fixes #99)
+	* [frontend] Ensuring a filename has been selected when trying to
+	upload image. (fixes #97)
