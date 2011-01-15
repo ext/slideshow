@@ -29,7 +29,7 @@ typedef struct {
 typedef void (*render_callback)(transition_context_t* context);
 
 typedef struct {
-	MODULE_HEAD();
+	struct module_t base;
 	render_callback render;
 } transition_module_t;
 

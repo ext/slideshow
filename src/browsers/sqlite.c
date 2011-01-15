@@ -23,7 +23,7 @@
 #include <string.h>
 
 typedef struct {
-	browser_context_t base;
+	struct browser_module_t module;
 
 	int loop_queue;
 	int queue_id;
@@ -36,11 +36,10 @@ typedef struct {
 } sqlite3_context_t;
 
 MODULE_INFO("SQLite3 Browser", BROWSER_MODULE, "David Sveningsson");
-MODULE_CONTEXT(sqlite3_context_t);
 
 static int connect(sqlite3_context_t* this){
 	int ret;
-	if ( (ret = sqlite3_open(this->base.name, &this->conn)) != SQLITE_OK ){
+	if ( (ret = sqlite3_open(this->module.context.name, &this->conn)) != SQLITE_OK ){
 		log_message(Log_Fatal, "sqlite3_open failed with %d\n", ret);
 		return ret;
 	}
@@ -101,6 +100,8 @@ static int connect(sqlite3_context_t* this){
 		log_message(Log_Fatal, "pop_intermediate::sqlite3_prepare_v2 failed with %d\n", ret);
 		return ret;
 	}
+
+	return 0;
 }
 
 static int disconnect(sqlite3_context_t* this){
@@ -131,23 +132,7 @@ static int pop_intermediate(sqlite3_context_t* this, int id){
 	return ret;
 }
 
-int EXPORT module_init(sqlite3_context_t* this){
-	this->loop_queue = 1;
-	this->queue_id = 0;
-	this->prev_slide_id = -1;
-	this->conn = 0;
-	this->query_slide  = 0;
-	this->query_looping  = 0;
-	this->query_pop_intermediate  = 0;
-
-	return connect(this);
-}
-
-int EXPORT module_cleanup(sqlite3_context_t* this){
-	return disconnect(this);
-}
-
-slide_context_t EXPORT next_slide(sqlite3_context_t* this){
+static slide_context_t next_slide(sqlite3_context_t* this){
 	slide_context_t slide;
 	slide.filename = NULL;
 	slide.assembler = NULL;
@@ -219,15 +204,15 @@ slide_context_t EXPORT next_slide(sqlite3_context_t* this){
 	return slide;
 }
 
-void EXPORT queue_reload(sqlite3_context_t* this){
+static void queue_reload(sqlite3_context_t* this){
 
 }
 
-void EXPORT queue_dump(sqlite3_context_t* this){
+static void queue_dump(sqlite3_context_t* this){
 
 }
 
-int EXPORT queue_set(sqlite3_context_t* this, unsigned int id){
+static int queue_set(sqlite3_context_t* this, unsigned int id){
 	/* if we change queue we reset the position back to the start */
 	if ( this->queue_id != id ){
 		this->prev_slide_id = -1;
@@ -257,4 +242,37 @@ int EXPORT queue_set(sqlite3_context_t* this, unsigned int id){
 
 	sqlite3_reset(this->query_looping);
 	return ret;
+}
+
+void* module_alloc(){
+	return malloc(sizeof(sqlite3_context_t));
+}
+
+int EXPORT module_init(sqlite3_context_t* this){
+	/* setup function table (casting added because it expects a different
+	 * pointer type (we are using an extended struct so it is compatible).*/
+	this->module.next_slide   = (next_slide_callback)next_slide;
+	this->module.queue_reload = (queue_reload_callback)queue_reload;
+	this->module.queue_dump   = (queue_dump_callback)queue_dump;
+	this->module.queue_set    = (queue_set_callback)queue_set;
+
+	/* initialize variables */
+	this->loop_queue = 1;
+	this->queue_id = 0;
+	this->prev_slide_id = -1;
+	this->conn = 0;
+	this->query_slide  = 0;
+	this->query_looping  = 0;
+	this->query_pop_intermediate  = 0;
+
+	return connect(this);
+}
+
+int EXPORT module_cleanup(sqlite3_context_t* this){
+	/* it looks weird, but free_context only releases the fields not the
+	 * pointer itself, so this is safe. */
+	free_context(&this->module.context);
+
+	/* "disconnect" database */
+	return disconnect(this);
 }

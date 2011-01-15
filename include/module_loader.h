@@ -25,36 +25,59 @@
 extern "C" {
 #endif
 
-#ifdef WIN32
-#	define SO_SUFFIX ".dll"
-#else
-#	define SO_SUFFIX ".la"
-#endif
+#include <ltdl.h>
 
 void moduleloader_init(const char* searchpath);
 void moduleloader_cleanup();
 
-typedef void (*module_init_callback)();
-typedef void (*module_cleanup_callback)();
+struct module_t;
 
-#define MODULE_HEAD() \
-	module_init_callback init; \
-	module_cleanup_callback cleanup
+typedef void  (*module_init_callback)(struct module_t* handle);
+typedef void  (*module_cleanup_callback)(struct module_t* handle);
+typedef struct module_t* (*module_alloc_callback)();
+typedef void  (*module_free_callback)(struct module_t* handle);
 
-typedef struct {
-	MODULE_HEAD();
-} module_t;
+struct module_t {
+	lt_dlhandle handle;
+
+	/**
+	 * Called when loading the plugin.
+	 */
+	module_init_callback init;
+
+	/**
+	 * Called before unloading the plugin.
+	 */
+	module_cleanup_callback cleanup;
+
+	/**
+	 * Allocate context structure.
+	 */
+	module_alloc_callback alloc;
+
+	/**
+	 * Free context structure *AND* its members.
+	 */
+	module_free_callback free;
+};
+
+typedef struct module_t* module_handle;
+
+enum module_flags {
+	/* Initialization flags (CALLEE_INIT is default and takes precedance if both is set) */
+	MODULE_CALLEE_INIT = (1<<0), /* Automatically initializes module (default) */
+	MODULE_CALLER_INIT = (2<<0), /* Caller must manually initialize module. */
+};
 
 int module_error();
 const char* module_error_string();
 
-struct module_context_t* module_open(const char* name);
-void module_close(struct module_context_t* context);
+module_handle module_open(const char* name, enum module_type_t type, int flags);
+void module_close(module_handle handle);
 
-module_t* module_get(struct module_context_t* context);
-const char* module_get_name(const struct module_context_t* context);
-const char* module_get_author(const struct module_context_t* context);
-int module_type(const struct module_context_t* module_context_t);
+const char* module_get_name(const module_handle handle);
+const char* module_get_author(const module_handle handle);
+enum module_type_t module_type(const module_handle handle);
 
 #ifdef __cplusplus
 }

@@ -25,7 +25,7 @@
 typedef int (*assemble_callback)(const slide_t* slide, const resolution_t* resolution);
 
 typedef struct {
-	MODULE_HEAD();
+	struct module_t base;
 	assemble_callback assemble;
 } assembler_module_t;
 

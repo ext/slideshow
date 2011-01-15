@@ -98,6 +98,10 @@ int parse(struct state_t* fsm, browser_context_t* ctx, const char* line){
 	return 0;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 browser_context_t get_context(const char* string){
 	struct state_t fsm;
 	browser_context_t ctx;
@@ -117,10 +121,14 @@ browser_context_t get_context(const char* string){
 	return ctx;
 }
 
-void free_context(browser_context_t& context){
-	free(context.provider);
-	free(context.user);
-	free(context.pass);
-	free(context.host);
-	free(context.name);
+void free_context(browser_context_t* context){
+	free(context->provider);
+	free(context->user);
+	free(context->pass);
+	free(context->host);
+	free(context->name);
 }
+
+#ifdef __cplusplus
+}
+#endif

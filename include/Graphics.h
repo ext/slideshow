@@ -29,7 +29,7 @@ class Graphics {
 		void render(float state);
 		void load_image(const char* filename);
 
-		void set_transition(transition_module_t* module);
+		void set_transition(const char* name);
 
 	private:
 		void glew_init();

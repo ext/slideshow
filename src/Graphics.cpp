@@ -23,6 +23,7 @@
 #include "exception.h"
 #include "Graphics.h"
 #include "Kernel.h"
+#include "module_loader.h"
 #include "OS.h"
 #include "Log.h"
 #include "Transition.h"
@@ -66,12 +67,7 @@ Graphics::~Graphics(){
 	gl_cleanup_textures();
 	imageloader_cleanup();
 	glew_cleanup();
-
-	if ( _transition && _transition->cleanup ){
-		_transition->cleanup();
-	}
-
-	free(_transition);
+	module_close(&_transition->base);
 }
 
 void Graphics::glew_init(){
@@ -281,14 +277,7 @@ void Graphics::swap_textures(){
 	_texture[1] = tmp;
 }
 
-void Graphics::set_transition(transition_module_t* module){
-	if ( _transition && _transition->cleanup ){
-		_transition->cleanup();
-	}
-
-	_transition = module;
-
-	if ( _transition && _transition->init ){
-		_transition->init();
-	}
+void Graphics::set_transition(const char* name){
+	module_close(&_transition->base);
+	_transition = (transition_module_t*)module_open(name, TRANSITION_MODULE, 0);
 }

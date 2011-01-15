@@ -39,7 +39,7 @@ class State {
 		virtual State* action(bool &flip) = 0;
 
 		slide_context_t next_slide(){
-			return _browser->next_slide(&_browser->data);
+			return _browser->next_slide(_browser);
 		}
 
 		browser_module_t* browser(){ return _browser; }

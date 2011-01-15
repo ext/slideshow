@@ -22,15 +22,7 @@
 
 MODULE_INFO("Fade", TRANSITION_MODULE, "David Sveningsson");
 
-int EXPORT module_init(){
-	return 0;
-}
-
-int EXPORT module_cleanup(){
-	return 0;
-}
-
-void EXPORT render(transition_context_t* context){
+static void render(transition_context_t* context){
 	glColor4f(1,1,1,1);
 	glBindTexture(GL_TEXTURE_2D, context->texture[1]);
 	glBegin( GL_QUADS );
@@ -49,3 +41,13 @@ void EXPORT render(transition_context_t* context){
 		glTexCoord2f(1.0f, 0.0f); glVertex2f(1.0f, 0.0f);
 	glEnd();
 }
+
+void* module_alloc(){
+	return malloc(sizeof(transition_module_t));
+}
+
+int EXPORT module_init(transition_module_t* module){
+	module->render = render;
+	return 0;
+}
+

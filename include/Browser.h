@@ -29,48 +29,54 @@ typedef struct {
 	char* name;
 } browser_context_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 browser_context_t get_context(const char* string);
 void free_context(browser_context_t* context);
+
+#ifdef __cplusplus
+}
+#endif
 
 typedef struct {
 	char* filename;
 	char* assembler;
 } slide_context_t;
 
-typedef int (*browser_init_callback)(browser_context_t* data);
+struct browser_module_t;
+
 /**
  * Get next slide from queue.
  * @return A slide context with copies of the strings which the caller must
  *         deallocate using free.
  */
-typedef slide_context_t (*next_slide_callback)(browser_context_t* data);
+typedef slide_context_t (*next_slide_callback)(struct browser_module_t* data);
 
 /**
  * Force reload of queue.
  */
-typedef int (*queue_reload_callback)(browser_context_t* data);
+typedef int (*queue_reload_callback)(struct browser_module_t* data);
 
 /**
  * Dump queue to log.
  */
-typedef int (*queue_dump_callback)(browser_context_t* data);
+typedef int (*queue_dump_callback)(struct browser_module_t* data);
 
 /**
  * Change the active queue.
  */
-typedef int (*queue_set_callback)(browser_context_t* data, unsigned int id);
+typedef int (*queue_set_callback)(struct browser_module_t* data, unsigned int id);
 
-typedef struct {
-	MODULE_HEAD();
+struct browser_module_t {
+	struct module_t module;
+	browser_context_t context;
 
 	next_slide_callback next_slide;
 	queue_reload_callback queue_reload;
 	queue_dump_callback queue_dump;
 	queue_set_callback queue_set;
-	browser_init_callback init2;
-
-	/* MUST BE THE LAST FIELD BECAUSE OF VARIABLE STRUCT SIZE */
-	browser_context_t data;
-} browser_module_t;
+};
 
 #endif // BROWSER_H

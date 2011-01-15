@@ -107,7 +107,7 @@ void Kernel::init(){
 
 void Kernel::cleanup(){
 	delete _state;
-	free(_browser);
+	module_close(&_browser->module);
 	delete _graphics;
 	delete _ipc;
 	free(pidfile);
@@ -150,27 +150,18 @@ void Kernel::init_browser(){
 		context.pass = strdup(_password);
 	}
 
-	struct module_context_t* module_context = module_open(context.provider);
+	_browser = (struct browser_module_t*)module_open(context.provider, BROWSER_MODULE, MODULE_CALLER_INIT);
 
-	if ( !module_context ){
-		Log::message(Log_Warning, "Unknown database provider '%s'\n", context.provider);
-		goto error;
+	if ( !_browser ){
+		Log::message(Log_Warning, "Failed to load browser plugin '%s': %s\n", context.provider, module_error_string());
+		Log::message(Log_Warning, "No browser selected, you will not see any slides\n");
+		return;
 	}
 
-	if ( module_type(module_context) != BROWSER_MODULE ){
-		Log::message(Log_Warning, "Plugin '%s'is not a browser module.\n", context.provider);
-		goto error;
-	}
-
-	_browser = (browser_module_t*)module_get(module_context); assert(_browser);
-	_browser->data = context;
-	_browser->init2(&_browser->data);
+	_browser->context = context;
+	_browser->module.init((module_handle)_browser);
 
 	change_bin(_arg.collection_id);
-	return;
-
-	error:
-	Log::message(Log_Warning, "No browser selected, you will not see any slides\n");
 }
 
 char* Kernel::get_password(){
@@ -191,20 +182,7 @@ void Kernel::init_fsm(){
 }
 
 void Kernel::load_transition(const char* name){
-	struct module_context_t* context = module_open(name);
-
-	if ( !context ){
-		Log::message(Log_Info, "Transition plugin not found\n");
-		return;
-	}
-
-	if ( module_type(context) != TRANSITION_MODULE ){
-		Log::message(Log_Info, "Plugin is not a transition module\n");
-		return;
-	}
-
-	transition_module_t* m = (transition_module_t*)module_get(context);
-	_graphics->set_transition(m);
+	_graphics->set_transition(name);
 }
 
 void Kernel::poll(){
@@ -257,6 +235,12 @@ void Kernel::print_licence_statement() const {
 	Log::message(Log_Info, "\n");
 }
 
+#ifdef WIN32
+#	define SO_SUFFIX ".dll"
+#else
+#	define SO_SUFFIX ".la"
+#endif
+
 static int filter(const struct dirent* el){
 	return fnmatch("*" SO_SUFFIX , el->d_name, 0) == 0;
 }
@@ -276,7 +260,7 @@ void Kernel::print_transitions(){
 			perror("scandir");
 		} else {
 			for ( int i = 0; i < n; i++ ){
-				struct module_context_t* context = module_open(namelist[i]->d_name);
+				module_handle context = module_open(namelist[i]->d_name, ANY_MODULE, MODULE_CALLEE_INIT);
 				free(namelist[i]);
 
 				if ( !context ){
@@ -362,13 +346,13 @@ void Kernel::quit(){
 }
 
 void Kernel::reload_browser(){
-	_browser->queue_reload(&_browser->data);
+	_browser->queue_reload(_browser);
 }
 
 void Kernel::change_bin(unsigned int id){
 	Log::message(Log_Verbose, "Kernel: Switching to queue %d\n", id);
-	_browser->queue_set(&_browser->data, id);
-	_browser->queue_reload(&_browser->data);
+	_browser->queue_set(_browser, id);
+	_browser->queue_reload(_browser);
 }
 
 void Kernel::ipc_quit(){
@@ -377,7 +361,7 @@ void Kernel::ipc_quit(){
 }
 
 void Kernel::debug_dumpqueue(){
-	_browser->queue_dump(&_browser->data);
+	_browser->queue_dump(_browser);
 }
 
 void Kernel::create_pidpath(){

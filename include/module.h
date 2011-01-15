@@ -20,6 +20,7 @@
 #define SLIDESHOW_MODULE_H
 
 enum module_type_t {
+	ANY_MODULE,
 	TRANSITION_MODULE,
 	ASSEMBLER_MODULE,
 	BROWSER_MODULE,
@@ -39,7 +40,5 @@ enum module_type_t {
 	EXPORT const char *             __module_name = name; \
 	EXPORT const enum module_type_t __module_type = type; \
 	EXPORT const char *             __module_author = author
-
-#define MODULE_CONTEXT(structure) EXPORT unsigned int __module_context_size = sizeof(structure)
 
 #endif // SLIDESHOW_MODULE_H

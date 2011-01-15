@@ -22,7 +22,6 @@
 #include "Browser.h"
 #include "log_base.h"
 #include "Transition.h"
-#include <ltdl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,10 +31,12 @@ struct module_context_t {
 	lt_dlhandle handle;
 };
 
-static int errnum = 0;
-
-#define MODULE_NOT_FOUND 1
-#define MODULE_INVALID 2
+static enum {
+	MODULE_NO_ERROR,
+	MODULE_NOT_FOUND,
+	MODULE_INVALID,
+	MODULE_WRONG_TYPE,
+} errnum = MODULE_NO_ERROR;
 
 void moduleloader_init(const char* searchpath){
 	lt_dlinit();
@@ -59,118 +60,120 @@ int module_error(){
 
 const char* module_error_string(){
 	switch ( errnum ){
+		case MODULE_NO_ERROR: return NULL;
 		case MODULE_NOT_FOUND: return "Module not found";
 		case MODULE_INVALID: return "Not a valid module";
-
-		default: return NULL;
+		case MODULE_WRONG_TYPE: return "Requested module is not of the requested type";
 	}
 
+	/* make gcc happy (warning: control reaches end of non-void function) */
+	return NULL;
 }
 
-struct module_context_t* module_open(const char* name){
+static struct module_t* default_alloc(){
+	return (struct module_t*)malloc(sizeof(struct module_t));
+}
+
+static void default_free(struct module_t* m){
+	free(m);
+}
+
+/**
+ * returns non-zero if MODULE_CALLEE_INIT is set
+ * or if neither MODULE_CALLEE_INIT or
+ * MODULE_CALLER_INIT is.
+ */
+static int callee_init(int flags){
+	int A = flags & MODULE_CALLEE_INIT;
+	int B = flags & MODULE_CALLER_INIT;
+
+	/* converse implication */
+	return A | !B;
+}
+
+module_handle module_open(const char* name, enum module_type_t type, int flags){
 	log_message(Log_Debug, "Loading plugin '%s'\n", name);
+
+	/* dlopenext tries all searchpaths and adds appropriate suffix */
 	lt_dlhandle handle = lt_dlopenext(name);
 
 	if ( !handle ){
+		log_message(Log_Debug, "Plugin '%s' not found in search path.\n", name);
 		errnum = MODULE_NOT_FOUND;
 		return NULL;
 	}
 
-	void* sym = lt_dlsym(handle, "__module_name");
-
+	/* test if the module is valid by quering a symbol which must exists in
+	 * every module. */
+	void* sym = lt_dlsym(handle, "__module_type");
 	if ( !sym ){
+		log_message(Log_Debug, "Plugin '%s' found but is invalid\n", name);
 		errnum = MODULE_INVALID;
 		return NULL;
 	}
 
-	struct module_context_t* context = (struct module_context_t*)malloc(sizeof(struct module_context_t));
-	context->handle = handle;
-
-	return context;
-}
-
-void module_close(struct module_context_t* context){
-	if ( !context ){
-		return;
+	if ( type != ANY_MODULE && *((enum module_type_t*)sym) != type ){
+		log_message(Log_Debug, "Plugin '%s' found but is invalid\n", name);
+		errnum = MODULE_INVALID;
+		return NULL;
 	}
 
-	lt_dlclose(context->handle);
-	free(context);
-}
+	/* base functions */
+	void* module_init    = lt_dlsym(handle, "module_init");
+	void* module_cleanup = lt_dlsym(handle, "module_cleanup");
+	void* module_alloc   = lt_dlsym(handle, "module_alloc");
+	void* module_free    = lt_dlsym(handle, "module_free");
 
-static void* dlsym_abort(struct module_context_t* context, const char* name){
-	void* ptr;
+	/* create base structure (later copied into the real struct */
+	struct module_t base;
+	base.handle  = handle;
+	base.init    = (module_init_callback)module_init;
+	base.cleanup = (module_cleanup_callback)module_cleanup;
+	base.alloc   = module_alloc ? (module_alloc_callback)module_alloc : default_alloc;
+	base.free    = module_free  ?  (module_free_callback)module_free  : default_free;
 
-	if( !(ptr = lt_dlsym(context->handle, name)) ){
-		fprintf(stderr, "module does not implement required function '%s'.", name);
-		abort();
+	/* allocate real structure and copy base fields */
+	module_handle module = base.alloc();
+	*module = base;
+
+	/* run module initialization if available */
+	if ( callee_init(flags) && module->init ){
+		module->init(module);
 	}
-
-	return ptr;
-}
-
-module_t* module_get(struct module_context_t* context){
-	module_t* module = NULL;
-
-	unsigned int* custom_size = (unsigned int*)lt_dlsym(context->handle, "__module_context_size");
-
-	switch ( module_type(context) ){
-		case TRANSITION_MODULE:
-		{
-			transition_module_t* m = (transition_module_t*)malloc(custom_size ? *custom_size : sizeof(transition_module_t));
-			m->render = (render_callback)dlsym_abort(context, "render");
-			module = (module_t*)m;
-		}
-		break;
-
-		case ASSEMBLER_MODULE:
-		{
-			assembler_module_t* m = (assembler_module_t*)malloc(custom_size ? *custom_size : sizeof(assembler_module_t));
-			m->assemble = (assemble_callback)dlsym_abort(context, "assemble");
-			module = (module_t*)m;
-		}
-		break;
-
-		case BROWSER_MODULE:
-		{
-			size_t base_size = sizeof(browser_module_t) - sizeof(browser_context_t);
-			size_t context_size = custom_size ? *custom_size : sizeof(browser_context_t);
-
-			browser_module_t* m = (browser_module_t*)malloc(base_size + context_size);
-
-			m->next_slide   = (next_slide_callback)  dlsym_abort(context, "next_slide");
-			m->queue_reload = (queue_reload_callback)dlsym_abort(context, "queue_reload");
-			m->queue_dump   = (queue_dump_callback)  dlsym_abort(context, "queue_dump");
-			m->queue_set    = (queue_set_callback)   dlsym_abort(context, "queue_set");
-			m->init2        = (browser_init_callback)dlsym_abort(context, "module_init");
-
-			module = (module_t*)m;
-		}
-		break;
-
-		default:
-			fprintf(stderr, "module_loader: unknown module, type id is %d\n", module_type(context));
-			return NULL;
-	}
-
-	module->init = (module_init_callback)lt_dlsym(context->handle, "module_init");
-	module->cleanup = (module_cleanup_callback)lt_dlsym(context->handle, "module_cleanup");
 
 	return module;
 }
 
-const char* module_get_name(const struct module_context_t* context){
-	void* sym = lt_dlsym(context->handle, "__module_name");
+void module_close(module_handle module){
+	/* it should be safe to call module_close on a NULL pointer */
+	if ( !module ){
+		return;
+	}
+
+	/* run module cleanup if available */
+	if ( module->cleanup ){
+		module->cleanup(module);
+	}
+
+	/* close ltdl context */
+	lt_dlclose(module->handle);
+
+	/* release handle */
+	module->free(module);
+}
+
+const char* module_get_name(const module_handle module){
+	void* sym = lt_dlsym(module->handle, "__module_name");
 	return *((char**)sym);
 
 }
 
-const char* module_get_author(const struct module_context_t* context){
-	void* sym = lt_dlsym(context->handle, "__module_author");
+const char* module_get_author(const module_handle module){
+	void* sym = lt_dlsym(module->handle, "__module_author");
 	return *((char**)sym);
 }
 
-int module_type(const struct module_context_t* context){
-	void* sym = lt_dlsym(context->handle, "__module_type");
-	return *((int*)sym);
+enum module_type_t module_type(const module_handle module){
+	void* sym = lt_dlsym(module->handle, "__module_type");
+	return *((enum module_type_t*)sym);
 }
