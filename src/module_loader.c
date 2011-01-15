@@ -20,6 +20,7 @@
 #include "module_loader.h"
 #include "assembler.h"
 #include "Browser.h"
+#include "log_base.h"
 #include "Transition.h"
 #include <ltdl.h>
 #include <stdio.h>
@@ -67,6 +68,7 @@ const char* module_error_string(){
 }
 
 struct module_context_t* module_open(const char* name){
+	log_message(Log_Debug, "Loading plugin '%s'\n", name);
 	lt_dlhandle handle = lt_dlopenext(name);
 
 	if ( !handle ){

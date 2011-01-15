@@ -150,8 +150,6 @@ void Kernel::init_browser(){
 		context.pass = strdup(_password);
 	}
 
-	Log::message(Log_Debug, "Loading plugin '%s'\n", context.provider);
-
 	struct module_context_t* module_context = module_open(context.provider);
 
 	if ( !module_context ){
@@ -193,8 +191,6 @@ void Kernel::init_fsm(){
 }
 
 void Kernel::load_transition(const char* name){
-	Log::message(Log_Warning, "Loading plugin '%s'\n", name);
-
 	struct module_context_t* context = module_open(name);
 
 	if ( !context ){
