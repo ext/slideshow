@@ -509,6 +509,13 @@ class Settings(object):
                             n += 1
                         except ValueError as e:
                             print >> sys.stderr, '"%s.%s" contains illegal data ("%s": %s), resetting to default' % (k, name, value, str(e))
+                            # In general these errors are swallowed but
+                            # Path.BasePath is handled specially here because
+                            # caller must know if the basepath isn't valid any
+                            # longer, and take appropriate action.
+                            # Bug #104
+                            if k == 'Path' and name == 'BasePath':
+                                raise
                         except KeyError:
                             traceback.print_exc()
                             print >> sys.stderr, '"%s.%s"found in config but is not defined in xml' % (k, name)
