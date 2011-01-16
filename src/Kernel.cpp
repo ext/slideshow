@@ -293,6 +293,7 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 	option_add_flag(&options,	"verbose",			'v', "Include debugging messages in log.", &arg.loglevel, Log_Debug);
 	option_add_flag(&options,	"quiet",			'q', "Show only warnings and errors in log.", &arg.loglevel, Log_Warning);
 	option_add_flag(&options,	"fullscreen",		'f', "Start in fullscreen mode", &arg.fullscreen, true);
+	option_add_flag(&options,	"window",			'w', "Start in windowed mode [default]", &arg.fullscreen, false);
 	option_add_flag(&options,	"daemon",			'd', "Run in background", &arg.mode, DaemonMode);
 	option_add_flag(&options,	"list-transitions",	 0,  "List available transitions", &arg.mode, ListTransitionMode);
 	option_add_flag(&options,	"stdin-password",	 0,  "Except the input (e.g database password) to come from stdin", &arg.have_password, true);
