@@ -62,7 +62,7 @@ int main( int argc, const char* argv[] ){
 			NULL,					// connection_string
 			NULL,					// transition_string
 			NULL,					// file log
-			NULL,					// pipe log
+			NULL,					// named pipe log
 			NULL					// unix domain socket log
 		};
 
@@ -78,7 +78,7 @@ int main( int argc, const char* argv[] ){
 		Log::initialize();
 
 		/* only log to stdout if no other destination has been set */
-		if ( !(arguments.log_file || arguments.fifo || arguments.domain) ){
+		if ( !(arguments.log_file || arguments.log_fifo || arguments.log_domain) ){
 			Log::add_destination(new FileDestination(stdout));
 		}
 
@@ -88,13 +88,13 @@ int main( int argc, const char* argv[] ){
 		}
 
 		/* setup named pipe log */
-		if ( arguments.fifo ){
-			Log::add_destination(new FIFODestination(arguments.fifo));
+		if ( arguments.log_fifo ){
+			Log::add_destination(new FIFODestination(arguments.log_fifo));
 		}
 
 		/* setup unix domain socket log */
-		if ( arguments.domain ){
-			UDSServer d(arguments.domain);
+		if ( arguments.log_domain ){
+			UDSServer d(arguments.log_domain);
 			d.accept(NULL);
 		}
 

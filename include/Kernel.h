@@ -41,9 +41,9 @@ class Kernel {
 			float switch_time;
 			char* connection_string;
 			char* transition_string;
-			char* log_file; /* log: file */
-			char* fifo;     /* log: named pipe */
-			char* domain;   /* log: unix domain socket */
+			char* log_file;     /* log: file */
+			char* log_fifo;     /* log: named pipe */
+			char* log_domain;   /* log: unix domain socket */
 		} argument_set_t;
 
 		enum Mode {

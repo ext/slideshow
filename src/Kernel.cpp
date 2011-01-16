@@ -303,8 +303,8 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 
 	/* logging options */
 	option_add_string(&options,	"file-log",			 0,  "Log to regular file (appending)", &arg.log_file);
-	option_add_string(&options,	"fifo-log",			 0,  "Log to a named pipe", &arg.fifo);
-	option_add_string(&options,	"uds-log",			 0,  "Log to a unix domain socket", &arg.domain);
+	option_add_string(&options,	"fifo-log",			 0,  "Log to a named pipe", &arg.log_fifo);
+	option_add_string(&options,	"uds-log",			 0,  "Log to a unix domain socket", &arg.log_domain);
 
 	int n = option_parse(&options);
 	option_finalize(&options);
