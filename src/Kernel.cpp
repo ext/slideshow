@@ -290,22 +290,22 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 	option_initialize(&options, argc, argv);
 	option_set_description(&options, "Slideshow is an application for showing text and images in a loop on monitors and projectors.");
 
-	option_add_flag(&options,	"verbose",			'v', "Include debugging messages in log.", &arg.loglevel, Log_Debug);
-	option_add_flag(&options,	"quiet",			'q', "Show only warnings and errors in log.", &arg.loglevel, Log_Warning);
-	option_add_flag(&options,	"fullscreen",		'f', "Start in fullscreen mode", &arg.fullscreen, true);
-	option_add_flag(&options,	"window",			'w', "Start in windowed mode [default]", &arg.fullscreen, false);
-	option_add_flag(&options,	"daemon",			'd', "Run in background", &arg.mode, DaemonMode);
-	option_add_flag(&options,	"list-transitions",	 0,  "List available transitions", &arg.mode, ListTransitionMode);
-	option_add_flag(&options,	"stdin-password",	 0,  "Except the input (e.g database password) to come from stdin", &arg.have_password, true);
-	option_add_string(&options,	"browser",			 0,  "Browser connection string. provider://user[:pass]@host[:port]/name", &arg.connection_string);
-	option_add_string(&options,	"transition",		't', "Set slide transition plugin [fade]", &arg.transition_string);
-	option_add_int(&options,	"collection-id",	'c', "ID of the collection to display", &arg.collection_id);
-	option_add_format(&options,	"resolution",		'r', "Resolution", "WIDTHxHEIGHT", "%dx%d", &arg.width, &arg.height);
+	option_add_flag(&options,   "verbose",          'v', "Include debugging messages in log.", &arg.loglevel, Log_Debug);
+	option_add_flag(&options,   "quiet",            'q', "Show only warnings and errors in log.", &arg.loglevel, Log_Warning);
+	option_add_flag(&options,   "fullscreen",       'f', "Start in fullscreen mode", &arg.fullscreen, true);
+	option_add_flag(&options,   "window",           'w', "Start in windowed mode [default]", &arg.fullscreen, false);
+	option_add_flag(&options,   "daemon",           'd', "Run in background", &arg.mode, DaemonMode);
+	option_add_flag(&options,   "list-transitions",  0,  "List available transitions", &arg.mode, ListTransitionMode);
+	option_add_flag(&options,   "stdin-password",    0,  "Except the input (e.g database password) to come from stdin", &arg.have_password, true);
+	option_add_string(&options, "browser",           0,  "Browser connection string. provider://user[:pass]@host[:port]/name", &arg.connection_string);
+	option_add_string(&options, "transition",       't', "Set slide transition plugin [fade]", &arg.transition_string);
+	option_add_int(&options,    "collection-id",    'c', "ID of the collection to display", &arg.collection_id);
+	option_add_format(&options, "resolution",       'r', "Resolution", "WIDTHxHEIGHT", "%dx%d", &arg.width, &arg.height);
 
 	/* logging options */
-	option_add_string(&options,	"file-log",			 0,  "Log to regular file (appending)", &arg.log_file);
-	option_add_string(&options,	"fifo-log",			 0,  "Log to a named pipe", &arg.log_fifo);
-	option_add_string(&options,	"uds-log",			 0,  "Log to a unix domain socket", &arg.log_domain);
+	option_add_string(&options, "file-log",          0,  "Log to regular file (appending)", &arg.log_file);
+	option_add_string(&options, "fifo-log",          0,  "Log to a named pipe", &arg.log_fifo);
+	option_add_string(&options, "uds-log",           0,  "Log to a unix domain socket", &arg.log_domain);
 
 	int n = option_parse(&options);
 	option_finalize(&options);
