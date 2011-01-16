@@ -95,6 +95,11 @@ def run():
 			rc = install(args.install, args.config_file)
 			sys.exit(rc)
 
+		# verify that a config_file was indeed passed
+		if args.config_file is None:
+			print >> sys.stderr, 'Must provide a config-file using the --config-file flag'
+			sys.exit(1)
+
 		# verify that config_file exists
 		if not os.path.exists(args.config_file):
 			print >> sys.stderr, 'Could not open configuration file:', args.config_file
