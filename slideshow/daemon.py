@@ -59,7 +59,8 @@ def settings(browser, resolution=None, fullscreen=True):
 	
 	cmd = settings['Files.BinaryPath']
 	args = [
-		'--uds-log', 'slideshow.sock', 
+		'--uds-log', 'slideshow.sock',
+		'--file-log', 'slideshow.log',
 		'--browser', str(browser),
 		'--collection-id', str(settings['Runtime.queue']),
 	]
