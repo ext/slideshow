@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from xml.dom import minidom
-import os, os.path, stat, traceback
+import os, sys, stat, traceback
 import json, xorg_query
 import pprint
 import threading
