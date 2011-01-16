@@ -508,10 +508,10 @@ class Settings(object):
                             del v[name] # drop from list
                             n += 1
                         except ValueError as e:
-                            print >> sys.stderr, name, k, 'contains illegal data ("%s": %s), resetting to default' % (value, str(e))
+                            print >> sys.stderr, '"%s.%s" contains illegal data ("%s": %s), resetting to default' % (k, name, value, str(e))
                         except KeyError:
                             traceback.print_exc()
-                            print >> sys.stderr, name, k, 'found in config but is not defined in xml'
+                            print >> sys.stderr, '"%s.%s"found in config but is not defined in xml' % (k, name)
                                 
                 if n == 0:
                     break
