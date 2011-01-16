@@ -58,6 +58,15 @@ class Group:
     def __iter__(self):
         return self._items.values().__iter__()
 
+class ValidationError(Exception):
+    def __init__(self, msg, item, value):
+        self.msg = msg
+        self.item = item
+        self.value = value
+
+    def __str__(self):
+        return '"%s.%s" cannot be set to "%s": %s' % (self.item.group.name, self.item.name, self.value, self.msg)
+
 class Item:
     typename = '' # automatically set
     
@@ -109,12 +118,12 @@ class ItemDirectory(Item):
             try:
                 statinfo = os.stat(path)
             except OSError:
-                raise ValueError, 'Directory not found ' + path
+                raise ValidationError('Directory not found ', self, path)
             
             if not stat.S_ISDIR(statinfo.st_mode):
-                raise ValueError, 'Not a directory'
+                raise ValidationError('Not a directory', self, path)
             if not os.access(path, os.W_OK):
-                raise ValueError, 'Need write-permission'
+                raise ValidationError('Need write-permission', self, path)
             
             return tmp
         except:
@@ -172,7 +181,7 @@ class ItemInteger(Item):
                 self._value = int(value)
                 return tmp
             except ValueError:
-                raise ValueError, 'Not a valid integer'
+                raise ValidationError('Not a valid integer', self, value)
         except:
             if rollback:
                 self._value = tmp
@@ -190,7 +199,7 @@ class ItemFloat(Item):
                 self._value = float(value)
                 return tmp
             except ValueError:
-                raise ValueError, 'Not a valid float'
+                raise ValidationError('Not a valid float', self, value)
         except:
             if rollback:
                 self._value = tmp
@@ -507,7 +516,7 @@ class Settings(object):
                             item.set(value, rollback=True)
                             del v[name] # drop from list
                             n += 1
-                        except ValueError as e:
+                        except ValidationError as e:
                             print >> sys.stderr, '"%s.%s" contains illegal data ("%s": %s), resetting to default' % (k, name, value, str(e))
                             # In general these errors are swallowed but
                             # Path.BasePath is handled specially here because
