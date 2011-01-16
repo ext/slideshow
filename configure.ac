@@ -27,6 +27,7 @@ AC_CONFIG_FILES([
 	src/transitions/Makefile
 	src/browsers/Makefile
 ])
+AC_CONFIG_FILES([slideshow-daemon], [chmod +x slideshow-daemon])
 
 AC_MSG_CHECKING([host architecture])
 case "$host" in
