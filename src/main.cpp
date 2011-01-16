@@ -61,6 +61,7 @@ int main( int argc, const char* argv[] ){
 			5.0f,					// switch_time;
 			NULL,					// connection_string
 			NULL,					// transition_string
+			NULL,					// file log
 			NULL,					// pipe log
 			NULL					// unix domain socket log
 		};
@@ -77,11 +78,14 @@ int main( int argc, const char* argv[] ){
 		Log::initialize();
 
 		/* only log to stdout if no other destination has been set */
-		if ( !(arguments.fifo || arguments.domain) ){
+		if ( !(arguments.log_file || arguments.fifo || arguments.domain) ){
 			Log::add_destination(new FileDestination(stdout));
 		}
 
-		Log::add_destination(new FileDestination("slideshow.log"));
+		/* setup file log */
+		if ( arguments.log_file ){
+			Log::add_destination(new FileDestination(arguments.log_file));
+		}
 
 		/* setup named pipe log */
 		if ( arguments.fifo ){
