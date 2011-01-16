@@ -290,8 +290,8 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 	option_initialize(&options, argc, argv);
 	option_set_description(&options, "Slideshow is an application for showing text and images in a loop on monitors and projectors.");
 
-	option_add_flag(&options,	"verbose",			'v', "Explain what is being done", &arg.loglevel, Log_Debug);
-	option_add_flag(&options,	"quiet",			'q', "Explain what is being done", &arg.loglevel, Log_Warning);
+	option_add_flag(&options,	"verbose",			'v', "Include debugging messages in log.", &arg.loglevel, Log_Debug);
+	option_add_flag(&options,	"quiet",			'q', "Show only warnings and errors in log.", &arg.loglevel, Log_Warning);
 	option_add_flag(&options,	"fullscreen",		'f', "Start in fullscreen mode", &arg.fullscreen, true);
 	option_add_flag(&options,	"daemon",			'd', "Run in background", &arg.mode, DaemonMode);
 	option_add_flag(&options,	"list-transitions",	 0,  "List available transitions", &arg.mode, ListTransitionMode);
