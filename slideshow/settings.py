@@ -414,7 +414,15 @@ class Settings(object):
             size = xorg_query.current_resolution(use_rotation=True)
             return Resolution(size[0], size[1])
     
-    def load(self, base, config_file=None, format_keys={}):
+    def load(self, base, config_file=None, format_keys={}, errors=[]):
+        """
+        :param base: Path to settings XML definition file.
+        :param config_file: Path to file to load settings from.
+        :format_keys: 
+        :param errors: Decides what to do about validation errors.
+          If list, elements is considered fatal and raises an error, for others a warning is issued on stderr.
+          If none, all errors is ignored
+        """
         doc = minidom.parse(base)
         self.groups = OrderDict()
         self.enviroment = {}
@@ -476,12 +484,12 @@ class Settings(object):
         
         # load stored settings
         if config_file:
-            self._load_user(config_file)
+            self._load_user(config_file, errors)
 
         # read resolution from selected display
         ItemResolution.values = resolutions(self['Appearance.Display'])
 
-    def _load_user(self, config_file):
+    def _load_user(self, config_file, errors):
         with open(config_file, 'r') as f:
             c = json.load(f)
             
@@ -517,14 +525,14 @@ class Settings(object):
                             del v[name] # drop from list
                             n += 1
                         except ValidationError as e:
-                            print >> sys.stderr, '"%s.%s" contains illegal data ("%s": %s), resetting to default' % (k, name, value, str(e))
-                            # In general these errors are swallowed but
-                            # Path.BasePath is handled specially here because
-                            # caller must know if the basepath isn't valid any
-                            # longer, and take appropriate action.
-                            # Bug #104
-                            if k == 'Path' and name == 'BasePath':
+                            if errors is None:
+                                continue
+
+                            fullname ='%s.%s' % (k, name)
+                            if fullname in errors:
                                 raise
+
+                            print >> sys.stderr, '"%s.%s" contains illegal data ("%s": %s), resetting to default' % (k, name, value, str(e))
                         except KeyError:
                             traceback.print_exc()
                             print >> sys.stderr, '"%s.%s"found in config but is not defined in xml' % (k, name)

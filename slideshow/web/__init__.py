@@ -9,11 +9,11 @@ import argparse
 import traceback
 
 import slideshow
-from slideshow.lib import template, browser as browser_factory
+from slideshow.lib import template, browser as browser_factory, slide
 from slideshow.pages import slides
 from slideshow.pages import maintenance
 from slideshow.pages import queue
-from slideshow.settings import Settings
+from slideshow.settings import Settings, ValidationError
 import slideshow.daemon as daemon
 
 def get_resource_path(*path):
@@ -78,7 +78,35 @@ def install(dst, config_file):
 	return 0
 
 def switch(dst, config_file):
-	return 1
+	settings = Settings()
+
+	src = None
+	try:
+		settings.load(get_resource_path('settings.xml'), config_file=config_file, format_keys=dict(basepath=os.path.split(config_file)[0]), errors=['Path.BasePath'])
+	except ValidationError, e:
+		src = e.value
+
+	# Old basepath still exists, so read it from config
+	if src is None:
+		src = settings['Path.BasePath']
+
+	# Replace basepath
+	with settings:
+		settings['Path.BasePath'] = dst
+	settings.load(get_resource_path('settings.xml'), config_file=config_file, format_keys=dict(basepath=os.path.split(config_file)[0]), errors=None)
+
+	# load browser
+	browser = browser_factory.from_settings(settings)
+	conn = browser._connect()
+
+	# update path in  all slides
+	[x.switch(conn, dst) for x in slide.all(conn, validate_path=False)]
+	conn.commit()
+
+	# save settings
+	settings.persist(dst=config_file)
+
+	return 0
 
 def run():
 	# setup argument parser
@@ -125,11 +153,8 @@ def run():
 		# load slideshow settings
 		try:
 			settings = Settings()
-			settings.load(get_resource_path('settings.xml'), config_file=args.config_file, format_keys=dict(basepath=os.path.split(args.config_file)[0]))
-		except ValueError:
-			# @todo Need to make sure it is the Path.BasePath field
-			# that fails, but for now it is the only error that may
-			# leak from Settings.load()
+			settings.load(get_resource_path('settings.xml'), config_file=args.config_file, format_keys=dict(basepath=os.path.split(args.config_file)[0]), errors=['Path.BasePath'])
+		except  ValidationError:
 			print >> sys.stderr, '"Path.BasePath" does not exist, if you intend to move the datafolder use the --switch flag to update "Path.BasePath" and all references.'
 			sys.exit(1)
 

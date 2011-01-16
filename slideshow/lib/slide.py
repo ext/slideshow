@@ -13,7 +13,7 @@ class InvalidSlide(Exception):
 	pass
 
 class Slide:
-	def __init__(self, id, queue, path, active, assembler, data, stub=False):
+	def __init__(self, id, queue, path, active, assembler, data, stub=False, validate_path=True):
 		self.id = id
 		self._queue = queue
 		self._path = path
@@ -25,7 +25,7 @@ class Slide:
 		# constructed or is otherwise not complete.
 		self._stub = stub
 
-		if not os.path.exists(path):
+		if validate_path and not os.path.exists(path):
 			settings = Settings()
 			base_path = settings['Path.BasePath']
 			image_path = settings['Path.Image']
@@ -75,6 +75,24 @@ class Slide:
 		self.rasterize(Resolution(200,200)) # thumbnail
 		self.rasterize(Resolution(800,600)) # windowed mode (debug)
 		self.rasterize(resolution)
+
+	def switch(self, c, dst):
+		head, tail = os.path.split(self._path)
+		self._path = os.path.join(dst, 'image', tail)
+		c.execute('UPDATE slide SET path = :path WHERE id = :id', dict(path=self._path, id=self.id))
+		return self._path
+
+def all(c, validate_path=True):
+	return [Slide(queue=None, validate_path=validate_path, **x) for x in c.execute("""
+		SELECT
+			id,
+			path,
+			active,
+			assembler,
+			data
+		FROM
+			slide
+		""").fetchall()]
 
 def from_id(c, id):
 	row = c.execute("""
