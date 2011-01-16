@@ -95,7 +95,7 @@ def run():
 			rc = install(args.install, args.config_file)
 			sys.exit(rc)
 
-		# verify that a config_file was indeed passed
+		# verify that a config_file was indeed passed (#101)
 		if args.config_file is None:
 			print >> sys.stderr, 'Must provide a config-file using the --config-file flag'
 			sys.exit(1)
