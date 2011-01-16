@@ -34,7 +34,7 @@ done
 if [ $found -eq 1 ]; then # rest is daemon args
     daemon_args=($*)
 else # if -- isn't found, everything is considered daemon arguments
-    daemon_args=$tool_args
+    daemon_args=${tool_args[@]}
     tool_args=()
 fi
 
