@@ -77,6 +77,9 @@ def install(dst, config_file):
 	print >> sys.stderr, 'Configuration installed, restart without --install flag to continue.'
 	return 0
 
+def switch(dst, config_file):
+	return 1
+
 def run():
 	# setup argument parser
 	parser = argparse.ArgumentParser(description='Slideshow frontend')
@@ -85,6 +88,7 @@ def run():
 	parser.add_argument('-q', '--quiet', dest='verbose', action='store_false')
 	parser.add_argument('-p', '--port', type=int, default=8000)
 	parser.add_argument('--install', default=None)
+	parser.add_argument('--switch', default=None)
 
 	# parse args
 	args = parser.parse_args()
@@ -113,9 +117,21 @@ def run():
 			print >> sys.stderr, 'Make sure the user has proper permissions.'
 			sys.exit(1)
 
+		# update basepath and references if using --switch
+		if args.switch:
+			rc = switch(args.switch, args.config_file)
+			sys.exit(rc)
+
 		# load slideshow settings
-		settings = Settings()
-		settings.load(get_resource_path('settings.xml'), config_file=args.config_file, format_keys=dict(basepath=os.path.split(args.config_file)[0]))
+		try:
+			settings = Settings()
+			settings.load(get_resource_path('settings.xml'), config_file=args.config_file, format_keys=dict(basepath=os.path.split(args.config_file)[0]))
+		except ValueError:
+			# @todo Need to make sure it is the Path.BasePath field
+			# that fails, but for now it is the only error that may
+			# leak from Settings.load()
+			print >> sys.stderr, '"Path.BasePath" does not exist, if you intend to move the datafolder use the --switch flag to update "Path.BasePath" and all references.'
+			sys.exit(1)
 
 		# read cherrypy config
 		config = settings['cherrypy']
