@@ -161,7 +161,7 @@ void Kernel::init_browser(){
 	_browser->context = context;
 	_browser->module.init((module_handle)_browser);
 
-	change_bin(_arg.collection_id);
+	change_bin(_arg.queue_id);
 }
 
 char* Kernel::get_password(){
@@ -300,7 +300,8 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 	option_add_flag(&options,   "stdin-password",    0,  "Except the input (e.g database password) to come from stdin", &arg.have_password, true);
 	option_add_string(&options, "browser",           0,  "Browser connection string. provider://user[:pass]@host[:port]/name", &arg.connection_string);
 	option_add_string(&options, "transition",       't', "Set slide transition plugin [fade]", &arg.transition_string);
-	option_add_int(&options,    "collection-id",    'c', "ID of the collection to display", &arg.collection_id);
+	option_add_int(&options,    "collection-id",    'c', "ID of the queue to display (deprecated, use `--queue-id')",  &arg.queue_id);
+	option_add_int(&options,    "queue-id",         'c', "ID of the queue to display", &arg.queue_id);
 	option_add_format(&options, "resolution",       'r', "Resolution", "WIDTHxHEIGHT", "%dx%d", &arg.width, &arg.height);
 
 	/* logging options */

@@ -34,7 +34,7 @@ class Kernel {
 			int loglevel;
 			int fullscreen;
 			int have_password;
-			int collection_id;
+			int queue_id;
 			int width;
 			int height;
 			float transition_time;

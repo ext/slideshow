@@ -54,7 +54,7 @@ int main( int argc, const char* argv[] ){
 			Log_Info, 				// loglevel
 			false,					// fullscreen
 			false,					// have_password
-			0, 						// collection_id
+			0, 						// queue_id
 			800,					// width
 			600,					// height
 			3.0f,					// transition_time;
