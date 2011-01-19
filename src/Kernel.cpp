@@ -142,6 +142,12 @@ void Kernel::init_IPC(){
 }
 
 void Kernel::init_browser(){
+	/* no browser string */
+	if ( !_arg.connection_string){
+		Log::message(Log_Warning, "No browser selected, you will not see any slides\n");
+		return;
+	}
+
 	browser_context_t context = get_context(_arg.connection_string);
 
 	// If the contex doesn't contain a password and a password was passed from stdin (arg password)
@@ -154,7 +160,6 @@ void Kernel::init_browser(){
 
 	if ( !_browser ){
 		Log::message(Log_Warning, "Failed to load browser plugin '%s': %s\n", context.provider, module_error_string());
-		Log::message(Log_Warning, "No browser selected, you will not see any slides\n");
 		return;
 	}
 
