@@ -90,14 +90,7 @@ AC_SUBST(dbus_LIBS)
 dnl #######################################################################
 dnl # libportable
 dnl #######################################################################
-PKG_CHECK_MODULES(libportable, [libportable],
-	[
-		AC_DEFINE(HAVE_PORTABLE, 1, [Define if libportable is available])
-	],
-	[
-		AC_MSG_ERROR([Required libportable not found])
-	])
-
+PKG_CHECK_MODULES(libportable, [libportable >= 0.2.1])
 AC_SUBST(libportable_CFLAGS)
 AC_SUBST(libportable_LIBS)
 
