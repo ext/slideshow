@@ -77,7 +77,7 @@ VideoState::VideoState(State* state, const char* filename)
 		return;
 	}
 
-	command("loadfile %s\n", filename);
+	command("loadfile %s/src/video\n", filename);
 }
 
 VideoState::~VideoState(){
