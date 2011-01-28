@@ -30,6 +30,7 @@
 #include "Log.h"
 #include "exception.h"
 #include "Transition.h"
+#include "state/VideoState.h" /* must be initialized */
 
 // IPC
 #ifdef HAVE_DBUS
@@ -103,9 +104,11 @@ void Kernel::init(){
 	init_IPC();
 	init_browser();
 	init_fsm();
+	VideoState::init();
 }
 
 void Kernel::cleanup(){
+	VideoState::cleanup();
 	delete _state;
 	module_close(&_browser->module);
 	delete _graphics;
@@ -192,6 +195,7 @@ void Kernel::load_transition(const char* name){
 
 void Kernel::poll(){
 	_backend->poll(_running);
+	VideoState::poll();
 }
 
 void Kernel::action(){

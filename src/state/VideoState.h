@@ -28,7 +28,15 @@ class VideoState: public State {
 
 		virtual State* action(bool &flip);
 
+		static int init();
+		static int cleanup();
+		static void poll();
+
 	private:
+		static int child_pid;
+		static int child_stdin;
+		static int child_stdout;
+
 		char* _filename;
 };
 
