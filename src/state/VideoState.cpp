@@ -63,6 +63,7 @@ void VideoState::command(const char* fmt, ...){
 	va_list ap;
 	va_start(ap, fmt);
 	char* tmp = vasprintf2(fmt, ap);
+	Log::message(Log_Debug, "mplayer: %s\n", tmp);
 	write(child_stdin, tmp, strlen(tmp));
 	free(tmp);
 	va_end(ap);
