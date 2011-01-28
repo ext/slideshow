@@ -33,7 +33,7 @@ class VideoAssembler(Assembler):
 				'-f', 'gif', # format
 				'-an', # skip audio
 				'-y', # overwrite dst
-				
+				cache,
 			])
 			if retcode != 0:
 				raise ValueError, 'failed to resample %s' % (slide.raster_path(size))
