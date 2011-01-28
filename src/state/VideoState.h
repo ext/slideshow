@@ -33,9 +33,7 @@ class VideoState: public State {
 		static void poll();
 
 	private:
-		static int child_pid;
-		static int child_stdin;
-		static int child_stdout;
+		static void command(const char* fmt, ...);
 
 		char* _filename;
 };

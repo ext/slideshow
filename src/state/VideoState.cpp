@@ -26,22 +26,25 @@
 #include <cstdlib>
 #include <cstring>
 #include <cerrno>
+#include <cassert>
 #include <unistd.h>
 #include <fcntl.h>
+#include <signal.h>
+#include <sys/wait.h>
 #include <portable/asprintf.h>
 
-int VideoState::child_pid = -1;
-int VideoState::child_stdin = -1;
-int VideoState::child_stdout = -1;
+static char read_buffer[1024];
+static int child_pid = -1;
+static int child_stdin = -1;
+static int child_stdout = -1;
 
 static const char* read2(int fd){
-	static char buf[1024];
-	while ( read(fd, buf, 1024) > 0 ){
-		if ( strncmp(buf, "ANS_", 4) == 0 ){
-			return buf;
+	while ( read(fd, read_buffer, 1024) > 0 ){
+		if ( strncmp(read_buffer, "ANS_", 4) == 0 ){
+			return read_buffer;
 		}
 
-		Log::message(Log_Verbose, "mplayer: %s", buf);
+		Log::message(Log_Verbose, "mplayer: %s", read_buffer);
 	}
 
 	switch ( errno ){
@@ -54,13 +57,27 @@ static const char* read2(int fd){
 	return NULL;
 }
 
+void VideoState::command(const char* fmt, ...){
+	assert(child_pid > 0);
+
+	va_list ap;
+	va_start(ap, fmt);
+	char* tmp = vasprintf2(fmt, ap);
+	write(child_stdin, tmp, strlen(tmp));
+	free(tmp);
+	va_end(ap);
+}
+
 VideoState::VideoState(State* state, const char* filename)
 	: State(state)
 	, _filename(strdup(filename)){
 
-	char* tmp = asprintf2("load %s\n", _filename);
-	write(child_stdin, tmp, strlen(tmp));
-	free(tmp);
+	if ( child_pid <= 0 ){
+		Log::message(Log_Verbose, "no mplayer: process, cannot play video\n");
+		return;
+	}
+
+	command("loadfile %s\n", filename);
 }
 
 VideoState::~VideoState(){
@@ -69,7 +86,11 @@ VideoState::~VideoState(){
 }
 
 State* VideoState::action(bool &flip){
-	write(child_stdin, "get_property filename\n", 22);
+	if ( !child_pid <= 0 ){
+		return new SwitchState(this);
+	}
+
+	command("get_property filename\n");
 
 	while ( true ){
 		const char* ans = read2(child_stdout);
@@ -113,10 +134,32 @@ int VideoState::init(){
 }
 
 int VideoState::cleanup(){
-	write(child_stdin, "quit\n", 5);
+	if ( child_pid > 0 ){
+		command("quit\n");
+	}
 	return 0;
 }
 
 void VideoState::poll(){
+	if ( child_pid < 0 ){
+		return;
+	}
+
+	int sigstate = kill(child_pid, 0);
+	if ( sigstate != 0 ){ /* child process terminated */
+		Log::message(Log_Fatal, "mplayer process has gone away (for reasons unknown)");
+		child_pid = -1;
+	}
+
+	int status;
+	if ( waitpid(child_pid, &status, WNOHANG) != 0 ){
+		if ( WIFEXITED(status) ){
+			Log::message(Log_Fatal, "mplayer process has gone away (exited with code %d)\n", WEXITSTATUS(status));
+		} else {
+			Log::message(Log_Fatal, "mplayer process has gone away (terminated with signal %d)\n", WTERMSIG(status));
+		}
+		child_pid = -1;
+	}
+
 	read2(child_stdout);
 }
