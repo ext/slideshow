@@ -3,7 +3,7 @@
 
 from . import Assembler
 from slideshow.lib.resolution import Resolution
-import subprocess
+import subprocess, pipes
 import PythonMagick
 
 class ImageAssembler(Assembler):
@@ -29,14 +29,20 @@ class ImageAssembler(Assembler):
 			raise ValueError, 'omg'
 		
 		src = params['filename']
-		retcode = subprocess.call([
+		args = [
 			"convert", slide.src_path(src),
 			'-resize', str(size),
 			'-background', 'black',
 			'-gravity', 'center',
 			'-extent', str(size),
 			slide.raster_path(size)
-		])
+		]
+		
+		try:
+			retcode = subprocess.call(args)
+		except OSError, e:
+			raise RuntimeError, 'Failed to run `%s`: %s' % (' '.join([pipes.quote(x) for x in args]), e) 
+		
 		if retcode != 0:
 			raise ValueError, 'failed to resample %s' % (slide.raster_path(size))
 	
