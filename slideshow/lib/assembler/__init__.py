@@ -13,6 +13,12 @@ loader = TemplateLoader(
 class Assembler:
 	name = '' # automatically set in factory initialization
 	
+	def is_viewable(self):
+		"""
+		A viewable assembler shows the "Full" action which view original or resized version of the slide.
+		"""
+		return True
+	
 	def is_editable(self):
 		"""
 		Tells whenever an assembler is editable or not.
