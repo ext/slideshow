@@ -172,6 +172,11 @@ img {
 	background: transparent url('/static/icon/zoom.png') no-repeat center left;
 }
 
+.slide .play {
+	padding: 2px 0px 2px 16px;
+	background: transparent url('/static/icon/control_play_blue.png') no-repeat center left;
+}
+
 .slide .edit {
 	padding: 2px 0px 2px 16px;
 	background: transparent url('/static/icon/page_white_edit.png') no-repeat center left;

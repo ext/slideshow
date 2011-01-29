@@ -76,6 +76,10 @@ class Handler(object):
 		return bytes
 	
 	@cherrypy.expose
+	def play(self, id):
+		raise NotImplementedError
+	
+	@cherrypy.expose
 	@template.output('slides/upload.html', parent='slides')
 	def upload(self, **kwargs):
 		# get all assembers

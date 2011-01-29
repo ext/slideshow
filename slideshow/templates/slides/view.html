@@ -48,6 +48,7 @@
 						<img src="/slides/show/${slide.id}/200/200" />
 						<div class="menu">
 							<span class="zoom" py:if="slide.assembler.is_viewable()"><a href="/slides/show/${slide.id}">Full</a></span>
+							<span class="play" py:if="slide.assembler.is_playable()"><a href="/slides/play/${slide.id}">Play</a></span>
 							<span class="edit" py:if="slide.assembler.is_editable()"><a href="/slides/edit/${slide.id}">Edit</a></span>
 							<span class="hide" py:if="slide.active"><a href="/slides/deactivate/${slide.id}">Hide</a></span>
 							<span class="show" py:if="not slide.active"><a href="/slides/activate/${slide.id}">Show</a></span>

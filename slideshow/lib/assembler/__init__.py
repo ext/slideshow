@@ -25,6 +25,12 @@ class Assembler:
 		"""
 		return False
 	
+	def is_playable(self):
+		"""
+		A playable assembler allows to display playable content (e.g. video).
+		"""
+		return False
+	
 	def assemble(self, slide, **kwargs):
 		"""
 		Prepares an assembler. It does not rasterize anything.

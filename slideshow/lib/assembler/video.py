@@ -6,8 +6,14 @@ import os, os.path, subprocess
 from slideshow.settings import Settings
 
 class VideoAssembler(Assembler):
+	def is_viewable(self):
+		return False
+	
 	def is_editable(self):
 		return False
+	
+	def is_playable(self):
+		return True
 	
 	def assemble(self, slide, filename, **kwargs):
 		return {'filename': filename}
