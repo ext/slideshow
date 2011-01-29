@@ -87,7 +87,7 @@ VideoState::~VideoState(){
 }
 
 State* VideoState::action(bool &flip){
-	if ( !child_pid <= 0 ){
+	if ( child_pid <= 0 ){
 		return new SwitchState(this);
 	}
 
