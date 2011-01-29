@@ -126,6 +126,7 @@ int VideoState::init(){
 	if (!child_pid) { /* in child process */
 		dup2(pipefds1[1], STDOUT_FILENO);
 		dup2(pipefds2[0], STDIN_FILENO);
+		setenv("TERM", "xterm", 0);
 		return execlp("mplayer", "slideshow-mplayer", "-slave", "-idle", "-quiet", "-msglevel", "all=-1:global=4", "-fs", NULL);
 	} else { /* in parent process */
 		child_stdin  = pipefds2[1];
