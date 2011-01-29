@@ -1,3 +1,29 @@
+2011-01-29; David Sveningsson <ext@sidvind.com>
+	* [daemon] Reimplementing support for video playback, this time as proper
+	slides and mplayer using slave mode.
+	* [frontend] Better exception when it fails to execute ImageMagick convert.
+
+2011-01-19; David Sveningsson <ext@sidvind.com>
+	* [daemon] Checking for NULL browser-string, so it doesn't crash if no
+	browser is provided.
+	
+2011-01-16; David Sveningsson <ext@sidvind.com
+	* [frontend] Always logging to `slideshow.log`.
+	* [frontend] Adding --switch to allow user to switch BasePath, e.g. moving
+	installation.
+	* [frontend] Making it a fatal error if not passing a config-file, so it
+	doesn't crash with unrelated errors.
+	* [daemon] renaming `collection_id` to `queue_id` so it is consistent
+	across codebase. Adding a new flag `--queue-id`, but keeping old flag for
+	backward compability.
+	* [daemon] Adding `--fullscreen` and `--foreground` flags for symmetry.
+	* [daemon] Adding `--file-log` flag to log to file.
+	* [daemon] Rewriting launcher script.
+
+2011-01-15; David Sveningsson <ext@sidvind.com>
+	* [daemon] Printing errors to stderr.
+	* [daemon] Major rewrite of pluing loader.
+
 2011-01-14; David Sveningsson <ext@sidvind.com>
 	* [daemon] Various minor memory-leaks fixed.
 	* [daemon] Browsers implemented as plugins, this removes support for all
