@@ -17,10 +17,8 @@
 
 	<h2>Edit</h2>
 	<form action="/slides/submit" method="post" enctype="multipart/form-data" accept-charset="utf-8">
-		<input type="hidden" name="assembler" value="text" />
 		<input type="hidden" name="id" value="${id}" />
-		<input type="hidden" name="context" value="edit" />
-		${Markup(assembler.render(content=preview))}
+		${Markup(assembler.render(content=preview, context="edit"))}
 	</form>
 
 </body>
