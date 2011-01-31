@@ -7,7 +7,7 @@ from slideshow.lib import browser as browser_factory
 import threading, json, re, gamin
 from select import select
 from fnmatch import fnmatchcase
-import time
+import time, traceback, pipes
 
 from cherrypy.process import plugins
 
@@ -71,10 +71,11 @@ class PreviewCreator(plugins.SimplePlugin, threading.Thread):
 				
 				try:
 					def prog(x):
-						print 'Generating preview for %s: %03d%%\r' % (path, x),
+						print 'Generating preview for %s: %3d%%\r' % (path, x),
 						sys.stdout.flush()
 					self.generate(src, dst, progress_fn=prog)
 				except:
+					traceback.print_exc()
 					os.remove(dst)
 		
 		mon = gamin.WatchMonitor()
@@ -89,11 +90,13 @@ class PreviewCreator(plugins.SimplePlugin, threading.Thread):
 		args = [
 			'ffmpeg',
 			'-i', src,
+			'-ar', '11025',
 			'-y',
 			dst
 		]
+		
 		try:
-			proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			proc = subprocess.Popen(args, stderr=subprocess.PIPE)
 		except OSError, e:
 			raise RuntimeError, 'Failed to run `%s`: %s' % (' '.join([pipes.quote(x) for x in args]), e) 
 		
@@ -110,10 +113,7 @@ class PreviewCreator(plugins.SimplePlugin, threading.Thread):
 			if not self._running:
 				raise RuntimeError, 'aborted'
 			
-			(rlist, _, _) = select([proc.stdout, proc.stderr], [], [], 1.0)
-			
-			if proc.stdout in rlist:
-				print 'stdout:', proc.stdout.readline()
+			(rlist, _, _) = select([proc.stderr], [], [], 1.0)
 			
 			if proc.stderr in rlist:
 				ch = proc.stderr.read(1)
