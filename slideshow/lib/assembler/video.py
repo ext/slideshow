@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from . import Assembler
-import os, os.path, subprocess
 from slideshow.settings import Settings
+import os, subprocess
 
 class VideoAssembler(Assembler):
 	def is_viewable(self):
@@ -33,6 +33,7 @@ class VideoAssembler(Assembler):
 			'-an', # skip audio
 			'-f', 'image2',
 			'-vframes', '1',
+			'-loglevel', 'fatal',
 			slide.raster_path(size)
 		]
 		try:
@@ -65,4 +66,5 @@ class VideoAssembler(Assembler):
 		videopath = os.path.join(base, video)
 		
 		content['files'] = os.listdir(videopath)
+		
 		return Assembler.render(self, content, context)

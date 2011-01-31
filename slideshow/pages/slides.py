@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import cherrypy, urllib
+import cherrypy, urllib, os
 from slideshow.lib import assembler, queue, slide, template
 from slideshow.lib.resolution import Resolution
 from slideshow.settings import Settings
 import slideshow.daemon as daemon
+from cherrypy.lib.static import serve_file
 
 class Ajax(object):
 	@cherrypy.expose
@@ -76,8 +77,40 @@ class Handler(object):
 		return bytes
 	
 	@cherrypy.expose
+	@template.output('slides/play.html', parent='video')
 	def play(self, id):
-		raise NotImplementedError
+		s = slide.from_id(cherrypy.thread_data.db.cursor(), id)
+		stream = None
+
+		settings = Settings()
+		base = settings['Path.BasePath']
+		temp = settings['Path.Temp']
+		
+		path = s._data['filename']
+		root, ext = os.path.splitext(path) 
+		ext = ext[1:].lower()
+		preview = os.path.join(base, temp, 'preview', root + '.flv')
+		
+		if os.path.exists(preview):
+			stream = '/slides/stream/%s' % id
+		
+		return template.render(title=s._data['filename'], stream=stream)
+	
+	@cherrypy.expose
+	#@cherrypy.tools.response_headers(headers=[('Content-Type', 'application/octet-stream')])
+	def stream(self, id):
+		s = slide.from_id(cherrypy.thread_data.db.cursor(), id)
+		
+		settings = Settings()
+		base = settings['Path.BasePath']
+		temp = settings['Path.Temp']
+		
+		path = s._data['filename']
+		root, ext = os.path.splitext(path) 
+		ext = ext[1:].lower()
+		preview = os.path.join(base, temp, 'preview', root + '.flv')
+		
+		return serve_file(preview, content_type=None, disposition='attachment')
 	
 	@cherrypy.expose
 	@template.output('slides/upload.html', parent='slides')
