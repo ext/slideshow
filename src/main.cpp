@@ -34,6 +34,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <limits.h>
+#include <signal.h>
 #include <portable/Time.h>
 #include "backend/platform.h"
 #include "Browser.h"
@@ -44,6 +45,22 @@
 #	define getcwd _getcwd
 #	define PATH_MAX _MAX_PATH
 #endif
+
+static Kernel* application = NULL;
+
+static void sighandler(int signum){
+	switch ( signum ){
+	case SIGINT:
+		Log::message(Log_Verbose, "IPC: Quit\n");
+		application->quit();
+		break;
+	case SIGHUP:
+		Log::message(Log_Verbose, "IPC: Reload browser\n");
+		application->reload_browser();
+		signal(SIGHUP, sighandler);
+		break;
+	}
+}
 
 int main( int argc, const char* argv[] ){
 	try {
@@ -103,8 +120,6 @@ int main( int argc, const char* argv[] ){
 #endif /* HAVE_SYSLOG */
 		//Log::set_level( (Log::Severity)arguments.loglevel );
 
-		Kernel* application = NULL;
-
 		/* Kernel takes ownership of backend and will release memory when finished */
 		const char* backend_name = "sdl";
 		PlatformBackend* backend = PlatformBackend::factory(backend_name);
@@ -129,11 +144,15 @@ int main( int argc, const char* argv[] ){
 				throw exception("No valid mode. This should not happen, please report this to the maintainer. Modeid: %d\n", arguments.mode);
 		}
 
+		signal(SIGINT, sighandler);
+		signal(SIGHUP, sighandler);
+
 		application->init();
 		application->run();
 		application->cleanup();
 
 		delete application;
+		application = NULL;
 
 		moduleloader_cleanup();
 		PlatformBackend::register_cleanup();
