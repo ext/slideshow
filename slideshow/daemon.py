@@ -3,7 +3,6 @@
 
 import multiprocessing, subprocess, sys, threading, traceback
 import time, os, re, signal, socket, sqlite3
-import dbus, dbus.service
 import cherrypy
 from select import select
 from settings import Settings
@@ -199,8 +198,7 @@ class DaemonProcess:
 		if self._proc is None:
 			return
 		
-		print 'stop'
-		self._proc.send_signal(signal.SIGTERM)
+		self._proc.send_signal(signal.SIGINT)
 		
 		# wait for proper shutdown
 		n = 0
@@ -218,6 +216,8 @@ class DaemonProcess:
 	def reload(self):
 		if self._proc is None:
 			return
+		
+		self._proc.send_signal(signal.SIGHUP)
 	
 	def reset(self):
 		self.stop()
@@ -287,11 +287,7 @@ class Daemon(plugins.SimplePlugin, threading.Thread):
 	
 		self._browser = browser
 		self._pid = None
-		self._ipc = None
 		self._proc = DaemonProcess()
-		
-		self._state = STOPPED
-		self._state_lock = threading.Lock()
 		
 		self._queue = []
 		self._sem = multiprocessing.Semaphore(0) # not using threading.Semaphore since it doesn't support timeouts
@@ -359,6 +355,12 @@ class Daemon(plugins.SimplePlugin, threading.Thread):
 	def _reset_int(self):
 		return self._proc.reset()
 	
+	def reload(self):
+		return self.call(Daemon._reload_int)
+	
+	def _reload_int(self):
+		return self._proc.reload()
+	
 	def __str__(self):
 		return '<daemon id="{id}" />'.format(id=id(self))
 	
@@ -416,31 +418,6 @@ class Daemon(plugins.SimplePlugin, threading.Thread):
 		
 		return ret.get()
 
-class _DBus(dbus.service.Object):
-	def __init__(self):
-		dbus.service.Object.__init__(self, dbus.SystemBus(), '/com/slideshow/dbus/ping')
-
-	@dbus.service.signal(dbus_interface='com.slideshow.dbus.Signal', signature='')
-	def Ping(self):
-		pass
-	
-	@dbus.service.signal(dbus_interface='com.slideshow.dbus.Signal', signature='')
-	def Reload(self):
-		pass
-	
-	@dbus.service.signal(dbus_interface='com.slideshow.dbus.Signal', signature='')
-	def Debug_DumpQueue(self):
-		pass
-	
-	@dbus.service.signal(dbus_interface='com.slideshow.dbus.Signal', signature='u')
-	def ChangeQueue(self, id):
-		pass
-
-from dbus.mainloop.glib import DBusGMainLoop
-DBusGMainLoop(set_as_default=True)
-
-ipc = _DBus()
-
 def start(resolution=None, fullscreen=True):
 	return Daemon.instance.start_proc(resolution, fullscreen)
 
@@ -449,6 +426,9 @@ def stop():
 
 def reset():
 	return Daemon.instance.reset()
+
+def reload():
+	return Daemon.instance.reload()
 
 def state():
 	return Daemon.instance.state()
@@ -460,6 +440,6 @@ def log():
 class EventListener:
 	@event.callback('config.queue_changed')
 	def queue_changed(self, id):
-		ipc.ChangeQueue(id)
+		reload()
 
 _listener = EventListener()

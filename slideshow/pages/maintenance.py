@@ -73,13 +73,8 @@ class Handler(object):
 		raise cherrypy.HTTPRedirect('/maintenance')
 	
 	@cherrypy.expose
-	def ping(self):
-		daemon.ipc.Ping()
-		raise cherrypy.HTTPRedirect('/maintenance')
-	
-	@cherrypy.expose
-	def dumpqueue(self):
-		daemon.ipc.Debug_DumpQueue()
+	def reload(self):
+		daemon.reload()
 		raise cherrypy.HTTPRedirect('/maintenance')
 	
 	@cherrypy.expose

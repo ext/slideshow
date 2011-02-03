@@ -28,7 +28,7 @@ class Ajax(object):
 				id = :id
 		""", slides)
 		cherrypy.thread_data.db.commit()
-		daemon.ipc.Reload()
+		daemon.reload()
 		
 		return None
 
@@ -151,7 +151,7 @@ class Handler(object):
 				s = slide.create(cherrypy.thread_data.db.cursor(), assembler, kwargs)
 			else: #edited slide
 				s = slide.edit(cherrypy.thread_data.db.cursor(), id, assembler, kwargs)
-			daemon.ipc.Reload()
+			daemon.reload()
 			cherrypy.thread_data.db.commit()
 		except:
 			cherrypy.thread_data.db.rollback()

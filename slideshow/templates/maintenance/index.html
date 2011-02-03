@@ -41,17 +41,15 @@
 	</py:if>
 	
 	<h2>Menu</h2>
-	
 	<ul>
 		<li py:if="state == daemon.STOPPED"><a href="/maintenance/start">Start daemon</a> (<a href="/maintenance/start?resolution=800x600&amp;fullscreen=0">windowed</a>)</li>
 		<li py:if="state == daemon.RUNNING"><a href="/maintenance/stop">Stop daemon</a></li>
-		<li><a href="/maintenance/ping">Ping daemon</a></li>
-		<li><a href="/maintenance/debug/kill_mplayer">Kill mplayer</a></li>
+		<li py:if="state == daemon.RUNNING"><a href="/maintenance/reload">Reload daemon</a></li>
+		<li><a href="/maintenance/rebuild">Rebuild cache</a></li>
 		<li><a href="/maintenance/config">Configuration</a></li>
 	</ul>
 
 	<h2>Log</h2>
-	
 	<div id="log" class="mono">
 		<p>
 			<py:for each="line in log">
@@ -61,7 +59,6 @@
 	</div>
 	
 	<h2>Debug</h2>
-	
 	<div id="debug" class="mono">
 		<p>
 			CWD: ${cwd}<br/>
@@ -69,13 +66,6 @@
 			CMD: ${cmd} ${' '.join(args)}<br/>
 		</p>
 	</div>
-	
-	<ul>
-		<li><a href="/maintenance/dumpqueue">Dump queue</a></li>
-		<li><a href="/maintenance/rebuild">Rebuild cache</a></li>
-	</ul>
-	
-	
 </body>
 
 </html>
