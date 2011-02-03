@@ -14,7 +14,7 @@ from slideshow.pages import slides
 from slideshow.pages import maintenance
 from slideshow.pages import queue
 from slideshow.settings import Settings, ValidationError
-import slideshow.daemon as daemon
+from slideshow.daemon import Daemon
 from slideshow.video_preview import PreviewCreator
 
 def get_resource_path(*path):
@@ -209,7 +209,8 @@ def run():
 		cherrypy.config.update(config)
 	
 		# initiate daemon instance
-		daemon.initiate(cherrypy.engine, browser)
+		daemon = Daemon(cherrypy.engine, browser)
+		daemon.subscribe()
 		
 		# initialize view preview generator
 		preview = PreviewCreator(cherrypy.engine)

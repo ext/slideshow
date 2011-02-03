@@ -10,6 +10,8 @@ from settings import Settings
 from slideshow.lib import browser
 import event
 import resource
+from cherrypy.process import plugins
+import pipes
 
 # used to get a pretty name from signal numbers
 _signal_lut = dict((k, v) for v, k in signal.__dict__.iteritems() if v.startswith('SIG') and not v.startswith('SIG_'))
@@ -62,7 +64,7 @@ def settings(browser, resolution=None, fullscreen=True):
 		'--uds-log', 'slideshow.sock',
 		'--file-log', 'slideshow.log',
 		'--browser', str(browser),
-		'--collection-id', str(settings['Runtime.queue']),
+		'--queue-id', str(settings['Runtime.queue']),
 	]
 	
 	args.append('--resolution')
@@ -81,7 +83,8 @@ def settings(browser, resolution=None, fullscreen=True):
 		DISPLAY=settings['Appearance.Display'],
 		SLIDESHOW_NO_ABORT='',
 		SDL_VIDEO_X11_XRANDR='0',
-		HOME=os.environ['HOME']
+		HOME=os.environ['HOME'],
+		PATH=os.environ['PATH'],
 	)
 	for k,v in settings['Env'].items():
 		env['SLIDESHOW_' + k] = v
@@ -162,80 +165,100 @@ class _Log:
 		
 		return lines.__iter__()
 
-class _Daemon(threading.Thread):
-	def __init__(self, browser):
-		threading.Thread.__init__(self)
+class DaemonProcess:
+	def __init__(self, logsize=35):
+		self._proc = None
+		self._returncode = None
+		self._log = _Log(size=logsize)
+		self._logobj = None
 	
-		self._browser = browser
-		self._pid = None
-		self._ipc = None
-		self._instance = None
-		self.log = _Log(size=35)
-		
-		self._state = STOPPED
-		self._state_lock = threading.Lock()
-		
-		self._queue = []
-		self._sem = multiprocessing.Semaphore(0) # not using threading.Semaphore since it doesn't support timeouts
-		
-		self._running = False
-	
-	def stop(self):
-		ipc.Quit()
-		
-		# wait for proper shutdown
-		n = 0
-		while self._instance:
-			if n > 10: # give up
-				break
-
-			try:
-				os.kill(self._instance.pid, 0) # try if process accepts signals
-			except OSError:
-				# does not accept signals, process is fubar or lost, cannot continue
-				print >> sys.stderr, 'Lost contact with childprocess while trying to kill it, most likely it crashed during the operation.'
-				self._instance = None
-				break
-			
-			print >> sys.stderr, 'Waiting for instance to terminate'
-			time.sleep(1)
-			n+=1
-		
-		self._running = False
-	
-	# reset is called when the application is crashed, to reset state
-	def reset(self):
-		if self._state != CRASHED:
+	def start(self, resolution, fullscreen):
+		if self._proc is not None:
 			return
 		
-		self._state = STOPPED
-	
-	def do_start(self, resolution, fullscreen):
-		if not self._state in [STOPPED, CRASHED]:
-			raise StateError, 'Cannot start daemon while in state ' + statename(self._state)
-
+		cmd, args, env, cwd = settings(browser.from_settings(Settings()), resolution, fullscreen)
+		
+		def preexec():
+			resource.setrlimit(resource.RLIMIT_CORE, (-1, -1))
+		
 		try:
-			self._state = STARTING
-			cmd, args, env, cwd = settings(browser.from_settings(Settings()), resolution, fullscreen)
-			
-			def preexec():
-				resource.setrlimit(resource.RLIMIT_CORE, (-1, -1))
-			
-			instance = subprocess.Popen(
+			self._returncode = None
+			self._proc = subprocess.Popen(
 				[cmd] + args,
 				stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
 				cwd=cwd, env=env,
 				preexec_fn=preexec
 			)
-			
-			self._logobj = self._connect_log(instance, cwd)
-			self._instance = instance
-			
-			self._state = RUNNING
-		except:
-			self._state = CRASHED
-			raise
+		except Exception, e:
+			raise RuntimeError, 'Failed to run `%s`: %s' % (' '.join([pipes.quote(x) for x in args]), e)
+		
+		self._logobj = self._connect_log(self._proc, cwd)
+		time.sleep(1.0) # let daemon settle
 	
+	def stop(self):
+		if self._proc is None:
+			return
+		
+		print 'stop'
+		self._proc.send_signal(signal.SIGTERM)
+		
+		# wait for proper shutdown
+		n = 0
+		while self._proc:
+			self.poll(1.0)
+			
+			if n > 10: # give up
+				print >> sys.stderr, 'Giving up waiting for instance to terminate'
+				break
+			
+			print >> sys.stderr, 'Waiting for instance to terminate'
+			time.sleep(1.0)
+			n+=1
+	
+	def reload(self):
+		if self._proc is None:
+			return
+	
+	def reset(self):
+		self.stop()
+		self._returncode = None
+	
+	def log(self):
+		return self._log
+	
+	def state(self):
+		if self._returncode is not None:
+			return CRASHED
+		
+		if self._proc is None:
+			return STOPPED
+		
+		return RUNNING
+	
+	def poll(self, timeout):
+		if self._proc is None:
+			return
+
+		self._proc.poll()
+		
+		if self._logobj:
+			(rd, _, _) = select([self._logobj], [], [], timeout)
+			if len(rd) > 0:
+				for line in self._logobj.recv(4096).split("\n")[:-1]:
+					self._log.push(line)
+		
+		if self._proc.returncode != None:
+			rc = self._proc.returncode
+			if rc != 0:
+				self._returncode = rc
+				global _signal_lut
+				if rc > 0:
+					self._log.push('childprocess exited with abnormal returncode:' + rc)
+				else:
+					self._log.push('childprocess aborted from signal ' + _signal_lut[-rc])
+			
+			self._proc = None
+
 	@staticmethod
 	def _connect_log(instance, cwd):
 		s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -254,76 +277,149 @@ class _Daemon(threading.Thread):
 				time.sleep(0.1)
 		
 		raise RuntimeError, "Failed to connect log"
+
+class Daemon(plugins.SimplePlugin, threading.Thread):
+	instance = None
+	
+	def __init__(self, bus, browser):
+		plugins.SimplePlugin.__init__(self, bus)
+		threading.Thread.__init__(self)
+	
+		self._browser = browser
+		self._pid = None
+		self._ipc = None
+		self._proc = DaemonProcess()
+		
+		self._state = STOPPED
+		self._state_lock = threading.Lock()
+		
+		self._queue = []
+		self._sem = multiprocessing.Semaphore(0) # not using threading.Semaphore since it doesn't support timeouts
+		
+		self._running = False
+	
+	def start(self):
+		"""
+		Start the handler thread.
+		"""
+		
+		if not Daemon.instance:
+			self.bus.log("Starting daemon handler.")
+			threading.Thread.start(self)
+			Daemon.instance = self
+	
+	def graceful(self):
+		self.bus.log("Restarting daemon handler.")
+		if not Daemon.instance:
+			threading.Thread.start(self)
+			Daemon.instance = self
+	
+	def stop(self):
+		if not Daemon.instance:
+			return
+		
+		self.bus.log("Stopping daemon handler.")
+		
+		# stop process
+		self.stop_proc()
+		
+		# stop thread
+		self._running = False
+		self.join(5.0)
+		
+		if self.is_alive():
+			self.bus.log("Timed out waiting for daemon thread to stop.")
+	
+	def start_proc(self, resolution, fullscreen):
+		return self.call(Daemon._start_proc_int, resolution, fullscreen)
+	
+	def _start_proc_int(self, resolution, fullscreen):
+		""" Should be called from within thread only. """
+		return self._proc.start(resolution, fullscreen)
+	
+	def stop_proc(self):
+		return self.call(Daemon._stop_proc_int)
+	
+	def _stop_proc_int(self):
+		""" Should be called from within thread only. """
+		return self._proc.stop()
+	
+	def get_log(self):
+		return self._proc.log()
 	
 	def state(self):
-		self._state_lock.acquire()
-		tmp = self._state
-		self._state_lock.release()
-		return tmp
+		return self.call(Daemon._state_int)
+	
+	def _state_int(self):
+		return self._proc.state()
+	
+	def reset(self):
+		return self.call(Daemon._reset_int)
+	
+	def _reset_int(self):
+		return self._proc.reset()
 	
 	def __str__(self):
 		return '<daemon id="{id}" />'.format(id=id(self))
-
+	
 	def run(self):
 		# setup database connection inside daemon thread
 		self._browser.connect()
 
 		self._running = True
 		while self._running:
-			if self._instance:
-				self._instance.poll()
-				
-				(rd, _, _) = select([self._logobj], [], [], 0)
-				if len(rd) > 0:
-					for line in self._logobj.recv(4096).split("\n")[:-1]:
-						self.log.push(line)
-				
-				if self._instance.returncode != None:
-					# poll std{out,err}
-					for line in self._instance.stdout:
-						self.log.push(line)
-					
-					rc = self._instance.returncode
-					if rc == 0:
-						self._state = STOPPED
-					else:
-						global _signal_lut
-						if rc > 0:
-							self.log.push('childprocess exited with abnormal returncode:' + rc)
-						else:
-							self.log.push('childprocess aborted from signal ' + _signal_lut[-rc])
-						self._state = CRASHED
-					
-					self._instance = None
-			
-			# check if any commands has been issued
-			if not self._sem.acquire(timeout=1.0):
-				continue
-			
-			func, args, kwargs, sem, ret = self._queue.pop()
 			try:
-				ret.set(func(self, *args, **kwargs))
-			except Exception as e:
+				self._proc.poll(timeout=0.05)
+				
+				# check if any commands has been issued
+				if not self._sem.acquire(timeout=1.0):
+					continue
+				
+				func, args, kwargs, sem, ret = self._queue.pop()
+				try:
+					ret.set(func(self, *args, **kwargs))
+				except Exception as e:
+					traceback.print_exc()
+					e.exc_info = sys.exc_info()
+					ret.set(e)
+				sem.release()
+			except:
 				traceback.print_exc()
-				e.exc_info = sys.exc_info()
-				ret.set(e)
-			sem.release()
+		
+		Daemon.instance = None
+		self.bus.log("Daemon handler stopped.")
 	
-	def push(self, func, args, kwargs, sem, ret):
-		if not self._running:
-			raise RuntimeError, 'Cannot push command while daemon isn\'t running'
+	def call(self, func, *args, **kwargs):
+		class V:
+			def __init__(self, value=None):
+				self.value = value
+				
+			def set(self, value):
+				self.value = value
+			
+			def get(self):
+				return self.value
+		
+		sem = multiprocessing.Semaphore(0)
+		ret = V()
 		
 		self._queue.append((func, args, kwargs, sem, ret))
 		self._sem.release()
+		
+		if not sem.acquire(timeout=10):
+			raise RuntimeError, 'Timeout waiting for call reply: %s.%s %s %s' % (func.im_class.__name__, func.__func__.__name__, args, kwargs)
+		
+		# pass exceptions to caller
+		if isinstance(ret.get(), Exception):
+			exc_info = ret.get().exc_info
+			raise exc_info[0], exc_info[1], exc_info[2]
+		
+		return ret.get()
 
 class _DBus(dbus.service.Object):
 	def __init__(self):
 		dbus.service.Object.__init__(self, dbus.SystemBus(), '/com/slideshow/dbus/ping')
 
-	@dbus.service.signal(dbus_interface='com.slideshow.dbus.Signal', signature='')
-	def Quit(self):
-		pass
-	
 	@dbus.service.signal(dbus_interface='com.slideshow.dbus.Signal', signature='')
 	def Ping(self):
 		pass
@@ -343,55 +439,22 @@ class _DBus(dbus.service.Object):
 from dbus.mainloop.glib import DBusGMainLoop
 DBusGMainLoop(set_as_default=True)
 
-_daemon = None
-ipc = None
-
-def initiate(engine, browser):
-	global _daemon, ipc
-
-	_daemon = _Daemon(browser)
-	ipc = _DBus()
-
-	engine.subscribe('start', _daemon.start)
-	engine.subscribe('stop', _daemon.stop)
-
-def _call(func, *args, **kwargs):
-	class V:
-		def __init__(self, value=None):
-			self.value = value
-			
-		def set(self, value):
-			self.value = value
-		
-		def get(self):
-			return self.value
-	
-	sem = multiprocessing.Semaphore(0)
-	ret = V()
-	_daemon.push(func, args, kwargs, sem, ret)
-	if not sem.acquire(timeout=10):
-		raise RuntimeError, 'Timeout waiting for call reply'
-	
-	if isinstance(ret.get(), Exception):
-		exc_info = ret.get().exc_info
-		raise exc_info[0], exc_info[1], exc_info[2]
-	
-	return ret.get()
+ipc = _DBus()
 
 def start(resolution=None, fullscreen=True):
-	return _call(_Daemon.do_start, resolution, fullscreen)
+	return Daemon.instance.start_proc(resolution, fullscreen)
 
 def stop():
-	_daemon.stop()
+	return Daemon.instance.stop_proc()
 
 def reset():
-	_daemon.reset()
+	return Daemon.instance.reset()
 
 def state():
-	return _daemon.state()
+	return Daemon.instance.state()
 
 def log():
-	return _daemon.log
+	return Daemon.instance.get_log()
 
 @event.listener
 class EventListener:
