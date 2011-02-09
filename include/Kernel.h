@@ -44,6 +44,10 @@ class Kernel {
 			char* log_file;     /* log: file */
 			char* log_fifo;     /* log: named pipe */
 			char* log_domain;   /* log: unix domain socket */
+
+			/* frontend settings */
+			char* url;
+			char* instance;
 		} argument_set_t;
 
 		enum Mode {
@@ -100,12 +104,14 @@ class Kernel {
 		char* get_password();
 
 		void init_backend();
+		void cleanup_backend();
 		void init_graphics();
 		void init_IPC();
+		void cleanup_IPC();
 		void init_browser();
 		void init_fsm();
 
-		void cleanup_backend();
+
 
 		argument_set_t _arg;
 

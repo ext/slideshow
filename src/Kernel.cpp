@@ -59,6 +59,10 @@
 #include <cstring>
 #include <cassert>
 
+// Loading settings
+#include <curl/curl.h>
+#include <json/json.h>
+
 // Platform
 #ifdef __GNUC__
 #	include <sys/wait.h>
@@ -72,6 +76,26 @@
 #endif
 
 static char* pidfile = NULL;
+static CURL* curl_handle_settings = NULL;
+struct curl_httppost* settings_formpost = NULL;
+
+struct MemoryStruct {
+	char *memory;
+	size_t size;
+};
+
+static size_t curl_resize(void *ptr, size_t size, size_t nmemb, void *data) {
+	size_t realsize = size * nmemb;
+	struct MemoryStruct *mem = (struct MemoryStruct *)data;
+
+	mem->memory = (char*)realloc(mem->memory, mem->size + realsize + 1);
+
+	memcpy(&(mem->memory[mem->size]), ptr, realsize);
+	mem->size += realsize;
+	mem->memory[mem->size] = 0;
+
+	return realsize;
+}
 
 Kernel::Kernel(const argument_set_t& arg, PlatformBackend* backend)
 	: _arg(arg)
@@ -94,6 +118,7 @@ Kernel::~Kernel(){
 
 	free( _arg.connection_string );
 	free( _arg.transition_string );
+	free( _arg.url );
 }
 
 void Kernel::init(){
@@ -112,16 +137,15 @@ void Kernel::cleanup(){
 	delete _state;
 	module_close(&_browser->module);
 	delete _graphics;
-	delete _ipc;
 	free(pidfile);
 	free(_password);
 
+	cleanup_IPC();
 	cleanup_backend();
 
 	_state = NULL;
 	_browser = NULL;
 	_graphics = NULL;
-	_ipc = NULL;
 	pidfile = NULL;
 }
 
@@ -142,6 +166,25 @@ void Kernel::init_IPC(){
 #ifdef HAVE_DBUS
 	_ipc = new DBus(this, 50);
 #endif /* HAVE_DBUS */
+
+	char* settings_url = asprintf2("%s/instance/settings", _arg.url);
+
+	/* get json data */
+	curl_handle_settings = curl_easy_init();
+	struct curl_httppost *lastptr = NULL;
+	curl_formadd(&settings_formpost, &lastptr, CURLFORM_COPYNAME, "name", CURLFORM_COPYCONTENTS, _arg.instance, CURLFORM_END);
+	curl_easy_setopt(curl_handle_settings, CURLOPT_URL, settings_url);
+	curl_easy_setopt(curl_handle_settings, CURLOPT_HTTPPOST, settings_formpost);
+	curl_easy_setopt(curl_handle_settings, CURLOPT_WRITEFUNCTION, curl_resize);
+	free(settings_url);
+}
+
+void Kernel::cleanup_IPC(){
+	delete _ipc;
+	_ipc = NULL;
+
+	curl_easy_cleanup(curl_handle_settings);
+	curl_formfree(settings_formpost);
 }
 
 void Kernel::init_browser(){
@@ -298,6 +341,7 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 
 	option_initialize(&options, argc, argv);
 	option_set_description(&options, "Slideshow is an application for showing text and images in a loop on monitors and projectors.");
+	option_set_helpline(&options, "FRONTEND-URL");
 
 	option_add_flag(&options,   "verbose",          'v', "Include debugging messages in log.", &arg.loglevel, Log_Debug);
 	option_add_flag(&options,   "quiet",            'q', "Show only warnings and errors in log.", &arg.loglevel, Log_Warning);
@@ -312,6 +356,7 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 	option_add_int(&options,    "collection-id",    'c', "ID of the queue to display (deprecated, use `--queue-id')",  &arg.queue_id);
 	option_add_int(&options,    "queue-id",         'c', "ID of the queue to display", &arg.queue_id);
 	option_add_format(&options, "resolution",       'r', "Resolution", "WIDTHxHEIGHT", "%dx%d", &arg.width, &arg.height);
+	option_add_string(&options, "name",             'n', "Instance name [machine hostname]", &arg.instance);
 
 	/* logging options */
 	option_add_string(&options, "file-log",          0,  "Log to regular file (appending)", &arg.log_file);
@@ -325,11 +370,18 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 		return false;
 	}
 
-	if ( n != argc ){
-		printf("%d %d\n", n, argc);
-		printf("%s: unrecognized option '%s'\n", argv[0], argv[n+1]);
+	if ( n == argc ){
+		printf("%s: Missing frontend url.\n", argv[0]);
 		printf("Try `%s --help' for more information.\n", argv[0]);
 		return false;
+	}
+
+	arg.url = strdup(argv[n+1]);
+
+	/* use machine hostname by default */
+	if ( !arg.instance ){
+		arg.instance = (char*)malloc(1024);
+		gethostname(arg.instance, 1024);
 	}
 
 	return true;
@@ -364,6 +416,51 @@ void Kernel::reload_browser(){
 	if ( _browser ){
 		_browser->queue_reload(_browser);
 	}
+
+	struct MemoryStruct chunk;
+	long response;
+
+	chunk.memory = (char*)malloc(1);  /* will be grown as needed by the realloc above */
+	chunk.size = 0;    /* no data at this point */
+
+	/* get json data */
+	curl_easy_setopt(curl_handle_settings, CURLOPT_WRITEDATA, (void *)&chunk);
+	curl_easy_perform(curl_handle_settings);
+	curl_easy_getinfo(curl_handle_settings, CURLINFO_RESPONSE_CODE, &response);
+
+	if ( response != 200 ){ /* HTTP OK */
+		Log::message(Log_Warning, "Server replied with code %ld\n", response);
+		return;
+	}
+
+	/* parse */
+	json_object* settings = json_tokener_parse(chunk.memory);
+	if ( !settings ){
+		Log::message(Log_Warning, "Failed to parse settings");
+		return;
+	}
+
+	json_object_object_foreach(settings, key, value) {
+		/* @todo map */
+		if ( strcasecmp(key, "queue") == 0 ){
+			change_bin(json_object_get_int(value));
+			continue;
+		}
+
+		if ( strcasecmp(key, "transitiontime") == 0 ){
+			TransitionState::set_transition_time((float)json_object_get_double(value));
+			continue;
+		}
+
+		if ( strcasecmp(key, "switchtime") == 0 ){
+			ViewState::set_view_time(json_object_get_double(value));
+			continue;
+		}
+
+		Log::message(Log_Verbose, "Unhandled setting %s: %s\n", key, json_object_to_json_string(value));
+	}
+
+	json_object_put(settings);
 }
 
 void Kernel::change_bin(unsigned int id){

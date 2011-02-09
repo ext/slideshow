@@ -80,7 +80,10 @@ int main( int argc, const char* argv[] ){
 			NULL,					// transition_string
 			NULL,					// file log
 			NULL,					// named pipe log
-			NULL					// unix domain socket log
+			NULL,					// unix domain socket log
+
+			NULL,                   // Frontend URL.
+			NULL,                   // Instance name.
 		};
 
 		// Parse the cli arguments, overriding the defaults

@@ -66,6 +66,8 @@ slideshow_daemon_LDADD = \
 	libipc.a \
 	libfsm.a \
 	-lltdl \
+	-lcurl \
+	-ljson \
 	-lGLEW \
 	${libportable_LIBS} \
 	${libdaemon_LIBS} \

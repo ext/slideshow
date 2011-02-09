@@ -7,9 +7,11 @@ import sqlite3
 import re
 import argparse
 import traceback
+import json
 
 import slideshow
 from slideshow.lib import template, browser as browser_factory, slide
+from slideshow.pages import instance
 from slideshow.pages import slides
 from slideshow.pages import maintenance
 from slideshow.pages import queue
@@ -24,6 +26,7 @@ class Root(object):
 	slides = slides.Handler()
 	maintenance = maintenance.Handler()
 	queue = queue.Handler()
+	instance = instance.Handler()
 	
 	@cherrypy.expose
 	def index(self):
