@@ -361,13 +361,17 @@ void Kernel::quit(){
 }
 
 void Kernel::reload_browser(){
-	_browser->queue_reload(_browser);
+	if ( _browser ){
+		_browser->queue_reload(_browser);
+	}
 }
 
 void Kernel::change_bin(unsigned int id){
 	Log::message(Log_Verbose, "Kernel: Switching to queue %d\n", id);
-	_browser->queue_set(_browser, id);
-	_browser->queue_reload(_browser);
+	if ( _browser ){
+		_browser->queue_set(_browser, id);
+		_browser->queue_reload(_browser);
+	}
 }
 
 void Kernel::ipc_quit(){
@@ -376,7 +380,9 @@ void Kernel::ipc_quit(){
 }
 
 void Kernel::debug_dumpqueue(){
-	_browser->queue_dump(_browser);
+	if ( _browser ){
+		_browser->queue_dump(_browser);
+	}
 }
 
 void Kernel::create_pidpath(){
