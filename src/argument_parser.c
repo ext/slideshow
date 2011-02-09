@@ -91,6 +91,7 @@ argument_t* argument_allocate(size_t size, int type, const char* name, char flag
 
 void option_initialize(option_set_t* option, int argc, const char* const* argv){
 	option->description = 0;
+	option->helpline = 0;
 	option->argc = argc;
 	option->argv = argv;
 	option->argument = 0;
@@ -101,6 +102,7 @@ void option_finalize(option_set_t* option){
 	argument_node_t* next = NULL;
 
 	free(option->description);
+	free(option->helpline);
 
 	ptr = option->argument;
 	while ( ptr ){
@@ -274,10 +276,14 @@ void option_set_description(option_set_t* option, const char* description){
 	option->description = strdup(description);
 }
 
+void option_set_helpline(option_set_t* option, const char* helpline){
+	option->helpline = strdup(helpline);
+}
+
 void option_display_help(option_set_t* option){
 	argument_node_t* node = option->argument;
 
-	printf("Usage: %s [options]\n", option->argv[0]);
+	printf("Usage: %s [options] %s\n", option->argv[0], option->helpline ? option->helpline : "");
 
 	if ( option->description ){
 		printf("%s\n\n", option->description);
