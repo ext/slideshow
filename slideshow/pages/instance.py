@@ -9,9 +9,6 @@ import slideshow.event as event
 class Handler(object):
 	@cherrypy.expose
 	def settings(self, name, format='raw'):
-		print 'name:', name
-		print 'format', format
-		
 		if format == 'raw':
 			cherrypy.response.headers['Content-Type'] = 'application/json'
 		elif format == 'text':
@@ -23,4 +20,21 @@ class Handler(object):
 			'Queue': settings['Runtime.queue'],
 			'TransitionTime': settings['Appearance.TransitionTime'],
 			'SwitchTime': settings['Appearance.SwitchTime'],
+		}, indent=4)
+
+	@cherrypy.expose
+	def next(self, id, name, version, format='raw'):
+		if format == 'raw':
+			cherrypy.response.headers['Content-Type'] = 'application/json'
+		elif format == 'text':
+			cherrypy.response.headers['Content-Type'] = 'text/plain'
+		
+		settings = Settings()
+		
+		return json.dumps({
+			'version': 1,
+			'assembler': 'image',
+			'filename': None,
+			'slide-id': 52,
+			'context': 0,
 		}, indent=4)
