@@ -1,7 +1,9 @@
-AM_CPPFLAGS = -I${top_srcdir}/include  -Wall -Wextra  -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers
+AM_CPPFLAGS = -I${top_srcdir}/include -I${top_srcdir}/src -D_GNU_SOURCE -Wall
 AM_LDFLAGS = -shared -module -avoid-version
 
-plugin_LTLIBRARIES = sqlite3.la
+plugin_LTLIBRARIES = sqlite3.la frontend.la
 
 sqlite3_la_SOURCES = sqlite.c
 sqlite3_la_LIBADD = ${sqlite3_LIBS}
+
+frontend_la_LIBADD = -lcurl -ljson

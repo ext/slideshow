@@ -62,6 +62,7 @@
 // Loading settings
 #include <curl/curl.h>
 #include <json/json.h>
+#include "curl_local.h"
 
 // Platform
 #ifdef __GNUC__
@@ -77,25 +78,7 @@
 
 static char* pidfile = NULL;
 static CURL* curl_handle_settings = NULL;
-struct curl_httppost* settings_formpost = NULL;
-
-struct MemoryStruct {
-	char *memory;
-	size_t size;
-};
-
-static size_t curl_resize(void *ptr, size_t size, size_t nmemb, void *data) {
-	size_t realsize = size * nmemb;
-	struct MemoryStruct *mem = (struct MemoryStruct *)data;
-
-	mem->memory = (char*)realloc(mem->memory, mem->size + realsize + 1);
-
-	memcpy(&(mem->memory[mem->size]), ptr, realsize);
-	mem->size += realsize;
-	mem->memory[mem->size] = 0;
-
-	return realsize;
-}
+static struct curl_httppost* settings_formpost = NULL;
 
 Kernel::Kernel(const argument_set_t& arg, PlatformBackend* backend)
 	: _arg(arg)
@@ -175,7 +158,7 @@ void Kernel::init_IPC(){
 	curl_formadd(&settings_formpost, &lastptr, CURLFORM_COPYNAME, "name", CURLFORM_COPYCONTENTS, _arg.instance, CURLFORM_END);
 	curl_easy_setopt(curl_handle_settings, CURLOPT_URL, settings_url);
 	curl_easy_setopt(curl_handle_settings, CURLOPT_HTTPPOST, settings_formpost);
-	curl_easy_setopt(curl_handle_settings, CURLOPT_WRITEFUNCTION, curl_resize);
+	curl_easy_setopt(curl_handle_settings, CURLOPT_WRITEFUNCTION, curl_local_resize);
 	free(settings_url);
 }
 
@@ -188,13 +171,18 @@ void Kernel::cleanup_IPC(){
 }
 
 void Kernel::init_browser(){
-	/* no browser string */
-	if ( !_arg.connection_string){
-		Log::message(Log_Warning, "No browser selected, you will not see any slides\n");
-		return;
-	}
+	browser_context_t context;
 
-	browser_context_t context = get_context(_arg.connection_string);
+	if ( _arg.connection_string ){
+		context = get_context(_arg.connection_string);
+	} else {
+		/* default to frontend browser */
+		context.provider = strdup("frontend");
+		context.user     = NULL;
+		context.pass     = NULL;
+		context.host     = strdup(_arg.url);
+		context.name     = strdup(_arg.instance);
+	}
 
 	// If the contex doesn't contain a password and a password was passed from stdin (arg password)
 	// we set that as the password in the context.
@@ -351,7 +339,7 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 	option_add_flag(&options,   "foreground",       'd', "Run in foreground mode", &arg.mode, ForegroundMode);
 	option_add_flag(&options,   "list-transitions",  0,  "List available transitions", &arg.mode, ListTransitionMode);
 	option_add_flag(&options,   "stdin-password",    0,  "Except the input (e.g database password) to come from stdin", &arg.have_password, true);
-	option_add_string(&options, "browser",           0,  "Browser connection string. provider://user[:pass]@host[:port]/name", &arg.connection_string);
+	option_add_string(&options, "browser",           0,  "Browser connection string. provider://user[:pass]@host[:port]/name [use frontend]", &arg.connection_string);
 	option_add_string(&options, "transition",       't', "Set slide transition plugin [fade]", &arg.transition_string);
 	option_add_int(&options,    "collection-id",    'c', "ID of the queue to display (deprecated, use `--queue-id')",  &arg.queue_id);
 	option_add_int(&options,    "queue-id",         'c', "ID of the queue to display", &arg.queue_id);
