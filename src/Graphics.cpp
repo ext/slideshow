@@ -216,58 +216,70 @@ static bool is_slide(const char* name){
 	return strcmp(name + len - 6, ext) == 0;
 }
 
+void Graphics::load_file(const char* filename){
+	Ptr<char> real_name(strdup(filename));
+	if ( is_slide(filename) ){
+		real_name.reset(asprintf2("%s/raster/%dx%d.png", filename, _width, _height));
+	}
+
+#ifdef UNICODE
+	char* tmp = real_path(real_name.get());
+	Ptr<wchar_t> path(to_tchar(tmp));
+	free(tmp);
+#else /* UNICODE */
+	Ptr<char> path(real_path(real_name.get()));
+#endif /* UNICODE */
+
+	ILuint devilID;
+
+	/* load image @todo Dont generate buffer each time */
+	ilGenImages(1, &devilID);
+	ilBindImage(devilID);
+	ilLoadImage(path.get());
+	ILuint devilError = ilGetError();
+
+	if( devilError != IL_NO_ERROR ){
+#ifdef UNICODE
+		const wchar_t* asdf = iluErrorString (devilError);
+		const char* error = from_tchar(asdf);
+#else /* UNICODE */
+		const char* error = iluErrorString (devilError);
+#endif /* UNICODE */
+		throw exception("Failed to load image '%s' (ilLoadImage: %s)", path.get(), error);
+	}
+
+	ILubyte* pixels = ilGetData();
+	int width  = ilGetInteger(IL_IMAGE_WIDTH);
+	int height = ilGetInteger(IL_IMAGE_HEIGHT);
+	int format = ilGetInteger(IL_IMAGE_FORMAT);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, pixels);
+
+	/* free buffer */
+	ilDeleteImages(1, &devilID);
+}
+
+void Graphics::load_blank(){
+	static const unsigned char black[] = {
+		0, 0, 0
+	};
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, black);
+}
+
+void Graphics::load_url(const char* url){
+
+}
+
 void Graphics::load_image(const char* name){
 	swap_textures();
 
 	glBindTexture(GL_TEXTURE_2D, _texture[0]);
 
 	if ( name ){
-		Ptr<char> real_name(strdup(name));
-		if ( is_slide(name) ){
-			real_name.reset(asprintf2("%s/raster/%dx%d.png", name, _width, _height));
-		}
-
-#ifdef UNICODE
-		char* tmp = real_path(real_name.get());
-		Ptr<wchar_t> path(to_tchar(tmp));
-		free(tmp);
-#else /* UNICODE */
-		Ptr<char> path(real_path(real_name.get()));
-#endif /* UNICODE */
-
-		ILuint devilID;
-
-		/* load image @todo Dont generate buffer each time */
-		ilGenImages(1, &devilID);
-		ilBindImage(devilID);
-		ilLoadImage(path.get());
-		ILuint devilError = ilGetError();
-
-		if( devilError != IL_NO_ERROR ){
-#ifdef UNICODE
-			const wchar_t* asdf = iluErrorString (devilError);
-			const char* error = from_tchar(asdf);
-#else /* UNICODE */
-			const char* error = iluErrorString (devilError);
-#endif /* UNICODE */
-			throw exception("Failed to load image '%s' (ilLoadImage: %s)", path.get(), error);
-		}
-
-		ILubyte* pixels = ilGetData();
-		int width  = ilGetInteger(IL_IMAGE_WIDTH);
-		int height = ilGetInteger(IL_IMAGE_HEIGHT);
-		int format = ilGetInteger(IL_IMAGE_FORMAT);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, pixels);
-
-		/* free buffer */
-		ilDeleteImages(1, &devilID);
+		load_file(name);
 	} else {
-		static const unsigned char black[] = {
-			0, 0, 0
-		};
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, black);
+		load_blank();
 	}
 }
 
