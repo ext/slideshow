@@ -205,15 +205,19 @@ static char* from_tchar(const TCHAR* src){
 }
 #endif /* WIN32 */
 
-static bool is_slide(const char* name){
-	const char* ext = ".slide";
-	size_t len = strlen(name);
+/**
+ * Check if a filename has the .slide-extension.
+ */
+static bool __attribute__ ((pure))  __attribute__((nonnull)) is_slide(const char* name){
+	static const char* ext = ".slide";
+	ssize_t offset = strlen(name) - sizeof(ext);
 
-	if ( len < 6 ){
+	/* name is shorter than extension */
+	if ( offset < 0 ){
 		return false;
 	}
 
-	return strcmp(name + len - 6, ext) == 0;
+	return strcmp(name + offset, ext) == 0;
 }
 
 void Graphics::load_file(const char* filename){
