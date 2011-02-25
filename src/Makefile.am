@@ -6,7 +6,7 @@ bin_PROGRAMS = slideshow-daemon
 warning_flags = -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers
 
 AM_LDFLAGS = -shared -module -avoid-version
-AM_CPPFLAGS = -I${top_srcdir}/include -pipe $(ARCH_FLAGS) ${warning_flags}
+AM_CPPFLAGS = -I${top_srcdir}/include -I${top_srcdir}/src -pipe $(ARCH_FLAGS) ${warning_flags}
 
 libipc_a_CPPFLAGS = -I${top_srcdir}/include
 libipc_a_SOURCES = 
@@ -51,6 +51,7 @@ slideshow_daemon_SOURCES = \
 	argument_parser.c \
 	browser_context.rl \
 	Browser.cpp ${top_srcdir}/include/Browser.h \
+	curl_local.c curl_local.h \
 	DaemonApp.cpp ${top_srcdir}/include/DaemonApp.h \
 	exception.cpp ${top_srcdir}/include/exception.h \
 	ForegroundApp.cpp ${top_srcdir}/include/ForegroundApp.h \
