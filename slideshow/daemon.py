@@ -189,7 +189,7 @@ class DaemonProcess:
 				preexec_fn=preexec
 			)
 		except Exception, e:
-			raise RuntimeError, 'Failed to run `%s`: %s' % (' '.join([pipes.quote(x) for x in args]), e)
+			raise RuntimeError, 'Failed to run `%s`: %s' % (' '.join([pipes.quote(x) for x in [cmd] + args]), e)
 		
 		self._logobj = self._connect_log(self._proc, cwd)
 		time.sleep(1.0) # let daemon settle
