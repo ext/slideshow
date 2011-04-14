@@ -209,8 +209,8 @@ static char* from_tchar(const TCHAR* src){
  * Check if a filename has the .slide-extension.
  */
 static bool __attribute__ ((pure))  __attribute__((nonnull)) is_slide(const char* name){
-	static const char* ext = ".slide";
-	ssize_t offset = strlen(name) - sizeof(ext);
+	static const char ext[] = ".slide";
+	ssize_t offset = strlen(name) - sizeof(ext) - 1; /* -1 for null terminator */
 
 	/* name is shorter than extension */
 	if ( offset < 0 ){
@@ -221,6 +221,8 @@ static bool __attribute__ ((pure))  __attribute__((nonnull)) is_slide(const char
 }
 
 void Graphics::load_file(const char* filename){
+	Log::message(Log_Debug, "Loading '%s' as local file.\n", filename);
+
 	Ptr<char> real_name(strdup(filename));
 	if ( is_slide(filename) ){
 		real_name.reset(asprintf2("%s/raster/%dx%d.png", filename, _width, _height));
@@ -264,15 +266,13 @@ void Graphics::load_file(const char* filename){
 }
 
 void Graphics::load_blank(){
+	Log::message(Log_Debug, "Loading blank image.\n");
+
 	static const unsigned char black[] = {
 		0, 0, 0
 	};
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, black);
-}
-
-void Graphics::load_url(const char* url){
-
 }
 
 void Graphics::load_image(const char* name){
