@@ -59,6 +59,7 @@ def settings(browser, resolution=None, fullscreen=True):
 	settings = Settings()
 	
 	cmd = settings['Files.BinaryPath']
+	url = settings['Database.URL']
 	args = [
 		'--uds-log', 'slideshow.sock',
 		'--file-log', 'slideshow.log',
@@ -77,6 +78,9 @@ def settings(browser, resolution=None, fullscreen=True):
 	
 	if fullscreen:
 		args.append('--fullscreen')
+
+	# must be last arg
+	args.append(url)
 	
 	env = dict(
 		DISPLAY=settings['Appearance.Display'],

@@ -54,6 +54,7 @@
 		<item name="Password" type="password" cls="browserblur"></item>
 		<item name="Hostname" type="string" cls="browserblur"></item>
 		<item name="Name" type="string" cls="browserblur">site.db</item>
+		<item name="URL" type="string">http://localhost</item>
 	</group>
 	
 	<group name="Slideshow">
