@@ -210,7 +210,7 @@ static char* from_tchar(const TCHAR* src){
  */
 static bool __attribute__ ((pure))  __attribute__((nonnull)) is_slide(const char* name){
 	static const char ext[] = ".slide";
-	ssize_t offset = strlen(name) - sizeof(ext) - 1; /* -1 for null terminator */
+	const ssize_t offset = strlen(name) - sizeof(ext) + 1; /* +1 for null terminator */
 
 	/* name is shorter than extension */
 	if ( offset < 0 ){
