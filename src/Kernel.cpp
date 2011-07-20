@@ -48,7 +48,7 @@
 #include "backend/platform.h"
 
 // libportable
-#include <portable/Time.h>
+#include <portable/time.h>
 #include <portable/asprintf.h>
 #include <portable/scandir.h>
 #include <portable/cwd.h>

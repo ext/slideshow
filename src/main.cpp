@@ -35,7 +35,7 @@
 #include <cstdlib>
 #include <limits.h>
 #include <signal.h>
-#include <portable/Time.h>
+#include <portable/time.h>
 #include "backend/platform.h"
 #include "Browser.h"
 
