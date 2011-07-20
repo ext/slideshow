@@ -13,8 +13,7 @@ AC_LIBTOOL_DLOPEN
 LT_INIT
 AC_PROG_CC_C99
 CHECK_RAGEL([src/browser_context.cpp])
-AX_LIB_CURL
-
+AX_LIB_CURL([],,AC_MSG_ERROR([Required library libcurl not found]))
 AX_CHECK_GLU
 PKG_CHECK_MODULES(glew, [glew])
 
