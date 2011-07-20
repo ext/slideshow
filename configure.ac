@@ -5,10 +5,6 @@ AM_INIT_AUTOMAKE([-Wall 1.11 silent-rules subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([include/config.h])
 
-m4_include([m4/ax_check_gl.m4])
-m4_include([m4/ax_check_glu.m4])
-m4_include([m4/sdl.m4])
-
 AC_GNU_SOURCE
 AC_PROG_CXX
 AM_PROG_CC_C_O
