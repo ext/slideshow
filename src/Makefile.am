@@ -6,7 +6,7 @@ bin_PROGRAMS = slideshow-daemon
 warning_flags = -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers
 
 AM_LDFLAGS = -shared -module -avoid-version
-AM_CPPFLAGS = -I${top_srcdir}/include -I${top_srcdir}/src -pipe $(ARCH_FLAGS) ${warning_flags}
+AM_CPPFLAGS = -I${top_srcdir}/include -I${top_srcdir}/src ${libportable_CFLAGS} -pipe $(ARCH_FLAGS) ${warning_flags}
 
 libipc_a_CPPFLAGS = -I${top_srcdir}/include
 libipc_a_SOURCES = 

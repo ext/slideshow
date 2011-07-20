@@ -35,7 +35,7 @@ State* ViewState::action(bool &flip){
 	}
 
 	// Sleep for a while
-	wait( 0.1f );
+	sleepd( 0.1 );
 
 	return this;
 }
