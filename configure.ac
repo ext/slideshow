@@ -16,6 +16,7 @@ CHECK_RAGEL([src/browser_context.cpp])
 AX_LIB_CURL([],,AC_MSG_ERROR([Required library libcurl not found]))
 AX_CHECK_GLU
 PKG_CHECK_MODULES(glew, [glew])
+PKG_CHECK_MODULES(json, [json])
 
 AC_CONFIG_FILES([
 	Makefile
