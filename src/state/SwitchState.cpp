@@ -48,8 +48,12 @@ State* SwitchState::action(bool &flip){
 	autofree_t container(slide);
 
 	if ( !(slide.filename && slide.assembler) ){
+		/* The current queue is empty, load a blank screen instead of keeping the
+		 * current slide. It makes more sense that the screen goes blank when removing 
+		 * all the slides from the queue. */
 		Log::message(Log_Warning, "Kernel: Queue is empty\n");
-		return new ViewState(this);
+		gfx()->load_image(NULL); /* blank screen */
+		return new TransitionState(this);
 	}
 
 	/* @todo make something factory-like */
