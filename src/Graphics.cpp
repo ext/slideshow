@@ -77,7 +77,7 @@ void Graphics::glew_init(){
 		throw exception("Failed to initialize glew");
 	}
 
-	if (GLEW_VERSION_2_0){
+	if ( !GLEW_VERSION_2_0 ){
 		Log::warning("Graphics card does not support OpenGL 2.0+\n");
 	}
 
