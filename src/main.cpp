@@ -87,8 +87,9 @@ int main( int argc, const char* argv[] ){
 			NULL,                   // Instance name.
 		};
 
-		// Parse the cli arguments, overriding the defaults
-		if ( !Kernel::parse_arguments(arguments, argc, argv) ){
+		// Parse the cli arguments, overriding the defaults. Throw an exception
+		// if running as a child (e.g. from a front-end).
+		if ( !Kernel::parse_arguments(arguments, argc, argv) && !isatty(STDOUT_FILENO) ){
 			throw exception("Failed to parse commandline arguments");
 		}
 
