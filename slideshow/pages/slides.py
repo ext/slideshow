@@ -57,15 +57,15 @@ class Handler(object):
 	
 	@cherrypy.expose
 	@cherrypy.tools.response_headers(headers=[('Content-Type', 'image/png')])
-	def show(self, id, *args):
+	def show(self, id, width=None, height=None):
 		s = slide.from_id(cherrypy.thread_data.db.cursor(), id)
 		
-		if len(args) == 0:
+		if width is None:
 			size = s.default_size()
-		elif len(args) == 1:
-			size = s.default_size(args[0])
+		elif height is None:
+			size = s.default_size(width)
 		else:
-			size = Resolution(float(args[0]), float(args[1]))
+			size = Resolution(float(width), float(height))
 		
 		s.rasterize(size)
 		
