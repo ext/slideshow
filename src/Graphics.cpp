@@ -34,6 +34,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <memory>
+#include <cassert>
 
 #include <portable/string.h>
 
@@ -170,6 +171,7 @@ void Graphics::render(float state){
 #ifdef WIN32
 /* convert to LPCTSTR, release memory with free */
 static TCHAR* to_tchar(const char* src){
+	assert(src);
 	size_t len = 0;
 	TCHAR* buf = NULL;
 
@@ -188,6 +190,7 @@ static TCHAR* to_tchar(const char* src){
 
 /* convert from LPCTSTR, release memory with free */
 static char* from_tchar(const TCHAR* src){
+	assert(src);
 	size_t len = 0;
 	char* buf = NULL;
 
@@ -209,6 +212,7 @@ static char* from_tchar(const TCHAR* src){
  * Check if a filename has the .slide-extension.
  */
 static bool __attribute__ ((pure))  __attribute__((nonnull)) is_slide(const char* name){
+	if ( !name ) return false;
 	static const char ext[] = ".slide";
 	const ssize_t offset = strlen(name) - sizeof(ext) + 1; /* +1 for null terminator */
 
@@ -220,12 +224,18 @@ static bool __attribute__ ((pure))  __attribute__((nonnull)) is_slide(const char
 	return strcmp(name + offset, ext) == 0;
 }
 
+/**
+ * Test if given name is a URL.
+ */
 static bool __attribute__((pure)) __attribute__((nonnull)) is_url(const char* name){
+	if ( !name ) return false;
 	static const char prefix[] = "http://";
 	return strncmp(name, prefix, strlen(prefix)) == 0;
 }
 
 void Graphics::load_file(const char* filename){
+	assert(filename);
+
 	Log::debug("Loading '%s' as local file.\n", filename);
 
 	Ptr<char> real_name(strdup(filename));
@@ -271,6 +281,8 @@ void Graphics::load_file(const char* filename){
 }
 
 void Graphics::load_url(const char* url){
+	assert(url);
+
 	Log::debug("Loading '%s' as remote image.\n", url);
 	throw exception("not implemented");
 }
@@ -310,6 +322,7 @@ void Graphics::swap_textures(){
 }
 
 void Graphics::set_transition(const char* name){
+	assert(name);
 	module_close(&_transition->base);
 	_transition = (transition_module_t*)module_open(name, TRANSITION_MODULE, 0);
 }
