@@ -237,7 +237,7 @@ static bool __attribute__((pure)) __attribute__((nonnull)) is_url(const char* na
 	return strncmp(name, prefix, strlen(prefix)) == 0;
 }
 
-void Graphics::load_file(const char* filename){
+void Graphics::load_file(const char* filename, unsigned int dst){
 	assert(filename);
 
 	Log::debug("Loading '%s' as local file.\n", filename);
@@ -255,11 +255,7 @@ void Graphics::load_file(const char* filename){
 	Ptr<char> path(real_path(real_name.get()));
 #endif /* UNICODE */
 
-	ILuint devilID;
-
-	/* load image @todo Dont generate buffer each time */
-	ilGenImages(1, &devilID);
-	ilBindImage(devilID);
+	ilBindImage(dst);
 	ilLoadImage(path.get());
 	ILuint devilError = ilGetError();
 
@@ -272,20 +268,11 @@ void Graphics::load_file(const char* filename){
 #endif /* UNICODE */
 		throw exception("Failed to load image '%s' (ilLoadImage: %s)", path.get(), error);
 	}
-
-	ILubyte* pixels = ilGetData();
-	int width  = ilGetInteger(IL_IMAGE_WIDTH);
-	int height = ilGetInteger(IL_IMAGE_HEIGHT);
-	int format = ilGetInteger(IL_IMAGE_FORMAT);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, pixels);
-
-	/* free buffer */
-	ilDeleteImages(1, &devilID);
 }
 
-void Graphics::load_url(const char* url){
+void Graphics::load_url(const char* url, unsigned int dst){
 	assert(url);
+	assert(dst >= 1);
 	Log::debug("Loading '%s' as remote image.\n", url);
 
 	struct MemoryStruct chunk = {
@@ -312,11 +299,7 @@ void Graphics::load_url(const char* url){
 	Log::debug("  Content-type: %s\n", content_type);
 	Log::debug("  Content-length: %d bytes (chunk size %zd)\n", static_cast<int>(content_length), chunk.size);
 
-	ILuint devilID;
-
-	/* load image @todo Dont generate buffer each time */
-	ilGenImages(1, &devilID);
-	ilBindImage(devilID);
+	ilBindImage(dst);
 	ilLoadL(IL_TYPE_UNKNOWN, chunk.memory, static_cast<ILuint>(chunk.size));
 	ILuint devilError = ilGetError();
 
@@ -329,16 +312,6 @@ void Graphics::load_url(const char* url){
 #endif /* UNICODE */
 		throw exception("Failed to load image '%s' (ilLoadImage: %s)", url, error);
 	}
-
-	ILubyte* pixels = ilGetData();
-	int width  = ilGetInteger(IL_IMAGE_WIDTH);
-	int height = ilGetInteger(IL_IMAGE_HEIGHT);
-	int format = ilGetInteger(IL_IMAGE_FORMAT);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, pixels);
-
-	/* free buffer */
-	ilDeleteImages(1, &devilID);
 }
 
 void Graphics::load_blank(){
@@ -362,11 +335,24 @@ void Graphics::load_image(const char* name){
 		return;
 	}
 
+	ILuint image[2];
+	ilGenImages(2, image);
+
 	if ( is_url(name) ) {
-		load_url(name);
+		load_url(name, image[0]);
 	} else {
-		load_file(name);
+		load_file(name, image[0]);
 	}
+
+	/* copy data to texture */
+	ILubyte* pixels = ilGetData();
+	int width  = ilGetInteger(IL_IMAGE_WIDTH);
+	int height = ilGetInteger(IL_IMAGE_HEIGHT);
+	int format = ilGetInteger(IL_IMAGE_FORMAT);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, pixels);
+
+	/* free buffer */
+	ilDeleteImages(2, image);
 }
 
 void Graphics::swap_textures(){

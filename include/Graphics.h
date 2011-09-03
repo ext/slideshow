@@ -44,8 +44,8 @@ class Graphics {
 		void gl_init_textures();
 		void gl_cleanup_textures();
 
-		void load_file(const char* filename);
-		void load_url(const char* url);
+		void load_file(const char* filename, unsigned int dst);
+		void load_url(const char* url, unsigned int dst);
 		void load_blank();
 
 		void swap_textures();
