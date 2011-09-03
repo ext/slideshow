@@ -52,11 +52,11 @@ static Kernel* application = NULL;
 static void sighandler(int signum){
 	switch ( signum ){
 	case SIGINT:
-		Log::message(Log_Verbose, "IPC: Quit\n");
+		Log::verbose("IPC: Quit\n");
 		application->quit();
 		break;
 	case SIGHUP:
-		Log::message(Log_Verbose, "IPC: Reload browser\n");
+		Log::verbose("IPC: Reload browser\n");
 		application->reload_browser();
 		signal(SIGHUP, sighandler);
 		break;

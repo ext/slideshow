@@ -39,7 +39,7 @@ void DaemonApp::init(){
 	try {
 		Kernel::init();
 	} catch ( ExitException& e ){
-		Log::message(Log_Fatal, "Error 0x%02x: %s\n", e.code());
+		Log::fatal("Error 0x%02x: %s\n", e.code());
 
 		pass_exception(e);
 		daemon_retval_send(e.code());
@@ -47,7 +47,7 @@ void DaemonApp::init(){
 		daemon_stop();
 		exit(0);
 	} catch ( exception& e ){
-		Log::message(Log_Fatal, "Unhandled exception: %s\n", e.what());
+		Log::fatal("Unhandled exception: %s\n", e.what());
 
 		pass_exception(e);
 		daemon_retval_send(DAEMON_UNHANDLED_EXCEPTION);
@@ -163,7 +163,7 @@ void DaemonApp::daemon_start(){
 	} else { /* The daemon */
 		/* Close FDs */
 		if (daemon_close_all(_writefd, -1) < 0) {
-			Log::message(Log_Fatal, "Failed to close all file descriptors: %s\n", strerror(errno));
+			Log::fatal("Failed to close all file descriptors: %s\n", strerror(errno));
 
 			/* Send the error condition to the parent process */
 			daemon_retval_send(DAEMON_FILE_ERROR);
@@ -173,7 +173,7 @@ void DaemonApp::daemon_start(){
 
 		/* Create the PID file */
 		if (daemon_pid_file_create() < 0) {
-			Log::message(Log_Fatal, "Could not create PID file (%s).\n", strerror(errno));
+			Log::fatal("Could not create PID file (%s).\n", strerror(errno));
 			daemon_retval_send(DAEMON_PID_ERROR);
 			daemon_stop();
 			exit(0);
@@ -181,7 +181,7 @@ void DaemonApp::daemon_start(){
 
 		/* Initialize signal handling */
 		if (daemon_signal_init(SIGINT, SIGTERM, SIGQUIT, SIGHUP, 0) < 0) {
-			Log::message(Log_Fatal, "Could not register signal handlers (%s).\n", strerror(errno));
+			Log::fatal("Could not register signal handlers (%s).\n", strerror(errno));
 			daemon_retval_send(DAEMON_SIGNAL_ERROR);
 			daemon_stop();
 			exit(0);
@@ -193,7 +193,7 @@ void DaemonApp::daemon_ready(){
 	/* Send OK to parent process */
 	daemon_retval_send(0);
 
-	Log::message(Log_Info, "Sucessfully started\n");
+	Log::info("Sucessfully started\n");
 	daemon_log(LOG_INFO, "Sucessfully started\n");
 
 	/* Prepare for select() on the signal fd */
@@ -212,7 +212,7 @@ void DaemonApp::daemon_poll(){
 		if (errno == EINTR)
 			return;
 
-		Log::message(Log_Warning, "select(): %s\n", strerror(errno));
+		Log::warning("select(): %s\n", strerror(errno));
 		return;
 	}
 
@@ -222,7 +222,7 @@ void DaemonApp::daemon_poll(){
 
 		/* Get signal */
 		if ((sig = daemon_signal_next()) <= 0) {
-			Log::message(Log_Warning, "daemon_signal_next() failed: %s\n", strerror(errno));
+			Log::warning("daemon_signal_next() failed: %s\n", strerror(errno));
 			return;
 		}
 
@@ -232,7 +232,7 @@ void DaemonApp::daemon_poll(){
 			case SIGINT:
 			case SIGQUIT:
 			case SIGTERM:
-				Log::message(Log_Info, "Got SIGINT, SIGQUIT or SIGTERM\n");
+				Log::info("Got SIGINT, SIGQUIT or SIGTERM\n");
 				quit();
 				break;
 		}
@@ -240,7 +240,7 @@ void DaemonApp::daemon_poll(){
 }
 
 void DaemonApp::daemon_stop(){
-	Log::message(Log_Info, "Exiting\n");
+	Log::info("Exiting\n");
 	daemon_log(LOG_INFO, "Exiting");
 
 	close(_writefd);

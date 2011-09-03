@@ -105,7 +105,7 @@ Kernel::~Kernel(){
 }
 
 void Kernel::init(){
-	Log::message(Log_Info, "Kernel: Starting slideshow\n");
+	Log::info("Kernel: Starting slideshow\n");
 
 	init_backend();
 	init_graphics();
@@ -193,7 +193,7 @@ void Kernel::init_browser(){
 	_browser = (struct browser_module_t*)module_open(context.provider, BROWSER_MODULE, MODULE_CALLER_INIT);
 
 	if ( !_browser ){
-		Log::message(Log_Warning, "Failed to load browser plugin '%s': %s\n", context.provider, module_error_string());
+		Log::warning("Failed to load browser plugin '%s': %s\n", context.provider, module_error_string());
 		return;
 	}
 
@@ -239,7 +239,7 @@ void Kernel::action(){
 	try {
 		_state = _state->action(flip);
 	} catch ( exception& e ){
-		Log::message(Log_Warning, "State exception: %s\n", e.what());
+		Log::warning("State exception: %s\n", e.what());
 		_state = NULL;
 	}
 
@@ -251,28 +251,28 @@ void Kernel::action(){
 void Kernel::print_config() const {
 	char* cwd = get_current_dir_name();
 
-	Log::message(Log_Info, "Slideshow configuration\n");
-	Log::message(Log_Info, "  cwd: %s\n", cwd);
-	Log::message(Log_Info, "  pidfile: %s\n", pidfile);
-	Log::message(Log_Info, "  datapath: %s\n", datapath());
-	Log::message(Log_Info, "  pluginpath: %s\n", pluginpath());
-	Log::message(Log_Info, "  resolution: %dx%d (%s)\n", _arg.width, _arg.height, _arg.fullscreen ? "fullscreen" : "windowed");
-	Log::message(Log_Info, "  transition time: %0.3fs\n", _arg.transition_time);
-	Log::message(Log_Info, "  switch time: %0.3fs\n", _arg.switch_time);
-	Log::message(Log_Info, "  connection string: %s\n", _arg.connection_string);
-	Log::message(Log_Info, "  transition: %s\n", _arg.transition_string);
-	Log::message(Log_Info, "\n");
+	Log::info("Slideshow configuration\n");
+	Log::info("  cwd: %s\n", cwd);
+	Log::info("  pidfile: %s\n", pidfile);
+	Log::info("  datapath: %s\n", datapath());
+	Log::info("  pluginpath: %s\n", pluginpath());
+	Log::info("  resolution: %dx%d (%s)\n", _arg.width, _arg.height, _arg.fullscreen ? "fullscreen" : "windowed");
+	Log::info("  transition time: %0.3fs\n", _arg.transition_time);
+	Log::info("  switch time: %0.3fs\n", _arg.switch_time);
+	Log::info("  connection string: %s\n", _arg.connection_string);
+	Log::info("  transition: %s\n", _arg.transition_string);
+	Log::info("\n");
 
 	free(cwd);
 }
 
 void Kernel::print_licence_statement() const {
-	Log::message(Log_Info, "Slideshow  Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>\n");
-	Log::message(Log_Info, "This program comes with ABSOLUTELY NO WARRANTY.\n");
-	Log::message(Log_Info, "This is free software, and you are welcome to redistribute it\n");
-	Log::message(Log_Info, "under certain conditions; see COPYING or <http://www.gnu.org/licenses/>\n");
-	Log::message(Log_Info, "for details.\n");
-	Log::message(Log_Info, "\n");
+	Log::info("Slideshow  Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>\n");
+	Log::info("This program comes with ABSOLUTELY NO WARRANTY.\n");
+	Log::info("This is free software, and you are welcome to redistribute it\n");
+	Log::info("under certain conditions; see COPYING or <http://www.gnu.org/licenses/>\n");
+	Log::info("for details.\n");
+	Log::info("\n");
 }
 
 #ifdef WIN32
@@ -286,7 +286,7 @@ static int filter(const struct dirent* el){
 }
 
 void Kernel::print_transitions(){
-	Log::message(Log_Info, "Available transitions: \n");
+	Log::info("Available transitions: \n");
 
 	struct dirent **namelist;
 	int n;
@@ -311,7 +311,7 @@ void Kernel::print_transitions(){
 					continue;
 				}
 
-				Log::message(Log_Info, " * %s\n", module_get_name(context));
+				Log::info(" * %s\n", module_get_name(context));
 
 				module_close(context);
 			}
@@ -377,7 +377,7 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 
 void Kernel::play_video(const char* fullpath){
 #ifndef WIN32
-	Log::message(Log_Info, "Kernel: Playing video \"%s\"\n", fullpath);
+	Log::verbose("Kernel: Playing video \"%s\"\n", fullpath);
 
 	int status;
 
@@ -388,7 +388,7 @@ void Kernel::play_video(const char* fullpath){
 
 	::wait(&status);
 #else /* WIN32 */
-	Log::message(Log_Warning, "Kernel: Video playback is not supported on this platform (skipping \"%s\")\n", fullpath);
+	Log::warning("Kernel: Video playback is not supported on this platform (skipping \"%s\")\n", fullpath);
 #endif /* WIN32 */
 }
 
@@ -417,14 +417,14 @@ void Kernel::reload_browser(){
 	curl_easy_getinfo(curl_handle_settings, CURLINFO_RESPONSE_CODE, &response);
 
 	if ( response != 200 ){ /* HTTP OK */
-		Log::message(Log_Warning, "Server replied with code %ld\n", response);
+		Log::warning("Server replied with code %ld\n", response);
 		return;
 	}
 
 	/* parse */
 	json_object* settings = json_tokener_parse(chunk.memory);
 	if ( !settings ){
-		Log::message(Log_Warning, "Failed to parse settings");
+		Log::warning("Failed to parse settings");
 		return;
 	}
 
@@ -445,14 +445,14 @@ void Kernel::reload_browser(){
 			continue;
 		}
 
-		Log::message(Log_Verbose, "Unhandled setting %s: %s\n", key, json_object_to_json_string(value));
+		Log::verbose("Unhandled setting %s: %s\n", key, json_object_to_json_string(value));
 	}
 
 	json_object_put(settings);
 }
 
 void Kernel::change_bin(unsigned int id){
-	Log::message(Log_Verbose, "Kernel: Switching to queue %d\n", id);
+	Log::verbose("Kernel: Switching to queue %d\n", id);
 	if ( _browser ){
 		_browser->queue_set(_browser, id);
 		_browser->queue_reload(_browser);

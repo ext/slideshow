@@ -51,28 +51,28 @@ State* SwitchState::action(bool &flip){
 		/* The current queue is empty, load a blank screen instead of keeping the
 		 * current slide. It makes more sense that the screen goes blank when removing 
 		 * all the slides from the queue. */
-		Log::message(Log_Warning, "Kernel: Queue is empty\n");
+		Log::warning("Kernel: Queue is empty\n");
 		gfx()->load_image(NULL); /* blank screen */
 		return new TransitionState(this);
 	}
 
 	/* @todo make something factory-like */
 	if ( strcmp("image", slide.assembler) == 0 || strcmp("text", slide.assembler) == 0 ){
-		Log::message(Log_Debug, "Kernel: Switching to image \"%s\"\n", slide.filename);
+		Log::debug("Kernel: Switching to image \"%s\"\n", slide.filename);
 
 		try {
 			gfx()->load_image( slide.filename );
 		} catch ( exception& e ) {
-			Log::message(Log_Warning, "Kernel: Failed to load image '%s': %s\n", slide.filename, e.what());
+			Log::warning("Kernel: Failed to load image '%s': %s\n", slide.filename, e.what());
 			return new ViewState(this);
 		}
 
 		return new TransitionState(this);
 	} else if ( strcmp("video", slide.assembler) == 0 ){
-		Log::message(Log_Debug, "Kernel: Playing video \"%s\"\n", slide.filename);
+		Log::debug("Kernel: Playing video \"%s\"\n", slide.filename);
 		return new VideoState(this, slide.filename);
 	} else {
-		Log::message(Log_Warning, "Unhandled assembler \"%s\" for \"%s\"\n", slide.assembler, slide.filename);
+		Log::warning("Unhandled assembler \"%s\" for \"%s\"\n", slide.assembler, slide.filename);
 		return new ViewState(this);
 	}
 }

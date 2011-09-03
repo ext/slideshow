@@ -30,8 +30,8 @@ State* InitialState::action(bool &flip){
 		gfx()->load_image(NULL);
 		gfx()->load_image("resources/splash.png");
 	} catch ( exception &e ){
-		Log::message(Log_Warning, "%s\n", e.what());
-		Log::message(Log_Warning, "Failed to load initial resources, check your configuration\n");
+		Log::warning("%s\n", e.what());
+		Log::warning("Failed to load initial resources, check your configuration\n");
 	}
 
 	gfx()->render(0.0);

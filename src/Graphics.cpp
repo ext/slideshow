@@ -54,7 +54,7 @@ Graphics::Graphics(int width, int height, bool fullscreen):
 		_texture[i] = 0;
 	}
 
-	Log::message(Log_Verbose, "Graphics: Using resoultion %dx%d\n", width, height);
+	Log::verbose("Graphics: Using resoultion %dx%d\n", width, height);
 
 	glew_init();
 	imageloader_init();
@@ -78,11 +78,11 @@ void Graphics::glew_init(){
 	}
 
 	if (GLEW_VERSION_2_0){
-		Log::message(Log_Warning, "Graphics card does not support OpenGL 2.0+\n");
+		Log::warning("Graphics card does not support OpenGL 2.0+\n");
 	}
 
 	if (!GLEW_ARB_texture_non_power_of_two){
-		Log::message(Log_Warning, "Graphics card does not support ARB_texture_non_power_of_two, performance will suffer\n");
+		Log::warning("Graphics card does not support ARB_texture_non_power_of_two, performance will suffer\n");
 	}
 }
 
@@ -221,7 +221,7 @@ static bool __attribute__ ((pure))  __attribute__((nonnull)) is_slide(const char
 }
 
 void Graphics::load_file(const char* filename){
-	Log::message(Log_Debug, "Loading '%s' as local file.\n", filename);
+	Log::debug("Loading '%s' as local file.\n", filename);
 
 	Ptr<char> real_name(strdup(filename));
 	if ( is_slide(filename) ){
@@ -266,7 +266,7 @@ void Graphics::load_file(const char* filename){
 }
 
 void Graphics::load_blank(){
-	Log::message(Log_Debug, "Loading blank image.\n");
+	Log::debug("Loading blank image.\n");
 
 	static const unsigned char black[] = {
 		0, 0, 0

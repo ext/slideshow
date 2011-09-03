@@ -51,7 +51,10 @@ int syslog_severity[5] = {
 };
 #endif /* HAVE_SYSLOG */
 
-Log::vector Log::_dst;
+typedef std::vector<Destination*> vector;
+typedef vector::iterator iterator;
+
+static vector destinations;
 
 FileDestination::FileDestination(const char* filename)
 	: _fp(NULL)
@@ -171,63 +174,109 @@ bool UDSServer::accept(struct timeval *timeout) const {
 	return true;
 }
 
-void Log::initialize(){
+namespace Log {
 
-}
+	static char *timestring(char *buffer, int bufferlen);
+	static const char* severity_string(Severity severity);
 
-void Log::cleanup(){
-	for ( iterator it = _dst.begin(); it != _dst.end(); ++it ){
-		delete *it;
+	void initialize(){
+
 	}
-	_dst.clear();
-}
 
-void Log::add_destination(Destination* dst){
-	_dst.push_back(dst);
-}
-
-void Log::message(Severity severity, const char* fmt, ...){
-	va_list ap;
-	va_start(ap, fmt);
-	vmessage(severity, fmt, ap);
-	va_end(ap);
-}
-
-void Log::vmessage(Severity severity, const char* fmt, va_list ap){
-	static char buf[255]; /* this isn't thread-safe anyway, might as well make it static */
-
-	Ptr<char> content( vasprintf2(fmt, ap) );
-	Ptr<char> decorated( asprintf2("(%s) [%s] %s", severity_string(severity), timestring(buf, 255), content.get()) );
-
-	for ( iterator it = _dst.begin(); it != _dst.end(); ++it ){
-		Destination* dst = *it;
-		dst->write(content.get(), decorated.get());
+	void cleanup(){
+		for ( iterator it = destinations.begin(); it != destinations.end(); ++it ){
+			delete *it;
+		}
+		destinations.clear();
 	}
-}
 
-char* Log::timestring(char *buffer, int bufferlen) {
-	time_t t = time(NULL);
-	struct tm* nt;
+	void add_destination(Destination* dst){
+		destinations.push_back(dst);
+	}
+
+	void message(Severity severity, const char* fmt, ...){
+		va_list ap;
+		va_start(ap, fmt);
+		vmessage(severity, fmt, ap);
+		va_end(ap);
+	}
+
+	void vmessage(Severity severity, const char* fmt, va_list ap){
+		static char buf[255]; /* this isn't thread-safe anyway, might as well make it static */
+
+		Ptr<char> content( vasprintf2(fmt, ap) );
+		Ptr<char> decorated( asprintf2("(%s) [%s] %s", severity_string(severity), timestring(buf, 255), content.get()) );
+
+		for ( iterator it = destinations.begin(); it != destinations.end(); ++it ){
+			Destination* dst = *it;
+			dst->write(content.get(), decorated.get());
+		}
+	}
+
+	char* timestring(char *buffer, int bufferlen) {
+		time_t t = time(NULL);
+		struct tm* nt;
 #ifdef WIN32
-	nt = new struct tm;
-	localtime_s(nt, &t);
+		nt = new struct tm;
+		localtime_s(nt, &t);
 #else
-	nt = localtime(&t);
+		nt = localtime(&t);
 #endif
-	strftime(buffer, bufferlen, "%Y-%m-%d %H:%M:%S", nt);
+		strftime(buffer, bufferlen, "%Y-%m-%d %H:%M:%S", nt);
 #ifdef WIN32
-	delete nt;
+		delete nt;
 #endif
-	return buffer;
-}
+		return buffer;
+	}
 
-const char* Log::severity_string(Severity severity){
-	switch ( severity ){
+	const char* severity_string(Severity severity){
+		switch ( severity ){
 		case Log_Debug: return "DD";
 		case Log_Verbose: return "--";
 		case Log_Info: return "  ";
 		case Log_Warning: return "WW";
 		case Log_Fatal: return "!!";
+		}
+		return NULL;
 	}
-	return NULL;
+
+	void debug(const char* fmt, ...){
+		va_list ap;
+		va_start(ap, fmt);
+		vmessage(Log_Debug, fmt, ap);
+		va_end(ap);
+	}
+
+	void verbose(const char* fmt, ...){
+		va_list ap;
+		va_start(ap, fmt);
+		vmessage(Log_Verbose, fmt, ap);
+		va_end(ap);
+
+	}
+
+	void info(const char* fmt, ...){
+		va_list ap;
+		va_start(ap, fmt);
+		vmessage(Log_Info, fmt, ap);
+		va_end(ap);
+
+	}
+
+	void warning(const char* fmt, ...){
+		va_list ap;
+		va_start(ap, fmt);
+		vmessage(Log_Warning, fmt, ap);
+		va_end(ap);
+
+	}
+
+	void fatal(const char* fmt, ...){
+		va_list ap;
+		va_start(ap, fmt);
+		vmessage(Log_Fatal, fmt, ap);
+		va_end(ap);
+
+	}
+
 }

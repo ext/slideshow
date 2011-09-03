@@ -105,30 +105,25 @@ class SyslogDestination: public Destination {
 };
 #endif /* HAVE_SYSLOG */
 
-class Log {
-	public:
-		static void initialize();
-		static void cleanup();
-
-		/**
-		 * Add a logging destination.
-		 * @param dst Memory will be release using delete.
-		 */
-		static void add_destination(Destination* dst);
-
-		static void  message(Severity severity, const char* fmt, ...);
-		static void vmessage(Severity severity, const char* fmt, va_list ap);
-
-	private:
-		Log(){}
-
-		static char *timestring(char *buffer, int bufferlen);
-		static const char* severity_string(Severity severity);
-
-		typedef std::vector<Destination*> vector;
-		typedef vector::iterator iterator;
-
-		static vector _dst;
-};
+namespace Log {
+	
+	void initialize();
+	void cleanup();
+	
+	/**
+	 * Add a logging destination.
+	 * @param dst Memory will be release using delete.
+	 */
+	void add_destination(Destination* dst);
+	
+	void  message(Severity severity, const char* fmt, ...);
+	void vmessage(Severity severity, const char* fmt, va_list ap);
+	
+	void debug(const char* fmt, ...);     /** Short for message(Log_Debug) */
+	void verbose(const char* fmt, ...);   /** Short for message(Log_Verbose) */
+	void info(const char* fmt, ...);      /** Short for message(Log_Info) */
+	void warning(const char* fmt, ...);   /** Short for message(Log_Warning) */
+	void fatal(const char* fmt, ...);     /** Short for message(Log_Fatal) */
+}
 
 #endif // LOG_H

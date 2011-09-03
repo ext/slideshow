@@ -44,14 +44,14 @@ static const char* read2(int fd){
 			return read_buffer;
 		}
 
-		Log::message(Log_Verbose, "mplayer: %s", read_buffer);
+		Log::verbose("mplayer: %s", read_buffer);
 	}
 
 	switch ( errno ){
 		case EWOULDBLOCK:
 			break;
 		default:
-			Log::message(Log_Warning, "mplayer: read failed with code %d\n", errno);
+			Log::warning("mplayer: read failed with code %d\n", errno);
 	}
 
 	return NULL;
@@ -73,7 +73,7 @@ VideoState::VideoState(State* state, const char* filename)
 	, _filename(strdup(filename)){
 
 	if ( child_pid <= 0 ){
-		Log::message(Log_Verbose, "no mplayer: process, cannot play video\n");
+		Log::warning("no mplayer: process, cannot play video\n");
 		return;
 	}
 
@@ -148,16 +148,16 @@ void VideoState::poll(){
 
 	int sigstate = kill(child_pid, 0);
 	if ( sigstate != 0 ){ /* child process terminated */
-		Log::message(Log_Fatal, "mplayer process has gone away (for reasons unknown)");
+		Log::fatal("mplayer process has gone away (for reasons unknown)");
 		child_pid = -1;
 	}
 
 	int status;
 	if ( waitpid(child_pid, &status, WNOHANG) != 0 ){
 		if ( WIFEXITED(status) ){
-			Log::message(Log_Fatal, "mplayer process has gone away (exited with code %d)\n", WEXITSTATUS(status));
+			Log::fatal("mplayer process has gone away (exited with code %d)\n", WEXITSTATUS(status));
 		} else {
-			Log::message(Log_Fatal, "mplayer process has gone away (terminated with signal %d)\n", WTERMSIG(status));
+			Log::fatal("mplayer process has gone away (terminated with signal %d)\n", WTERMSIG(status));
 		}
 		child_pid = -1;
 	}

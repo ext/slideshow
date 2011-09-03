@@ -36,6 +36,8 @@ class Graphics {
 		void glew_cleanup();
 		void imageloader_init();
 		void imageloader_cleanup();
+		void curl_init();
+		void curl_cleanup();
 		void gl_setup();
 		void gl_set_matrices();
 		void gl_init_textures();
