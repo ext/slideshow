@@ -197,8 +197,20 @@ void Kernel::init_browser(){
 		return;
 	}
 
+	/* setup defalts */
 	_browser->context = context;
+	_browser->queue_reload = browser_default_queue_reload;
+	_browser->queue_dump = browser_default_queue_dump;
+	_browser->queue_set = browser_default_queue_set;
+
+	/* initialize browser */
 	_browser->module.init((module_handle)_browser);
+
+	/* assertions */
+	assert(_browser->next_slide);
+	assert(_browser->queue_reload);
+	assert(_browser->queue_dump);
+	assert(_browser->queue_set);
 
 	change_bin(_arg.queue_id);
 }

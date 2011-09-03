@@ -74,9 +74,14 @@ struct browser_module_t {
 	browser_context_t context;
 
 	next_slide_callback next_slide;
-	queue_reload_callback queue_reload;
-	queue_dump_callback queue_dump;
-	queue_set_callback queue_set;
+	queue_reload_callback queue_reload; /* can be left "unset" */
+	queue_dump_callback queue_dump;     /* can be left "unset" */
+	queue_set_callback queue_set;       /* can be left "unset" */
 };
+
+/* Default callbacks */
+int browser_default_queue_reload(struct browser_module_t*);
+int browser_default_queue_dump(struct browser_module_t*);
+int browser_default_queue_set(struct browser_module_t*, unsigned int);
 
 #endif // BROWSER_H
