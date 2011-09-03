@@ -116,14 +116,14 @@ namespace Log {
 	 */
 	void add_destination(Destination* dst);
 	
-	void  message(Severity severity, const char* fmt, ...);
+	void  message(Severity severity, const char* fmt, ...) __attribute__ ((format (printf, 2, 3)));
 	void vmessage(Severity severity, const char* fmt, va_list ap);
 	
-	void debug(const char* fmt, ...);     /** Short for message(Log_Debug) */
-	void verbose(const char* fmt, ...);   /** Short for message(Log_Verbose) */
-	void info(const char* fmt, ...);      /** Short for message(Log_Info) */
-	void warning(const char* fmt, ...);   /** Short for message(Log_Warning) */
-	void fatal(const char* fmt, ...);     /** Short for message(Log_Fatal) */
+	void debug(const char* fmt, ...)   __attribute__ ((format (printf, 1, 2)));  /** Short for message(Log_Debug) */
+	void verbose(const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));  /** Short for message(Log_Verbose) */
+	void info(const char* fmt, ...)    __attribute__ ((format (printf, 1, 2)));  /** Short for message(Log_Info) */
+	void warning(const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));  /** Short for message(Log_Warning) */
+	void fatal(const char* fmt, ...)   __attribute__ ((format (printf, 1, 2)));  /** Short for message(Log_Fatal) */
 }
 
 #endif // LOG_H
