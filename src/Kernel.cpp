@@ -338,6 +338,7 @@ void Kernel::print_transitions(){
 
 bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 	option_set_t options;
+	char* directory = NULL;
 
 	option_initialize(&options, argc, argv);
 	option_set_description(&options, "Slideshow is an application for showing text and images in a loop on monitors and projectors.");
@@ -352,6 +353,7 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 	option_add_flag(&options,   "list-transitions",  0,  "List available transitions", &arg.mode, ListTransitionMode);
 	option_add_flag(&options,   "stdin-password",    0,  "Except the input (e.g database password) to come from stdin", &arg.have_password, true);
 	option_add_string(&options, "browser",           0,  "Browser connection string. provider://user[:pass]@host[:port]/name [use frontend]", &arg.connection_string);
+	option_add_string(&options, "directory",         0,  "Use directory browser (short for directory://PATH) (--browser has precedence)", &directory);
 	option_add_string(&options, "transition",       't', "Set slide transition plugin [fade]", &arg.transition_string);
 	option_add_int(&options,    "collection-id",    'c', "ID of the queue to display (deprecated, use `--queue-id')",  &arg.queue_id);
 	option_add_int(&options,    "queue-id",         'c', "ID of the queue to display", &arg.queue_id);
@@ -365,6 +367,12 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 
 	int n = option_parse(&options);
 	option_finalize(&options);
+
+	/* If no browser was provided but the --directory option was given construct a browser-string from it */
+	if ( !arg.connection_string && directory ){
+		arg.connection_string = asprintf2("directory://%s", directory);
+		free(directory);
+	}
 
 	if ( n < 0 ){
 		return false;
