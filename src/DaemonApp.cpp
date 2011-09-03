@@ -39,7 +39,7 @@ void DaemonApp::init(){
 	try {
 		Kernel::init();
 	} catch ( ExitException& e ){
-		Log::fatal("Error 0x%02x: %s\n", e.code());
+		Log::fatal("Failed to initialize (error code 0x%02x)\n", e.code());
 
 		pass_exception(e);
 		daemon_retval_send(e.code());
