@@ -253,15 +253,15 @@ class DaemonProcess:
 		
 		if self._proc.returncode != None:
 			rc = self._proc.returncode
+			self._proc = None
+
 			if rc != 0:
 				self._returncode = rc
 				global _signal_lut
 				if rc > 0:
-					self._log.push('childprocess exited with abnormal returncode:' + rc)
+					self._log.push('childprocess exited with abnormal returncode: %d' % rc)
 				else:
-					self._log.push('childprocess aborted from signal ' + _signal_lut[-rc])
-			
-			self._proc = None
+					self._log.push('childprocess aborted from signal ' + _signal_lut[-rc])			
 
 	@staticmethod
 	def _connect_log(instance, cwd):
