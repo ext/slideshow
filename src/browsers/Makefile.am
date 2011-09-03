@@ -7,6 +7,10 @@ if WITH_SQLITE3
 plugin_LTLIBRARIES+=sqlite3.la
 endif
 
+if WITH_DIRECTORY
+plugin_LTLIBRARIES+=directory.la
+endif
+
 sqlite3_la_SOURCES = sqlite.c
 sqlite3_la_LIBADD = ${sqlite3_LIBS}
 

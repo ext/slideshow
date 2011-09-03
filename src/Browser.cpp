@@ -29,3 +29,18 @@
 #ifdef WIN32
 #	include "win32.h"
 #endif
+
+int browser_default_queue_reload(struct browser_module_t*){
+	/* do nothing */
+	return 0;
+}
+
+int browser_default_queue_dump(struct browser_module_t*){
+	/* do nothing */
+	return 0;
+}
+
+int browser_default_queue_set(struct browser_module_t*, unsigned int){
+	/* do nothing */
+	return 0;
+}

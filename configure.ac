@@ -39,6 +39,13 @@ case "$host" in
 		AC_MSG_RESULT([unknown]) ;;
 esac
 
+dnl Directory browser
+AC_ARG_WITH([directory], [AS_HELP_STRING([--with-directory], [support for directory browser @<:@default=enabled@:>@])],, [with_directory=yes])
+AS_IF([test "x$with_directory" != xno], [
+    AC_DEFINE(HAVE_DIRECTORY, 1, [Define if directory browser is available])
+])
+AM_CONDITIONAL([WITH_DIRECTORY], [test "x$with_directory" != xno])
+
 dnl #######################################################################
 dnl # Paths
 dnl #######################################################################
