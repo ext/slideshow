@@ -194,20 +194,12 @@ dnl #######################################################################
 dnl # SQLite3
 dnl #######################################################################
 
-AC_ARG_WITH([sqlite3],
-	[AS_HELP_STRING([--with-sqlite3], [support for SQLite3])],
-	[],
-	[with_sqlite3=no])
-
-AS_IF([test "x$with_sqlite3" != xno],
-	[
-		PKG_CHECK_MODULES(sqlite3, [sqlite3])
-		AC_DEFINE(HAVE_SQLITE3, 1, [Define if sqlite3 is available])
-	],
-	[])
-
+AC_ARG_WITH([sqlite3], [AS_HELP_STRING([--with-sqlite3], [support for SQLite3 @<:@default=no@:>@])])
+AS_IF([test "x$with_sqlite3" != xno], [
+    PKG_CHECK_MODULES(sqlite3, [sqlite3])
+    AC_DEFINE(HAVE_SQLITE3, 1, [Define if sqlite3 is available])
+])
 AM_CONDITIONAL([WITH_SQLITE3], [test "x$with_sqlite3" != xno])
-AC_SUBST(sqlite3_LIBS)
 
 dnl #######################################################################
 dnl # SDL
