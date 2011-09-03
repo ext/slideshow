@@ -42,15 +42,18 @@ static int next_slide_v1(frontend_context_t* this, slide_context_t* slide, struc
 	struct json_object* filename  = json_object_object_get(data, "filename");
 	struct json_object* context   = json_object_object_get(data, "context");
 
-	slide->assembler = strdup(json_object_get_string(assembler));
+	/* is assembler isn't set, no field can be assumed to be. It means no slide could be fetched (e.g. empty queue). */
+	if ( assembler ){
+		slide->assembler = strdup(json_object_get_string(assembler));
 
-	if ( strcmp(slide->assembler, "image") == 0 ){
-		slide->filename = asprintf2("%s/slides/show/%d", this->module.context.host, json_object_get_int(slide_id));
-	} else {
-		slide->filename = strdup(json_object_get_string(filename));
+		if ( strcmp(slide->assembler, "video") != 0 ){
+			slide->filename = asprintf2("%s/slides/show/%d", this->module.context.host, json_object_get_int(slide_id));
+		} else {
+			slide->filename = strdup(json_object_get_string(filename));
+		}
+
+		this->id = json_object_get_int(context);
 	}
-
-	this->id = json_object_get_int(context);
 
 	json_object_put(context);
 	json_object_put(filename);
@@ -142,7 +145,7 @@ int EXPORT module_init(frontend_context_t* this){
 	/* initialize variables */
 	this->handle = curl_easy_init();
 	this->formpost = 0;
-	this->id = 0;
+	this->id = -1;
 
 	struct curl_httppost *lastptr = 0;
 	curl_formadd(&this->formpost, &lastptr, CURLFORM_COPYNAME, "name", CURLFORM_COPYCONTENTS, this->module.context.name, CURLFORM_END);
