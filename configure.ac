@@ -88,7 +88,7 @@ AC_SUBST(dbus_LIBS)
 dnl #######################################################################
 dnl # libportable
 dnl #######################################################################
-PKG_CHECK_MODULES(libportable, [libportable >= 0.2.1])
+PKG_CHECK_MODULES(libportable, [libportable >= 0.2.2])
 AC_SUBST(libportable_CFLAGS)
 AC_SUBST(libportable_LIBS)
 
