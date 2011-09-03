@@ -28,7 +28,7 @@ class Graphics {
 		~Graphics();
 
 		void render(float state);
-		void load_image(const char* filename);
+		void load_image(const char* filename, bool letterbox = true);
 
 		void set_transition(const char* name);
 
@@ -47,6 +47,7 @@ class Graphics {
 		void load_file(const char* filename, unsigned int dst);
 		void load_url(const char* url, unsigned int dst);
 		void load_blank();
+		void apply_letterbox(unsigned int src, unsigned int dst);
 
 		void swap_textures();
 

@@ -324,7 +324,50 @@ void Graphics::load_blank(){
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, black);
 }
 
-void Graphics::load_image(const char* name){
+/**
+ * Add a {letter,pillar}box if necessary.
+ * Leaves the new image bound.
+ */
+void Graphics::apply_letterbox(unsigned int src, unsigned int dst){
+	ilBindImage(src);
+
+	/* skip if the size is already correct (slides from frontend is already rendered correct) */
+	if ( ilGetInteger(IL_IMAGE_WIDTH) == _width && ilGetInteger(IL_IMAGE_HEIGHT) == _height ){
+		return;
+	}
+
+	const float old_width  = static_cast<float>(ilGetInteger(IL_IMAGE_WIDTH));
+	const float old_height = static_cast<float>(ilGetInteger(IL_IMAGE_HEIGHT));
+	const ILuint depth = ilGetInteger(IL_IMAGE_DEPTH);
+	const ILubyte bpp = static_cast<ILubyte>(ilGetInteger(IL_IMAGE_BPP));
+	const ILenum format = ilGetInteger(IL_IMAGE_FORMAT);
+	const ILenum type = ilGetInteger(IL_IMAGE_TYPE);
+	const float old_aspect = old_width / old_height;
+	
+	float new_width  = static_cast<float>(_width);
+	float new_height = static_cast<float>(_height);
+	const float new_aspect = new_width / new_height;
+	
+	if ( old_aspect > new_aspect ){
+		new_height = new_width * (old_height / old_width);
+	} else {
+		new_width = new_height * (old_width / old_height);
+	}
+	
+	Log::debug("  Letterboxed resolution: %dx%d\n", (int)new_width, (int)new_height);
+	
+	iluImageParameter(ILU_FILTER, ILU_BILINEAR);
+	iluScale(static_cast<ILuint>(new_width), static_cast<ILuint>(new_height), depth);
+	
+	const int offset_x = (_width  - static_cast<int>(new_width )) / 2;
+	const int offset_y = (_height - static_cast<int>(new_height)) / 2;
+	ilBindImage(dst);
+	ilTexImage(_width, _height, depth, bpp, format, type, NULL);
+	ilOverlayImage(src, offset_x, offset_y, 0);
+	iluFlipImage();
+}
+
+void Graphics::load_image(const char* name, bool letterbox){
 	swap_textures();
 
 	glBindTexture(GL_TEXTURE_2D, _texture[0]);
@@ -344,11 +387,15 @@ void Graphics::load_image(const char* name){
 		load_file(name, image[0]);
 	}
 
+	if ( letterbox ){
+		apply_letterbox(image[0], image[1]);
+	}
+
 	/* copy data to texture */
-	ILubyte* pixels = ilGetData();
-	int width  = ilGetInteger(IL_IMAGE_WIDTH);
-	int height = ilGetInteger(IL_IMAGE_HEIGHT);
-	int format = ilGetInteger(IL_IMAGE_FORMAT);
+	const ILubyte* pixels = ilGetData();
+	const ILuint width  = ilGetInteger(IL_IMAGE_WIDTH);
+	const ILuint height = ilGetInteger(IL_IMAGE_HEIGHT);
+	const ILuint format = ilGetInteger(IL_IMAGE_FORMAT);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, pixels);
 
 	/* free buffer */
