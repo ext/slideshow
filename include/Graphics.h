@@ -20,6 +20,7 @@
 #define GRAPHICS_H
 
 #include "Transition.h"
+#include <curl/curl.h>
 
 class Graphics {
 	public:
@@ -49,6 +50,7 @@ class Graphics {
 
 		void swap_textures();
 
+		CURL* curl;
 		transition_module_t* _transition;
 		unsigned int _texture[2];
 		int _width;

@@ -30,6 +30,7 @@
 #include "path.h"
 #include "gl.h"
 #include "ptr.h"
+#include "curl_local.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -102,10 +103,13 @@ void Graphics::imageloader_init(){
 
 	iluInit();
 	ilutRenderer(ILUT_OPENGL);
+
+	/* init curl */
+	curl = curl_easy_init();
 }
 
 void Graphics::imageloader_cleanup(){
-
+	curl_easy_cleanup(curl);
 }
 
 void Graphics::gl_setup(){
@@ -282,9 +286,59 @@ void Graphics::load_file(const char* filename){
 
 void Graphics::load_url(const char* url){
 	assert(url);
-
 	Log::debug("Loading '%s' as remote image.\n", url);
-	throw exception("not implemented");
+
+	struct MemoryStruct chunk = {
+		(char*)malloc(1), 0
+	};
+	long response = -1;
+
+	/* get image data */
+	curl_easy_setopt(curl, CURLOPT_URL, url);
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_local_resize);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+	curl_easy_perform(curl);
+	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response);
+
+	if ( response != 200 ){ /* HTTP OK */
+		throw exception("Failed to load url, server replied with code %ld\n", response);
+	}
+
+	char* content_type;
+	double content_length;
+	curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &content_type);
+	curl_easy_getinfo(curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &content_length);
+
+	Log::debug("  Content-type: %s\n", content_type);
+	Log::debug("  Content-length: %d bytes (chunk size %zd)\n", static_cast<int>(content_length), chunk.size);
+
+	ILuint devilID;
+
+	/* load image @todo Dont generate buffer each time */
+	ilGenImages(1, &devilID);
+	ilBindImage(devilID);
+	ilLoadL(IL_TYPE_UNKNOWN, chunk.memory, static_cast<ILuint>(chunk.size));
+	ILuint devilError = ilGetError();
+
+	if( devilError != IL_NO_ERROR ){
+#ifdef UNICODE
+		const wchar_t* asdf = iluErrorString (devilError);
+		const char* error = from_tchar(asdf);
+#else /* UNICODE */
+		const char* error = iluErrorString (devilError);
+#endif /* UNICODE */
+		throw exception("Failed to load image '%s' (ilLoadImage: %s)", url, error);
+	}
+
+	ILubyte* pixels = ilGetData();
+	int width  = ilGetInteger(IL_IMAGE_WIDTH);
+	int height = ilGetInteger(IL_IMAGE_HEIGHT);
+	int format = ilGetInteger(IL_IMAGE_FORMAT);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, format, GL_UNSIGNED_BYTE, pixels);
+
+	/* free buffer */
+	ilDeleteImages(1, &devilID);
 }
 
 void Graphics::load_blank(){
