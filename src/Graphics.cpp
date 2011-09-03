@@ -220,6 +220,11 @@ static bool __attribute__ ((pure))  __attribute__((nonnull)) is_slide(const char
 	return strcmp(name + offset, ext) == 0;
 }
 
+static bool __attribute__((pure)) __attribute__((nonnull)) is_url(const char* name){
+	static const char prefix[] = "http://";
+	return strncmp(name, prefix, strlen(prefix)) == 0;
+}
+
 void Graphics::load_file(const char* filename){
 	Log::debug("Loading '%s' as local file.\n", filename);
 
@@ -265,6 +270,11 @@ void Graphics::load_file(const char* filename){
 	ilDeleteImages(1, &devilID);
 }
 
+void Graphics::load_url(const char* url){
+	Log::debug("Loading '%s' as remote image.\n", url);
+	throw exception("not implemented");
+}
+
 void Graphics::load_blank(){
 	Log::debug("Loading blank image.\n");
 
@@ -280,10 +290,16 @@ void Graphics::load_image(const char* name){
 
 	glBindTexture(GL_TEXTURE_2D, _texture[0]);
 
-	if ( name ){
-		load_file(name);
-	} else {
+	/* null is passed when the screen should go blank (e.g. queue is empty) */
+	if ( !name ){
 		load_blank();
+		return;
+	}
+
+	if ( is_url(name) ) {
+		load_url(name);
+	} else {
+		load_file(name);
 	}
 }
 
