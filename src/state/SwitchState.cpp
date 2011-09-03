@@ -58,7 +58,7 @@ State* SwitchState::action(bool &flip){
 
 	/* @todo make something factory-like */
 	if ( strcmp("image", slide.assembler) == 0 || strcmp("text", slide.assembler) == 0 ){
-		Log::debug("Kernel: Switching to image \"%s\"\n", slide.filename);
+		Log::verbose("Kernel: Switching to image \"%s\"\n", slide.filename);
 
 		try {
 			gfx()->load_image( slide.filename );
