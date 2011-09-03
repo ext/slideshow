@@ -111,6 +111,7 @@ def activate(id):
 		settings['Runtime.queue'] = id
 	
 	settings.persist()
+	event.trigger('config.queue_changed', id)
 
 def set_loop(c, id, state):
 	c.execute("""
