@@ -7,6 +7,7 @@ import json, xorg_query
 import pprint
 import threading
 import event
+from glob import glob
 from lib.resolution import Resolution
 
 try:
@@ -305,6 +306,28 @@ class ItemStatic(Item):
     def __str__(self):
         return '<div class="static {cls}" name="{group}.{name}">&nbsp;</div>'.format(**self._values())
 
+class ItemFilelist(Item):
+    default = ''
+    def __init__(self, path, *args, **kwargs):
+        Item.__init__(self, *args, **kwargs)
+        self.path = path
+
+
+    def __str__(self):
+        values = [os.path.basename(x) for x in glob(self.path.format(Settings()))]
+        def f(x):
+            if self._value == x:
+                return '<option selected="selected">{value}</option>'
+            else:
+                return '<option>{value}</option>'
+        
+        options = [f(x).format(value=x) for x in values]
+        head = '<select name="{group}.{name}" class="{cls}">'.format(**self._values())
+        content = '\n'.join(options)
+        tail = '</select>'
+        
+        return head + content + tail
+        
 itemfactory = {
     'directory': ItemDirectory,
     'file':      ItemFile,
@@ -315,6 +338,7 @@ itemfactory = {
     'resolution':ItemResolution,
     'display':   ItemDisplay,
     'static':    ItemStatic,
+    'filelist':  ItemFilelist,
 }
 
 for k,v in itemfactory.items():
