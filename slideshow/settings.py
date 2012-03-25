@@ -93,7 +93,7 @@ class Item:
         )
     
     def __str__(self):
-        return '<input type="text" class="{cls}" name="{group}.{name}" type="{type}" value="{value}"/>'.format(**self._values())
+        return '<input type="text" class="{cls}" name="{group}.{name}" value="{value}"/>'.format(**self._values())
     
     def set(self, value, rollback=False):
         tmp = self._value
@@ -209,7 +209,7 @@ class ItemPassword(Item):
     default = ''
     
     def __str__(self):
-        return '<input type="password" class="{cls}" name="{group}.{name}" type="{type}" value=""/>'.format(**self._values())
+        return '<input type="password" class="{cls}" name="{group}.{name}" value=""/>'.format(**self._values())
 
 _aspects = [
     (4, 3),   # Regular 4:3 (VGA, PAL, SVGA, etc)
