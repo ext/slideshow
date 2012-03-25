@@ -40,6 +40,7 @@ class Handler(object):
     
     @cherrypy.expose
     def add(self, name, submit):
+        name = name.decode('utf-8')
         c = cherrypy.thread_data.db.cursor()
         queue.add(c, name)
         cherrypy.thread_data.db.commit()
