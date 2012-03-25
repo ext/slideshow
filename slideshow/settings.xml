@@ -2,12 +2,13 @@
 <!DOCTYPE settings SYSTEM "settings.dtd">
 <settings>
 	<group name="Path">
-		<description>The base directory is the homedirectory of the frontend. All other paths are relative to it.</description>
+		<description>The base directory is the homedirectory of the frontend. All other paths are relative unless the begin with a slash.</description>
 		
 		<item name="BasePath" title="Base directory" type="directory">{basepath}</item>
 		<item name="Image" type="directory" rel="Path.BasePath">image</item>
 		<item name="Video" type="directory" rel="Path.BasePath">video</item>
 		<item name="Temp" type="directory" rel="Path.BasePath">tmp</item>
+		<item name="Theme" type="directory" rel="Path.BasePath">theme</item>
 	</group>
 	
 	<group name="Files">
@@ -39,7 +40,7 @@
 
 		<item name="Resolution" type="resolution" description="Display resolution" allow_empty="1">1280x1024</item>
 		<item name="VirtualResolution" title="Virtual resolution" type="resolution" description="Window resolution" allow_empty="1"></item>
-		<item name="Theme" title="Theme" type="file" description="Theme for text-based slides">default.xml</item>
+		<item name="Theme" title="Theme" type="filelist" path="{0[Path.BasePath]}/{0[Path.Theme]}/*.xml" description="Theme for text-based slides">default.xml</item>
 		<item name="TransitionTime" title="Transition time" type="float" description="Time in sec it takes to change slide">3.0</item>
 		<item name="SwitchTime" title="Switch time" type="float" description="Time in sec each slide will be shown">10.0</item>
 		<item name="Display" title="Display" type="display" description="X display to use">:0.0</item>
