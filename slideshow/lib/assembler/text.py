@@ -220,6 +220,12 @@ class Template:
 
 			if background[:3] == 'url':
 				url = background[4:-1] # extract filename from "url(filename)"
+
+				# url is relative to theme-directory unless it begins with /
+				if not url[0] == '/':
+					settings = Settings()
+					url = os.path.join(settings['Path.BasePath'], settings['Path.Theme'], url)
+                
 				try:
 					image = cairo.ImageSurface.create_from_png(url)
 				except Exception, e:
