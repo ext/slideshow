@@ -45,7 +45,7 @@
 		<li py:if="state == daemon.STOPPED"><a href="/maintenance/start">Start daemon</a> (<a href="/maintenance/start?resolution=800x600&amp;fullscreen=0">windowed</a>)</li>
 		<li py:if="state == daemon.RUNNING"><a href="/maintenance/stop">Stop daemon</a></li>
 		<li py:if="state == daemon.RUNNING"><a href="/maintenance/reload">Reload daemon</a></li>
-		<li><a href="/maintenance/rebuild">Rebuild cache</a></li>
+		<li><a href="/maintenance/rebuild" onclick="return confirm('Warning!\n\nThis will rerasterize all slides with the selected theme. This can be an expensive\noperation depending on the number of slides.\n\nSlideshow will be locked until rebuild is complete.');">Rebuild cache</a></li>
 		<li><a href="/maintenance/config">Configuration</a></li>
 	</ul>
 
