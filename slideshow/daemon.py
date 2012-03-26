@@ -109,15 +109,16 @@ class _Log:
     def __init__(self, size=5):
         self.size = size
         
-    def push(self, line):
+    def push(self, line, severity=2):
         try:
             c = cherrypy.thread_data.db.cursor()
-            match = re.match('\((..)\) \[(.*)\] (.*)', line)
-            
-            severity = 2
+
+            # default values
             stamp = time.mktime(time.localtime())
             message = line
-            
+
+            # try to guess based on content (this is the output log output format from daemon)
+            match = re.match('\((..)\) \[(.*)\] (.*)', line)
             if match:
                 severity, stampstr, message = match.groups()
                 stamp = time.mktime(time.strptime(stampstr, '%Y-%m-%d %H:%M:%S'))
@@ -230,8 +231,8 @@ class DaemonProcess:
     def log(self):
         return self._log
 
-    def logmsg(self, line):
-        self._log.push(line)
+    def logmsg(self, line, **kwargs):
+        self._log.push(line, **kwargs)
     
     def state(self):
         if self._returncode is not None:
@@ -260,7 +261,7 @@ class DaemonProcess:
         if proc.returncode != None:
             # flush stdout/stderr into the log
             for line in proc.stdout.read().split("\n")[:-1]:
-                self.logmsg(line)
+                self.logmsg(line, severity=0)
             
             rc = proc.returncode
             self._proc = None
