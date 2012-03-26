@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import cherrypy, os.path
-from slideshow.lib import queue, slide, template, browser
+from slideshow.lib import queue, slide, template, browser as browser_factory
 from slideshow.settings import Settings
 import slideshow.daemon as daemon
 import slideshow.event as event
+import traceback
 
 class Ajax(object):
     @cherrypy.expose
@@ -19,7 +20,7 @@ class Handler(object):
     @template.output('maintenance/index.html', parent='maintenance')
     def index(self):
         settings = Settings()
-        cmd, args, env, cwd = daemon.settings(browser.from_settings(settings))
+        cmd, args, env, cwd = daemon.settings(browser_factory.from_settings(settings))
         return template.render(log=daemon.log(), state=daemon.state(), cmd=cmd, args=args, env=env, cwd=cwd)
 
     @cherrypy.expose
@@ -85,10 +86,11 @@ class Handler(object):
         cwd = settings['Path.BasePath']
         
         return open(os.path.join(cwd, 'core'))
-    
+
     @cherrypy.expose
     def rebuild(self):
-        import sqlite3, threading
+        cherrypy.response.headers['Content-Type'] = 'text/html'
+        import threading
         class Progress(threading.Thread):
             def __init__(self):
                 threading.Thread.__init__(self)
@@ -98,26 +100,31 @@ class Handler(object):
             def push(self, x):
                 self._content.append(x)
                 self._sem.release()
+
+            def __iter__(self):
+                return self
             
-            def pop(self):
-                while True:
-                    self._sem.acquire()
-                    value = self._content.pop()
-                    if value == None:
-                        break
-                    else:
-                        yield str(value)
+            def next(self):
+                self._sem.acquire()
+                value = self._content.pop()
+                if value == None:
+                    raise StopIteration()
+                
+                return str(value)
             
             def run(self):
-                cherrypy.thread_data.db = sqlite3.connect('site.db')
-                cherrypy.thread_data.db.row_factory = sqlite3.Row
-                cherrypy.thread_data.db.cursor().execute('PRAGMA foreign_keys = ON')
-                
-                event.trigger('maintenance.rebuild', self.push)
-                self.push(None)
+                try:
+                    browser = browser_factory.from_settings(Settings())
+                    browser.connect()
+                    
+                    event.trigger('maintenance.rebuild', self.push)
+                    self.push('Finished, <a href="/maintenance">go back</a>.')
+                    self.push(None)
+                except:
+                    traceback.print_exc()
         
         progress = Progress()
         progress.start()
         
-        return progress.pop()
-    rebuild._cp_config = {'response.stream': True}
+        return progress
+    rebuild._cp_config = {'response.stream': True, 'tools.gzip.on' : False}
