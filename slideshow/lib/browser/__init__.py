@@ -4,12 +4,12 @@ class Browser:
 	# registered factories
     	factory = {}
 
-	def __init__(self, host, username, password, name):
-		self._provider = self.__class__.provider
-		self._host = host
-		self._username = username
-		self._password = password
-		self._name = name
+	def __init__(self, hostname, username, password, database):
+		self.provider = self.__class__.provider
+		self.hostname = hostname
+		self.username = username
+		self.password = password
+		self.database = database
 
         def install(self):
             import slideshow
@@ -22,20 +22,20 @@ class Browser:
 
 	def string(self, password=False):
 		credentials = ''
-		if self._username != '':
-			credentials = self._username
+		if self.username != '':
+			credentials = self.username
 
 			# if plain-text password is enable
-			if password and self._password != '':
-				credentials += ':' + self._password
+			if password and self.password != '':
+				credentials += ':' + self.password
 
 			credentials += '@'
 
-		hostname = self._host
+		hostname = self.hostname
 		if hostname != '':
 			hostname += '/'
 
-		return '{provider}://{credentials}{hostname}{name}'.format(provider=self._provider, credentials=credentials, hostname=hostname, name=self._name)
+		return '{provider}://{credentials}{hostname}{name}'.format(provider=self.provider, credentials=credentials, hostname=hostname, name=self.database)
 
 def register(name):
     def inner(cls):
@@ -65,8 +65,9 @@ def from_settings(settings):
     username = settings['Database.Username']
     password = settings['Database.Password']
     hostname = settings['Database.Hostname']
-    name = settings['Database.Name']
+    database = settings['Database.Name']
     
-    return Browser.factory[provider](hostname, username, password, name)
+    return Browser.factory[provider](hostname, username, password, database)
 
 import slideshow.lib.browser._sqlite3
+import slideshow.lib.browser._mysql
