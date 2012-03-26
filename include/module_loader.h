@@ -32,7 +32,7 @@ void moduleloader_cleanup();
 
 struct module_t;
 
-typedef void  (*module_init_callback)(struct module_t* handle);
+typedef int   (*module_init_callback)(struct module_t* handle);
 typedef void  (*module_cleanup_callback)(struct module_t* handle);
 typedef struct module_t* (*module_alloc_callback)();
 typedef void  (*module_free_callback)(struct module_t* handle);

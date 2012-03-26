@@ -137,8 +137,9 @@ module_handle module_open(const char* name, enum module_type_t type, int flags){
 	*module = base;
 
 	/* run module initialization if available */
-	if ( callee_init(flags) && module->init ){
-		module->init(module);
+	if ( callee_init(flags) && module->init && module->init(module) != 0 ){
+		log_message(Log_Fatal, "Plugin `%s' initialization failed.\n", name);
+		return NULL;
 	}
 
 	return module;
