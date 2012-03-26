@@ -13,7 +13,7 @@ class Ajax(object):
 	def move(self, queue, slides):
 		queue = queue[6:] # remove 'queue_'-prefix
 		slides = [x[6:] for x in slides.split(',')] # remove 'slide_'-prefix
-		c = cherrypy.thread_data.db.cursor()
+		c = cherrypy.thread_data.db
 		
 		# prepare slides
 		slides = [dict(queue=queue, id=id, order=n) for (n,id) in enumerate(slides)]
@@ -38,7 +38,7 @@ class Handler(object):
 	@cherrypy.expose
 	@template.output('slides/view.html')
 	def list(self):
-		queues = queue.all(cherrypy.thread_data.db.cursor())
+		queues = queue.all(cherrypy.thread_data.db)
 		settings = Settings()
 		
 		id = settings['Runtime.queue']
@@ -58,7 +58,7 @@ class Handler(object):
 	@cherrypy.expose
 	@cherrypy.tools.response_headers(headers=[('Content-Type', 'image/png')])
 	def show(self, id, width=None, height=None):
-		s = slide.from_id(cherrypy.thread_data.db.cursor(), id)
+		s = slide.from_id(cherrypy.thread_data.db, id)
 		
 		if width is None:
 			size = s.default_size()
@@ -79,7 +79,7 @@ class Handler(object):
 	@cherrypy.expose
 	@template.output('slides/play.html', parent='video')
 	def play(self, id):
-		s = slide.from_id(cherrypy.thread_data.db.cursor(), id)
+		s = slide.from_id(cherrypy.thread_data.db, id)
 		stream = None
 
 		settings = Settings()
@@ -99,7 +99,7 @@ class Handler(object):
 	@cherrypy.expose
 	#@cherrypy.tools.response_headers(headers=[('Content-Type', 'application/octet-stream')])
 	def stream(self, id):
-		s = slide.from_id(cherrypy.thread_data.db.cursor(), id)
+		s = slide.from_id(cherrypy.thread_data.db, id)
 		
 		settings = Settings()
 		base = settings['Path.BasePath']
@@ -129,7 +129,7 @@ class Handler(object):
 	@cherrypy.expose
 	@template.output('slides/edit.html', parent='slides')
 	def edit(self, id, **kwargs):
-		s = slide.from_id(cherrypy.thread_data.db.cursor(), id)
+		s = slide.from_id(cherrypy.thread_data.db, id)
 		
 		# @todo using private variable!
 		params = s._data.copy()
@@ -148,9 +148,9 @@ class Handler(object):
 		
 		try:
 			if id == None: # new slide
-				s = slide.create(cherrypy.thread_data.db.cursor(), assembler, kwargs)
+				s = slide.create(cherrypy.thread_data.db, assembler, kwargs)
 			else: #edited slide
-				s = slide.edit(cherrypy.thread_data.db.cursor(), id, assembler, kwargs)
+				s = slide.edit(cherrypy.thread_data.db, id, assembler, kwargs)
 			daemon.reload()
 			cherrypy.thread_data.db.commit()
 		except:
@@ -180,7 +180,7 @@ class Handler(object):
 	@cherrypy.expose
 	def delete(self, id):
 		try:
-			slide.delete(cherrypy.thread_data.db.cursor(), id)
+			slide.delete(cherrypy.thread_data.db, id)
 			cherrypy.thread_data.db.commit()
 		except:
 			cherrypy.thread_data.db.rollback()
