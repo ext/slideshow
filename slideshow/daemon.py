@@ -158,6 +158,7 @@ class _Log:
                 log.id DESC
             LIMIT :limit;
         """, dict(limit=self.size)).fetchall()
+        lines = list(lines)
         lines.reverse()
         
         def f(severity, user, stamp, message):
