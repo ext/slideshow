@@ -5,6 +5,7 @@ from . import Assembler
 from slideshow.lib.resolution import Resolution
 import subprocess, pipes
 import PythonMagick
+import sys, traceback
 
 class ImageAssembler(Assembler):
 	def is_editable(self):
@@ -30,7 +31,7 @@ class ImageAssembler(Assembler):
 		
 		src = params['filename']
 		args = [
-			"convert", slide.src_path(src),
+			"convert", slide.src_path(src).encode('utf-8'),
 			'-resize', str(size),
 			'-background', 'black',
 			'-gravity', 'center',
@@ -41,7 +42,11 @@ class ImageAssembler(Assembler):
 		try:
 			retcode = subprocess.call(args)
 		except OSError, e:
-			raise RuntimeError, 'Failed to run `%s`: %s' % (' '.join([pipes.quote(x) for x in args]), e) 
+			raise RuntimeError, 'Failed to run `%s`: %s' % (' '.join([pipes.quote(x) for x in args]), e)
+		except:
+			traceback.print_exc()
+			print >> sys.stderr, 'When running', args
+			return
 		
 		if retcode != 0:
 			raise ValueError, 'failed to resample %s' % (slide.raster_path(size))
