@@ -229,6 +229,9 @@ class DaemonProcess:
     
     def log(self):
         return self._log
+
+    def logmsg(self, line):
+        self._log.push(line)
     
     def state(self):
         if self._returncode is not None:
@@ -252,13 +255,13 @@ class DaemonProcess:
             (rd, _, _) = select([self._logobj], [], [], timeout)
             if len(rd) > 0:
                 for line in self._logobj.recv(4096).split("\n")[:-1]:
-                    self._log.push(line)
+                    self.logmsg(line)
         
         if proc.returncode != None:
             # flush stdout/stderr into the log
             for line in proc.stdout.read().split("\n")[:-1]:
-                self._log.push(line)
-                        
+                self.logmsg(line)
+            
             rc = proc.returncode
             self._proc = None
 
