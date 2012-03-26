@@ -30,7 +30,7 @@ class Handler(object):
 			cherrypy.response.headers['Content-Type'] = 'text/plain'
 		
 		settings = Settings()
-		c = cherrypy.thread_data.db.cursor()
+		c = cherrypy.thread_data.db
 		
 		row = self._get_next_slide(queue=settings['Runtime.queue'], context=id)
         
@@ -55,7 +55,7 @@ class Handler(object):
 		}, indent=4)
 
 	def _get_next_slide(self, **kwargs):
-		c = cherrypy.thread_data.db.cursor()
+		c = cherrypy.thread_data.db
 		return c.execute("""
 		    SELECT
 		        id,
@@ -84,4 +84,3 @@ class Handler(object):
 		    sortorder
 		LIMIT 1;
 		    """, kwargs).fetchone()
-	

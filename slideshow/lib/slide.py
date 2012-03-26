@@ -185,7 +185,7 @@ def delete(c, id):
 class EventListener:
 	@event.callback('maintenance.rebuild')
 	def flush(self, progresss):
-		c = cherrypy.thread_data.db.cursor()
+		c = cherrypy.thread_data.db
 		settings = Settings()
 		
 		slides = [Slide(queue=None, **x) for x in c.execute("""
@@ -205,7 +205,7 @@ class EventListener:
 	
 	@event.callback('config.resolution_changed')
 	def resolution_changed(self, resolution):
-		c = cherrypy.thread_data.db.cursor()
+		c = cherrypy.thread_data.db
 		
 		slides = [Slide(queue=None, **x) for x in c.execute("""
 			SELECT

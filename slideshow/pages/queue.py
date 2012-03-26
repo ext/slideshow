@@ -8,7 +8,7 @@ class Ajax(object):
     @cherrypy.expose
     def rename(self, id, value):
         id = int(id[6:]) # remove prefix
-        c = cherrypy.thread_data.db.cursor()
+        c = cherrypy.thread_data.db
         q = queue.from_id(c, id)
         
         if q is None:
@@ -22,7 +22,7 @@ class Ajax(object):
     def remove(self, id):
         id = int(id)
         
-        c = cherrypy.thread_data.db.cursor()
+        c = cherrypy.thread_data.db
         if not queue.delete(c, id):
             return 'false'
         
@@ -35,13 +35,13 @@ class Handler(object):
     @cherrypy.expose
     @template.output('queue/index.html', parent='queues')
     def index(self):
-        queues = queue.all(cherrypy.thread_data.db.cursor())
+        queues = queue.all(cherrypy.thread_data.db)
         return template.render(queues=queues)
     
     @cherrypy.expose
     def add(self, name, submit):
         name = name.decode('utf-8')
-        c = cherrypy.thread_data.db.cursor()
+        c = cherrypy.thread_data.db
         queue.add(c, name)
         cherrypy.thread_data.db.commit()
         raise cherrypy.HTTPRedirect('/queue')
@@ -49,7 +49,7 @@ class Handler(object):
     @cherrypy.expose
     @template.output('queue/rename.html', parent='queues')
     def rename(self, id, name=None, submit=None):
-        c = cherrypy.thread_data.db.cursor()
+        c = cherrypy.thread_data.db
         q = queue.from_id(c, id)
         
         if name is not None:
@@ -66,7 +66,7 @@ class Handler(object):
     
     @cherrypy.expose
     def loop(self, id, state):
-    	c = cherrypy.thread_data.db.cursor()
+    	c = cherrypy.thread_data.db
         queue.set_loop(c, id, state)
         cherrypy.thread_data.db.commit()
         raise cherrypy.HTTPRedirect('/')

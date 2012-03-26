@@ -111,7 +111,7 @@ class _Log:
         
     def push(self, line, severity=2):
         try:
-            c = cherrypy.thread_data.db.cursor()
+            c = cherrypy.thread_data.db
 
             # default values
             stamp = time.mktime(time.localtime())
@@ -141,7 +141,7 @@ class _Log:
             traceback.print_exc()
     
     def __iter__(self):
-        c = cherrypy.thread_data.db.cursor()
+        c = cherrypy.thread_data.db
         lines = c.execute("""
             SELECT
                 log.severity as severity,
