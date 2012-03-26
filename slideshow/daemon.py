@@ -240,10 +240,12 @@ class DaemonProcess:
         return RUNNING
     
     def poll(self, timeout):
-        if self._proc is None:
+        proc = self._proc
+        
+        if proc is None:
             return
 
-        self._proc.poll()
+        proc.poll()
 
         # logobj is the log socket between daemon and frontend
         if self._logobj:
@@ -252,12 +254,12 @@ class DaemonProcess:
                 for line in self._logobj.recv(4096).split("\n")[:-1]:
                     self._log.push(line)
         
-        if self._proc.returncode != None:
+        if proc.returncode != None:
             # flush stdout/stderr into the log
-            for line in self._proc.stdout.read().split("\n")[:-1]:
+            for line in proc.stdout.read().split("\n")[:-1]:
                 self._log.push(line)
                         
-            rc = self._proc.returncode
+            rc = proc.returncode
             self._proc = None
 
             if rc != 0:
