@@ -343,22 +343,22 @@ void Graphics::apply_letterbox(unsigned int src, unsigned int dst){
 	const ILenum format = ilGetInteger(IL_IMAGE_FORMAT);
 	const ILenum type = ilGetInteger(IL_IMAGE_TYPE);
 	const float old_aspect = old_width / old_height;
-	
+
 	float new_width  = static_cast<float>(_width);
 	float new_height = static_cast<float>(_height);
 	const float new_aspect = new_width / new_height;
-	
+
 	if ( old_aspect > new_aspect ){
 		new_height = new_width * (old_height / old_width);
 	} else {
 		new_width = new_height * (old_width / old_height);
 	}
-	
+
 	Log::debug("  Letterboxed resolution: %dx%d\n", (int)new_width, (int)new_height);
-	
+
 	iluImageParameter(ILU_FILTER, ILU_BILINEAR);
 	iluScale(static_cast<ILuint>(new_width), static_cast<ILuint>(new_height), depth);
-	
+
 	const int offset_x = (_width  - static_cast<int>(new_width )) / 2;
 	const int offset_y = (_height - static_cast<int>(new_height)) / 2;
 	ilBindImage(dst);
@@ -412,4 +412,7 @@ void Graphics::set_transition(const char* name){
 	assert(name);
 	module_close(&_transition->base);
 	_transition = (transition_module_t*)module_open(name, TRANSITION_MODULE, 0);
+	if ( !_transition ){
+		throw exception("No transition plugin available.\n");
+	}
 }
