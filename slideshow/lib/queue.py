@@ -12,17 +12,17 @@ class Queue:
         self.loop = loop == 1
         self.slides = [Slide(queue=self, **x) for x in c.execute("""
             SELECT
-                id,
-                path,
-                active,
-                assembler,
-                data
+                `id`,
+                `path`,
+                `active`,
+                `assembler`,
+                `data`
             FROM
-                slide
+                `slide`
             WHERE
-                queue_id = :queue
+                `queue_id` = :queue
             ORDER BY
-                sortorder
+                `sortorder`
         """, {'queue': id}).fetchall()]
     
     def __len__(self):
@@ -42,11 +42,11 @@ class Queue:
 def all(c):
     return [Queue(c, **x) for x in c.execute("""
         SELECT
-            id,
-            name,
-            loop
+            `id`,
+            `name`,
+            `loop`
         FROM
-            queue
+            `queue`
     """).fetchall()]
 
 def from_id(c, id):
