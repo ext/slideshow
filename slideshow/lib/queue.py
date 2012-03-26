@@ -31,11 +31,11 @@ class Queue:
     def rename(self, c, name):
         c.execute("""
             UPDATE
-                queue
+                `queue`
             SET
-                name = :name
+                `name` = :name
             WHERE
-                id = :id
+                `id` = :id
         """, dict(id=self.id, name=name))
         self.name = name
 
@@ -52,13 +52,13 @@ def all(c):
 def from_id(c, id):
     row = c.execute("""
         SELECT
-            id,
-            name,
-            loop
+            `id`,
+            `name`,
+            `loop`
         FROM
-            queue
+            `queue`
         WHERE
-            id = :id
+            `id` = :id
         LIMIT 1
     """, dict(id=id)).fetchone()
     
@@ -68,20 +68,22 @@ def from_id(c, id):
     return Queue(c, **row) 
 
 def add(c, name):
+    
     c.execute("""
-        INSERT INTO queue (
-            name
+        INSERT INTO `queue` (
+            `name`
         ) VALUES (
             :name
         )
     """, dict(name=name))
     
-    id = c.lastrowid
-    n = int(c.execute("SELECT count(*) as count FROM queue").fetchone()['count'])
-    
+    row_id = c.last_row_id()
+    n = int(c.execute("SELECT COUNT(*) as `count` FROM `queue`").fetchone()['count'])
+
     # if no previous queue (except default) existed, make this the active
-    if n == 2:
-        activate(id)
+    if n == 3:
+        print 'derp'
+        activate(row_id)
 
 def delete(c, id):
     if id <= 0:
@@ -89,17 +91,17 @@ def delete(c, id):
     
     c.execute("""
         UPDATE
-            slide
+            `slide`
         SET
-            queue_id = 0
+            `queue_id` = 0
         WHERE
-            queue_id = :id
+            `queue_id` = :id
     """, dict(id=id))
     c.execute("""
         DELETE FROM
-            queue
+            `queue`
         WHERE
-            id = :id
+            `id` = :id
     """, dict(id=id))
     
     return True
@@ -116,11 +118,11 @@ def activate(id):
 def set_loop(c, id, state):
     c.execute("""
         UPDATE
-            queue
+            `queue`
         SET
-            loop = :state
+            `loop` = :state
         WHERE
-            id = :id
+            `id` = :id
     """, dict(id=id, state=state))
     
     # to force reloading of queue settings
