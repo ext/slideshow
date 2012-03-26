@@ -22,24 +22,39 @@
 
 MODULE_INFO("Fade", TRANSITION_MODULE, "David Sveningsson");
 
+typedef struct {
+	float x;
+	float y;
+	float u;
+	float v;
+} vertex_t;
+
+static vertex_t vertices[4] = {
+	{0.0f, 0.0f, 0.0f, 0.0f},
+	{0.0f, 1.0f, 0.0f, 1.0f},
+	{1.0f, 1.0f, 1.0f, 1.0f},
+	{1.0f, 0.0f, 1.0f, 0.0f},
+};
+static unsigned char indices[4] = {
+	0, 1, 2, 3
+};
+
 static void render(transition_context_t* context){
+	glPushClientAttrib(GL_VERTEX_ARRAY|GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glVertexPointer(2, GL_FLOAT, sizeof(vertex_t), &vertices[0].x);
+	glTexCoordPointer(2, GL_FLOAT, sizeof(vertex_t), &vertices[0].u);
+
 	glColor4f(1,1,1,1);
 	glBindTexture(GL_TEXTURE_2D, context->texture[1]);
-	glBegin( GL_QUADS );
-		glTexCoord2f(0.0f, 0.0f); glVertex2f(0.0f, 0.0f);
-		glTexCoord2f(0.0f, 1.0f); glVertex2f(0.0f, 1.0f);
-		glTexCoord2f(1.0f, 1.0f); glVertex2f(1.0f, 1.0f);
-		glTexCoord2f(1.0f, 0.0f); glVertex2f(1.0f, 0.0f);
-	glEnd();
+	glDrawElements(GL_QUADS, 4, GL_UNSIGNED_BYTE, indices);
 
 	glColor4f(1,1,1,context->state);
 	glBindTexture(GL_TEXTURE_2D, context->texture[0]);
-	glBegin( GL_QUADS );
-		glTexCoord2f(0.0f, 0.0f); glVertex2f(0.0f, 0.0f);
-		glTexCoord2f(0.0f, 1.0f); glVertex2f(0.0f, 1.0f);
-		glTexCoord2f(1.0f, 1.0f); glVertex2f(1.0f, 1.0f);
-		glTexCoord2f(1.0f, 0.0f); glVertex2f(1.0f, 0.0f);
-	glEnd();
+	glDrawElements(GL_QUADS, 4, GL_UNSIGNED_BYTE, indices);
+
+	glPopClientAttrib();
 }
 
 void* module_alloc(){
