@@ -194,7 +194,7 @@ int main( int argc, const char* argv[] ){
 		fflush(stderr);
 
 		if ( getenv("SLIDESHOW_NO_ABORT") ) {
-			return -1;
+			return 1;
 		} else {
 #ifdef WIN32
 			__debugbreak();
