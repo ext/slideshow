@@ -1,3 +1,4 @@
+/* -*- mode: c; -*- */
 /**
  * This file is part of Slideshow.
  * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
