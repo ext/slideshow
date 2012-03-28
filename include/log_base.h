@@ -37,7 +37,7 @@ enum Severity {
 	Log_Fatal
 };
 
-void  log_message(enum Severity severity, const char* fmt, ...);
+void  log_message(enum Severity severity, const char* fmt, ...) __attribute__((format(printf,2,3)));
 void log_vmessage(enum Severity severity, const char* fmt, va_list ap);
 
 #ifdef __cplusplus
