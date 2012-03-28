@@ -4,9 +4,10 @@
   <p>Using this option you can create new slides with text only. The text will be applied to the predefined background if specified in the configuration.</p>
 	
   <py:for each="item in template.items()">
-    ${Markup(item.render(fields.get(item.name, '')))}<br/>
+    ${Markup(item.render(fields.get(item.name, '')))}
   </py:for>
-  
+  <p><small>Text is parsed using <a href="http://developer.gnome.org/pango/stable/PangoMarkupFormat.html"> Pango Markup</a>. Allowed html-tags is <tt>&lt;b&gt;</tt>, &lt;big&gt;, &lt;i&gt;, &lt;s&gt;, &lt;sub&gt;, &lt;sup&gt;, &lt;small&gt;, &lt;span&gt;, &lt;tt&gt; and &lt;u&gt;.</small></p>  
+
   <input type="submit" name="submit" value="preview" />
   <input type="submit" name="submit" value="upload" /><br/>
   
