@@ -474,7 +474,7 @@ void Kernel::reload_browser(){
 			continue;
 		}
 
-		Log::verbose("Unhandled setting %s: %s\n", key, json_object_to_json_string(value));
+		Log::warning("Unhandled setting %s: %s\n", key, json_object_to_json_string(value));
 	}
 
 	json_object_put(settings);
