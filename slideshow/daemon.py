@@ -145,10 +145,10 @@ class _Log:
         c.commit()
         lines = c.execute("""
             SELECT
-                log.severity as severity,
-                user.name as user,
-                UNIX_TIMESTAMP(log.stamp) as stamp,
-                log.message as message
+                log.severity AS severity,
+                user.name AS user,
+                UNIX_TIMESTAMP(log.stamp) AS stamp,
+                log.message AS message
             FROM
                 log,
                 user
@@ -167,9 +167,7 @@ class _Log:
             formated_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stamp))
             return severity, '({severity}) {stamp} {user} {message}'.format(severity=severity_str, user=user, stamp=formated_time, message=message)
         
-        lines = [f(**x) for x in lines]
-        print lines
-        
+        lines = [f(**x) for x in lines]        
         return lines.__iter__()
 
 class DaemonProcess:

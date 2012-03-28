@@ -1,17 +1,23 @@
 import os, sys, re
 import MySQLdb
 import cherrypy
+import traceback
 from slideshow.lib.browser import Browser, register, on_install
 from slideshow.settings import Settings
 from MySQLdb.cursors import DictCursor
 from MySQLdb.constants import CR
 pattern = re.compile(r':([A-Za-z0-9]+)')
+retrim  = re.compile(r'\s+')
 
 # This hack "enables" using ? and :name as placeholders (MySQLdb.paramstyle is 'format', not 'qmark')
 class QCursor(DictCursor):
     def execute(self, query, args=None):
         query = query.replace('?', '%s')
-        query = re.sub(pattern, r'%(\1)s', query)
+        query = re.sub(pattern, r'%(\1)s', query.strip())
+
+        if True:
+            temp = re.sub(retrim, ' ', query)
+            cherrypy.engine.log('Query: "%s" %s' % (temp, args))
         return DictCursor.execute(self, query, args)
 
 @register('mysql')
@@ -21,12 +27,12 @@ class MySQL(Browser):
         Browser.__init__(self, *args, **kwargs)
 
         self.real_connect()
-        
+
         # check if not previous database is created
         self.execute("SELECT `table_name` FROM `information_schema`.`tables` WHERE `table_schema` = ? and table_name = 'slide'", (self.database,))
         if self.fetchone() is None:
             self.install()
-
+    
     def real_connect(self):
         self.conn = MySQLdb.connect(
             host = self.hostname,
@@ -81,10 +87,10 @@ class MySQL(Browser):
         return self.conn.insert_id()
     
     def commit(self):
-        self.conn.commit()
+        return self.conn.commit()
 
     def rollback(self):
-        self.conn.rollback()
+        return self.conn.rollback()
     
     def connect(self, *args):
         """ Called by threads go get a thread-local copy of database """
