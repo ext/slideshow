@@ -199,12 +199,21 @@ void Kernel::init_browser(){
 
 	/* setup defalts */
 	_browser->context = context;
+	_browser->next_slide = NULL;
 	_browser->queue_reload = browser_default_queue_reload;
 	_browser->queue_dump = browser_default_queue_dump;
 	_browser->queue_set = browser_default_queue_set;
 
 	/* initialize browser */
-	_browser->module.init((module_handle)_browser);
+	if ( _browser->module.init ){
+		_browser->module.init((module_handle)_browser);
+	}
+
+	if ( !_browser->next_slide ){
+		Log::warning("Browser plugin `%s' does not implement next_slide function (no slides can be retrieved).\n", context.provider);
+		_browser = NULL;
+		return;
+	}
 
 	/* assertions */
 	assert(_browser->next_slide);
