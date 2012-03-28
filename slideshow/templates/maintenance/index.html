@@ -51,11 +51,10 @@
 
 	<h2>Log</h2>
 	<div id="log" class="mono">
-		<p>
-			<py:for each="line in log">
-				${Markup(line)}<br/>
-			</py:for>
-		</p>
+		<pre>
+<span py:for="severity, line in log" class="${logcls[severity]}">${Markup(line)}
+</span>
+		</pre>
 	</div>
 	
 	<h2>Debug</h2>

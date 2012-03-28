@@ -205,3 +205,13 @@ h1, h2 {
 	margin: 0;
 	text-shadow: #bbb 1px 1px 1px;
 }
+
+#log .fatal {
+		color: red;
+		font-weight: bold;
+}
+
+#log .warning {
+		color: yellow;
+		font-weight: bold;
+}

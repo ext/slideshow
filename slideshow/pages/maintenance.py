@@ -8,10 +8,12 @@ import slideshow.daemon as daemon
 import slideshow.event as event
 import traceback
 
+logcls = ['fatal', 'warning', 'info', 'verbose', 'debug']
+
 class Ajax(object):
     @cherrypy.expose
     def log(self):
-        return '<p>' + '<br/>\n'.join(daemon.log()) + '</p>'
+        return '<p>' + '<br/>\n'.join(['<span class="%s">%s</span>' % (logcls[severity], line) for severity, line in daemon.log()]) + '</p>'
 
 class Handler(object):
     ajax = Ajax()
@@ -21,7 +23,7 @@ class Handler(object):
     def index(self):
         settings = Settings()
         cmd, args, env, cwd = daemon.settings(browser_factory.from_settings(settings))
-        return template.render(log=daemon.log(), state=daemon.state(), cmd=cmd, args=args, env=env, cwd=cwd)
+        return template.render(log=daemon.log(), logcls=logcls, state=daemon.state(), cmd=cmd, args=args, env=env, cwd=cwd)
 
     @cherrypy.expose
     @template.output('maintenance/config.html', parent='maintenance')
