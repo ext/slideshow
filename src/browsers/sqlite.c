@@ -181,7 +181,7 @@ static slide_context_t next_slide(sqlite3_context_t* this){
 				this->prev_slide_id = sort_order;
 			} else {
 				/* pop intermediate slides back to unsorted */
-				log_message(Log_Debug, "popping intermediate slide\n", slide.filename, id, queue_id);
+				log_message(Log_Debug, "popping intermediate slide\n");
 				pop_intermediate(this, id);
 			}
 
