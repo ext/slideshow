@@ -13,7 +13,7 @@ logcls = ['fatal', 'warning', 'info', 'verbose', 'debug']
 class Ajax(object):
     @cherrypy.expose
     def log(self):
-        return '<p>' + '<br/>\n'.join(['<span class="%s">%s</span>' % (logcls[severity], line) for severity, line in daemon.log()]) + '</p>'
+        return '<pre>' + '\n'.join(['<span class="%s">%s</span>' % (logcls[severity], line) for severity, line in daemon.log()]) + '</pre>'
 
 class Handler(object):
     ajax = Ajax()

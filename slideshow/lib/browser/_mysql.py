@@ -15,7 +15,7 @@ class QCursor(DictCursor):
         query = query.replace('?', '%s')
         query = re.sub(pattern, r'%(\1)s', query.strip())
 
-        if True:
+        if False:
             temp = re.sub(retrim, ' ', query)
             cherrypy.engine.log('Query: "%s" %s' % (temp, args))
         return DictCursor.execute(self, query, args)
@@ -41,7 +41,7 @@ class MySQL(Browser):
             db = self.database,
             cursorclass=QCursor)
         self.cursor = self.conn.cursor()
-        self.conn.autocommit(0)
+        self.conn.autocommit(1)
 
     def fetchone(self):
         return self.cursor.fetchone()
@@ -85,12 +85,17 @@ class MySQL(Browser):
 
     def last_row_id(self):
         return self.conn.insert_id()
+
+    def transaction(self):
+        self.conn.autocommit(0)
     
     def commit(self):
-        return self.conn.commit()
+        self.conn.commit()
+        self.conn.autocommit(1)
 
     def rollback(self):
-        return self.conn.rollback()
+        self.conn.rollback()
+        self.conn.autocommit(1)
     
     def connect(self, *args):
         """ Called by threads go get a thread-local copy of database """

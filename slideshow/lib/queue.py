@@ -4,6 +4,7 @@
 from slideshow.lib.slide import Slide
 from slideshow.settings import Settings
 import slideshow.event as event
+import cherrypy
 
 class Queue:
     def __init__(self, c, id, name, loop):
@@ -115,7 +116,8 @@ def activate(id):
     settings.persist()
     event.trigger('config.queue_changed', id)
 
-def set_loop(c, id, state):
+def set_loop(id, state):
+    c = cherrypy.thread_data.db
     c.execute("""
         UPDATE
             `queue`
@@ -124,6 +126,7 @@ def set_loop(c, id, state):
         WHERE
             `id` = :id
     """, dict(id=id, state=state))
+    c.commit()
     
     # to force reloading of queue settings
     event.trigger('config.queue_changed', id)

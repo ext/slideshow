@@ -147,7 +147,7 @@ def create(c, assembler, params):
 			:data
 		)
 	""", dict(path=slide._path, assembler=slide.assembler.name, data=json.dumps(slide._data)))
-	
+
 	return slide
 
 def edit(c, id, assembler, params):

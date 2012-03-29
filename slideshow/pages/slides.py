@@ -145,7 +145,8 @@ class Handler(object):
 				args['id'] = id
 			
 			raise cherrypy.HTTPRedirect('/slides/' + context + '?' + urllib.urlencode(args))
-		
+
+		cherrypy.thread_data.db.transaction()
 		try:
 			if id == None: # new slide
 				s = slide.create(cherrypy.thread_data.db, assembler, kwargs)
@@ -179,6 +180,7 @@ class Handler(object):
 	
 	@cherrypy.expose
 	def delete(self, id):
+		cherrypy.thread_data.db.transaction()
 		try:
 			slide.delete(cherrypy.thread_data.db, id)
 			cherrypy.thread_data.db.commit()

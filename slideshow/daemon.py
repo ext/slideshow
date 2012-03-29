@@ -117,6 +117,7 @@ class _Log:
             stamp = time.mktime(time.localtime())
             message = line
 
+            print >> sys.stderr, line
             # try to guess based on content (this is the output log output format from daemon)
             match = re.match('\((..)\) \[(.*)\] (.*)', line)
             if match:
