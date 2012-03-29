@@ -3,21 +3,22 @@ DROP TABLE IF EXISTS `queue`;
 DROP TABLE IF EXISTS `log`;
 DROP TABLE IF EXISTS `user`;
 
-CREATE TABLE `slide` (
-	id INTEGER PRIMARY KEY AUTO_INCREMENT,          -- ID of the slide
-	queue_id INTEGER NOT NULL REFERENCES queue(id), -- Queue ID the slide belong to
-	path TEXT NOT NULL,                             -- Path to slide
-	sortorder INTEGER NOT NULL DEFAULT 0,           -- Sort order index, ASC
-	active TINYINT NOT NULL DEFAULT 1,              -- 1 if enabled, 0 if disabled
-	assembler TEXT NOT NULL,                        -- Which assember is used to rasterize source data
-	data BLOB NOT NULL
-) ENGINE=InnoDB;
-
 CREATE TABLE `queue` (
 	id INTEGER PRIMARY KEY AUTO_INCREMENT,          -- ID of queue
 	`name` TEXT NOT NULL,                            -- Name of queue
 	`loop` TINYINT NOT NULL DEFAULT 1                -- 1 if looping is enabled, 0 if disabled.
-) ENGINE=InnoDB AUTO_INCREMENT=100;
+) ENGINE=INNODB AUTO_INCREMENT=100;
+
+CREATE TABLE `slide` (
+	id INTEGER PRIMARY KEY AUTO_INCREMENT,          -- ID of the slide
+	queue_id INTEGER NOT NULL,                      -- Queue ID the slide belong to
+	path TEXT NOT NULL,                             -- Path to slide
+	sortorder INTEGER NOT NULL DEFAULT 0,           -- Sort order index, ASC
+	active TINYINT NOT NULL DEFAULT 1,              -- 1 if enabled, 0 if disabled
+	assembler TEXT NOT NULL,                        -- Which assember is used to rasterize source data
+	data BLOB NOT NULL,
+  FOREIGN KEY (queue_id) REFERENCES queue(id)
+) ENGINE=INNODB;
 
 CREATE TABLE `log` (
        id INTEGER PRIMARY KEY AUTO_INCREMENT,
