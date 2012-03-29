@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os, os.path, json
+import os, os.path, sys, json
 import slideshow.lib.assembler as asm
 import shutil, uuid
 from slideshow.settings import Settings
 from slideshow.lib.resolution import Resolution
 import slideshow.event as event
 import cherrypy
+import traceback
 
 class InvalidSlide(Exception):
     pass
@@ -19,7 +20,11 @@ class Slide:
         self._path = path
         self.active = active
         self.assembler = asm.get(assembler)
-        self._data = data and json.loads(data) or None
+        try:
+            self._data = data and json.loads(data) or None
+        except:
+            print >> sys.stderr, 'Data was:', [data]
+            raise
         
         # Tells if this is a full slide (which database entry) or if it is being
         # constructed or is otherwise not complete.
