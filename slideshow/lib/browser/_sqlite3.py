@@ -25,7 +25,7 @@ class SQLite3(Browser):
 
 	def _connect(self):
 		settings = Settings()
-		filename = os.path.join(settings['Path.BasePath'], self._name)
+		filename = os.path.join(settings['Path.BasePath'], self.database)
 		
 		try:
 			conn = sqlite3.connect(filename)
