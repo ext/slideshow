@@ -148,7 +148,7 @@ class _Log:
             SELECT
                 log.severity AS severity,
                 user.name AS user,
-                UNIX_TIMESTAMP(log.stamp) AS stamp,
+                log.stamp+0 AS stamp,
                 log.message AS message
             FROM
                 log,
