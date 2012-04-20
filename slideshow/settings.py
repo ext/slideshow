@@ -514,6 +514,7 @@ class Settings(object):
         try:
             ItemResolution.values = resolutions(self['Appearance.Display'])
         except ValueError:
+            traceback.print_exc()
             ItemResolution.values = []
 
     def _load_user(self, config_file, errors):
