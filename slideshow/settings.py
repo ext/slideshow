@@ -511,7 +511,10 @@ class Settings(object):
             self._load_user(config_file, errors)
 
         # read resolution from selected display
-        ItemResolution.values = resolutions(self['Appearance.Display'])
+        try:
+            ItemResolution.values = resolutions(self['Appearance.Display'])
+        except ValueError:
+            ItemResolution.values = []
 
     def _load_user(self, config_file, errors):
         with open(config_file, 'r') as f:
