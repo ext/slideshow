@@ -12,17 +12,8 @@
 	
 	<?python empty_queue = active.id == 0 or len(active) == 0 ?>
 	<div id="empty_notice" class="notice" py:attrs="{'style': 'display:' + (empty_queue and 'block' or 'none')}">
-		<script type="text/javascript">
-			document.write("The current active queue is empty. You can create some slides and move them into the active queue.");
-		</script>
-		<noscript py:if="len(active) == 0">
-			The current active queue is empty. You can create some slides and move them into the active queue.
-		</noscript>
+		The current active queue is empty. You can create some slides and move them into the active queue.
 	</div>
-	
-	<!--! These br's is to force linebreaks in non-graphics browsers like links -->
-	<br style="display:none" />
-	<br style="display:none" />
 	
 	<py:for each="queue in queues">
 		<div class="queuewrapper">
@@ -53,15 +44,6 @@
 							<span class="hide" py:if="slide.active"><a href="/slides/deactivate/${slide.id}">Hide</a></span>
 							<span class="show" py:if="not slide.active"><a href="/slides/activate/${slide.id}">Show</a></span>
 							<span class="delete"><a href="/slides/delete/${slide.id}">Delete</a></span>
-
-							<noscript>
-								<form action="/slides/move/${slide.id}" method="post">
-								<select name="to_bin">
-									<option py:for="x in queues" value="${x.id}">${queue.name}</option>
-								</select>
-								<input type="submit" value="Move" />
-							</form>
-							</noscript>
 						</div>
 					</div>
 				</py:for>
