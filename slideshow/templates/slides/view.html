@@ -33,7 +33,7 @@
 				</py:if>
 			</span><br/>
 			
-			<div class="queue" id="queue_${queue.id}">
+			<div class="queue" id="${queue.div}">
 				<py:for each="slide in queue.slides">
 					<div class="slide" id="slide_${slide.id}">
 						<img src="/slides/show/${slide.id}/200/200" />
@@ -55,8 +55,8 @@
 	<script type="text/javascript">
 		var notice_visible = ${len(active) == 0 and 'true' or 'false'};
 		<py:for each="queue in queues">
-			$$("#queue_${queue.id}").sortable({
-				connectWith: [ ${', '.join(['"#queue_%d"' % q.id for q in queues])} ],
+			$$("#${queue.div}").sortable({
+				connectWith: [ ${', '.join(['"#%s"' % q.div for q in queues])} ],
 				placeholder: 'slide_placeholder',
 				tolerance: "pointer",
 				
