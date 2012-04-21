@@ -198,7 +198,10 @@ img {
 }
 
 .slide_placeholder {
-	border: 3px dashed #666;
+    border: 3px dashed #666;
+    float: left;
+    height: 227px;
+    width: 200px;
 }
 
 h1, h2 {
