@@ -1,5 +1,5 @@
 dnl Remember to bump 'setup.py' and 'slideshow/templates/index.html' as well
-AC_INIT([slideshow],[0.3.4], [ext@sidvind.com])
+AC_INIT([slideshow],[0.4.0], [ext@sidvind.com])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall 1.11 subdir-objects])
 AM_SILENT_RULES([yes])
