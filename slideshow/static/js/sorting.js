@@ -37,6 +37,7 @@ $(document).ready(function(){
 						connectWith: other,
 						placeholder: 'slide_placeholder',
 						tolerance: 'pointer',
+						distance: 10,
 						update: function(){
 								$(this).trigger('updated');
 						},
