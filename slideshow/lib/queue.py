@@ -6,9 +6,18 @@ from slideshow.settings import Settings
 import slideshow.event as event
 import cherrypy
 
+def div_id(id):
+    if id >= 0:
+        return 'queue_%d' % id
+    elif id == -1:
+        return 'queue_int'
+    else:
+        raise ValueError, 'Invalid id for div_id: %d' % id
+
 class Queue:
     def __init__(self, c, id, name, loop):
         self.id = id
+        self.div = div_id(id)
         self.name = name
         self.loop = loop == 1
         self.slides = [Slide(queue=self, **x) for x in c.execute("""
