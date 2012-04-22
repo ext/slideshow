@@ -143,11 +143,10 @@
 	border:1px solid #aaa;
 }
 
-img {
-	
-	cursor:		move;
-	margin: 0;
-	padding: 0;
+.slide img {
+    cursor:		move;
+    margin: 0;
+    padding: 0;
 }
 
 .slide .menu {
