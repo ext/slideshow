@@ -118,10 +118,16 @@
 
 .queuewrapper .title {
 	margin: 0 0 0 10px;
-	padding: 0 10px;
+	padding: 0 7px;
 	background: white;
 	position: relative; top: -10px;
 	display: inline;
+	font-size: 0.9em;
+	font-family: sans-serif;
+}
+
+.queuewrapper .title a {
+    color: #00e;
 }
 
 .queue {
