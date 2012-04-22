@@ -37,6 +37,15 @@ class Browser:
 
         return '{provider}://{credentials}{hostname}{name}'.format(provider=self.provider, credentials=credentials, hostname=hostname, name=self.database)
 
+    def __enter__(self):
+        self.transaction()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type is None:
+            self.commit()
+        else:
+            self.rollback()
+
 def register(name):
     def inner(cls):
         Browser.factory[name] = cls
