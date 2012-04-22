@@ -1,3 +1,6 @@
+/* global states */
+var delete_id = undefined; /* which slide is about to be deleted */
+
 $(document).ready(function(){
 		/* queue is a global variable */
 		for ( i in queue ){
@@ -49,9 +52,33 @@ $(document).ready(function(){
 		$('#delete_cancel').bind('click', function(){
 				$('#delete_dialog').dialog('close');
 		});
+		$('#delete_confirm').bind('click', function(){
+				/* notify server about update */
+				$.ajax({
+						type: "POST",
+						url: "/slides/ajax/delete",
+						data: {id: delete_id},
+						dataType: 'json',
+						success: function(data){
+								if ( data['success'] ){
+										$('#slide_' + delete_id).remove();
+								} else {
+										alert(data['message']);
+								}
+								$('#delete_dialog').dialog('close');
+						},
+						error: function(x, status, error){
+								alert(status + '\n' + error);
+								$('#delete_dialog').dialog('close');
+						},
+
+				});
+		});
+
 });
 
 function slide_delete(id){
+		delete_id = id;
 		$("#delete_dialog img").attr('src', '/slides/show/' + id + '/800/600');
 		$("#delete_dialog").dialog({
 				modal: true,
@@ -59,5 +86,9 @@ function slide_delete(id){
 				position: 'center',
 				width: 834, /* 800 + 17 + 17 (padding) */
 				height: 700,
+				close: function(){
+						console.log('dialog closed');
+						delete_id = undefined;
+				}
 		});
 }

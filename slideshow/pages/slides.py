@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import cherrypy, urllib, os
+import traceback
+import json
 from slideshow.lib import assembler, queue, slide, template
 from slideshow.lib.resolution import Resolution
 from slideshow.settings import Settings
@@ -31,6 +33,15 @@ class Ajax(object):
         daemon.reload()
 
         return None
+
+    @cherrypy.expose
+    def delete(self, id):
+        try:
+            slide.delete(cherrypy.thread_data.db, id)
+            return json.dumps({'success': True})
+        except Exception, e:
+            traceback.print_exc()
+            return json.dumps({'success': False, 'message': str(e)})
 
 class Handler(object):
     ajax = Ajax()
