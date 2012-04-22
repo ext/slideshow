@@ -130,7 +130,7 @@ class Handler(object):
         unsorted=assembler.all()
 
         # manually place image and text first
-        sorted = [unsorted.pop('image'), unsorted.pop('text')]
+        sorted = [unsorted.pop('text'), unsorted.pop('image')]
         unsorted = unsorted.items()
         unsorted.sort()
         sorted += [v for k,v in unsorted]

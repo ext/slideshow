@@ -104,4 +104,16 @@ $(document).ready(function(){
 
 				});
 		});
+		
+		/* fold slide upload fieldsets */
+		var $f = $('.foldable');
+		$f.foldable({
+				collapsed: function(){
+						/* all start collapsed but text assembler */
+						return $(this).attr('id') != 'assembler_text';
+				},
+				expanded_html: '',
+				collapsed_html: '',
+				connected: $f,
+		});
 });

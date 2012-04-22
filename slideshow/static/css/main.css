@@ -124,6 +124,29 @@ body {
     padding-left: 40px;
 }
 
+#content .folding {
+    text-decoration: none;
+    color: #000;
+    padding-left: 16px;
+}
+
+#content .fold-expanded {
+    background: url('/static/icon/bullet_toggle_minus.png');
+    background-position: 0 6px;
+    background-repeat: no-repeat;
+}
+
+#content .fold-collapsed {
+    background: url('/static/icon/bullet_toggle_plus.png');
+    background-position: 0 6px;
+    background-repeat: no-repeat;
+}
+
+#content .assembler legend {
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
 .queuewrapper {
 	margin-top: 10px;
 	margin-bottom: 10px;

@@ -16,7 +16,6 @@
 	</div>
 	
 	<py:for each="assembler in assemblers">
-		<h2>${assembler.title()}</h2>
 		<form action="/slides/submit" method="post" enctype="multipart/form-data" accept-charset="utf-8">
 			${Markup(assembler.render(content=preview, context="upload"))}
 		</form>

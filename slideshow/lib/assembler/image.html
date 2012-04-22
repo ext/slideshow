@@ -1,18 +1,19 @@
-<fieldset>
-  <script type="text/javascript">
-    function ${assembler}_validate_submit(){
-      if ( $('#${assembler}-filename').val() == '' ){
-        alert('No image selected');
-        return false;
-      }
-
-      return true;
-    }
-  </script>
-
-  <input type="hidden" name="assembler" value="${assembler}" />
-  <input type="hidden" name="context" value="${context}" />
-  <p>Using this option you can upload an existing image. The image will be scaled to fit the screen but will keep the aspect ratio.</p>
-  <input type="file" id="${assembler}-filename" name="filename" accept="image/*" />
-  <input type="submit" value="Upload" onclick="javascript:return ${assembler}_validate_submit();"/>
+<fieldset id="assembler_image" class="assembler foldable">
+	<legend>Image <a href="#" onclick="$('#assembler_image').foldable('toggle');" class="folding"></a></legend>
+	<script type="text/javascript">
+		function ${assembler}_validate_submit(){
+			if ( $('#${assembler}-filename').val() == '' ){
+		        alert('No image selected');
+		        return false;
+			}
+		
+			return true;
+		}
+	</script>
+	
+	<input type="hidden" name="assembler" value="${assembler}" />
+	<input type="hidden" name="context" value="${context}" />
+	<p>Using this option you can upload an existing image. The image will be scaled to fit the screen but will keep the aspect ratio.</p>
+	<input type="file" id="${assembler}-filename" name="filename" accept="image/*" />
+	<input type="submit" value="Upload" onclick="javascript:return ${assembler}_validate_submit();"/>
 </fieldset>

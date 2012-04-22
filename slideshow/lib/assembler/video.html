@@ -1,12 +1,13 @@
-<fieldset xmlns:py="http://genshi.edgewall.org/">
-  <input type="hidden" name="assembler" value="${assembler}" />
-  <input type="hidden" name="context" value="${context}" />
-  <p>Upload videos into the video folder and they will appear here.</p>
-
-  <select id="${assembler}-filename" name="filename">
-    <option value="">&mdash;</option>
-    <option py:for="file in files" value="${file}">${file}</option>
-  </select>
-
-  <input type="submit" value="Prepare" />
+<fieldset id="assembler_video" class="assembler foldable" xmlns:py="http://genshi.edgewall.org/">
+	<legend>Video <a href="#" onclick="$('#assembler_video').foldable('toggle');" class="folding"></a></legend>
+	<input type="hidden" name="assembler" value="${assembler}" />
+	<input type="hidden" name="context" value="${context}" />
+	<p>Upload videos into the video folder and they will appear here.</p>
+	
+	<select id="${assembler}-filename" name="filename">
+		<option value="">&mdash;</option>
+		<option py:for="file in files" value="${file}">${file}</option>
+	</select>
+	
+	<input type="submit" value="Prepare" />
 </fieldset>
