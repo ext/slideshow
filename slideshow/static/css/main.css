@@ -1,3 +1,12 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    padding: 10px;
+}
+
 .mono {
 	font-family:	monospace;
 	background:	#ccc;
@@ -28,7 +37,6 @@
 
 #menu :link, #menu :visited {
 	padding: .25em 14px .25em 30px;
-	margin: 0;
 	text-decoration: none;
 	background: white;
 	border: 1px solid black;
@@ -73,15 +81,11 @@
 
 #menu ul {
 	list-style: none;
-	padding: 0;
-	margin: 0;
 	text-align: left;
 }
 
 #menu li {
 	display: inline;
-	padding: 0;
-	margin: 0;
 	white-space: nowrap;
 }
 
@@ -93,7 +97,6 @@
 	font: normal 10px verdana,'Bitstream Vera Sans',helvetica,arial,sans-serif;
 	float: right;
 	padding: .25em 20px .10em 20px;
-	margin: 0;
 	white-space: nowrap;
 	background: white;
 	border: 1px solid black;
@@ -102,11 +105,23 @@
 #content {
 	clear:both;
 	background: white;
-	margin: 0;
 	padding: 10px;
 	border-left: 1px solid black;
 	border-right: 1px solid black;
 	border-bottom: 1px solid black;
+}
+
+#content fieldset {
+    margin: 0 2px;
+    padding: 5px 10px 12px 10px;
+}
+
+#content p {
+    margin: 16px 0;
+}
+
+#content ul {
+    padding-left: 40px;
 }
 
 .queuewrapper {
@@ -143,7 +158,6 @@
 .slide {
 	float: left;
 	
-	margin: 0;
 	margin-right: 10px;
 	padding: 0;
 	border:1px solid #aaa;
@@ -151,12 +165,9 @@
 
 .slide img {
     cursor:		move;
-    margin: 0;
-    padding: 0;
 }
 
 .slide .menu {
-	margin: 0;
 	padding: 5px;
 
 	font-size: 0.7em;
@@ -211,12 +222,7 @@
 }
 
 h1 {
-    margin: 0;
     text-shadow: #bbb 1px 1px 1px;
-}
-
-h2 {
-    margin: 0;
 }
 
 #log .fatal {
