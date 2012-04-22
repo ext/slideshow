@@ -218,3 +218,7 @@ h1, h2 {
 		color: yellow;
 		font-weight: bold;
 }
+
+#delete_dialog {
+    text-align: right;
+}

@@ -44,4 +44,20 @@ $(document).ready(function(){
 				});
 				$(id).disableSelection();
 		}
+
+		/* setup delete dialog buttons */
+		$('#delete_cancel').bind('click', function(){
+				$('#delete_dialog').dialog('close');
+		});
 });
+
+function slide_delete(id){
+		$("#delete_dialog img").attr('src', '/slides/show/' + id + '/800/600');
+		$("#delete_dialog").dialog({
+				modal: true,
+				resizable: false,
+				position: 'center',
+				width: 834, /* 800 + 17 + 17 (padding) */
+				height: 700,
+		});
+}
