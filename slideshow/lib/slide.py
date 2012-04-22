@@ -177,10 +177,10 @@ def edit(c, id, assembler, params):
 def delete(db, id):
     with db:
         # validate that the slide exists
-        s = from_id(c, id)
+        s = from_id(db, id)
 
         # delete slide from database
-        c.execute("""
+        db.execute("""
             DELETE FROM
                 slide
             WHERE
