@@ -2,7 +2,7 @@ import os
 
 class Browser:
     # registered factories
-        factory = {}
+    factory = {}
 
     def __init__(self, hostname, username, password, database):
         self.provider = self.__class__.provider
