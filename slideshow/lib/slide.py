@@ -174,17 +174,21 @@ def edit(c, id, assembler, params):
             id = :id
     """, dict(id=id, data=json.dumps(slide._data)))
 
-def delete(c, id):
-    s = from_id(c, id)
+def delete(db, id):
+    with db:
+        # validate that the slide exists
+        s = from_id(c, id)
 
-    c.execute("""
-        DELETE FROM
-            slide
-        WHERE
-            id = :id
-    """, dict(id=s.id))
+        # delete slide from database
+        c.execute("""
+            DELETE FROM
+                slide
+            WHERE
+                id = :id
+        """, dict(id=s.id))
 
-    shutil.rmtree(s._path)
+        # remove all resources
+        shutil.rmtree(s._path)
 
 @event.listener
 class EventListener:
