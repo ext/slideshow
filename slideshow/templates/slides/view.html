@@ -6,7 +6,7 @@
 
 	<head>
 		<script type="text/javascript">
-			var queue = [ ${', '.join(['"#%s"' % q.div for q in queues])} ];
+			var queues = [ ${', '.join(['"#%s"' % q.div for q in queues])} ];
 			var active = "${'#' + active.div}";
 			var notice_visible = ${len(active) == 0 and 'true' or 'false'};
 		</script>
@@ -53,7 +53,7 @@
 							<span class="edit" py:if="slide.assembler.is_editable()"><a href="/slides/edit/${slide.id}">Edit</a></span>
 							<span class="hide" py:if="slide.active"><a href="/slides/deactivate/${slide.id}">Hide</a></span>
 							<span class="show" py:if="not slide.active"><a href="/slides/activate/${slide.id}">Show</a></span>
-							<span class="delete"><a href="#" onclick="slide_delete(${slide.id});">Delete</a></span>
+							<span class="delete"><a href="#" onclick="slide.delete(${slide.id});">Delete</a></span>
 						</div>
 					</div>
 				</py:for>
