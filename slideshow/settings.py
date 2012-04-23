@@ -456,7 +456,14 @@ class Settings(object):
             grpname = group.getAttribute('name')
             hidden  = group.hasAttribute('hidden') and group.getAttribute('hidden') == '1'
             ignore  = group.hasAttribute('ignore') and group.getAttribute('ignore') == '1'
-            grpdesc = ''.join([x.toxml() for x in group.getElementsByTagName('description')[0].childNodes])
+            grpdesc = None
+
+            # Parse group description
+            t = group.getElementsByTagName('description')
+            if len(t) == 1:
+                grpdesc = ''.join([x.toxml() for x in t[0].childNodes])
+            elif len(t) > 1:
+                raise ValueError, 'Multiple descriptions for group %s' % grpname
 
             g = Group(name=grpname, description=grpdesc, hidden=hidden, ignore=ignore)
 
