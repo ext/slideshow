@@ -22,20 +22,20 @@ class OrderDict:
     def __init__(self):
         self._list = []
         self._dict = {}
-    
+
     def __setitem__(self, k, v):
         self._list.append((k,v))
         self._dict[k] = v
-    
+
     def __getitem__(self, k):
         return self._dict[k]
 
     def values(self):
         return [v for k,v in self._list]
-    
+
     def keys(self):
         return [k for k,v in self._list]
-    
+
     def items(self):
         return self._list
 
@@ -46,13 +46,13 @@ class Group:
         self.hidden = hidden
         self.ignore = ignore
         self._items = OrderDict()
-    
+
     def add(self, item):
         self._items[item.name] = item
-    
+
     def __getitem__(self, k):
         return self._items[k]
-    
+
     def items(self):
         return self._items.items().__iter__()
 
@@ -70,7 +70,7 @@ class ValidationError(Exception):
 
 class Item:
     typename = '' # automatically set
-    
+
     def __init__(self, group, name, title=None, description='', rel=None, cls=''):
         self.group = group
         self.name = name
@@ -82,25 +82,25 @@ class Item:
 
         if title is not None:
             self.title = title
-    
+
     def _values(self):
         return dict(
             group=self.group.name,
             name=self.name,
-            title=self.title, 
+            title=self.title,
             type=self.typename,
             value=unicode(self._value),
             cls=self.cls,
         )
-    
+
     def __str__(self):
         return '<input type="text" class="{cls}" name="{group}.{name}" value="{value}"/>'.format(**self._values())
-    
+
     def set(self, value, rollback=False):
         tmp = self._value
         self._value = value
         return tmp
-    
+
     def get(self):
         return self._value
 
@@ -109,61 +109,61 @@ class ItemDummy(Item):
 
 class ItemDirectory(Item):
     default = ''
-    
+
     def set(self, value, rollback=False):
         tmp = self._value
         self._value = value
         path = self.fullpath()
-        
+
         try:
             try:
                 statinfo = os.stat(path)
             except OSError:
                 raise ValidationError('Directory not found ', self, path)
-            
+
             if not stat.S_ISDIR(statinfo.st_mode):
                 raise ValidationError('Not a directory', self, path)
             if not os.access(path, os.W_OK):
                 raise ValidationError('Need write-permission', self, path)
-            
+
             return tmp
         except:
             if rollback:
                 self._value = tmp
             raise
-    
+
     def fullpath(self):
         # quick sanity check
         if self._value == '':
             return self._value
-        
+
         # is no relative path is specified it is always considered absolute
         if not self.rel:
             return self._value
-        
+
         # absolute path is not relative
         if self._value[0] == '/':
             return self._value
-        
+
         # join relative path with it's parent
         return os.path.join(self.rel.fullpath(), self._value)
 
 class ItemFile(Item):
     default = ''
-    
+
     def fullpath(self):
         # quick sanity check
         if self._value == '':
             return self._value
-        
+
         # is no relative path is specified it is always considered absolute
         if not self.rel:
             return self._value
-        
+
         # absolute path is not relative
         if self._value[0] == '/':
             return self._value
-        
+
         # join relative path with it's parent
         return os.path.join(self.rel.fullpath(), self._value)
 
@@ -172,11 +172,11 @@ class ItemString(Item):
 
 class ItemInteger(Item):
     default = 0
-    
+
     def set(self, value, rollback=False):
         tmp = self._value
         self._value = value
-        
+
         try:
             try:
                 self._value = int(value)
@@ -190,11 +190,11 @@ class ItemInteger(Item):
 
 class ItemFloat(Item):
     default = 0.0
-    
+
     def set(self, value, rollback=False):
         tmp = self._value
         self._value = value
-        
+
         try:
             try:
                 self._value = float(value)
@@ -208,7 +208,7 @@ class ItemFloat(Item):
 
 class ItemPassword(Item):
     default = ''
-    
+
     def __str__(self):
         return '<input type="password" class="{cls}" name="{group}.{name}" value=""/>'.format(**self._values())
 
@@ -253,56 +253,56 @@ def resolutions(dpy):
 class ItemResolution(Item):
     default = None
     values = []
-    
+
     def __init__(self, allow_empty=False, **kwargs):
         Item.__init__(self, **kwargs)
         self._extra = []
-        
+
         if allow_empty:
             self._extra.append(('',''))
-        
+
     def __str__(self):
         def f(x):
             if self._value == x:
                 return '<option value="{key}" selected="selected">{value}</option>'
             else:
                 return '<option value="{key}">{value}</option>'
-        
+
         options = [f(k).format(key=k, value=v) for k,v in self._extra + self.values]
         head = '<select name="{group}.{name}" class="{cls}">'.format(**self._values())
         content = '\n'.join(options)
         tail = '</select>'
-        
+
         return head + content + tail
 
 class ItemDisplay(Item):
     default = ':0.0'
     values = map(lambda x: (x,x), xorg_query.screens())
-    
+
     def __init__(self, allow_empty=False, **kwargs):
         Item.__init__(self, **kwargs)
         self._extra = []
-        
+
         if allow_empty:
             self._extra.append(('',''))
-    
+
     def __str__(self):
         def f(x):
             if self._value == x:
                 return '<option value="{key}" selected="selected">{value}</option>'
             else:
                 return '<option value="{key}">{value}</option>'
-        
+
         options = [f(k).format(key=k, value=v) for k,v in self._extra + self.values]
         head = '<select name="{group}.{name}" class="{cls}">'.format(**self._values())
         content = '\n'.join(options)
         tail = '</select>'
-        
+
         return head + content + tail
 
 class ItemStatic(Item):
     default = None
-    
+
     def __str__(self):
         return '<div class="static {cls}" name="{group}.{name}">&nbsp;</div>'.format(**self._values())
 
@@ -320,14 +320,14 @@ class ItemFilelist(Item):
                 return '<option selected="selected">{value}</option>'
             else:
                 return '<option>{value}</option>'
-        
+
         options = [f(x).format(value=x) for x in values]
         head = '<select name="{group}.{name}" class="{cls}">'.format(**self._values())
         content = '\n'.join(options)
         tail = '</select>'
-        
+
         return head + content + tail
-        
+
 itemfactory = {
     'directory': ItemDirectory,
     'file':      ItemFile,
@@ -346,33 +346,33 @@ for k,v in itemfactory.items():
 
 class Settings(object):
     __singleton = None
-    
+
     def __new__(cls, *args, **kwargs):
         if cls != type(cls.__singleton):
             cls.__singleton = object.__new__(cls)
             cls.__singleton.__real_init__()
         return cls.__singleton
-    
+
     def __init__(self):
         """ NOT SAFE, WILL BE CALLED FOR EACH COPY OF THE SINGLETON! """
         pass
-    
+
     def __real_init__(self):
         """ Will be called on singleton creation """
         self._locked = False
         self._lock = threading.Lock()
-        
+
     def __iter__(self):
         return self.groups.values().__iter__()
-    
+
     def item(self, key):
         [groupname, itemname] = key.split('.')
         return self.groups[groupname][itemname]
-    
+
     def __str__(self):
         pp = pprint.PrettyPrinter(indent=4)
         return pp.pformat(self.all())
-    
+
     def all(self):
         c = {}
         for group in self:
@@ -382,21 +382,21 @@ class Settings(object):
             c[group.name] = d
         c['Env'] = self.enviroment
         return c
-    
+
     def __enter__(self):
         self._lock.acquire()
         self._locked = True
-    
+
     def __exit__(self, type, value, traceback):
         ItemResolution.values = resolutions(self['Appearance.Display'])
-        
+
         self._locked = False
         self._lock.release()
-    
+
     def __getitem__(self, key):
         if key == 'Env':
             return self.enviroment
-        
+
         # full path passed, extract only the specific value
         if '.' in key:
             return self.item(key)._value
@@ -409,24 +409,24 @@ class Settings(object):
             d[str(k)] = v._value
 
         return d
-    
+
     def __setitem__(self, key, value):
         if not self._locked:
             raise RuntimeError, 'Cannot assign settings while not locked'
-        
+
         if key == 'Env':
             self.enviroment = value
             return
-        
+
         item = self.item(key)
         old = item.set(value)
-        
+
         if key == 'Appearance.Resolution' and item._value != old:
             event.trigger('config.resolution_changed', self.resolution())
-        
+
         if key == 'Runtime.queue' and item._value != old:
             event.trigger('config.queue_changed', item._value)
-    
+
     def resolution(self):
         r = self['Appearance.Resolution']
         if r:
@@ -437,12 +437,12 @@ class Settings(object):
         else:
             size = xorg_query.current_resolution(use_rotation=True)
             return Resolution(size[0], size[1])
-    
+
     def load(self, base, config_file=None, format_keys={}, errors=[]):
         """
         :param base: Path to settings XML definition file.
         :param config_file: Path to file to load settings from.
-        :format_keys: 
+        :format_keys:
         :param errors: Decides what to do about validation errors.
           If list, elements is considered fatal and raises an error, for others a warning is issued on stderr.
           If none, all errors is ignored
@@ -451,36 +451,36 @@ class Settings(object):
         self.groups = OrderDict()
         self.enviroment = {}
         self.config_file = config_file
-        
+
         for group in doc.getElementsByTagName('group'):
             grpname = group.getAttribute('name')
             hidden  = group.hasAttribute('hidden') and group.getAttribute('hidden') == '1'
             ignore  = group.hasAttribute('ignore') and group.getAttribute('ignore') == '1'
             grpdesc = ''.join([x.toxml() for x in group.getElementsByTagName('description')[0].childNodes])
-            
+
             g = Group(name=grpname, description=grpdesc, hidden=hidden, ignore=ignore)
-            
+
             for item in group.getElementsByTagName('item'):
                 attrs = {}
                 for i in range(0, item.attributes.length):
                     k = item.attributes.item(i).name
                     v = item.getAttribute(k)
                     attrs[k] = v
-                
+
                 type  = attrs['type']
                 del attrs['type']
-                
+
                 item = itemfactory[type](group=g, **attrs)
                 g.add(item)
-            
+
             self.groups[grpname] = g
-        
+
         # resolve relative paths
         for group in self:
             for item in group:
                 if not item.rel:
                     continue
-                
+
                 item.rel = self.item(item.rel)
 
         # load default settings
@@ -505,7 +505,7 @@ class Settings(object):
                         traceback.print_exc()
                 elif n > 1:
                     raise RuntimeError, 'Got multiple default values for %s: %s' % (item, item.childNodes)
-        
+
         # load stored settings
         if config_file:
             self._load_user(config_file, errors)
@@ -520,16 +520,16 @@ class Settings(object):
     def _load_user(self, config_file, errors):
         with open(config_file, 'r') as f:
             c = json.load(f)
-            
+
             # Because of dependencies between items and no guarantee of the
-            # order they arrive in we keep iterating through all items that are 
+            # order they arrive in we keep iterating through all items that are
             # left until either no more changes was made or until no more items
             # are left.
             p = 0
             while True:
                 p += 1 # pass
                 n = 0  # nr of changes
-                
+
                 for k,v in c.items():
                     if k == 'Env':
                         self.enviroment = v
@@ -540,7 +540,7 @@ class Settings(object):
                     except KeyError:
                         print >> sys.stderr, 'group', k, 'found in config but is not defined xml'
                         continue
-                    
+
                     for name, value in v.items():
                         try:
                             if not group.ignore:
@@ -564,10 +564,10 @@ class Settings(object):
                         except KeyError:
                             traceback.print_exc()
                             print >> sys.stderr, '"%s.%s"found in config but is not defined in xml' % (k, name)
-                                
+
                 if n == 0:
                     break
-    
+
     def persist(self, dst=None):
         if dst is None:
             dst = self.config_file
