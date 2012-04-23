@@ -57,6 +57,12 @@
 		<item name="Name" type="string" cls="browserblur">site.db</item>
 		<item name="URL" type="string">http://localhost</item>
 	</group>
+
+	<group name="Access">
+		<description>Defines IP subnets that is allowed to access slideshow. To allow any IP use 0.0.0.0.</description>
+		<item name="Subnet" type="textarea" description="IP[/CIDR]">127.0.0.1/8
+0.0.0.0</item>
+	</group>
 	
 	<group name="Slideshow">
 		<description>These settings only affects the webGUI.</description>

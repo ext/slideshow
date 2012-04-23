@@ -438,6 +438,9 @@ class Settings(object):
         if key == 'Runtime.queue' and item._value != old:
             event.trigger('config.queue_changed', item._value)
 
+        if key == 'Access.Subnet' and item._value != old:
+            event.trigger('config.ipblock_changed', item._value)
+
     def resolution(self):
         r = self['Appearance.Resolution']
         if r:
