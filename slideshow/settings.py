@@ -328,6 +328,16 @@ class ItemFilelist(Item):
 
         return head + content + tail
 
+class ItemTextArea(Item):
+    default = ''
+
+    def __init__(self, *args, **kwargs):
+        Item.__init__(self, *args, **kwargs)
+        self.value = ''
+
+    def __str__(self):
+        return '<textarea name="{group}.{name}">{value}</textarea>'.format(**self._values())
+
 itemfactory = {
     'directory': ItemDirectory,
     'file':      ItemFile,
@@ -339,6 +349,7 @@ itemfactory = {
     'display':   ItemDisplay,
     'static':    ItemStatic,
     'filelist':  ItemFilelist,
+    'textarea':  ItemTextArea,
 }
 
 for k,v in itemfactory.items():
