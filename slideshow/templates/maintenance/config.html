@@ -83,7 +83,7 @@
 					on a separate line. Note that SLIDESHOW_ will be prepended
 					to each variable to prevent abuse.
 				</p>
-				<textarea name="Env"><py:for each="k,v in settings['Env'].items()">${k}=${v}${Markup("\n")}</py:for></textarea>
+				<textarea name="Env" class="wide"><py:for each="k,v in settings['Env'].items()">${k}=${v}${Markup("\n")}</py:for></textarea>
 			</fieldset>
 			<input type="submit" value="Save" />
 		</form>
