@@ -19,12 +19,8 @@ class IPBlock(object):
 
     def __call__(self):
         remote = self.parse_ip(cherrypy.request.remote.ip)
-        print remote, cherrypy.request.remote.ip
         for ip, mask in self.subnet:
-            print remote, ip, mask
-            print remote & mask
-            if (remote & mask) == ip:
-                return True
+            if (remote & mask) == ip: return
         raise cherrypy.HTTPError("401 Unauthorized", "IP not in whitelist.")
 
     def update(self, value):
@@ -44,7 +40,6 @@ class IPBlock(object):
                     ip = tmp[0]
                     cidr = tmp[1]
 
-                print 'raw', ip, cidr
                 mask = self.gen_mask(cidr)
                 ip = self.parse_ip(ip) & mask
 
