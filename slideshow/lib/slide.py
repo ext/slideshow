@@ -13,13 +13,14 @@ import traceback
 class InvalidSlide(Exception):
     pass
 
-class Slide:
+class Slide(object):
     def __init__(self, id, queue, path, active, assembler, data, stub=False, validate_path=True):
         self.id = id
         self._queue = queue
         self._path = path
         self.active = active
         self.assembler = asm.get(assembler)
+        self.classes = ['slide']
         try:
             self._data = data and json.loads(data) or None
         except:
@@ -35,6 +36,17 @@ class Slide:
             base_path = settings['Path.BasePath']
             image_path = settings['Path.Image']
             raise ValueError, "could not locate '{path}' in '{root}'".format(path=path, root=os.path.join(base_path, image_path))
+
+    def __getattribute__(self, key):
+        if key == 'attributes':
+            cls = list(self.classes)
+            if not self.active: cls.append('disabled')
+
+            return {
+                'class': ' '.join(cls)
+            }
+
+        return object.__getattribute__(self, key)
 
     def assemble(self, params):
         return json.dumps(self.assembler.assemble(self, **params))
