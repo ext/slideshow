@@ -1,6 +1,9 @@
 slideshow-0.4.0
 ---------------
 
+	* [frontend] folds fieldsets on upload screen so users don't
+	             accidentally press the wrong button.
+	* [frontend] delete slide with js.
 	* [frontend] javascript refactoring.
 	* [frontend] officially requiring javascript to use frontend.
 	* [frontend] updated to latest stable jquery.
