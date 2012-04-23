@@ -45,15 +45,17 @@
 			
 			<div class="queue" id="${queue.div}">
 				<py:for each="slide in queue.slides">
-					<div class="slide" id="slide_${slide.id}">
-						<img src="/slides/show/${slide.id}/200/200" />
+					<div py:attrs="slide.attributes" id="slide_${slide.id}">
+						<div class="preview">
+							<img src="/slides/show/${slide.id}/200/200" />
+						</div>
 						<div class="menu">
 							<span class="zoom" py:if="slide.assembler.is_viewable()"><a href="/slides/show/${slide.id}">Full</a></span>
 							<span class="play" py:if="slide.assembler.is_playable()"><a href="/slides/play/${slide.id}">Play</a></span>
 							<span class="edit" py:if="slide.assembler.is_editable()"><a href="/slides/edit/${slide.id}">Edit</a></span>
-							<span class="hide" py:if="slide.active"><a href="/slides/deactivate/${slide.id}">Hide</a></span>
-							<span class="show" py:if="not slide.active"><a href="/slides/activate/${slide.id}">Show</a></span>
-							<span class="delete"><a href="#" onclick="slide.delete(${slide.id});">Delete</a></span>
+							<span class="hide"><a href="#" onclick="slide.deactivate(${slide.id}, this); return false;">Hide</a></span>
+							<span class="show"><a href="#" onclick="slide.activate(${slide.id}, this);   return false;">Show</a></span>
+							<span class="delete"><a href="#" onclick="slide.delete(${slide.id}); return false;">Delete</a></span>
 						</div>
 					</div>
 				</py:for>

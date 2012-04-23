@@ -190,6 +190,25 @@ body {
     cursor:		move;
 }
 
+.disabled {
+}
+
+.disabled .preview {
+    background: url('images/ui-bg_diagonals-thick_20_666666_40x40.png');
+}
+
+.disabled img {
+    opacity: 0.2;
+}
+
+.disabled .hide {
+    display: none;
+}
+
+.disabled .show {
+    display: inline !important;
+}
+
 .slide .menu {
 	padding: 5px;
 
@@ -224,11 +243,13 @@ body {
 .slide .hide {
 	padding: 2px 0px 2px 16px;
 	background: transparent url('/static/icon/picture_empty.png') no-repeat center left;
+  /* display is controlled by .disabled */
 }
 
 .slide .show {
 	padding: 2px 0px 2px 16px;
 	background: transparent url('/static/icon/picture.png') no-repeat center left;
+  display: none; /* overridden by .disabled */
 }
 
 .slide .delete {

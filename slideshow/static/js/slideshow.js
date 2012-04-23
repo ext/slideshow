@@ -56,6 +56,25 @@ queue = function(){
 }();
 
 var slide = function(){
+		var post = function(url, data, func){
+				$.ajax({
+						type: "POST",
+						url: url,
+						data: data,
+						dataType: 'json',
+						success: function(data){
+								if ( !data.success ){
+										alert(data.message);
+										return;
+								}
+								return func(data);
+						},
+						error: function(x, status, error){
+								alert(status + '\n' + error);
+						},
+				});
+		};
+
 		return {
 				delete: function(id){
 						delete_id = id;
@@ -69,6 +88,22 @@ var slide = function(){
 								close: function(){
 										delete_id = undefined;
 								}
+						});
+				},
+
+				activate: function(id, elem){
+						return post("/slides/ajax/activate", {id: id}, function(data){
+								parent = '#slide_' + id;
+								$(parent).attr('class', data.class);
+								console.log('actiaved');
+						});
+				},
+
+				deactivate: function(id, elem){
+						return post("/slides/ajax/deactivate", {id: id}, function(data){
+								parent = '#slide_' + id;
+								$(parent).attr('class', data.class);
+								console.log('deactiaved');
 						});
 				},
 		}
