@@ -202,6 +202,24 @@ def delete(db, id):
         # remove all resources
         shutil.rmtree(s._path)
 
+def activate(db, id):
+    with db:
+        s = from_id(db, id)
+        db.execute('UPDATE slide SET active = 1 WHERE id = :id', dict(id=s.id))
+
+        # fulhack
+        s.active = True
+        return s
+
+def deactivate(db, id):
+    with db:
+        s = from_id(db, id)
+        db.execute('UPDATE slide SET active = 0 WHERE id = :id', dict(id=s.id))
+
+        # fulhack
+        s.active = False
+        return s
+
 @event.listener
 class EventListener:
     @event.callback('maintenance.rebuild')

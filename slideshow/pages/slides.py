@@ -43,6 +43,24 @@ class Ajax(object):
             traceback.print_exc()
             return json.dumps({'success': False, 'message': str(e)})
 
+    @cherrypy.expose
+    def activate(self, id):
+        try:
+            s = slide.activate(cherrypy.thread_data.db, id)
+            return json.dumps({'success': True, 'class': s.attributes['class']})
+        except Exception, e:
+            traceback.print_exc()
+            return json.dumps({'success': False, 'message': str(e)})
+
+    @cherrypy.expose
+    def deactivate(self, id):
+        try:
+            s = slide.deactivate(cherrypy.thread_data.db, id)
+            return json.dumps({'success': True, 'class': s.attributes['class']})
+        except Exception, e:
+            traceback.print_exc()
+            return json.dumps({'success': False, 'message': str(e)})
+
 class Handler(object):
     ajax = Ajax()
 
