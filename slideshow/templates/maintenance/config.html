@@ -59,7 +59,7 @@
 			  <py:if test="not group.hidden">
 				<fieldset title="${group.name}">
 					<legend>${group.name}</legend>
-					<p>${Markup(group.description)}</p>
+					<p py:if="group.description">${Markup(group.description)}</p>
 					
 					<py:for each="item in group">
 						<label for="${group.name}.${item.name}">
