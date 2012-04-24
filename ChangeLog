@@ -1,6 +1,7 @@
 slideshow-0.4.0
 ---------------
 
+	* [frontend] Support for IP whitelisting.
 	* [frontend] support for additional setting types (checkboxes, textarea,
 	             etc)
 	* [frontend] adding support for IP whitelisting.

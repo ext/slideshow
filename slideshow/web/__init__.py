@@ -18,6 +18,7 @@ from slideshow.pages import queue
 from slideshow.settings import Settings, ValidationError
 from slideshow.daemon import Daemon
 from slideshow.video_preview import PreviewCreator
+from slideshow.event import subscribe
 import slideshow.tools.ipblock
 
 def get_resource_path(*path):
@@ -205,14 +206,18 @@ def run():
             application.config['/logout'] = {'error_page.401': root.logout_error_401}
 
         # add ipblock tool
+        def ipblock_enable(value):
+            cherrypy.config.update({'tools.ipblock.on': value})
         cherrypy.tools.ipblock = cherrypy.Tool('on_start_resource', slideshow.tools.ipblock.IPBlock())
+        subscribe('config.ipblock_enabled', ipblock_enable)
+        if settings['Access.Whitelist']:
+            cherrypy.config.update({'tools.ipblock.on': True})
 
         # cherrypy site config
         cherrypy.config.update({
                 'sessionFilter.on': True,
                 'server.socket_host': "0.0.0.0",
                 'server.socket_port': args.port,
-                'tools.ipblock.on': True,
             })
         cherrypy.config.update(config)
 

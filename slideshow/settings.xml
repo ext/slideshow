@@ -60,6 +60,7 @@
 
 	<group name="Access">
 		<description>Defines IP subnets that is allowed to access slideshow. To allow any IP use 0.0.0.0.</description>
+		<item name="Whitelist" type="checkbox" title="Enable whitelist"></item>
 		<item name="Subnet" type="textarea" description="IP[/CIDR]">127.0.0.1/8
 0.0.0.0</item>
 	</group>
