@@ -206,12 +206,7 @@ def run():
             application.config['/logout'] = {'error_page.401': root.logout_error_401}
 
         # add ipblock tool
-        def ipblock_enable(value):
-            cherrypy.config.update({'tools.ipblock.on': value})
         cherrypy.tools.ipblock = cherrypy.Tool('on_start_resource', slideshow.tools.ipblock.IPBlock())
-        subscribe('config.ipblock_enabled', ipblock_enable)
-        if settings['Access.Whitelist']:
-            cherrypy.config.update({'tools.ipblock.on': True})
 
         # cherrypy site config
         cherrypy.config.update({

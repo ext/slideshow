@@ -12,16 +12,22 @@ class IPBlock(object):
     def __init__(self):
         self.subnet = []
 
-        s = Settings()
-        self.parse_subnet(s['Access.Subnet'])
+        settings = Settings()
+        self.parse_subnet(settings['Access.Subnet'])
 
+        subscribe('config.ipblock_enabled', self.enable)
         subscribe('config.ipblock_changed', self.update)
+        cherrypy.config.update({'tools.ipblock.on': settings['Access.Whitelist']})
 
     def __call__(self):
         remote = self.parse_ip(cherrypy.request.remote.ip)
         for ip, mask in self.subnet:
             if (remote & mask) == ip: return
         raise cherrypy.HTTPError("401 Unauthorized", "IP not in whitelist.")
+
+    def enable(self, value):
+        print 'herp derp', value
+        cherrypy.config.update({'tools.ipblock.on': value})
 
     def update(self, value):
         IPBlock.parse_subnet(self, value)
