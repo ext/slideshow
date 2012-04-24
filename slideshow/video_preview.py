@@ -78,13 +78,15 @@ class PreviewCreator(plugins.SimplePlugin, threading.Thread):
                     traceback.print_exc()
                     os.remove(dst)
 
+        path = os.path.join(base, video)
         mon = gamin.WatchMonitor()
-        mon.watch_directory(os.path.join(base, video), callback)
+        mon.watch_directory(path, callback)
         while self._running:
             time.sleep(1)
             if mon.event_pending() > 0:
                 mon.handle_one_event()
                 mon.handle_events()
+        mon.stop_watch(path)
 
     def generate(self, src, dst, progress_fn=None, finished_fn=None):
         args = [
