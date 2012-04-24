@@ -3,7 +3,7 @@
 
 import cherrypy, os.path
 from slideshow.lib import queue, slide, template, browser as browser_factory
-from slideshow.settings import Settings
+from slideshow.settings import Settings, ItemCheckbox
 import slideshow.daemon as daemon
 import slideshow.event as event
 import traceback
@@ -45,6 +45,14 @@ class Handler(object):
                         raise ValueError, 'Malformed environment variables'
                     finally:
                         kwargs['Env'] = env
+
+                # reset all checkboxes (as they aren't sent when disabled)
+                for group in settings:
+                    for item in group:
+                        if isinstance(item, ItemCheckbox):
+                            fullname = '%s.%s' % (group.name, item.name)
+                            if fullname not in kwargs:
+                                kwargs[fullname] = 'off'
 
                 for k,v in kwargs.items():
                     try:
