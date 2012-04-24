@@ -50,7 +50,7 @@ def install(dst, config_file):
         print >> sys.stderr, 'Must point to a directory, not', dst
         return 1
 
-    for x in ['image', 'video', 'tmp']:
+    for x in ['image', 'video', 'tmp', 'theme']:
         os.mkdir(join(dst, x))
 
     if not config_file:
