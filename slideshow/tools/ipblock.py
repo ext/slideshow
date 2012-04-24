@@ -26,7 +26,6 @@ class IPBlock(object):
         raise cherrypy.HTTPError("401 Unauthorized", "IP not in whitelist.")
 
     def enable(self, value):
-        print 'herp derp', value
         cherrypy.config.update({'tools.ipblock.on': value})
 
     def update(self, value):
