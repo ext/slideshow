@@ -1,5 +1,36 @@
 p, h1, form, button{border:0; margin:0; padding:0;}
 
+#sidebar {
+    float: right;
+    width: 200px;
+    border: 1px solid #000;
+    margin-top: 23px;
+}
+
+#sidebar ul {
+    padding: 0;
+    list-style: none;
+}
+
+#sidebar li {
+
+}
+
+#sidebar a {
+    padding: 0.6em 1.5em;
+    display: block;
+    color: #000;
+    text-decoration: none;
+}
+
+#sidebar a:hover {
+    color: #00f;
+}
+
+#sidebar a.selected {
+    color: green;
+}
+
 .conf{
 	padding: 14px;
 	width: 750px;

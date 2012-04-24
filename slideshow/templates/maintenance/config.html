@@ -8,7 +8,9 @@
 	<link rel="stylesheet" href="/static/css/config.css" type="text/css" media="screen" />
 	<script type="text/javascript">
 		$(document).ready(function() {
+		    $('#sidebar a').disableSelection();
 		    update_browserstring();
+		    config_open('Path');
 
 		    $(".browserblur").change(function(){
 		        update_browserstring();
@@ -20,30 +22,36 @@
 <body>
 	<h2>Configuration</h2>
 
-	<div class="conf">
-		<form id="form" method="post" action="/maintenance/config/save">
-			<py:for each="group in settings">
-			  <py:if test="not group.hidden">
-				<fieldset title="${group.name}">
-					<legend>${group.name}</legend>
-					<p py:if="group.description">${Markup(group.description)}</p>
-					
-					<py:for each="item in group">
-						<label for="${group.name}.${item.name}">
-							${item.title}
-							<py:choose test="hasattr(item, 'message')">
-								<span py:when="True" class="error">${item.message}</span>
-								<span py:when="False">${item.description}</span>
-							</py:choose>
-						</label>
-						${Markup(item)}
-						<br/>
-					</py:for>
-					
-				</fieldset>
-			  </py:if>
-			</py:for>
-			<fieldset title="Environmental variables">
+	<form id="form" method="post" action="/maintenance/config/save">
+		<div id="sidebar">
+			<ul>
+				<li py:for="group in settings" py:if="not group.hidden" id="menu_${group.name}"><a href="#" onclick="config_open('${group.name}'); return false;">${group.name}</a></li>
+				<li id="menu_Environmental"><a href="#" onclick="config_open('Environmental'); return false;">Environment</a></li>
+				<li><hr/></li>
+				<li><a href="/maintenance">Cancel</a></li>
+				<li><a href="#" onclick="document.forms[0].submit();">Save</a></li>
+			</ul>
+		</div>
+		
+		<div class="conf">
+			<fieldset py:for="group in settings" py:if="not group.hidden" id="conf_${group.name}" title="${group.name}">
+				<legend>${group.name}</legend>
+				<p py:if="group.description">${Markup(group.description)}</p>
+				
+				<py:for each="item in group">
+					<label for="${group.name}.${item.name}">
+						${item.title}
+						<py:choose test="hasattr(item, 'message')">
+							<span py:when="True" class="error">${item.message}</span>
+							<span py:when="False">${item.description}</span>
+						</py:choose>
+					</label>
+					${Markup(item)}
+					<br/>
+				</py:for>
+				
+			</fieldset>
+			<fieldset id="conf_Environmental" title="Environmental variables">
 				<legend>Environmental variables</legend>
 				<p>
 					Place each variable in the form key=value with each variable
@@ -52,9 +60,10 @@
 				</p>
 				<textarea name="Env" class="wide"><py:for each="k,v in settings['Env'].items()">${k}=${v}${Markup("\n")}</py:for></textarea>
 			</fieldset>
-			<input type="submit" value="Save" />
-		</form>
-	</div>
+		</div>
+	</form>
+
+	<br style="clear:both;"/>
 		
 </body>
 
