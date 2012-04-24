@@ -11,11 +11,11 @@ class Browser:
         self.password = password
         self.database = database
 
-        def install(self):
-            import slideshow
-            filename = os.path.join(os.path.dirname(slideshow.__file__), 'install', self.__class__._install)
-            lines = "\n".join(open(filename, 'r').readlines())
-            self.executescript(lines)
+    def install(self):
+        import slideshow
+        filename = os.path.join(os.path.dirname(slideshow.__file__), 'install', self.__class__._install)
+        lines = "\n".join(open(filename, 'r').readlines())
+        self.executescript(lines)
 
     def __str__(self):
         return self.string(password=False)
