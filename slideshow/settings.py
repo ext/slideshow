@@ -333,10 +333,30 @@ class ItemTextArea(Item):
 
     def __init__(self, *args, **kwargs):
         Item.__init__(self, *args, **kwargs)
-        self.value = ''
 
     def __str__(self):
         return '<textarea name="{group}.{name}">{value}</textarea>'.format(**self._values())
+
+class ItemCheckbox(Item):
+    default = False
+
+    def __init__(self, *args, **kwargs):
+        Item.__init__(self, *args, **kwargs)
+
+    def set(self, value, rollback=False):
+        if isinstance(value, basestring):
+            value = value.lower() == 'on'
+        Item.set(self, value, rollback)
+
+    def _values(self):
+        checked = ''
+        if self._value: checked = 'checked="checked"'
+        d = Item._values(self)
+        d['checked'] = checked
+        return d
+
+    def __str__(self):
+        return '<input name="{group}.{name}" type="checkbox" {checked} />'.format(**self._values())
 
 itemfactory = {
     'directory': ItemDirectory,
@@ -350,6 +370,7 @@ itemfactory = {
     'static':    ItemStatic,
     'filelist':  ItemFilelist,
     'textarea':  ItemTextArea,
+    'checkbox':  ItemCheckbox,
 }
 
 for k,v in itemfactory.items():
