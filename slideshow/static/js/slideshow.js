@@ -156,3 +156,28 @@ $(document).ready(function(){
 				connected: $f,
 		});
 });
+
+function update_browserstring(){
+		provider = $("input[name='Database.Provider']").val();
+		username = $("input[name='Database.Username']").val();
+		password = $("input[name='Database.Password']").val();
+		hostname = $("input[name='Database.Hostname']").val();
+		name     = $("input[name='Database.Name']").val();
+		
+		/* build credential-part of the browserstring */
+		credential = "";
+		if ( username != "" ){
+				credential = username;
+				if ( password != "" ){
+						credential += ":" + '*'.repeat(password.length);
+				}
+				credential += "@";
+		}
+		
+		/* append a / to hostname if specified */
+		if ( hostname != "" ){
+				hostname += "/";
+		}
+		
+		$('.browserstring').html(provider + "://" + credential + hostname + name);
+}
