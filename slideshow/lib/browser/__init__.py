@@ -78,5 +78,15 @@ def from_settings(settings):
 
     return Browser.factory[provider](hostname, username, password, database)
 
-import slideshow.lib.browser._sqlite3
-import slideshow.lib.browser._mysql
+have_sqlite = True # in stdlib
+have_mysql = False
+
+# test if mysql is available
+try:
+    import MySQLdb
+    have_mysql = True
+except ImportError:
+    pass
+
+if have_mysql:  import slideshow.lib.browser._mysql
+if have_sqlite: import slideshow.lib.browser._sqlite3
