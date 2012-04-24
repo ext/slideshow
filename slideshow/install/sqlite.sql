@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS user;
 CREATE TABLE slide (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,           -- ID of the slide
 	queue_id INTEGER NOT NULL REFERENCES queue(id), -- Queue ID the slide belong to
+	`timestamp` TIMESTAMP NOT NULL,                 -- Last time the slide was updated
 	path TEXT NOT NULL,                             -- Path to slide
 	sortorder INTEGER NOT NULL DEFAULT 0,           -- Sort order index, ASC
 	active TINYINT NOT NULL DEFAULT 1,              -- 1 if enabled, 0 if disabled
