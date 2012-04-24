@@ -17,7 +17,7 @@ class Ajax(object):
 
 class Handler(object):
     ajax = Ajax()
-    
+
     @cherrypy.expose
     @template.output('maintenance/index.html', parent='maintenance')
     def index(self):
@@ -29,7 +29,7 @@ class Handler(object):
     @template.output('maintenance/config.html', parent='maintenance')
     def config(self, action=None, **kwargs):
         settings = Settings()
-        
+
         if action == 'save':
             error = False
             with settings:
@@ -45,48 +45,48 @@ class Handler(object):
                         raise ValueError, 'Malformed environment variables'
                     finally:
                         kwargs['Env'] = env
-                
+
                 for k,v in kwargs.items():
                     try:
                         settings[k] = v
                     except ValueError as e:
                         settings.item(k).message = str(e)
                         error = True
-            
+
             if not error:
                 settings.persist()
                 raise cherrypy.HTTPRedirect('/maintenance')
-        
+
         return template.render(settings=settings)
-    
+
     @cherrypy.expose()
     def reset(self):
         daemon.reset()
         raise cherrypy.HTTPRedirect('/maintenance')
-    
+
     @cherrypy.expose
     def start(self, resolution=None, fullscreen=True):
         daemon.start(resolution, fullscreen)
         raise cherrypy.HTTPRedirect('/maintenance')
-    
+
     @cherrypy.expose
     def stop(self):
         daemon.stop()
         raise cherrypy.HTTPRedirect('/maintenance')
-    
+
     @cherrypy.expose
     def reload(self):
         daemon.reload()
         raise cherrypy.HTTPRedirect('/maintenance')
-    
+
     @cherrypy.expose
     def coredump(selfs):
         cherrypy.response.headers['Content-Type'] = 'application/octet-stream'
         cherrypy.response.headers['Content-Disposition'] = 'attachment; filename=core'
-        
+
         settings = Settings()
         cwd = settings['Path.BasePath']
-        
+
         return open(os.path.join(cwd, 'core'))
 
     @cherrypy.expose
@@ -98,35 +98,35 @@ class Handler(object):
                 threading.Thread.__init__(self)
                 self._sem = threading.Semaphore(value=0)
                 self._content = []
-            
+
             def push(self, x):
                 self._content.append(x)
                 self._sem.release()
 
             def __iter__(self):
                 return self
-            
+
             def next(self):
                 self._sem.acquire()
                 value = self._content.pop()
                 if value == None:
                     raise StopIteration()
-                
+
                 return str(value)
-            
+
             def run(self):
                 try:
                     browser = browser_factory.from_settings(Settings())
                     browser.connect()
-                    
+
                     event.trigger('maintenance.rebuild', self.push)
                     self.push('Finished, <a href="/maintenance">go back</a>.')
                     self.push(None)
                 except:
                     traceback.print_exc()
-        
+
         progress = Progress()
         progress.start()
-        
+
         return progress
     rebuild._cp_config = {'response.stream': True, 'tools.gzip.on' : False}
