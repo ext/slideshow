@@ -224,6 +224,10 @@ def run():
         preview = PreviewCreator(cherrypy.engine)
         preview.subscribe()
 
+        # database migration script
+        migration = slideshow.tools.Migration(cherrypy.engine, browser)
+        migration.subscribe()
+
         # start cherrypy
         if hasattr(cherrypy.engine, 'block'):
             # 3.1 syntax

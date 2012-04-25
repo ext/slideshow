@@ -37,6 +37,13 @@ CREATE TABLE `user` (
        host TEXT
 ) ENGINE=InnoDB;
 
+-- Database schema migrations.
+-- Each row contains a filename with a migration that has been executed.
+CREATE TABLE `migration` (
+       `filename` TEXT PRIMARY KEY,
+       `timestamp` TIMESTAMP NOT NULL
+);
+
 COMMIT;
 
 INSERT INTO `queue` (id, name) VALUES (-1, 'Intermediate');
