@@ -164,7 +164,7 @@ class Handler(object):
         params = s._data.copy()
         params.update(kwargs)
 
-        return template.render(id=id, assembler=assembler.get('text'), preview=params)
+        return template.render(slide=s, id=id, assembler=assembler.get('text'), preview=params)
 
     @cherrypy.expose
     def submit(self, id=None, context=None, assembler=None, submit=None, **kwargs):

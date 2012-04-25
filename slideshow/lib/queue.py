@@ -23,6 +23,7 @@ class Queue:
         self.slides = [Slide(queue=self, **x) for x in c.execute("""
             SELECT
                 `id`,
+                `timestamp`,
                 `path`,
                 `active`,
                 `assembler`,

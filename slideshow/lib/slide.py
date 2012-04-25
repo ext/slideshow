@@ -9,14 +9,16 @@ from slideshow.lib.resolution import Resolution
 import slideshow.event as event
 import cherrypy
 import traceback
+import time
 
 class InvalidSlide(Exception):
     pass
 
 class Slide(object):
-    def __init__(self, id, queue, path, active, assembler, data, stub=False, validate_path=True):
+    def __init__(self, id, queue, timestamp, path, active, assembler, data, stub=False, validate_path=True):
         self.id = id
         self._queue = queue
+        self.timestamp = timestamp and time.mktime(time.strptime(timestamp, '%Y-%m-%d %H:%M:%S')) or None
         self._path = path
         self.active = active
         self.assembler = asm.get(assembler)
@@ -103,6 +105,7 @@ def all(c, validate_path=True):
     return [Slide(queue=None, validate_path=validate_path, **x) for x in c.execute("""
         SELECT
             id,
+            `timestamp`,
             path,
             active,
             assembler,
@@ -115,6 +118,7 @@ def from_id(c, id):
     row = c.execute("""
         SELECT
             id,
+            `timestamp`,
             path,
             active,
             assembler,
@@ -147,17 +151,19 @@ def create(c, assembler, params):
     # reference resolution
     params['resolution'] = settings.resolution()
 
-    slide = Slide(id=None, queue=None, path=dst, active=False, assembler=assembler, data=None, stub=True)
+    slide = Slide(id=None, timestamp=None, queue=None, path=dst, active=False, assembler=assembler, data=None, stub=True)
     slide._data = json.loads(slide.assemble(params))
     slide.rebuild_cache(settings.resolution())
 
     c.execute("""
         INSERT INTO slide (
+            `timestamp`,
             queue_id,
             path,
             assembler,
             data
         ) VALUES (
+            CURRENT_TIMESTAMP,
             0,
             :path,
             :assembler,
