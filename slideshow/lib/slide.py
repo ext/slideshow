@@ -9,7 +9,7 @@ from slideshow.lib.resolution import Resolution
 import slideshow.event as event
 import cherrypy
 import traceback
-import time
+import time, calendar
 
 class InvalidSlide(Exception):
     pass
@@ -18,7 +18,7 @@ class Slide(object):
     def __init__(self, id, queue, timestamp, path, active, assembler, data, stub=False, validate_path=True):
         self.id = id
         self._queue = queue
-        self.timestamp = timestamp and time.mktime(time.strptime(timestamp, '%Y-%m-%d %H:%M:%S')) or None
+        self.timestamp = timestamp and calendar.timegm(time.strptime(timestamp, '%Y-%m-%d %H:%M:%S')) or None
         self._path = path
         self.active = active
         self.assembler = asm.get(assembler)
