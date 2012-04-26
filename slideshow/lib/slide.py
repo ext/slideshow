@@ -187,7 +187,8 @@ def edit(c, id, assembler, params):
         UPDATE
             slide
         SET
-            data = :data
+            data = :data,
+            `timestamp` = CURRENT_TIMESTAMP
         WHERE
             id = :id
     """, dict(id=id, data=json.dumps(slide._data)))
