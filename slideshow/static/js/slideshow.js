@@ -192,3 +192,27 @@ function config_open(section){
 		$('#menu_'+section+' a').attr('class', 'selected');
 		$('#conf_'+section).show();
 }
+
+var $text_preview_fields = [];
+var text_preview_timer;
+function text_preview(){
+		clearTimeout(text_preview_timer);
+
+		data = {}
+		$text_preview_fields.each(function(){
+				data[$(this).attr('name')] = $(this).val();
+		});
+
+		$('#assembler_text .preview img').attr('src', '/slides/preview?' + $.param(data));
+}
+
+function text_preview_init(){
+		$text_preview_fields = $('#assembler_text .fields span').find('input, textarea');
+		$text_preview_fields.each(function(){
+				$(this).blur(text_preview);
+				$(this).keydown(function(){
+						clearTimeout(text_preview_timer);
+						text_preview_timer = setTimeout(text_preview, 800);
+				});
+		});
+}
