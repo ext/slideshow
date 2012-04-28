@@ -190,7 +190,7 @@ class Handler(object):
 
     @cherrypy.expose
     @cherrypy.tools.response_headers(headers=[('Content-Type', 'image/png')])
-    def preview(self, **kwargs):
+    def preview(self, theme=None, **kwargs):
         import cStringIO
 
         dst = cStringIO.StringIO()
@@ -199,7 +199,7 @@ class Handler(object):
         settings = Settings()
         kwargs['resolution'] = (settings.resolution().w, settings.resolution().h)
 
-        asm.rasterize(file=dst, size=Resolution(800,600), params=kwargs)
+        asm.rasterize(file=dst, size=Resolution(800,600), params=kwargs, theme=theme)
 
         content = dst.getvalue()
         dst.close()

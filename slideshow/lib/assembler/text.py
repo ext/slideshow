@@ -286,14 +286,18 @@ class TextAssembler(Assembler):
         kwargs['resolution'] = (kwargs['resolution'].w, kwargs['resolution'].h)
         return kwargs
 
-    def rasterize(self, size, params, slide=None, file=None):
+    def rasterize(self, size, params, slide=None, file=None, theme=None):
         settings = Settings()
 
         params = params.copy()
         params['resolution'] = Resolution(params['resolution'][0], params['resolution'][1])
 
         dst = slide and slide.raster_path(size) or file
-        template = Template(settings['Appearance.Theme'])
+
+        if theme is None:
+            theme = settings['Appearance.Theme']
+
+        template = Template(theme)
         template.rasterize(dst=dst, size=size, params=params)
 
     def raster_is_valid(reference, resolution, **kwargs):
