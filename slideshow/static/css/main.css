@@ -180,7 +180,7 @@ body {
 
 .slide {
 	float: left;
-	
+
 	margin-right: 10px;
 	padding: 0;
 	border:1px solid #aaa;
@@ -281,4 +281,24 @@ h1 {
 
 #delete_dialog {
     text-align: right;
+}
+
+#assembler_text .wrapper {
+		width: 1000px;
+}
+
+#assembler_text .preview {
+		float: right;
+}
+
+#assembler_text .fields {
+		width: 300px;
+}
+
+#assembler_text .fields input[type='text'] {
+		width: 280px;
+}
+
+#assembler_text .fields textarea {
+		width: 280px;
 }
