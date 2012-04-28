@@ -10,7 +10,7 @@ import os
 import xml
 from xml.dom import minidom
 from htmlcolor import Parser as ColorParser
-from os.path import join, dirname, basename
+from os.path import join, dirname, basename, abspath
 import htmlcolor
 import urllib
 import traceback
@@ -176,21 +176,25 @@ class Theme:
             join(dirname(slideshow.__file__), 'themes'),
             '.']
 
-        fullpath = None
-
         if filename[0] == '/': # absolute path
-            fullpath = filename
+            self.fullpath = filename
+            self.basename = basename(filename)
+            self.dirname = dirname(filename)
+            if not os.path.exists(filename):
+                raise RuntimeError, 'Could not find theme-file "%s"' % filename
         else: # relative path
             for path in search_path:
-                test = os.path.abspath(os.path.join(path, filename))
+                test = abspath(join(path, filename))
                 if os.path.exists(test):
+                    self.fullpath = join(path, filename)
+                    self.basename = filename
+                    self.dirname = path
                     fullpath = test
                     break
             else:
                 raise RuntimeError, 'Could not find theme-file "%s"' % filename
 
-        self._filename = fullpath
-        self._doc = minidom.parse(self._filename)
+        self._doc = minidom.parse(self.fullpath)
         self._template = self._doc.getElementsByTagName('template')[0]
         self._items = [Item.factory(x) for x in self._template.childNodes if isinstance(x, minidom.Element)]
 
