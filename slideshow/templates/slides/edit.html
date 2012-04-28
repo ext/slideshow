@@ -16,7 +16,10 @@
 	<p>Last updated ${time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(slide.timestamp))}.</p>
 	<form action="/slides/submit" method="post" enctype="multipart/form-data" accept-charset="utf-8">
 		<input type="hidden" name="id" value="${id}" />
-		${Markup(assembler.render(content=preview, context="edit"))}
+		<xi:include href="../../lib/assembler/text.html" />
+		<div py:match="assembler">
+			${select('fieldset/*[not(legend or @class=\'description\')]')}
+		</div>
 	</form>
 
 </body>

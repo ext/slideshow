@@ -4,6 +4,7 @@
 import cherrypy, urllib, os
 import traceback
 import json
+import itertools
 from slideshow.lib import assembler, queue, slide, template
 from slideshow.lib.resolution import Resolution
 from slideshow.settings import Settings
@@ -143,7 +144,9 @@ class Handler(object):
 
     @cherrypy.expose
     @template.output('slides/upload.html', parent='slides')
-    def upload(self, **kwargs):
+    def upload(self, **content):
+        settings = Settings()
+
         # get all assembers
         unsorted=assembler.all()
 
@@ -153,7 +156,12 @@ class Handler(object):
         unsorted.sort()
         sorted += [v for k,v in unsorted]
 
-        return template.render(assemblers=sorted, preview=kwargs)
+        localdata = dict(itertools.chain(*[x.localdata(content).items() for x in sorted]))
+
+        return template.render(
+            assemblers=sorted,
+            context='upload', content=content,
+            **localdata)
 
     @cherrypy.expose
     @template.output('slides/edit.html', parent='slides')
@@ -161,10 +169,14 @@ class Handler(object):
         s = slide.from_id(cherrypy.thread_data.db, id)
 
         # @todo using private variable!
-        params = s._data.copy()
-        params.update(kwargs)
+        content = s._data.copy()
+        content.update(kwargs)
 
-        return template.render(slide=s, id=id, assembler=assembler.get('text'), preview=params)
+        return template.render(
+            slide=s, id=id,
+            assembler=assembler.get('text'),
+            context="edit", content=content,
+            **assembler.get('text').localdata(content))
 
     @cherrypy.expose
     def submit(self, id=None, context=None, assembler=None, submit=None, **kwargs):

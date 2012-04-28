@@ -17,7 +17,10 @@
 	
 	<py:for each="assembler in assemblers">
 		<form action="/slides/submit" method="post" enctype="multipart/form-data" accept-charset="utf-8">
-			${Markup(assembler.render(content=preview, context="upload"))}
+			<xi:include href="../../lib/assembler/${assembler.name}.html" />
+			<div py:match="assembler">
+				${select('fieldset')}
+			</div>
 		</form>
 	</py:for>
 
