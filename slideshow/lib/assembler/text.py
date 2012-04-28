@@ -243,6 +243,29 @@ class Theme:
         finally:
             cr.restore()
 
+    def paint_checkerboard(self, cr, parent, size):
+        surface = parent.create_similar(cairo.CONTENT_COLOR_ALPHA, 2*size, 2*size)
+        ctx = cairo.Context(surface)
+        s = size
+
+        ctx.set_source_rgb(0.6, 0.6, 0.6)
+        ctx.rectangle(0, 0, s, s)
+        ctx.rectangle(s, s, s, s)
+        ctx.fill()
+
+        ctx.set_source_rgba(0.4, 0.4, 0.4, 0.4)
+        ctx.rectangle(0, s, s, s)
+        ctx.rectangle(s, 0, s, s)
+        ctx.fill()
+
+        pattern = cairo.SurfacePattern(surface)
+        pattern.set_extend(cairo.EXTEND_REPEAT)
+
+        cr.save()
+        cr.set_source(pattern)
+        cr.paint()
+        cr.restore()
+
     def rasterize(self, dst, size, params):
         resolution = params['resolution']
         realsize = resolution.fit(size)
@@ -256,11 +279,11 @@ class Theme:
 
         cr.translate((size.w-realsize.w)*0.5, (size.h-realsize.h)*0.5)
 
-        cr.save()
-        cr.set_source_rgba(0.5, 0.0 , 0.5, 0.3)
-        cr.set_operator(cairo.OPERATOR_SOURCE)
-        cr.paint()
+        # makes it easier to spot transparent area
+        self.paint_checkerboard(cr, surface, int(size.w / 32))
 
+        # force alpha to 1 at the region that will be painted
+        cr.save()
         cr.set_source_rgba(0, 0, 0, 1)
         cr.rectangle(0, 0, realsize.w, realsize.h)
         cr.fill()
