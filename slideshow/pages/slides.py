@@ -156,26 +156,31 @@ class Handler(object):
         unsorted.sort()
         sorted += [v for k,v in unsorted]
 
+        resolution = settings.resolution().scale(640)
         localdata = dict(itertools.chain(*[x.localdata(content).items() for x in sorted]))
 
         return template.render(
             assemblers=sorted,
             context='upload', content=content,
+            resolution=resolution,
             **localdata)
 
     @cherrypy.expose
     @template.output('slides/edit.html', parent='slides')
     def edit(self, id, **kwargs):
+        settings = Settings()
         s = slide.from_id(cherrypy.thread_data.db, id)
 
         # @todo using private variable!
         content = s._data.copy()
         content.update(kwargs)
+        resolution = settings.resolution().scale(640)
 
         return template.render(
             slide=s, id=id,
             assembler=assembler.get('text'),
             context="edit", content=content,
+            resolution=resolution,
             **assembler.get('text').localdata(kwargs))
 
     @cherrypy.expose
