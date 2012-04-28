@@ -9,6 +9,7 @@ import os
 import xml
 from xml.dom import minidom
 from htmlcolor import Parser as ColorParser
+from os.path import join, dirname, basename
 import htmlcolor
 import urllib
 
@@ -169,7 +170,11 @@ class Template:
         settings = Settings()
         import slideshow
 
-        search_path = ['.', os.path.dirname(slideshow.__file__), settings['Path.BasePath']]
+        search_path = [
+            join(settings['Path.BasePath'], settings['Path.Theme']),
+            join(dirname(slideshow.__file__), 'themes'),
+            '.']
+
         fullpath = None
 
         if filename[0] == '/': # absolute path
@@ -283,7 +288,7 @@ class TextAssembler(Assembler):
         params['resolution'] = Resolution(params['resolution'][0], params['resolution'][1])
 
         dst = slide and slide.raster_path(size) or file
-        template = Template(os.path.join(settings['Path.Theme'], settings['Appearance.Theme']))
+        template = Template(settings['Appearance.Theme'])
         template.rasterize(dst=dst, size=size, params=params)
 
     def raster_is_valid(reference, resolution, **kwargs):
@@ -299,5 +304,5 @@ class TextAssembler(Assembler):
         if len(content) > 0:
             default['preview'] = urllib.urlencode(content)
         default.update(content)
-        default['template'] = Template(os.path.join(settings['Path.Theme'], settings['Appearance.Theme']))
+        default['template'] = Template(settings['Appearance.Theme'])
         return Assembler.render(self, content=default, context=context)

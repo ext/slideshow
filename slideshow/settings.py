@@ -7,8 +7,10 @@ import json, xorg_query
 import pprint
 import threading
 import event
+import itertools
 from glob import glob
 from lib.resolution import Resolution
+from os.path import join, basename, dirname
 
 try:
     # python 3.0
@@ -310,18 +312,22 @@ class ItemFilelist(Item):
     default = ''
     def __init__(self, path, *args, **kwargs):
         Item.__init__(self, *args, **kwargs)
-        self.path = path
-
+        self.path = path.split(';')
 
     def __str__(self):
-        values = [os.path.basename(x) for x in glob(self.path.format(Settings()))]
+        settings = Settings()
+        root = dirname(__file__)
+
+        # glob paths
+        files = [basename(x) for x in itertools.chain(*[glob(path.format(settings, root=root)) for path in self.path])]
+
         def f(x):
             if self._value == x:
                 return '<option selected="selected">{value}</option>'
             else:
                 return '<option>{value}</option>'
 
-        options = [f(x).format(value=x) for x in values]
+        options = [f(x).format(value=x) for x in files]
         head = '<select name="{group}.{name}" class="{cls}">'.format(**self._values())
         content = '\n'.join(options)
         tail = '</select>'
