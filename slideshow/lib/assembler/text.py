@@ -10,7 +10,7 @@ import os
 import xml
 from xml.dom import minidom
 from htmlcolor import Parser as ColorParser
-from os.path import join, dirname, basename, abspath
+from os.path import join, dirname, basename, abspath, realpath
 import htmlcolor
 import urllib
 import traceback
@@ -186,9 +186,9 @@ class Theme:
             for path in search_path:
                 test = abspath(join(path, filename))
                 if os.path.exists(test):
-                    self.fullpath = join(path, filename)
+                    self.fullpath = realpath(join(path, filename))
                     self.basename = filename
-                    self.dirname = path
+                    self.dirname = realpath(path)
                     fullpath = test
                     break
             else:
