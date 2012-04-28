@@ -309,7 +309,15 @@ class ItemStatic(Item):
         return '<div class="static {cls}" name="{group}.{name}">&nbsp;</div>'.format(**self._values())
 
 class ItemFilelist(Item):
+    """Select file from available choices.
+
+    :param path: A semi-colon delimited string with filename-patterns to search
+                 for. Each element is first formatted using string.format with
+                 arguments 0 as setting and "root" as the slideshow root
+                 directory. Next each element is globbed using glob.glob.
+    """
     default = ''
+
     def __init__(self, path, *args, **kwargs):
         Item.__init__(self, *args, **kwargs)
         self.path = path.split(';')
