@@ -75,7 +75,7 @@ class Assembler:
         fieldset wrapping the fields)
         """
 
-        kwargs = content
+        kwargs = content.copy()
         kwargs.update(**self.localdata(content))
 
         func = lambda: template.render(fields=content, assembler=self.name, context=context, **kwargs)
