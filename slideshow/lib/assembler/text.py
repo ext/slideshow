@@ -6,7 +6,7 @@ from slideshow.lib.resolution import Resolution
 from slideshow.settings import Settings
 import slideshow
 import array, cairo, pango, pangocairo, json, re
-import os
+import os, sys
 import xml
 from xml.dom import minidom
 from htmlcolor import Parser as ColorParser
@@ -198,6 +198,51 @@ class Theme:
         self._template = self._doc.getElementsByTagName('template')[0]
         self._items = [Item.factory(x) for x in self._template.childNodes if isinstance(x, minidom.Element)]
 
+    def get_path(self, filename):
+        # path is relative to theme-directory unless it begins with /
+        if filename[0] == '/':
+            return filename
+        return join(self.dirname, filename)
+
+    def paint_background(self, cr, realsize, string):
+        string = string.strip()
+
+        if not string:
+            cr.save()
+            cr.set_source_rgba(0,0,0,1)
+            cr.rectangle(0, 0, realsize.w, realsize.h)
+            cr.fill()
+            cr.restore()
+
+        cr.save()
+        try:
+            if string[:3] == 'url':
+                filename = self.get_path(string[4:-1]) # extract filename from "url(filename)"
+
+                try:
+                    image = cairo.ImageSurface.create_from_png(filename)
+                except Exception, e:
+                    # this is to provide a better error message.
+                    raise IOError, 'Failed to load background "%s": %s' % (filename, e)
+
+                w = image.get_width()
+                h = image.get_height()
+
+                cr.scale(realsize.w/w, realsize.h/h)
+                cr.set_source_surface(image, 0, 0)
+                cr.paint()
+            else:
+                cr.set_source_rgba(*decode_color(string))
+                cr.rectangle(0, 0, realsize.w, realsize.h)
+                cr.fill()
+        except:
+            traceback.print_exc()
+            cr.set_source_rgba(0,0,0,1)
+            cr.rectangle(0, 0, realsize.w, realsize.h)
+            cr.fill()
+        finally:
+            cr.restore()
+
     def rasterize(self, dst, size, params):
         resolution = params['resolution']
         realsize = resolution.fit(size)
@@ -221,41 +266,7 @@ class Theme:
         cr.fill()
         cr.restore()
 
-        background = self._template.getAttribute('background')
-        if background:
-            background = background.strip()
-
-            cr.save()
-
-            if background[:3] == 'url':
-                url = background[4:-1] # extract filename from "url(filename)"
-
-                # url is relative to theme-directory unless it begins with /
-                if not url[0] == '/':
-                    settings = Settings()
-                    url = os.path.join(settings['Path.BasePath'], settings['Path.Theme'], url)
-
-                try:
-                    image = cairo.ImageSurface.create_from_png(url)
-                except Exception, e:
-                    raise OSError, 'Failed to load background "%s": %s' % (url, e)
-
-                w = image.get_width()
-                h = image.get_height()
-
-                cr.scale(realsize.w/w, realsize.h/h)
-                cr.set_source_surface(image, 0, 0)
-                cr.paint()
-            else:
-                try:
-                    cr.set_source_rgba(*decode_color(background))
-                except:
-                    traceback.print_exc()
-                    cr.set_source_rgba(0,0,0,1)
-                cr.rectangle(0, 0, realsize.w, realsize.h)
-                cr.fill()
-
-            cr.restore()
+        self.paint_background(cr, realsize, self._template.getAttribute('background'))
 
         for item in self.items():
             cr.save()
