@@ -100,8 +100,8 @@ class TextArea(Item):
 
     def render(self, content):
         return ('<label for="slide-{name}">{title}</label><br/>' +
-                '<textarea id="slide-{name}" name="{name}" cols="41" rows="15">{content}</textarea><br/>') \
-                .format(name=self.name, title=self.title, content=content)
+                '<textarea id="slide-{name}" name="{name}" rows="15" style="text-align: {alignment};">{content}</textarea><br/>') \
+                .format(name=self.name, title=self.title, alignment=self._alignment, content=content)
 
     def raster(self, cr, size, realsize, scale, content):
         font = self._font
