@@ -65,13 +65,20 @@ class Assembler:
         """
         raise NotImplementedError
 
+    def localdata(self):
+        """Define local data that is required by renderer"""
+        return {}
+
     def render(self, content, context):
         """
         Get html representation of the upload/edit form (should include the
         fieldset wrapping the fields)
         """
 
-        func = lambda: template.render(fields=content, assembler=self.name, context=context, **content)
+        kwargs = content
+        kwargs.update(**self.localdata())
+
+        func = lambda: template.render(fields=content, assembler=self.name, context=context, **kwargs)
         file = self.name + '.html'
         return template.output(file, doctype=False, loader=loader)(func)()
 
