@@ -186,8 +186,7 @@ class Template:
                 if os.path.exists(test):
                     fullpath = test
                     break
-
-            if not fullpath:
+            else:
                 raise RuntimeError, 'Could not find theme-file "%s"' % filename
 
         self._filename = fullpath
