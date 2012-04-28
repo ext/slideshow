@@ -209,9 +209,10 @@ class Handler(object):
         asm = assembler.get('text')
 
         settings = Settings()
-        kwargs['resolution'] = (settings.resolution().w, settings.resolution().h)
+        resolution = settings.resolution()
+        kwargs['resolution'] = (resolution.w, resolution.h)
 
-        asm.rasterize(file=dst, size=Resolution(800,600), params=kwargs, theme=theme)
+        asm.rasterize(file=dst, size=Resolution(640,640/resolution.aspect()), params=kwargs, theme=theme)
 
         content = dst.getvalue()
         dst.close()
