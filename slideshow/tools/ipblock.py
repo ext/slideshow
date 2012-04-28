@@ -29,6 +29,7 @@ class IPBlock(object):
         cherrypy.config.update({'tools.ipblock.on': value})
 
     def update(self, value):
+        if not cherrypy.config['tools.ipblock.on']: return
         IPBlock.parse_subnet(self, value)
 
     def parse_subnet(self, data):
