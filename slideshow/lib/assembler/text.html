@@ -1,7 +1,13 @@
 <assembler xmlns:py="http://genshi.edgewall.org/">
 	<fieldset id="assembler_text" class="assembler foldable">
+		<script type="text/javascript">
+			//<![CDATA[
+			$(document).ready(text_preview_init);
+			//]]>
+		</script>
+
 		<legend>Text <a href="#" onclick="return $('#assembler_text').foldable('toggle');" class="folding"></a></legend>
-		<input type="hidden" name="assembler" value="${assembler}" />
+		<input type="hidden" name="assembler" value="${assembler.name}" />
 		<input type="hidden" name="context" value="${context}" />
 		<p class="description">Using this option you can create new slides with text only. The text will be applied to the predefined background if specified in the configuration.</p>
 
