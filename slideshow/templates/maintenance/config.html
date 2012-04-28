@@ -7,15 +7,23 @@
 <head>
 	<link rel="stylesheet" href="/static/css/config.css" type="text/css" media="screen" />
 	<script type="text/javascript">
+		//<![CDATA[
 		$(document).ready(function() {
 		    $('#sidebar a').disableSelection();
 		    update_browserstring();
-		    config_open('Path');
+
+		    section = 'Path';
+		    if ( window.location.hash.length > 0 ){
+		        section = window.location.hash.substr(1);
+		    }
+
+		    config_open(section);
 
 		    $(".browserblur").change(function(){
 		        update_browserstring();
 		    });
 		});
+		//]]>
 	</script>
 </head>
 
@@ -25,8 +33,8 @@
 	<form id="form" method="post" action="/maintenance/config/save">
 		<div id="sidebar">
 			<ul>
-				<li py:for="group in settings" py:if="not group.hidden" id="menu_${group.name}"><a href="#" onclick="config_open('${group.name}'); return false;">${group.name}</a></li>
-				<li id="menu_Environmental"><a href="#" onclick="config_open('Environmental'); return false;">Environment</a></li>
+				<li py:for="group in settings" py:if="not group.hidden" id="menu_${group.name}"><a href="#${group.name}" onclick="config_open('${group.name}');">${group.name}</a></li>
+				<li id="menu_Environmental"><a href="#Environmental" onclick="config_open('Environmental'); return false;">Environment</a></li>
 				<li><hr/></li>
 				<li><a href="/maintenance">Cancel</a></li>
 				<li><a href="#" onclick="document.forms[0].submit();">Save</a></li>
