@@ -4,6 +4,7 @@
 from . import Assembler
 from slideshow.lib.resolution import Resolution
 from slideshow.settings import Settings
+import slideshow
 import array, cairo, pango, pangocairo, json, re
 import os
 import xml
@@ -169,7 +170,6 @@ class Label(Item):
 class Template:
     def __init__(self, filename):
         settings = Settings()
-        import slideshow
 
         search_path = [
             join(settings['Path.BasePath'], settings['Path.Theme']),
