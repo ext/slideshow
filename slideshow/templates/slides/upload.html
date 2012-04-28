@@ -11,10 +11,6 @@
 </head>
 
 <body>
-	<div id="breadcrumb">
-		<h2><a href="/">Slideshow</a> &gt; Upload slide</h2>
-	</div>
-	
 	<py:for each="assembler in assemblers">
 		<form action="/slides/submit" method="post" enctype="multipart/form-data" accept-charset="utf-8">
 			<xi:include href="../../lib/assembler/${assembler.name}.html" />
