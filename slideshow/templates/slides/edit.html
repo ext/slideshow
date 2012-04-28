@@ -17,7 +17,7 @@
 	<form action="/slides/submit" method="post" enctype="multipart/form-data" accept-charset="utf-8">
 		<input type="hidden" name="id" value="${id}" />
 		<xi:include href="../../lib/assembler/text.html" />
-		<div py:match="assembler">
+		<div py:match="assembler" id="${select('fieldset/@id')}">
 			${select('fieldset/*[not(legend or @class=\'description\')]')}
 		</div>
 	</form>
