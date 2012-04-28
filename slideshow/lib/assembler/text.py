@@ -100,7 +100,7 @@ class TextArea(Item):
 
     def render(self, content):
         return ('<label for="slide-{name}">{title}</label><br/>' +
-                '<textarea id="slide-{name}" name="{name}" cols="80" rows="15">{content}</textarea><br/>') \
+                '<textarea id="slide-{name}" name="{name}" cols="41" rows="15">{content}</textarea><br/>') \
                 .format(name=self.name, title=self.title, content=content)
 
     def raster(self, cr, size, realsize, scale, content):
@@ -142,7 +142,7 @@ class Label(Item):
 
     def render(self, content):
         return ('<label for="slide-{name}">{title}</label><br/>' +
-                '<input type="text" id="slide-{name}" name="{name}" size="70" value="{content}" /><br/>') \
+                '<input type="text" id="slide-{name}" name="{name}" size="28" value="{content}" /><br/>') \
                 .format(name=self.name, title=self.title, content=content)
 
     def raster(self, cr, size, realsize, scale, content):
