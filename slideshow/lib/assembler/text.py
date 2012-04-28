@@ -294,7 +294,7 @@ class Theme:
         for item in self.items():
             cr.save()
             try:
-                item.raster(cr, size, realsize, scale, params[item.name])
+                item.raster(cr, size, realsize, scale, params.get(item.name, ''))
             finally:
                 cr.restore()
 
