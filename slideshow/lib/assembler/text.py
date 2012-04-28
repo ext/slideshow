@@ -167,7 +167,7 @@ class Label(Item):
         cr.move_to(x, y)
         cr.show_text(content)
 
-class Template:
+class Theme:
     def __init__(self, filename):
         settings = Settings()
 
@@ -296,7 +296,7 @@ class TextAssembler(Assembler):
         if theme is None:
             theme = settings['Appearance.Theme']
 
-        template = Template(theme)
+        template = Theme(theme)
         template.rasterize(dst=dst, size=size, params=params)
 
     def raster_is_valid(reference, resolution, **kwargs):
@@ -312,5 +312,5 @@ class TextAssembler(Assembler):
         if len(content) > 0:
             default['preview'] = urllib.urlencode(content)
         default.update(content)
-        default['template'] = Template(settings['Appearance.Theme'])
+        default['template'] = Theme(settings['Appearance.Theme'])
         return Assembler.render(self, content=default, context=context)
