@@ -1,6 +1,8 @@
 slideshow-0.4.0
 ---------------
 
+	* [frontend] Search for themes in multiple directories.
+	* [frontend] Configuration split into sections.
 	* [frontend] Support for IP whitelisting.
 	* [frontend] support for additional setting types (checkboxes, textarea,
 	             etc)
