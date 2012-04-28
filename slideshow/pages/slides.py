@@ -176,7 +176,7 @@ class Handler(object):
             slide=s, id=id,
             assembler=assembler.get('text'),
             context="edit", content=content,
-            **assembler.get('text').localdata(content))
+            **assembler.get('text').localdata(kwargs))
 
     @cherrypy.expose
     def submit(self, id=None, context=None, assembler=None, submit=None, **kwargs):
