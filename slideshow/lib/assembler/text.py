@@ -12,6 +12,7 @@ from htmlcolor import Parser as ColorParser
 from os.path import join, dirname, basename
 import htmlcolor
 import urllib
+import traceback
 
 def decode_position(str, size):
     """
@@ -243,7 +244,11 @@ class Template:
                 cr.set_source_surface(image, 0, 0)
                 cr.paint()
             else:
-                cr.set_source_rgba(*decode_color(background))
+                try:
+                    cr.set_source_rgba(*decode_color(background))
+                except:
+                    traceback.print_exc()
+                    cr.set_source_rgba(0,0,0,1)
                 cr.rectangle(0, 0, realsize.w, realsize.h)
                 cr.fill()
 
