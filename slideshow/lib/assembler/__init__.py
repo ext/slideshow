@@ -65,7 +65,7 @@ class Assembler:
         """
         raise NotImplementedError
 
-    def localdata(self):
+    def localdata(self, content):
         """Define local data that is required by renderer"""
         return {}
 
@@ -76,7 +76,7 @@ class Assembler:
         """
 
         kwargs = content
-        kwargs.update(**self.localdata())
+        kwargs.update(**self.localdata(content))
 
         func = lambda: template.render(fields=content, assembler=self.name, context=context, **kwargs)
         file = self.name + '.html'

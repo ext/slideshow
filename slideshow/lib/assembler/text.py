@@ -343,12 +343,9 @@ class TextAssembler(Assembler):
     def title(self):
         return 'Text'
 
-    def render(self, content, context):
+    def localdata(self, content):
         settings = Settings()
-
-        default = dict(preview=None)
-        if len(content) > 0:
-            default['preview'] = urllib.urlencode(content)
-        default.update(content)
-        default['template'] = Theme(settings['Appearance.Theme'])
-        return Assembler.render(self, content=default, context=context)
+        return {
+            'preview': urllib.urlencode(content),
+            'template': Theme(settings['Appearance.Theme'])
+        }
