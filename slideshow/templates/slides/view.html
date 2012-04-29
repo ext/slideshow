@@ -55,7 +55,7 @@
 							<span class="edit" py:if="slide.assembler.is_editable()"><a href="/slides/edit/${slide.id}">Edit</a></span>
 							<span class="hide"><a href="#" onclick="slide.deactivate(${slide.id}, this); return false;">Hide</a></span>
 							<span class="show"><a href="#" onclick="slide.activate(${slide.id}, this);   return false;">Show</a></span>
-							<span class="delete"><a href="#" onclick="slide.delete(${slide.id}); return false;">Delete</a></span>
+							<span class="delete"><a href="#" onclick="slide.delete(${slide.id}, event.shiftKey); return false;">Delete</a></span>
 						</div>
 					</div>
 				</py:for>

@@ -1,6 +1,7 @@
 slideshow-0.4.0
 ---------------
 
+	* [frontend] Bypass delete confirmation by holding shift.
 	* [frontend] Preview using ajax.
 	* [frontend] Search for themes in multiple directories.
 	* [frontend] Configuration split into sections.

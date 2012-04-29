@@ -80,8 +80,16 @@ var slide = function(){
 		};
 
 		return {
-				delete: function(id){
+				/* show a confirmation dialog and delete if user confirms (exception
+				 * being if quick is true in which case it is deleted immediately) */
+				delete: function(id, quick){
 						delete_id = id;
+
+						if ( quick ){
+								slide.real_delete();
+								return;
+						}
+
 						$("#delete_dialog img").attr('src', '/slides/show/' + id + '/800/600');
 						$("#delete_dialog").dialog({
 								modal: true,
@@ -92,6 +100,28 @@ var slide = function(){
 								close: function(){
 										delete_id = undefined;
 								}
+						});
+				},
+
+				/* delete slide without confirmation */
+				real_delete: function(){
+						$.ajax({
+								type: "POST",
+								url: "/slides/ajax/delete",
+								data: {id: delete_id},
+								dataType: 'json',
+								success: function(data){
+										if ( data['success'] ){
+												$('#slide_' + delete_id).remove();
+										} else {
+												alert(data['message']);
+										}
+										$('#delete_dialog').dialog('close');
+								},
+								error: function(x, status, error){
+										alert(status + '\n' + error);
+										$('#delete_dialog').dialog('close');
+								},
 						});
 				},
 
@@ -121,28 +151,7 @@ $(document).ready(function(){
 		$('#delete_cancel').bind('click', function(){
 				$('#delete_dialog').dialog('close');
 		});
-		$('#delete_confirm').bind('click', function(){
-				/* notify server about update */
-				$.ajax({
-						type: "POST",
-						url: "/slides/ajax/delete",
-						data: {id: delete_id},
-						dataType: 'json',
-						success: function(data){
-								if ( data['success'] ){
-										$('#slide_' + delete_id).remove();
-								} else {
-										alert(data['message']);
-								}
-								$('#delete_dialog').dialog('close');
-						},
-						error: function(x, status, error){
-								alert(status + '\n' + error);
-								$('#delete_dialog').dialog('close');
-						},
-
-				});
-		});
+		$('#delete_confirm').bind('click', slide.real_delete);
 		
 		/* fold slide upload fieldsets */
 		var $f = $('.foldable');
