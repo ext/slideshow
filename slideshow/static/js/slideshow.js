@@ -224,4 +224,7 @@ function text_preview_init(){
 						text_preview_timer = setTimeout(text_preview, 800);
 				});
 		});
+
+		/* initial preview */
+		text_preview();
 }
