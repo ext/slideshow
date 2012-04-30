@@ -13,7 +13,11 @@
 <body>
 	<h2>Edit slide ${id}</h2>
 	<?python import time ?>
-	<p>Last updated ${time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(slide.timestamp))}.</p>
+	<p>
+		Last updated ${time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(slide.timestamp))}.<br/>
+		Update url: <a href="/slides/update/${id}">/slides/update/${id}</a>.
+	</p>
+
 	<form action="/slides/submit" method="post" enctype="multipart/form-data" accept-charset="utf-8">
 		<input type="hidden" name="id" value="${id}" />
 		<xi:include href="../../lib/assembler/text.html" />
