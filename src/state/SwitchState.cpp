@@ -21,6 +21,7 @@
 #endif
 
 #include "SwitchState.h"
+#include "Graphics.h"
 #include "TransitionState.h"
 #include "VideoState.h"
 #include "ViewState.h"
@@ -49,10 +50,10 @@ State* SwitchState::action(bool &flip){
 
 	if ( !(slide.filename && slide.assembler) ){
 		/* The current queue is empty, load a blank screen instead of keeping the
-		 * current slide. It makes more sense that the screen goes blank when removing 
+		 * current slide. It makes more sense that the screen goes blank when removing
 		 * all the slides from the queue. */
 		Log::warning("Kernel: Queue is empty\n");
-		gfx()->load_image(NULL); /* blank screen */
+		graphics_load_image(NULL, 0); /* blank screen */
 		return new TransitionState(this);
 	}
 
@@ -60,10 +61,7 @@ State* SwitchState::action(bool &flip){
 	if ( strcmp("image", slide.assembler) == 0 || strcmp("text", slide.assembler) == 0 ){
 		Log::verbose("Kernel: Switching to image \"%s\"\n", slide.filename);
 
-		try {
-			gfx()->load_image( slide.filename );
-		} catch ( exception& e ) {
-			Log::warning("Kernel: Failed to load image '%s': %s\n", slide.filename, e.what());
+		if ( graphics_load_image(slide.filename, 1) == -1 ){
 			return new ViewState(this);
 		}
 

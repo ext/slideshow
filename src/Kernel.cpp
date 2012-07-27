@@ -84,7 +84,6 @@ Kernel::Kernel(const argument_set_t& arg, PlatformBackend* backend)
 	: _arg(arg)
 	, _password(NULL)
 	, _state(NULL)
-	, _graphics(NULL)
 	, _browser(NULL)
 	, _ipc(NULL)
 	, _backend(backend)
@@ -119,7 +118,7 @@ void Kernel::cleanup(){
 	VideoState::cleanup();
 	delete _state;
 	module_close(&_browser->module);
-	delete _graphics;
+	graphics_cleanup();
 	free(pidfile);
 	free(_password);
 
@@ -128,7 +127,6 @@ void Kernel::cleanup(){
 
 	_state = NULL;
 	_browser = NULL;
-	_graphics = NULL;
 	pidfile = NULL;
 }
 
@@ -141,8 +139,8 @@ void Kernel::cleanup_backend(){
 }
 
 void Kernel::init_graphics(){
-	_graphics = new Graphics(_arg.width, _arg.height, _arg.fullscreen > 0);
-	load_transition( _arg.transition_string ? _arg.transition_string : "fade" );
+	graphics_init(_arg.width, _arg.height);
+	graphics_set_transition( _arg.transition_string ? _arg.transition_string : "fade" );
 }
 
 void Kernel::init_IPC(){
@@ -243,11 +241,11 @@ char* Kernel::get_password(){
 void Kernel::init_fsm(){
 	TransitionState::set_transition_time(_arg.transition_time);
 	ViewState::set_view_time(_arg.switch_time);
-	_state = new InitialState(_browser, _graphics, _ipc);
+	_state = new InitialState(_browser, _ipc);
 }
 
 void Kernel::load_transition(const char* name){
-	_graphics->set_transition(name);
+	graphics_set_transition(name);
 }
 
 void Kernel::poll(){
@@ -444,6 +442,11 @@ void Kernel::reload_browser(){
 
 		chunk.memory = (char*)malloc(1);  /* will be grown as needed by the realloc above */
 		chunk.size = 0;    /* no data at this point */
+
+		/* get json data */
+		curl_easy_setopt(curl_handle_settings, CURLOPT_WRITEDATA, (void *)&chunk);
+		curl_easy_perform(curl_handle_settings);
+		curl_easy_getinfo(curl_handle_settings, CURLINFO_RESPONSE_CODE, &response);
 
 		/* get json data */
 		curl_easy_setopt(curl_handle_settings, CURLOPT_WRITEDATA, (void *)&chunk);

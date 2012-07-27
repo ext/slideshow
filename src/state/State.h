@@ -20,18 +20,17 @@
 #define STATE_H
 
 #include "Browser.h"
-#include "Graphics.h"
 #include "IPC.h"
 #include <portable/time.h>
 
 class State {
 	public:
-		State(browser_module_t* browser, Graphics* gfx, IPC* ipc): _browser(browser), _gfx(gfx), _ipc(ipc){
+		State(browser_module_t* browser, IPC* ipc): _browser(browser), _ipc(ipc){
 			_created = getTimef();
 		}
 		virtual ~State(){}
 
-		State(State* state): _browser(state->_browser), _gfx(state->_gfx), _ipc(state->_ipc){
+		State(State* state): _browser(state->_browser), _ipc(state->_ipc){
 			_created = getTimef();
 			delete state;
 		}
@@ -44,14 +43,12 @@ class State {
 
 		browser_module_t* browser(){ return _browser; }
 
-		Graphics* gfx(){ return _gfx; }
 		IPC* ipc(){ return _ipc; }
 
 		float age(){ return getTimef() - _created; }
 
 	private:
 		browser_module_t* _browser;
-		Graphics* _gfx;
 		IPC* _ipc;
 		float _created;
 };
