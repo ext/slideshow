@@ -183,21 +183,15 @@ dnl #######################################################################
 dnl # MySQL
 dnl #######################################################################
 
-AC_ARG_WITH([mysql],
-	[AS_HELP_STRING([--with-mysql], [support for MySQL])],
-	[],
-	[with_mysql=no])
-
-AS_IF([test "x$with_mysql" != xno],
-	[AC_CHECK_HEADERS([mysql/mysql.h],
-		[
-			MYSQL_LIBS="-lmysqlclient"
-		],
-		[
-			AC_MSG_ERROR([Required MySQL development libraries not found])
-		])],
-	[])
-
+AC_ARG_WITH([mysql], [AS_HELP_STRING([--with-mysql], [support for MySQL @<:@default=no@:>@])], [], [with_mysql=no])
+AS_IF([test "x$with_mysql" != xno], [
+  AC_CHECK_HEADERS([mysql/mysql.h], [
+    MYSQL_LIBS="-lmysqlclient"
+  ],[
+    AC_MSG_ERROR([Required MySQL development libraries not found])
+  ])
+  AC_DEFINE(HAVE_MYSQL, 1, [Define if mysql is available])
+])
 AM_CONDITIONAL([WITH_MYSQL], [test "x$with_mysql" != xno])
 AC_SUBST(MYSQL_LIBS)
 
@@ -205,7 +199,7 @@ dnl #######################################################################
 dnl # SQLite3
 dnl #######################################################################
 
-AC_ARG_WITH([sqlite3], [AS_HELP_STRING([--with-sqlite3], [support for SQLite3 @<:@default=no@:>@])])
+AC_ARG_WITH([sqlite3], [AS_HELP_STRING([--with-sqlite3], [support for SQLite3 @<:@default=no@:>@])], [], [with_sqlite3=no])
 AS_IF([test "x$with_sqlite3" != xno], [
     PKG_CHECK_MODULES(sqlite3, [sqlite3])
     AC_DEFINE(HAVE_SQLITE3, 1, [Define if sqlite3 is available])

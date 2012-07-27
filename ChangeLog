@@ -1,6 +1,7 @@
 slideshow-0.4.0
 ---------------
 
+	* [daemon] proper mysql browser.
 	* [frontend] Bypass delete confirmation by holding shift.
 	* [frontend] Preview using ajax.
 	* [frontend] Render checkerboard pattern for background instead of solid

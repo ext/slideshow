@@ -84,16 +84,6 @@ if WITH_SDL
 slideshow_daemon_SOURCES += backend/SDLbackend.cpp ${top_srcdir}/include/backend/SDLbackend.h
 endif
 
-if WITH_MYSQL
-slideshow_daemon_SOURCES += browsers/mysqlbrowser.cpp
-slideshow_daemon_LDADD += ${MYSQL_LIBS}
-endif
-
-#if WITH_SQLITE3
-#slideshow_daemon_SOURCES += browsers/sqlite.cpp
-#slideshow_daemon_LDADD += ${sqlite3_LIBS}
-#endif
-
 libmodule_loader_a_SOURCES = module_loader.c ${top_srcdir}/include/module_loader.h
 
 SUFFIXES = .rl
