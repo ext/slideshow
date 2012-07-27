@@ -7,6 +7,10 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([include/config.h])
 
 AC_GNU_SOURCE
+
+# automake 1.12 needs AM_PROG_AR but automake 1.11 doesn't have it
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
+
 AC_PROG_CXX
 AM_PROG_CC_C_O
 AM_DISABLE_STATIC
