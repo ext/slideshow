@@ -131,7 +131,7 @@ def from_id(c, id):
     """, {'id': id}).fetchone()
 
     if not row:
-        raise InvalidSlide, "No slide with id ':id'".format(id=id)
+        raise InvalidSlide, "No slide with id '{id}'".format(id=id)
 
     return Slide(queue=None, stub=False, **row)
 
