@@ -3,12 +3,14 @@ slideshow-0.4.0
 
 	* [frontend] Bypass delete confirmation by holding shift.
 	* [frontend] Preview using ajax.
+	* [frontend] Render checkerboard pattern for background instead of solid
+	             color to distinguish alpha.
 	* [frontend] Search for themes in multiple directories.
 	* [frontend] Configuration split into sections.
 	* [frontend] Support for IP whitelisting.
-	* [frontend] support for additional setting types (checkboxes, textarea,
+	* [frontend] Support for additional setting types (checkboxes, textarea,
 	             etc)
-	* [frontend] adding support for IP whitelisting.
+	* [frontend] Database migration handling
 	* [frontend] folds fieldsets on upload screen so users don't
 	             accidentally press the wrong button.
 	* [frontend] delete slide with js.
