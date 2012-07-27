@@ -150,16 +150,18 @@ void Kernel::init_IPC(){
 	_ipc = new DBus(this, 50);
 #endif /* HAVE_DBUS */
 
-	char* settings_url = asprintf2("%s/instance/settings", _arg.url);
+	if ( _arg.url ){
+		char* settings_url = asprintf2("%s/instance/settings", _arg.url);
 
-	/* get json data */
-	curl_handle_settings = curl_easy_init();
-	struct curl_httppost *lastptr = NULL;
-	curl_formadd(&settings_formpost, &lastptr, CURLFORM_COPYNAME, "name", CURLFORM_COPYCONTENTS, _arg.instance, CURLFORM_END);
-	curl_easy_setopt(curl_handle_settings, CURLOPT_URL, settings_url);
-	curl_easy_setopt(curl_handle_settings, CURLOPT_HTTPPOST, settings_formpost);
-	curl_easy_setopt(curl_handle_settings, CURLOPT_WRITEFUNCTION, curl_local_resize);
-	free(settings_url);
+		/* get json data */
+		curl_handle_settings = curl_easy_init();
+		struct curl_httppost *lastptr = NULL;
+		curl_formadd(&settings_formpost, &lastptr, CURLFORM_COPYNAME, "name", CURLFORM_COPYCONTENTS, _arg.instance, CURLFORM_END);
+		curl_easy_setopt(curl_handle_settings, CURLOPT_URL, settings_url);
+		curl_easy_setopt(curl_handle_settings, CURLOPT_HTTPPOST, settings_formpost);
+		curl_easy_setopt(curl_handle_settings, CURLOPT_WRITEFUNCTION, curl_local_resize);
+		free(settings_url);
+	}
 }
 
 void Kernel::cleanup_IPC(){
@@ -175,13 +177,16 @@ void Kernel::init_browser(){
 
 	if ( _arg.connection_string ){
 		context = get_context(_arg.connection_string);
-	} else {
+	} else if ( _arg.url ) {
 		/* default to frontend browser */
 		context.provider = strdup("frontend");
 		context.user     = NULL;
 		context.pass     = NULL;
 		context.host     = strdup(_arg.url);
 		context.name     = strdup(_arg.instance);
+	} else {
+		Log::fatal("No browser provided.\n");
+		return;
 	}
 
 	// If the contex doesn't contain a password and a password was passed from stdin (arg password)
@@ -288,7 +293,7 @@ void Kernel::print_config() const {
 }
 
 void Kernel::print_licence_statement() const {
-	Log::info("Slideshow  Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>\n");
+	Log::info("Slideshow  Copyright (C) 2008-2012 David Sveningsson <ext@sidvind.com>\n");
 	Log::info("This program comes with ABSOLUTELY NO WARRANTY.\n");
 	Log::info("This is free software, and you are welcome to redistribute it\n");
 	Log::info("under certain conditions; see COPYING or <http://www.gnu.org/licenses/>\n");
@@ -388,12 +393,11 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 	}
 
 	if ( n == argc ){
-		printf("%s: Missing frontend url.\n", argv[0]);
+		printf("%s: Warning: No frontend url given.\n", argv[0]);
 		printf("Try `%s --help' for more information.\n", argv[0]);
-		return false;
+	} else {
+		arg.url = strdup(argv[n+1]);
 	}
-
-	arg.url = strdup(argv[n+1]);
 
 	/* use machine hostname by default */
 	if ( !arg.instance ){
@@ -434,50 +438,52 @@ void Kernel::reload_browser(){
 		_browser->queue_reload(_browser);
 	}
 
-	struct MemoryStruct chunk;
-	long response;
+	if ( curl_handle_settings ){
+		struct MemoryStruct chunk;
+		long response;
 
-	chunk.memory = (char*)malloc(1);  /* will be grown as needed by the realloc above */
-	chunk.size = 0;    /* no data at this point */
+		chunk.memory = (char*)malloc(1);  /* will be grown as needed by the realloc above */
+		chunk.size = 0;    /* no data at this point */
 
-	/* get json data */
-	curl_easy_setopt(curl_handle_settings, CURLOPT_WRITEDATA, (void *)&chunk);
-	curl_easy_perform(curl_handle_settings);
-	curl_easy_getinfo(curl_handle_settings, CURLINFO_RESPONSE_CODE, &response);
+		/* get json data */
+		curl_easy_setopt(curl_handle_settings, CURLOPT_WRITEDATA, (void *)&chunk);
+		curl_easy_perform(curl_handle_settings);
+		curl_easy_getinfo(curl_handle_settings, CURLINFO_RESPONSE_CODE, &response);
 
-	if ( response != 200 ){ /* HTTP OK */
-		Log::warning("Server replied with code %ld\n", response);
-		return;
-	}
-
-	/* parse */
-	json_object* settings = json_tokener_parse(chunk.memory);
-	if ( !settings ){
-		Log::warning("Failed to parse settings");
-		return;
-	}
-
-	json_object_object_foreach(settings, key, value) {
-		/* @todo map */
-		if ( strcasecmp(key, "queue") == 0 ){
-			change_bin(json_object_get_int(value));
-			continue;
+		if ( response != 200 ){ /* HTTP OK */
+			Log::warning("Server replied with code %ld\n", response);
+			return;
 		}
 
-		if ( strcasecmp(key, "transitiontime") == 0 ){
-			TransitionState::set_transition_time((float)json_object_get_double(value));
-			continue;
+		/* parse */
+		json_object* settings = json_tokener_parse(chunk.memory);
+		if ( !settings ){
+			Log::warning("Failed to parse settings");
+			return;
 		}
 
-		if ( strcasecmp(key, "switchtime") == 0 ){
-			ViewState::set_view_time(json_object_get_double(value));
-			continue;
+		json_object_object_foreach(settings, key, value) {
+			/* @todo map */
+			if ( strcasecmp(key, "queue") == 0 ){
+				change_bin(json_object_get_int(value));
+				continue;
+			}
+
+			if ( strcasecmp(key, "transitiontime") == 0 ){
+				TransitionState::set_transition_time((float)json_object_get_double(value));
+				continue;
+			}
+
+			if ( strcasecmp(key, "switchtime") == 0 ){
+				ViewState::set_view_time(json_object_get_double(value));
+				continue;
+			}
+
+			Log::warning("Unhandled setting %s: %s\n", key, json_object_to_json_string(value));
 		}
 
-		Log::warning("Unhandled setting %s: %s\n", key, json_object_to_json_string(value));
+		json_object_put(settings);
 	}
-
-	json_object_put(settings);
 }
 
 void Kernel::change_bin(unsigned int id){
