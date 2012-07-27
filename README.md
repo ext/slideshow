@@ -11,4 +11,18 @@ Slideshow is a kiosk-style application for showing text, image and video in a co
 * Natively loads most image formats, including but not limited to: BMP, JPEG, PNG, GIF, TGA.
 * Hardware acceleration with OpenGL.
 * Transition via plugin-based system (fade and spin builtin).
-* Licensed under ​AGPLv3.
+* Licensed under AGPLv3.
+
+## Requirements
+
+* automake-1.11 or later
+* DevIL
+* GLEW
+* libdaemon
+* libjson
+* libportable
+
+## Optional
+
+* SDL
+* sqlite3 or mysql
