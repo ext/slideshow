@@ -2,3 +2,30 @@
 *~
 \#*\#
 .\#*
+
+# c/cpp
+*.[ao]
+*.l[ao]
+
+# autotools
+.deps
+.dirstamp
+.libs
+aclocal.m4
+autom4te.cache/
+build-aux/
+build/
+config.h
+config.h.in
+config.log
+config.status
+configure
+libtool
+Makefile
+Makefile.in
+stamp-h1
+
+# generated/built files
+src/browser_context.cpp
+src/slideshow-daemon
+slideshow-daemon
