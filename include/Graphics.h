@@ -36,37 +36,4 @@ int graphics_set_transition(const char* name);
 }
 #endif
 
-/*
-class Graphics {
-	public:
-		Graphics(int width, int height, bool fullscreen);
-		~Graphics();
-
-		void render(float state);
-		void load_image(const char* filename, bool letterbox = true);
-
-		void set_transition(const char* name);
-
-	private:
-		void glew_init();
-		void glew_cleanup();
-		void imageloader_init();
-		void imageloader_cleanup();
-		void curl_init();
-		void curl_cleanup();
-		void gl_setup();
-		void gl_set_matrices();
-		void gl_init_textures();
-		void gl_cleanup_textures();
-
-		void load_file(const char* filename, unsigned int dst);
-		void load_url(const char* url, unsigned int dst);
-		void load_blank();
-		void apply_letterbox(unsigned int src, unsigned int dst);
-
-		void swap_textures();
-
-};
-*/
-
 #endif /* SLIDESHOW_GRAPHICS_H */
