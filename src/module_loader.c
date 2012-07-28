@@ -20,7 +20,7 @@
 #include "module_loader.h"
 #include "assembler.h"
 #include "Browser.h"
-#include "log_base.h"
+#include "log.h"
 #include "Transition.h"
 #include <stdio.h>
 #include <stdlib.h>

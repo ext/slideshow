@@ -19,7 +19,7 @@
 #ifndef LOG_H
 #define LOG_H
 
-#include "log_base.h"
+#include "log.h"
 #include <cstdio>
 #include <vector>
 

@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2012 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,23 +16,32 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "log.hpp"
+#ifndef LOG_BASE_H
+#define LOG_BASE_H
+
+/**
+ * c api for logging.
+ */
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void  log_message(enum Severity severity, const char* fmt, ...){
-	va_list ap;
-	va_start(ap, fmt);
-	log_vmessage(severity, fmt, ap);
-	va_end(ap);
-}
+#include <stdarg.h>
 
-void log_vmessage(enum Severity severity, const char* fmt, va_list ap){
-	Log::vmessage(severity, fmt, ap);
-}
+enum Severity {
+	Log_Debug = 0,
+	Log_Verbose,
+	Log_Info,
+	Log_Warning,
+	Log_Fatal
+};
+
+void  log_message(enum Severity severity, const char* fmt, ...) __attribute__((format(printf,2,3)));
+void log_vmessage(enum Severity severity, const char* fmt, va_list ap);
 
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* LOG_BASE_H */

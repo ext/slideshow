@@ -18,7 +18,7 @@
 
 #include "module.h"
 #include "Browser.h"
-#include "log_base.h"
+#include "log.h"
 #include <sqlite3.h>
 #include <string.h>
 

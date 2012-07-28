@@ -18,7 +18,7 @@
 
 #include "module.h"
 #include "Browser.h"
-#include "log_base.h"
+#include "log.h"
 #include <string.h>
 #include <dirent.h>
 #include <portable/asprintf.h>
@@ -32,11 +32,11 @@ typedef struct {
 MODULE_INFO("Directory browser", BROWSER_MODULE, "David Sveningsson");
 
 static int filter(const struct dirent* d){
-	if ( 
+	if (
 	    strcmp(d->d_name, ".") == 0 ||
 	    strcmp(d->d_name, "..") == 0 ||
 	    strcmp(d->d_name, "Thumbs.db") == 0 ){
-		
+
 		return 0;
 	}
 	return 1;
@@ -66,14 +66,14 @@ static slide_context_t next_slide(context_t* this){
 		} else {
 			free(this->namelist);
 			queue_reload(this);
-			
+
 			/* empty directory, don't repeat */
 			if ( !this->current ){
 				return slide;
 			}
 
 			log_message(Log_Debug, "queue wrapping\n");
-			
+
 			/* retry */
 			continue;
 		}

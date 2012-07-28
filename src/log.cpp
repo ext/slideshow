@@ -280,3 +280,14 @@ namespace Log {
 	}
 
 }
+
+extern "C" void log_message(enum Severity severity, const char* fmt, ...){
+	va_list ap;
+	va_start(ap, fmt);
+	log_vmessage(severity, fmt, ap);
+	va_end(ap);
+}
+
+extern "C" void log_vmessage(enum Severity severity, const char* fmt, va_list ap){
+	Log::vmessage(severity, fmt, ap);
+}

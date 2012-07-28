@@ -17,7 +17,7 @@
  */
 
 #include "module.h"
-#include "log_base.h"
+#include "log.h"
 #include "Transition.h"
 #include "gl.h"
 

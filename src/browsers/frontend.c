@@ -18,7 +18,7 @@
 
 #include "module.h"
 #include "Browser.h"
-#include "log_base.h"
+#include "log.h"
 #include <curl/curl.h>
 #include "curl_local.h"
 #include <json/json.h>
