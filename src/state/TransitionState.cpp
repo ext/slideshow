@@ -21,7 +21,7 @@
 #endif
 
 #include "TransitionState.h"
-#include "Graphics.h"
+#include "graphics.h"
 #include "ViewState.h"
 
 float TransitionState::transition_time = 1.0f;

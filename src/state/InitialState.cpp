@@ -21,7 +21,7 @@
 #endif
 
 #include "InitialState.h"
-#include "Graphics.h"
+#include "graphics.h"
 #include "TransitionState.h"
 #include "exception.h"
 #include "Log.h"

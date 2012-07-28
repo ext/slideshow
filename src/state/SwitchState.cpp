@@ -21,7 +21,7 @@
 #endif
 
 #include "SwitchState.h"
-#include "Graphics.h"
+#include "graphics.h"
 #include "TransitionState.h"
 #include "VideoState.h"
 #include "ViewState.h"

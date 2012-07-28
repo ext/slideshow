@@ -24,7 +24,7 @@
 #include "module.h"
 #include "module_loader.h"
 #include "Kernel.h"
-#include "Graphics.h"
+#include "graphics.h"
 #include "OS.h"
 #include "path.h"
 #include "Log.h"

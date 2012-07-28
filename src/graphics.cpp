@@ -20,8 +20,8 @@
 #	include "config.h"
 #endif
 
+#include "graphics.h"
 #include "exception.h"
-#include "Graphics.h"
 #include "Kernel.h"
 #include "module_loader.h"
 #include "OS.h"
@@ -351,10 +351,10 @@ static void apply_letterbox(unsigned int src, unsigned int dst){
 	ilTexImage(width, height, depth, bpp, format, type, NULL);
 
 	/* clear image */
-	unsigned char black[_width*4];
-	memset(black, 0, _width*4);
-	for ( int i = 0; i < _height; i++ ){
-		ilSetPixels(0, i, 0, _width, 1, 0, format, type, black);
+	unsigned char black[width*4];
+	memset(black, 0, width*4);
+	for ( int i = 0; i < height; i++ ){
+		ilSetPixels(0, i, 0, width, 1, 0, format, type, black);
 	}
 
 	/* render image centered */

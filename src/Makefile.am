@@ -55,7 +55,7 @@ slideshow_daemon_SOURCES = \
 	DaemonApp.cpp ${top_srcdir}/include/DaemonApp.h \
 	exception.cpp ${top_srcdir}/include/exception.h \
 	ForegroundApp.cpp ${top_srcdir}/include/ForegroundApp.h \
-	Graphics.cpp ${top_srcdir}/include/Graphics.h \
+	graphics.cpp graphics.h \
 	Kernel.cpp ${top_srcdir}/include/Kernel.h \
 	log_base.cpp ${top_srcdir}/include/log_base.h\
 	Log.cpp ${top_srcdir}/include/Log.h\
