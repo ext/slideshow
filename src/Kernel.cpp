@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2012 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -26,7 +26,7 @@
 #include "Kernel.h"
 #include "graphics.h"
 #include "path.h"
-#include "Log.h"
+#include "log.hpp"
 #include "exception.h"
 #include "Transition.h"
 #include "state/VideoState.h" /* must be initialized */

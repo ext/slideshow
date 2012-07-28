@@ -47,8 +47,8 @@ slideshow_daemon_SOURCES = \
 	graphics.cpp graphics.h \
 	IPC.h \
 	Kernel.cpp Kernel.h \
-	log_base.cpp log_base.h\
-	Log.cpp Log.h\
+	log_base.cpp log_base.h \
+	log.cpp log.hpp \
 	main.cpp \
 	mathutils.h \
 	module.h \

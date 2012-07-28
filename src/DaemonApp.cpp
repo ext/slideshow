@@ -18,7 +18,7 @@
 
 #include "config.h"
 #include "DaemonApp.h"
-#include "Log.h"
+#include "log.hpp"
 #include <libdaemon/daemon.h>
 #include <cstring>
 #include <cstdlib>

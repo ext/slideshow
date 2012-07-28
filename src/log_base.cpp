@@ -16,7 +16,7 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Log.h"
+#include "log.hpp"
 
 #ifdef __cplusplus
 extern "C" {

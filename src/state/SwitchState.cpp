@@ -25,8 +25,7 @@
 #include "TransitionState.h"
 #include "VideoState.h"
 #include "ViewState.h"
-#include "exception.h"
-#include "Log.h"
+#include "log.hpp"
 #include <cstring>
 
 State* SwitchState::action(bool &flip){

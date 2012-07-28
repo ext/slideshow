@@ -20,7 +20,7 @@
 #	include "config.h"
 #endif
 
-#include "Log.h"
+#include "log.hpp"
 #include "VideoState.h"
 #include "SwitchState.h"
 #include <cstdlib>
