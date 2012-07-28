@@ -179,15 +179,16 @@ int main( int argc, const char* argv[] ){
 			cwd[0] = '\0';
 		}
 
-		fprintf(stderr, " *** slideshow unhandled exception ***\n");
+		fprintf(stderr, " *** "PACKAGE" unhandled exception ***\n");
+		fprintf(stderr, "\tversion: "PACKAGE"-"VERSION"\n");
 		fprintf(stderr, "\tcwd:     %s\n", cwd);
 		fprintf(stderr, "\tSource:  %s:%d\n", e.file(), e.line());
 		fprintf(stderr, "\tMessage: %s\n\n", e.what());
 		fprintf(stderr, "Troubleshooting:\n");
-		fprintf(stderr, " - Make sure that all required dll's are installed.\n");
+		fprintf(stderr, " - Make sure that all required shared libraries are installed.\n");
 		fprintf(stderr, " - Make sure that the cwd is correct.\n\n");
 		fprintf(stderr, "If the problem persists report the bug at\n"
-				"http://sidvind.com:8000/slideshow/newticket\n"
+				"https://github.com/ext/slideshow/issues/new\n"
 				"and copy the entire output from the console.\n\n");
 		fprintf(stderr, "This is a fatal error, the application will now terminate!\n\n");
 
