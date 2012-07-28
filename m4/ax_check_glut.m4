@@ -1,1 +1,0 @@
-../vendor/autoconf-gl-macros/m4/ax_check_glut.m4
