@@ -6,9 +6,9 @@ bin_PROGRAMS = slideshow-daemon
 warning_flags = -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers
 
 AM_LDFLAGS = -shared -module -avoid-version
-AM_CPPFLAGS = -I${top_srcdir}/include -I${top_srcdir}/src ${libportable_CFLAGS} -pipe $(ARCH_FLAGS) ${warning_flags}
+AM_CPPFLAGS = ${libportable_CFLAGS} -pipe $(ARCH_FLAGS) ${warning_flags}
 
-libipc_a_CPPFLAGS = -I${top_srcdir}/include
+libipc_a_CPPFLAGS = ${AM_CPPFLAGS}
 libipc_a_SOURCES = 
 
 if WITH_DBUS
@@ -24,7 +24,7 @@ libfsm_a_SOURCES = \
 	state/VideoState.cpp state/VideoState.h \
 	state/ViewState.cpp state/ViewState.h
 
-slideshow_daemon_CPPFLAGS = ${AM_CPPFLAGS} ${libdaemon_CFLAGS} -DBUILD_DAEMON
+slideshow_daemon_CPPFLAGS = ${AM_CPPFLAGS} ${libdaemon_CFLAGS}
 slideshow_daemon_CFLAGS   = ${AM_CPPFLAGS}
 slideshow_daemon_LDFLAGS  = ${AM_LDFLAGS} -rdynamic
 
@@ -33,9 +33,8 @@ slideshow_daemon_CPPFLAGS += ${dbus_CFLAGS}
 endif
 
 slideshow_daemon_SOURCES = \
-	backend/factory.cpp \
-  browsers/factory.cpp \
-  argument_parser.c \
+	backend/factory.cpp backend/platform.h \
+	argument_parser.c argument_parser.h \
 	browser_context.rl \
 	Browser.cpp Browser.h \
 	curl_local.c curl_local.h \
@@ -78,12 +77,12 @@ slideshow_daemon_LDADD = \
 	${xrandr_LIBS}
 
 if WITH_SDL
-slideshow_daemon_SOURCES += backend/SDLbackend.cpp ${top_srcdir}/include/backend/SDLbackend.h
+slideshow_daemon_SOURCES += backend/SDLbackend.cpp backend/SDLbackend.h
 endif
 
-libmodule_loader_a_SOURCES = module_loader.c ${top_srcdir}/include/module_loader.h
+libmodule_loader_a_SOURCES = module_loader.c module_loader.h assembler.h
 
-SUFFIXES = .rl
+CLEANFILES = browser_context.cpp
 
 .rl.cpp:
 	$(AM_V_GEN)$(RAGEL) $(RAGELFLAGS) -C $< -o $@

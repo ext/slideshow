@@ -23,6 +23,10 @@ AX_CHECK_GLU
 PKG_CHECK_MODULES(glew, [glew])
 PKG_CHECK_MODULES(json, [json])
 
+dnl Windows does not support daemon mode yet, but any platform where autotools
+dnl is used is assumed to.
+AC_DEFINE([BUILD_DAEMON], [1], [Define to 1 to build daemon mode support])
+
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
