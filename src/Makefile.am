@@ -50,7 +50,6 @@ slideshow_daemon_SOURCES = \
 	main.cpp \
 	mathutils.h \
 	module.h \
-	OS.h \
 	path.c path.h \
 	ptr.h \
 	slidelib.h \

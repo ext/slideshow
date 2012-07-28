@@ -24,7 +24,6 @@
 #include "exception.h"
 #include "Kernel.h"
 #include "module_loader.h"
-#include "OS.h"
 #include "Log.h"
 #include "Transition.h"
 #include "path.h"
