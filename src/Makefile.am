@@ -33,34 +33,31 @@ slideshow_daemon_CPPFLAGS += ${dbus_CFLAGS}
 endif
 
 slideshow_daemon_SOURCES = \
-	${top_srcdir}/include/backend/platform.h \
-	${top_srcdir}/include/argument_parser.h \
-	${top_srcdir}/include/assembler.h \
-	${top_srcdir}/include/gl.h \
-	${top_srcdir}/include/IPC.h \
-	${top_srcdir}/include/mathutils.h \
-	${top_srcdir}/include/module.h \
-	${top_srcdir}/include/OS.h \
-	${top_srcdir}/include/ptr.h \
-	${top_srcdir}/include/slidelib.h \
-	${top_srcdir}/include/Transition.h \
-	${top_srcdir}/include/vector.h \
-	${top_srcdir}/include/win32.h \
 	backend/factory.cpp \
-	browsers/factory.cpp \
-	argument_parser.c \
+  browsers/factory.cpp \
+  argument_parser.c \
 	browser_context.rl \
-	Browser.cpp ${top_srcdir}/include/Browser.h \
+	Browser.cpp Browser.h \
 	curl_local.c curl_local.h \
-	DaemonApp.cpp ${top_srcdir}/include/DaemonApp.h \
-	exception.cpp ${top_srcdir}/include/exception.h \
-	ForegroundApp.cpp ${top_srcdir}/include/ForegroundApp.h \
+	DaemonApp.cpp DaemonApp.h \
+	exception.cpp exception.h \
+	ForegroundApp.cpp ForegroundApp.h \
+	gl.h \
 	graphics.cpp graphics.h \
-	Kernel.cpp ${top_srcdir}/include/Kernel.h \
-	log_base.cpp ${top_srcdir}/include/log_base.h\
-	Log.cpp ${top_srcdir}/include/Log.h\
+	IPC.h \
+	Kernel.cpp Kernel.h \
+	log_base.cpp log_base.h\
+	Log.cpp Log.h\
 	main.cpp \
-	path.c ${top_srcdir}/include/path.h
+	mathutils.h \
+	module.h \
+	OS.h \
+	path.c path.h \
+	ptr.h \
+	slidelib.h \
+	Transition.h \
+	vector.h \
+	win32.h
 
 slideshow_daemon_LDADD = \
 	libmodule_loader.a \
