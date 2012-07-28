@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2012 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,11 +16,24 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef HAVE_CONFIG_H
-#	include "config.h"
+#ifndef SLIDESHOW_GRAPHICS_H
+#define SLIDESHOW_GRAPHICS_H
+
+#include "Transition.h"
+#include <curl/curl.h>
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-#include "Browser.h"
-#include "Log.h"
-#include <cstring>
+int graphics_init(int width, int height);
+int graphics_cleanup();
+void graphics_render(float state);
+int graphics_load_image(const char* filename, int letterbox);
+int graphics_set_transition(const char* name);
 
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* SLIDESHOW_GRAPHICS_H */

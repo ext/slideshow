@@ -4,7 +4,7 @@ AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall 1.11 subdir-objects foreign])
 AM_SILENT_RULES([yes])
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_HEADERS([include/config.h])
+AC_CONFIG_HEADERS([src/config.h])
 
 AC_GNU_SOURCE
 
@@ -22,6 +22,10 @@ AX_LIB_CURL([],,AC_MSG_ERROR([Required library libcurl not found]))
 AX_CHECK_GLU
 PKG_CHECK_MODULES(glew, [glew])
 PKG_CHECK_MODULES(json, [json])
+
+dnl Windows does not support daemon mode yet, but any platform where autotools
+dnl is used is assumed to.
+AC_DEFINE([BUILD_DAEMON], [1], [Define to 1 to build daemon mode support])
 
 AC_CONFIG_FILES([
 	Makefile

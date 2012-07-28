@@ -21,20 +21,17 @@
 #endif
 
 #include "InitialState.h"
+#include "graphics.h"
 #include "TransitionState.h"
 #include "exception.h"
 #include "Log.h"
 
 State* InitialState::action(bool &flip){
-	try {
-		gfx()->load_image(NULL);
-		gfx()->load_image("resources/splash.png", false);
-	} catch ( exception &e ){
-		Log::warning("%s\n", e.what());
-		Log::warning("Failed to load initial resources, check your configuration\n");
-	}
+	graphics_load_image(NULL, 0); /* load blank image */
+	graphics_load_image("resources/splash.png", 0);
 
-	gfx()->render(0.0);
+	/* force something on screen */
+	graphics_render(0.0);
 	flip = true;
 
 	return new TransitionState(this);

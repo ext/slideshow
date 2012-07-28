@@ -19,7 +19,6 @@
 #ifndef KERNEL_H
 #define KERNEL_H
 
-class Graphics;
 class IPC;
 class State;
 class PlatformBackend;
@@ -119,7 +118,6 @@ class Kernel {
 
 		State* _state;
 
-		Graphics* _graphics;
 		browser_module_t* _browser;
 		IPC* _ipc;
 		PlatformBackend* _backend;

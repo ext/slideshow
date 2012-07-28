@@ -21,6 +21,7 @@
 #endif
 
 #include "TransitionState.h"
+#include "graphics.h"
 #include "ViewState.h"
 
 float TransitionState::transition_time = 1.0f;
@@ -28,7 +29,7 @@ float TransitionState::transition_time = 1.0f;
 State* TransitionState::action(bool &flip){
 	float s = age() / transition_time;
 
-	gfx()->render( s );
+	graphics_render(s);
 	flip = true;
 
 	if ( s > 1.0f ){
