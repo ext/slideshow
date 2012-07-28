@@ -39,13 +39,8 @@
 
 #include <portable/string.h>
 
-/* hack to get opengl functions, does not seem to be used in header even when
- * built with opengl support. */
-#define ILUT_USE_OPENGL
-
 #include <IL/il.h>
 #include <IL/ilu.h>
-#include <IL/ilut.h>
 
 static CURL* curl = NULL;
 static transition_module_t* transition = NULL;
@@ -106,7 +101,6 @@ int graphics_init(int w, int h){
 		return EINVAL;
 	}
 	iluInit();
-	ilutRenderer(ILUT_OPENGL);
 
 	/* init curl */
 	curl = curl_easy_init();

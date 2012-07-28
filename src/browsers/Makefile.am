@@ -17,5 +17,6 @@ endif
 if WITH_MYSQL
 plugin_LTLIBRARIES += mysql.la
 mysql_la_SOURCES    = mysql.c
-mysql_la_LIBADD     = ${MYSQL_LIBS}
+mysql_la_CFLAGS     = ${AM_CFLAGS} ${MYSQL_CLIENT_CFLAGS}
+mysql_la_LIBADD     = ${MYSQL_CLIENT_LIBS}
 endif

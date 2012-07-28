@@ -6,9 +6,9 @@ bin_PROGRAMS = slideshow-daemon
 warning_flags = -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers
 
 AM_LDFLAGS = -shared -module -avoid-version
-AM_CPPFLAGS = ${libportable_CFLAGS} -pipe $(ARCH_FLAGS) ${warning_flags}
+AM_CFLAGS = ${libportable_CFLAGS} ${warning_flags}
 
-libipc_a_CPPFLAGS = ${AM_CPPFLAGS}
+libipc_a_CPPFLAGS = ${AM_CFLAGS}
 libipc_a_SOURCES = 
 
 if WITH_DBUS
@@ -24,12 +24,14 @@ libfsm_a_SOURCES = \
 	state/VideoState.cpp state/VideoState.h \
 	state/ViewState.cpp state/ViewState.h
 
-slideshow_daemon_CPPFLAGS = ${AM_CPPFLAGS} ${libdaemon_CFLAGS}
-slideshow_daemon_CFLAGS   = ${AM_CPPFLAGS}
-slideshow_daemon_LDFLAGS  = ${AM_LDFLAGS} -rdynamic
+slideshow_daemon_CFLAGS    = ${AM_CFLAGS} $(ARCH_FLAGS) ${libdaemon_CFLAGS} ${DevIL_CFLAGS} ${glew_CFLAGS} ${json_CFLAGS} ${CURL_CFLAGS}
+slideshow_daemon_CXXFLAGS  = ${slideshow_daemon_CFLAGS}
+slideshow_daemon_LDFLAGS   = ${AM_LDFLAGS} -rdynamic
+slideshow_daemon_LDADD     = libmodule_loader.a libipc.a libfsm.a -lltdl ${libportable_LIBS} ${libdaemon_LIBS} ${GL_LIBS} ${DevIL_LIBS} ${glew_LIBS} ${json_LIBS} ${CURL_LIBS}
 
 if WITH_DBUS
-slideshow_daemon_CPPFLAGS += ${dbus_CFLAGS}
+slideshow_daemon_CXXFLAGS += ${dbus_CFLAGS}
+slideshow_daemon_LDADD    += ${dbus_LIBS}
 endif
 
 slideshow_daemon_SOURCES = \
@@ -57,26 +59,10 @@ slideshow_daemon_SOURCES = \
 	vector.h \
 	win32.h
 
-slideshow_daemon_LDADD = \
-	libmodule_loader.a \
-	libipc.a \
-	libfsm.a \
-	-lltdl \
-	-lcurl \
-	-ljson \
-	-lGLEW \
-	${libportable_LIBS} \
-	${libdaemon_LIBS} \
-	${dbus_LIBS} \
-	${GL_LIBS} \
-	${DEVIL_LIBS} \
-	${SDL_LIBS} \
-	${X11_LIBS} \
-	${xxf86vm_LIBS} \
-	${xrandr_LIBS}
-
 if WITH_SDL
-slideshow_daemon_SOURCES += backend/SDLbackend.cpp backend/SDLbackend.h
+slideshow_daemon_SOURCES  += backend/SDLbackend.cpp backend/SDLbackend.h
+slideshow_daemon_CXXFLAGS += ${SDL_CFLAGS}
+slideshow_daemon_LDADD    += ${SDL_LIBS}
 endif
 
 libmodule_loader_a_SOURCES = module_loader.c module_loader.h assembler.h
