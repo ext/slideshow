@@ -1,6 +1,8 @@
 slideshow-0.4.0
 ---------------
 
+	* [daemon] During letterboxing the image is now cleared to black. Fixes
+	           #111.
 	* [daemon] proper mysql browser.
 	* [frontend] Bypass delete confirmation by holding shift.
 	* [frontend] Preview using ajax.

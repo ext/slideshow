@@ -363,6 +363,15 @@ void Graphics::apply_letterbox(unsigned int src, unsigned int dst){
 	const int offset_y = (_height - static_cast<int>(new_height)) / 2;
 	ilBindImage(dst);
 	ilTexImage(_width, _height, depth, bpp, format, type, NULL);
+
+	/* clear image */
+	unsigned char black[_width*4];
+	memset(black, 0, _width*4);
+	for ( int i = 0; i < _height; i++ ){
+		ilSetPixels(0, i, 0, _width, 1, 0, format, type, black);
+	}
+
+	/* render image centered */
 	ilOverlayImage(src, offset_x, offset_y, 0);
 	iluFlipImage();
 }
