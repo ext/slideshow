@@ -106,19 +106,19 @@ class SyslogDestination: public Destination {
 #endif /* HAVE_SYSLOG */
 
 namespace Log {
-	
+
 	void initialize();
 	void cleanup();
-	
+
 	/**
 	 * Add a logging destination.
 	 * @param dst Memory will be release using delete.
 	 */
 	void add_destination(Destination* dst);
-	
+
 	void  message(Severity severity, const char* fmt, ...) __attribute__ ((format (printf, 2, 3)));
 	void vmessage(Severity severity, const char* fmt, va_list ap);
-	
+
 	void debug(const char* fmt, ...)   __attribute__ ((format (printf, 1, 2)));  /** Short for message(Log_Debug) */
 	void verbose(const char* fmt, ...) __attribute__ ((format (printf, 1, 2)));  /** Short for message(Log_Verbose) */
 	void info(const char* fmt, ...)    __attribute__ ((format (printf, 1, 2)));  /** Short for message(Log_Info) */
