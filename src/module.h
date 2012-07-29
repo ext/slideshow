@@ -36,9 +36,15 @@ enum module_type_t {
 #	define EXPORT
 #endif
 
+#ifdef __cpluscpls
+#define EXTERN extern "C"
+#else
+#define EXTERN
+#endif
+
 #define MODULE_INFO(name, type, author) \
-	EXPORT const char *             __module_name = name; \
-	EXPORT const enum module_type_t __module_type = type; \
-	EXPORT const char *             __module_author = author
+	EXPORT EXTERN const char *             __module_name = name; \
+	EXPORT EXTERN const enum module_type_t __module_type = type; \
+	EXPORT EXTERN const char *             __module_author = author
 
 #endif // SLIDESHOW_MODULE_H
