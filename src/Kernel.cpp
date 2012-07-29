@@ -32,6 +32,7 @@
 #include "state/VideoState.h" /* must be initialized */
 
 // IPC
+#include "IPC/signal.hpp"
 #ifdef HAVE_DBUS
 #	include "IPC/dbus.h"
 #endif /* HAVE_DBUS */
@@ -142,6 +143,9 @@ void Kernel::init_graphics(){
 }
 
 void Kernel::init_IPC(){
+	/* Handle signals */
+	_ipc.push_back(new SignalIPC(this));
+
 #ifdef HAVE_DBUS
 	_ipc.push_back(new DBus(this));
 #endif /* HAVE_DBUS */

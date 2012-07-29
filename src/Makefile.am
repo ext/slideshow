@@ -9,7 +9,7 @@ AM_LDFLAGS = -shared -module -avoid-version
 AM_CFLAGS = ${libportable_CFLAGS} ${warning_flags}
 
 libipc_a_CPPFLAGS = ${AM_CFLAGS}
-libipc_a_SOURCES = 
+libipc_a_SOURCES = IPC/signal.cpp IPC/signal.h
 
 if WITH_DBUS
 libipc_a_CPPFLAGS += ${dbus_CFLAGS}
