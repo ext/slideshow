@@ -293,6 +293,7 @@ void Kernel::print_config() const {
 	char* cwd = get_current_dir_name();
 
 	Log::info("Slideshow configuration\n");
+	Log::info("  version: "VERSION"\n");
 	Log::info("  cwd: %s\n", cwd);
 	Log::info("  pidfile: %s\n", pidfile);
 	Log::info("  datapath: %s\n", datapath());
@@ -308,7 +309,7 @@ void Kernel::print_config() const {
 }
 
 void Kernel::print_licence_statement() const {
-	Log::info("Slideshow  Copyright (C) 2008-2012 David Sveningsson <ext@sidvind.com>\n");
+	Log::info("Slideshow Copyright (C) 2008-2012 David Sveningsson <ext@sidvind.com>\n");
 	Log::info("This program comes with ABSOLUTELY NO WARRANTY.\n");
 	Log::info("This is free software, and you are welcome to redistribute it\n");
 	Log::info("under certain conditions; see COPYING or <http://www.gnu.org/licenses/>\n");
