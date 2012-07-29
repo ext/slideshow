@@ -204,7 +204,7 @@ void Kernel::init_browser(){
 		return;
 	}
 
-	/* setup defalts */
+	/* setup defaults */
 	_browser->context = context;
 	_browser->next_slide = NULL;
 	_browser->queue_reload = browser_default_queue_reload;

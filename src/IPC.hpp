@@ -23,7 +23,6 @@ class Kernel;
 
 class IPC {
 public:
-	IPC(Kernel* kernel);
 	virtual ~IPC();
 
 	/**
@@ -52,6 +51,9 @@ public:
 	 * Set active queue.
 	 */
 	void action_set_queue(int id);
+
+protected:
+	IPC(Kernel* kernel);
 
 private:
 	Kernel* kernel;
