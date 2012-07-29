@@ -228,7 +228,7 @@ void Kernel::init_browser(){
 	assert(_browser->queue_dump);
 	assert(_browser->queue_set);
 
-	change_bin(_arg.queue_id);
+	queue_set(_arg.queue_id);
 }
 
 char* Kernel::get_password(){
@@ -486,7 +486,7 @@ void Kernel::reload_browser(){
 		json_object_object_foreach(settings, key, value) {
 			/* @todo map */
 			if ( strcasecmp(key, "queue") == 0 ){
-				change_bin(json_object_get_int(value));
+				queue_set(json_object_get_int(value));
 				continue;
 			}
 
@@ -507,7 +507,7 @@ void Kernel::reload_browser(){
 	}
 }
 
-void Kernel::change_bin(unsigned int id){
+void Kernel::queue_set(unsigned int id){
 	Log::verbose("Kernel: Switching to queue %d\n", id);
 	if ( _browser ){
 		_browser->queue_set(_browser, id);

@@ -37,12 +37,12 @@ DBus::DBus(Kernel* kernel)
 	}
 
 	dbus_bus_add_match (_bus, dbus_rule, &_error);
-	dbus_connection_add_filter (_bus, signal_filter, kernel, NULL);
+	dbus_connection_add_filter(_bus, signal_filter, this, NULL);
 }
 
 DBus::~DBus(){
 	dbus_bus_remove_match (_bus, dbus_rule, &_error);
-	dbus_connection_remove_filter (_bus, signal_filter, kernel());
+	dbus_connection_remove_filter (_bus, signal_filter, this);
 	dbus_error_free (&_error);
 }
 
@@ -51,14 +51,14 @@ void DBus::poll(int timeout){
 }
 
 DBusHandlerResult DBus::signal_filter (DBusConnection* bus, DBusMessage* message, void* user_data){
-	Kernel* kernel = static_cast<Kernel*>(user_data);
+	DBus* dbus = static_cast<DBus*>(user_data);
 
 	if (dbus_message_is_signal(message, DBUS_INTERFACE_LOCAL, "Disconnected")) {
 		Log::message(Log_Verbose, "D-Bus: Disconnected\n");
 		return DBUS_HANDLER_RESULT_HANDLED;
 	}
 
-	typedef void (*callback_t)(DBusMessage* message, Kernel* kernel);
+	typedef void (DBus::*callback_t)(DBusMessage* message);
 
 	struct command_t {
 		callback_t callback;
@@ -66,19 +66,18 @@ DBusHandlerResult DBus::signal_filter (DBusConnection* bus, DBusMessage* message
 	};
 
 	static command_t commands[] = {
-		{ handle_quit, "Quit" },
-		{ handle_reload, "Reload" },
-		{ handle_ping, "Ping" },
-		{ handle_playvideo, "PlayVideo" },
-		{ handle_debug_dumpqueue, "Debug_DumpQueue" },
-		{ handle_change_bin, "ChangeQueue" },
+		{ &DBus::handle_quit, "Quit" },
+		{ &DBus::handle_reload, "Reload" },
+		{ &DBus::handle_debug, "Debug_DumpQueue" },
+		{ &DBus::handle_set_queue, "ChangeQueue" },
 		{ NULL, NULL }
 	};
 
 	command_t* current_command = commands;
 	while ( current_command->name != NULL ){
 		if ( dbus_message_is_signal (message, "com.slideshow.dbus.Signal", current_command->name) ) {
-			current_command->callback(message, kernel);
+			const callback_t func = current_command->callback;
+			(dbus->*func)(message);
 			return DBUS_HANDLER_RESULT_HANDLED;
 		}
 
@@ -90,53 +89,26 @@ DBusHandlerResult DBus::signal_filter (DBusConnection* bus, DBusMessage* message
 	return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
 
-void DBus::handle_quit(DBusMessage* message, Kernel* kernel){
-	Log::message(Log_Verbose, "IPC: Quit\n");
-	kernel->quit();
+void DBus::handle_quit(DBusMessage* message){
+	action_quit();
 }
 
-void DBus::handle_reload(DBusMessage* message, Kernel* kernel){
-	Log::message(Log_Verbose, "IPC: Reload browser\n");
-	kernel->reload_browser();
+void DBus::handle_reload(DBusMessage* message){
+	action_reload();
 }
 
-void DBus::handle_playvideo(DBusMessage* message, Kernel* kernel){
+void DBus::handle_debug(DBusMessage* message){
+	action_debug();
+}
+
+void DBus::handle_set_queue(DBusMessage* message){
 	DBusError error;
 	dbus_error_init (&error);
 
-	char* fullpath;
+	unsigned int queue_id;
 
 	dbus_bool_t args_ok = dbus_message_get_args (message, &error,
-		DBUS_TYPE_STRING, &fullpath,
-		DBUS_TYPE_INVALID
-	);
-
-	if ( !args_ok ) {
-		Log::message(Log_Verbose, "D-Bus: Malformed PlayVideo command: %s\n", error.message);
-		return;
-	}
-
-	kernel->play_video(fullpath);
-}
-
-void DBus::handle_ping(DBusMessage* message, Kernel* kernel){
-	Log::message(Log_Verbose, "IPC: Ping (reloading)\n");
-	kernel->reload_browser();
-}
-
-void DBus::handle_debug_dumpqueue(DBusMessage* message, Kernel* kernel){
-	Log::message(Log_Verbose, "IPC: Debug DumpQueue\n");
-	kernel->debug_dumpqueue();
-}
-
-void DBus::handle_change_bin(DBusMessage* message, Kernel* kernel){
-	DBusError error;
-	dbus_error_init (&error);
-
-	unsigned int bin_id;
-
-	dbus_bool_t args_ok = dbus_message_get_args (message, &error,
-		DBUS_TYPE_UINT32, &bin_id,
+		DBUS_TYPE_UINT32, &queue_id,
 		DBUS_TYPE_INVALID
 	);
 
@@ -145,6 +117,5 @@ void DBus::handle_change_bin(DBusMessage* message, Kernel* kernel){
 		return;
 	}
 
-	Log::message(Log_Verbose, "IPC: Changing bin to %d\n", bin_id);
-	kernel->change_bin(bin_id);
+	action_set_queue(queue_id);
 }

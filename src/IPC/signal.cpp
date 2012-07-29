@@ -25,34 +25,34 @@
 #include "log.hpp"
 #include <signal.h>
 
-static Kernel* application = NULL;
+static SignalIPC* ipc = NULL;
 
 static void sighandler(int signum){
 	switch ( signum ){
 	case SIGINT:
 	case SIGTERM:
-		Log::verbose("IPC: Quit\n");
-		application->quit();
+		ipc->action_quit();
 		break;
 	case SIGHUP:
-		Log::verbose("IPC: Reload browser\n");
-		application->reload_browser();
-		signal(SIGHUP, sighandler);
+		ipc->action_reload();
 		break;
+	case SIGUSR1:
+		ipc->action_debug();
 	}
 }
 
 SignalIPC::SignalIPC(Kernel* kernel)
 	: IPC(kernel) {
-	application = kernel;
+	ipc = this;
 
 	signal(SIGINT, sighandler);
 	signal(SIGHUP, sighandler);
 	signal(SIGTERM, sighandler);
+	signal(SIGUSR1, sighandler);
 }
 
 SignalIPC::~SignalIPC(){
-	application = NULL;
+	ipc = NULL;
 }
 
 void SignalIPC::poll(int timeout){

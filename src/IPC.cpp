@@ -16,28 +16,39 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SLIDESHOW_DBUS_IPC_H
-#define SLIDESHOW_DBUS_IPC_H
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "IPC.hpp"
-#include <dbus/dbus.h>
+#include "Kernel.h"
+#include "log.hpp"
 
-class DBus: public IPC {
-	public:
-		DBus(Kernel* kernel);
-		virtual ~DBus();
+IPC::IPC(Kernel* kernel)
+	: kernel(kernel) {
 
-		virtual void poll(int timeout);
+}
 
-	private:
-		static DBusHandlerResult signal_filter (DBusConnection* bus, DBusMessage* message, void* user_data);
-		void handle_quit(DBusMessage* message);
-		void handle_reload(DBusMessage* message);
-		void handle_debug(DBusMessage* message);
-		void handle_set_queue(DBusMessage* message);
+IPC::~IPC(){
 
-		DBusConnection* _bus;
-		DBusError _error;
-};
+}
 
-#endif // SLIDESHOW_DBUS_IPC_H
+void IPC::action_quit(){
+	Log::message(Log_Verbose, "IPC: Quit\n");
+	kernel->quit();
+}
+
+void IPC::action_reload(){
+	Log::message(Log_Verbose, "IPC: Reload browser\n");
+	kernel->reload_browser();
+}
+
+void IPC::action_debug(){
+	Log::message(Log_Verbose, "IPC: Debug\n");
+	kernel->debug_dumpqueue();
+}
+
+void IPC::action_set_queue(int id){
+	Log::message(Log_Verbose, "IPC: Changing queue to %d\n", id);
+	kernel->queue_set(id);
+}

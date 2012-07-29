@@ -76,7 +76,7 @@ class Kernel {
 
 		void reload_browser();
 		void play_video(const char* fullpath);
-		void change_bin(unsigned int id);
+		void queue_set(unsigned int id);
 
 		void debug_dumpqueue();
 

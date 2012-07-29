@@ -45,7 +45,7 @@ slideshow_daemon_SOURCES = \
 	ForegroundApp.cpp ForegroundApp.h \
 	gl.h \
 	graphics.cpp graphics.h \
-	IPC.h \
+	IPC.cpp IPC.hpp \
 	Kernel.cpp Kernel.h \
 	log.cpp log.h log.hpp \
 	main.cpp \

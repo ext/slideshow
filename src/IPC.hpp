@@ -22,22 +22,39 @@
 class Kernel;
 
 class IPC {
-	public:
-		IPC(Kernel* kernel): _kernel(kernel){}
-		virtual ~IPC(){}
+public:
+	IPC(Kernel* kernel);
+	virtual ~IPC();
 
-		/**
-		 * Poll IPC implementation.
-		 *
-		 * @param timeout Time in ms it can block, 0 means no blocking.
-		 */
-		virtual void poll(int timeout) = 0;
+	/**
+	 * Poll IPC implementation.
+	 *
+	 * @param timeout Time in ms it can block, 0 means no blocking.
+	 */
+	virtual void poll(int timeout) = 0;
 
-	protected:
-		Kernel* kernel(){ return _kernel; }
+	/**
+	 * Quit application.
+	 */
+	void action_quit();
 
-	private:
-		Kernel* _kernel;
+	/**
+	 * Reload configuration.
+	 */
+	void action_reload();
+
+	/**
+	 * Output debugging information to log.
+	 */
+	void action_debug();
+
+	/**
+	 * Set active queue.
+	 */
+	void action_set_queue(int id);
+
+private:
+	Kernel* kernel;
 };
 
 #endif // SLIDESHOW_IPC_H
