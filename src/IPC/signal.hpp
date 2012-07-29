@@ -19,7 +19,7 @@
 #ifndef SLIDESHOW_SIGNAL_IPC_H
 #define SLIDESHOW_SIGNAL_IPC_H
 
-#include "IPC.h"
+#include "IPC.hpp"
 
 class SignalIPC: public IPC {
 public:
