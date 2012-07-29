@@ -32,6 +32,7 @@
 #include "state/VideoState.h" /* must be initialized */
 
 // IPC
+#include "IPC/signal.hpp"
 #ifdef HAVE_DBUS
 #	include "IPC/dbus.h"
 #endif /* HAVE_DBUS */
@@ -84,7 +85,6 @@ Kernel::Kernel(const argument_set_t& arg, PlatformBackend* backend)
 	, _password(NULL)
 	, _state(NULL)
 	, _browser(NULL)
-	, _ipc(NULL)
 	, _backend(backend)
 	, _running(false) {
 
@@ -143,8 +143,11 @@ void Kernel::init_graphics(){
 }
 
 void Kernel::init_IPC(){
+	/* Handle signals */
+	_ipc.push_back(new SignalIPC(this));
+
 #ifdef HAVE_DBUS
-	_ipc = new DBus(this, 50);
+	_ipc.push_back(new DBus(this));
 #endif /* HAVE_DBUS */
 
 	if ( _arg.url ){
@@ -162,8 +165,10 @@ void Kernel::init_IPC(){
 }
 
 void Kernel::cleanup_IPC(){
-	delete _ipc;
-	_ipc = NULL;
+	for ( std::vector<IPC*>::iterator it = _ipc.begin(); it != _ipc.end(); ++it ){
+		delete *it;
+	}
+	_ipc.clear();
 
 	curl_easy_cleanup(curl_handle_settings);
 	curl_formfree(settings_formpost);
@@ -240,16 +245,29 @@ char* Kernel::get_password(){
 void Kernel::init_fsm(){
 	TransitionState::set_transition_time(_arg.transition_time);
 	ViewState::set_view_time(_arg.switch_time);
-	_state = new InitialState(_browser, _ipc);
+	_state = new InitialState(_browser);
 }
 
 void Kernel::load_transition(const char* name){
 	graphics_set_transition(name);
 }
 
+void Kernel::run(){
+	start();
+
+	while ( running() ){
+		poll();
+		action();
+	}
+}
+
 void Kernel::poll(){
 	_backend->poll(_running);
 	VideoState::poll();
+
+	for ( std::vector<IPC*>::iterator it = _ipc.begin(); it != _ipc.end(); ++it ){
+		(*it)->poll(5);
+	}
 }
 
 void Kernel::action(){
@@ -494,11 +512,6 @@ void Kernel::change_bin(unsigned int id){
 		_browser->queue_set(_browser, id);
 		_browser->queue_reload(_browser);
 	}
-}
-
-void Kernel::ipc_quit(){
-	delete _ipc;
-	_ipc = NULL;
 }
 
 void Kernel::debug_dumpqueue(){

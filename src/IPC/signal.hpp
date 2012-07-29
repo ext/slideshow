@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2012 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,22 +16,16 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef HAVE_CONFIG_H
-#	include "config.h"
-#endif
+#ifndef SLIDESHOW_SIGNAL_IPC_H
+#define SLIDESHOW_SIGNAL_IPC_H
 
-#include "ViewState.h"
-#include "SwitchState.h"
+#include "IPC.h"
 
-double ViewState::view_time = 1.0;
+class SignalIPC: public IPC {
+public:
+	SignalIPC(Kernel* kernel);
+	virtual ~SignalIPC();
+	virtual void poll(int timeout);
+};
 
-State* ViewState::action(bool &flip){
-	if ( age() > view_time ){
-		return new SwitchState(this);
-	}
-
-	// Sleep for a while
-	sleepd( 0.1 );
-
-	return this;
-}
+#endif /* SLIDESHOW_SIGNAL_IPC_H */

@@ -34,7 +34,6 @@
 #include <cstring>
 #include <cstdlib>
 #include <limits.h>
-#include <signal.h>
 #include <portable/portable.h>
 #include <portable/time.h>
 #include "backend/platform.h"
@@ -47,23 +46,9 @@
 #	define PATH_MAX _MAX_PATH
 #endif
 
-static Kernel* application = NULL;
-
-static void sighandler(int signum){
-	switch ( signum ){
-	case SIGINT:
-		Log::verbose("IPC: Quit\n");
-		application->quit();
-		break;
-	case SIGHUP:
-		Log::verbose("IPC: Reload browser\n");
-		application->reload_browser();
-		signal(SIGHUP, sighandler);
-		break;
-	}
-}
-
 int main( int argc, const char* argv[] ){
+	Kernel* application = NULL;
+
 	try {
 
 		// Default arguments
@@ -148,9 +133,6 @@ int main( int argc, const char* argv[] ){
 			default:
 				throw exception("No valid mode. This should not happen, please report this to the maintainer. Modeid: %d\n", arguments.mode);
 		}
-
-		signal(SIGINT, sighandler);
-		signal(SIGHUP, sighandler);
 
 		application->init();
 		application->run();

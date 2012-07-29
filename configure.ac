@@ -105,6 +105,7 @@ dnl #######################################################################
 AC_ARG_WITH([dbus], [AS_HELP_STRING([--with-dbus], [support for D-Bus])], [],	[with_dbus=no])
 AS_IF([test "x$with_dbus" != xno], [
   PKG_CHECK_MODULES(dbus, [dbus-1, dbus-glib-1])
+  AC_DEFINE([HAVE_DBUS], [1], [Define to 1 if you have D-Bus])
 ])	
 AM_CONDITIONAL([WITH_DBUS], [test "x$with_dbus" != xno])
 

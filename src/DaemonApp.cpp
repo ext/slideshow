@@ -78,15 +78,6 @@ void DaemonApp::pass_exception(const ExitException &e){
 	verify( write(_writefd, e.what(), size) >= 0 );
 }
 
-void DaemonApp::run(){
-	start();
-
-	while ( running() ){
-		poll();
-		action();
-	}
-}
-
 void DaemonApp::daemon_start(){
     pid_t pid;
 

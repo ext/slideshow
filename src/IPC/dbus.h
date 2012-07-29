@@ -24,10 +24,10 @@
 
 class DBus: public IPC {
 	public:
-		DBus(Kernel* kernel, int timeout_ms);
+		DBus(Kernel* kernel);
 		virtual ~DBus();
 
-		virtual void poll();
+		virtual void poll(int timeout);
 
 	private:
 		static DBusHandlerResult signal_filter (DBusConnection* bus, DBusMessage* message, void* user_data);
@@ -40,7 +40,6 @@ class DBus: public IPC {
 
 		DBusConnection* _bus;
 		DBusError _error;
-		const int _timeout;
 };
 
 #endif // SLIDESHOW_DBUS_IPC_H

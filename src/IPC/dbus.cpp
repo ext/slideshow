@@ -17,15 +17,14 @@
  */
 
 #include "dbus.h"
-#include "Log.h"
+#include "log.hpp"
 #include "exception.h"
 #include "Kernel.h"
 
 static const char* dbus_rule = "type='signal',interface='com.slideshow.dbus.Signal'";
 
-DBus::DBus(Kernel* kernel, int timeout):
-	IPC(kernel),
-	_timeout(timeout){
+DBus::DBus(Kernel* kernel)
+	: IPC(kernel) {
 
 	Log::message(Log_Verbose, "D-Bus: Starting\n");
 
@@ -47,8 +46,8 @@ DBus::~DBus(){
 	dbus_error_free (&_error);
 }
 
-void DBus::poll(){
-	dbus_connection_read_write_dispatch ( _bus, _timeout );
+void DBus::poll(int timeout){
+	dbus_connection_read_write_dispatch(_bus, timeout);
 }
 
 DBusHandlerResult DBus::signal_filter (DBusConnection* bus, DBusMessage* message, void* user_data){
@@ -56,7 +55,6 @@ DBusHandlerResult DBus::signal_filter (DBusConnection* bus, DBusMessage* message
 
 	if (dbus_message_is_signal(message, DBUS_INTERFACE_LOCAL, "Disconnected")) {
 		Log::message(Log_Verbose, "D-Bus: Disconnected\n");
-		kernel->ipc_quit();
 		return DBUS_HANDLER_RESULT_HANDLED;
 	}
 

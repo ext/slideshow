@@ -23,7 +23,7 @@
 
 class InitialState: public State {
 	public:
-		InitialState(browser_module_t* browser, IPC* ipc): State(browser, ipc){}
+		InitialState(browser_module_t* browser): State(browser){}
 		virtual ~InitialState(){}
 
 		virtual State* action(bool &flip);

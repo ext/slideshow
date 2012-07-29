@@ -16,17 +16,45 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FOREGROUND_APP_H
-#define FOREGROUND_APP_H
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
+#include "signal.hpp"
 #include "Kernel.h"
+#include "log.hpp"
+#include <signal.h>
 
-class ForegroundApp: public Kernel {
-	public:
-		ForegroundApp(const argument_set_t& arg, PlatformBackend* backend);
-		~ForegroundApp();
+static Kernel* application = NULL;
 
-		virtual void init();
-};
+static void sighandler(int signum){
+	switch ( signum ){
+	case SIGINT:
+	case SIGTERM:
+		Log::verbose("IPC: Quit\n");
+		application->quit();
+		break;
+	case SIGHUP:
+		Log::verbose("IPC: Reload browser\n");
+		application->reload_browser();
+		signal(SIGHUP, sighandler);
+		break;
+	}
+}
 
-#endif // FOREGROUND_APP_H
+SignalIPC::SignalIPC(Kernel* kernel)
+	: IPC(kernel) {
+	application = kernel;
+
+	signal(SIGINT, sighandler);
+	signal(SIGHUP, sighandler);
+	signal(SIGTERM, sighandler);
+}
+
+SignalIPC::~SignalIPC(){
+	application = NULL;
+}
+
+void SignalIPC::poll(int timeout){
+	/* do nothing */
+}

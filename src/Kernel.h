@@ -25,6 +25,7 @@ class PlatformBackend;
 class UDSServer;
 
 #include "Browser.h"
+#include <vector>
 
 class Kernel {
 	public:
@@ -64,7 +65,7 @@ class Kernel {
 
 		virtual void init();
 		virtual void cleanup();
-		virtual void run() = 0;
+		virtual void run();
 		virtual void poll();
 		virtual void action();
 
@@ -74,7 +75,6 @@ class Kernel {
 		void quit();
 
 		void reload_browser();
-		void ipc_quit();
 		void play_video(const char* fullpath);
 		void change_bin(unsigned int id);
 
@@ -119,8 +119,8 @@ class Kernel {
 		State* _state;
 
 		browser_module_t* _browser;
-		IPC* _ipc;
 		PlatformBackend* _backend;
+		std::vector<IPC*> _ipc;
 
 		bool _running;
 };
