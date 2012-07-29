@@ -30,7 +30,6 @@ class DaemonApp: public Kernel {
 
 		virtual void init();
 		virtual void cleanup();
-		virtual void run();
 
 		void daemon_start();
 		void daemon_ready();

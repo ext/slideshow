@@ -64,7 +64,7 @@ class Kernel {
 
 		virtual void init();
 		virtual void cleanup();
-		virtual void run() = 0;
+		virtual void run();
 		virtual void poll();
 		virtual void action();
 

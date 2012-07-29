@@ -247,6 +247,15 @@ void Kernel::load_transition(const char* name){
 	graphics_set_transition(name);
 }
 
+void Kernel::run(){
+	start();
+
+	while ( running() ){
+		poll();
+		action();
+	}
+}
+
 void Kernel::poll(){
 	_backend->poll(_running);
 	VideoState::poll();

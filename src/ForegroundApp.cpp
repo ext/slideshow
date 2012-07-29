@@ -37,15 +37,4 @@ void ForegroundApp::init(){
 	print_config();
 
 	Kernel::init();
-	
-
-}
-
-void ForegroundApp::run(){
-	start();
-
-	while ( running() ){
-		poll();
-		action();
-	}
 }
