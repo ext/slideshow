@@ -25,6 +25,7 @@ class PlatformBackend;
 class UDSServer;
 
 #include "Browser.h"
+#include <vector>
 
 class Kernel {
 	public:
@@ -118,8 +119,8 @@ class Kernel {
 		State* _state;
 
 		browser_module_t* _browser;
-		IPC* _ipc;
 		PlatformBackend* _backend;
+		std::vector<IPC*> _ipc;
 
 		bool _running;
 };

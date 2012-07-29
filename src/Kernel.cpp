@@ -84,7 +84,6 @@ Kernel::Kernel(const argument_set_t& arg, PlatformBackend* backend)
 	, _password(NULL)
 	, _state(NULL)
 	, _browser(NULL)
-	, _ipc(NULL)
 	, _backend(backend)
 	, _running(false) {
 
@@ -144,7 +143,7 @@ void Kernel::init_graphics(){
 
 void Kernel::init_IPC(){
 #ifdef HAVE_DBUS
-	_ipc = new DBus(this);
+	_ipc.push_back(new DBus(this));
 #endif /* HAVE_DBUS */
 
 	if ( _arg.url ){
@@ -162,8 +161,10 @@ void Kernel::init_IPC(){
 }
 
 void Kernel::cleanup_IPC(){
-	delete _ipc;
-	_ipc = NULL;
+	for ( std::vector<IPC*>::iterator it = _ipc.begin(); it != _ipc.end(); ++it ){
+		delete *it;
+	}
+	_ipc.clear();
 
 	curl_easy_cleanup(curl_handle_settings);
 	curl_formfree(settings_formpost);
@@ -258,8 +259,11 @@ void Kernel::run(){
 
 void Kernel::poll(){
 	_backend->poll(_running);
-	_ipc->poll(5);
 	VideoState::poll();
+
+	for ( std::vector<IPC*>::iterator it = _ipc.begin(); it != _ipc.end(); ++it ){
+		(*it)->poll(5);
+	}
 }
 
 void Kernel::action(){
