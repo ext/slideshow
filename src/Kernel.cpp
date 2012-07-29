@@ -144,7 +144,7 @@ void Kernel::init_graphics(){
 
 void Kernel::init_IPC(){
 #ifdef HAVE_DBUS
-	_ipc = new DBus(this, 50);
+	_ipc = new DBus(this);
 #endif /* HAVE_DBUS */
 
 	if ( _arg.url ){

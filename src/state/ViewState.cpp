@@ -31,7 +31,7 @@ State* ViewState::action(bool &flip){
 	}
 
 	if ( ipc() ){
-		ipc()->poll();
+		ipc()->poll(5);
 	}
 
 	// Sleep for a while

@@ -26,7 +26,12 @@ class IPC {
 		IPC(Kernel* kernel): _kernel(kernel){}
 		virtual ~IPC(){}
 
-		virtual void poll() = 0;
+		/**
+		 * Poll IPC implementation.
+		 *
+		 * @param timeout Time in ms it can block, 0 means no blocking.
+		 */
+		virtual void poll(int timeout) = 0;
 
 	protected:
 		Kernel* kernel(){ return _kernel; }
