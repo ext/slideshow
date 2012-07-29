@@ -170,7 +170,7 @@ int main( int argc, const char* argv[] ){
 		fprintf(stderr, " - Make sure that all required shared libraries are installed.\n");
 		fprintf(stderr, " - Make sure that the cwd is correct.\n\n");
 		fprintf(stderr, "If the problem persists report the bug at\n"
-				"https://github.com/ext/slideshow/issues/new\n"
+				PACKAGE_BUGREPORT "\n"
 				"and copy the entire output from the console.\n\n");
 		fprintf(stderr, "This is a fatal error, the application will now terminate!\n\n");
 
