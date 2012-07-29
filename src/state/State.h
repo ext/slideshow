@@ -25,12 +25,12 @@
 
 class State {
 	public:
-		State(browser_module_t* browser, IPC* ipc): _browser(browser), _ipc(ipc){
+		State(browser_module_t* browser): _browser(browser) {
 			_created = getTimef();
 		}
 		virtual ~State(){}
 
-		State(State* state): _browser(state->_browser), _ipc(state->_ipc){
+		State(State* state): _browser(state->_browser) {
 			_created = getTimef();
 			delete state;
 		}
@@ -43,13 +43,10 @@ class State {
 
 		browser_module_t* browser(){ return _browser; }
 
-		IPC* ipc(){ return _ipc; }
-
 		float age(){ return getTimef() - _created; }
 
 	private:
 		browser_module_t* _browser;
-		IPC* _ipc;
 		float _created;
 };
 

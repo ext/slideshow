@@ -240,7 +240,7 @@ char* Kernel::get_password(){
 void Kernel::init_fsm(){
 	TransitionState::set_transition_time(_arg.transition_time);
 	ViewState::set_view_time(_arg.switch_time);
-	_state = new InitialState(_browser, _ipc);
+	_state = new InitialState(_browser);
 }
 
 void Kernel::load_transition(const char* name){
