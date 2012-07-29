@@ -506,11 +506,6 @@ void Kernel::change_bin(unsigned int id){
 	}
 }
 
-void Kernel::ipc_quit(){
-	delete _ipc;
-	_ipc = NULL;
-}
-
 void Kernel::debug_dumpqueue(){
 	if ( _browser ){
 		_browser->queue_dump(_browser);

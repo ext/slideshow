@@ -55,7 +55,6 @@ DBusHandlerResult DBus::signal_filter (DBusConnection* bus, DBusMessage* message
 
 	if (dbus_message_is_signal(message, DBUS_INTERFACE_LOCAL, "Disconnected")) {
 		Log::message(Log_Verbose, "D-Bus: Disconnected\n");
-		kernel->ipc_quit();
 		return DBUS_HANDLER_RESULT_HANDLED;
 	}
 
