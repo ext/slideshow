@@ -30,10 +30,6 @@ State* ViewState::action(bool &flip){
 		return new SwitchState(this);
 	}
 
-	if ( ipc() ){
-		ipc()->poll(5);
-	}
-
 	// Sleep for a while
 	sleepd( 0.1 );
 

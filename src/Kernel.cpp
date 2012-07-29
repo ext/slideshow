@@ -258,6 +258,7 @@ void Kernel::run(){
 
 void Kernel::poll(){
 	_backend->poll(_running);
+	_ipc->poll(5);
 	VideoState::poll();
 }
 
