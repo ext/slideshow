@@ -10,6 +10,7 @@ AC_CONFIG_FILES([
 	src/Makefile
 	src/transitions/Makefile
 	src/browsers/Makefile
+	src/IPC/Makefile
 ])
 AC_CONFIG_FILES([slideshow-daemon], [chmod +x slideshow-daemon])
 

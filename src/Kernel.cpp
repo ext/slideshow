@@ -21,6 +21,7 @@
 #endif
 
 #include "argument_parser.h"
+#include "IPC.h"
 #include "module.h"
 #include "module_loader.h"
 #include "Kernel.h"
@@ -30,12 +31,6 @@
 #include "exception.h"
 #include "Transition.h"
 #include "state/VideoState.h" /* must be initialized */
-
-// IPC
-#include "IPC/signal.hpp"
-#ifdef HAVE_DBUS
-#	include "IPC/dbus.h"
-#endif /* HAVE_DBUS */
 
 // FSM
 #include "state/State.h"
@@ -143,11 +138,13 @@ void Kernel::init_graphics(){
 }
 
 void Kernel::init_IPC(){
+	ipc_module_t* ipc;
+
 	/* Handle signals */
-	_ipc.push_back(new SignalIPC(this));
+	if ( (ipc=IPC::factory("signal")) ) _ipc.push_back(ipc);
 
 #ifdef HAVE_DBUS
-	_ipc.push_back(new DBus(this));
+	if ( (ipc=IPC::factory("dbus")) ) _ipc.push_back(ipc);
 #endif /* HAVE_DBUS */
 
 	if ( _arg.url ){
@@ -165,8 +162,9 @@ void Kernel::init_IPC(){
 }
 
 void Kernel::cleanup_IPC(){
-	for ( std::vector<IPC*>::iterator it = _ipc.begin(); it != _ipc.end(); ++it ){
-		delete *it;
+	for ( std::vector<struct ipc_module_t*>::iterator it = _ipc.begin(); it != _ipc.end(); ++it ){
+		struct ipc_module_t* ipc = *it;
+		module_close((module_t*)ipc);
 	}
 	_ipc.clear();
 
@@ -265,8 +263,11 @@ void Kernel::poll(){
 	_backend->poll(_running);
 	VideoState::poll();
 
-	for ( std::vector<IPC*>::iterator it = _ipc.begin(); it != _ipc.end(); ++it ){
-		(*it)->poll(5);
+	for ( std::vector<struct ipc_module_t*>::iterator it = _ipc.begin(); it != _ipc.end(); ++it ){
+		struct ipc_module_t* ipc = *it;
+		if ( ipc->poll ){
+			ipc->poll(ipc, 5);
+		}
 	}
 }
 

@@ -20,41 +20,45 @@
 #include "config.h"
 #endif
 
-#include "signal.hpp"
-#include "Kernel.h"
-#include "log.hpp"
+#include "IPC.h"
 #include <signal.h>
 
-static SignalIPC* ipc = NULL;
+MODULE_INFO("signal", IPC_MODULE, "David Sveningsson");
 
 static void sighandler(int signum){
 	switch ( signum ){
 	case SIGINT:
 	case SIGTERM:
-		ipc->action_quit();
+		action_quit();
 		break;
 	case SIGHUP:
-		ipc->action_reload();
+		action_reload();
 		break;
 	case SIGUSR1:
-		ipc->action_debug();
+		action_debug();
 	}
 }
 
-SignalIPC::SignalIPC(Kernel* kernel)
-	: IPC(kernel) {
-	ipc = this;
+void* module_alloc(){
+	return malloc(sizeof(struct ipc_module_t));
+}
+
+int module_init(struct ipc_module_t* module){
+	module->poll = NULL;
 
 	signal(SIGINT, sighandler);
 	signal(SIGHUP, sighandler);
 	signal(SIGTERM, sighandler);
 	signal(SIGUSR1, sighandler);
+
+	return 0;
 }
 
-SignalIPC::~SignalIPC(){
-	ipc = NULL;
-}
+int module_cleanup(struct ipc_module_t* module){
+	signal(SIGINT, SIG_DFL);
+	signal(SIGHUP, SIG_DFL);
+	signal(SIGTERM, SIG_DFL);
+	signal(SIGUSR1, SIG_DFL);
 
-void SignalIPC::poll(int timeout){
-	/* do nothing */
+	return 0;
 }

@@ -46,8 +46,10 @@
 #	define PATH_MAX _MAX_PATH
 #endif
 
+Kernel* global_fubar_kernel = NULL;
+
 int main( int argc, const char* argv[] ){
-	Kernel* application = NULL;
+	Kernel*& application = global_fubar_kernel;
 
 	try {
 

@@ -20,35 +20,34 @@
 #include "config.h"
 #endif
 
-#include "IPC.hpp"
+#include "IPC.h"
 #include "Kernel.h"
 #include "log.hpp"
 
-IPC::IPC(Kernel* kernel)
-	: kernel(kernel) {
+extern Kernel* global_fubar_kernel;
 
+ipc_module_t* IPC::factory(const std::string& name){
+	ipc_module_t* module = (ipc_module_t*)module_open(name.c_str(), IPC_MODULE, 0);
+	if ( !module ) Log::warning("Failed to load IPC module `%s'.\n", name.c_str());
+	return module;
 }
 
-IPC::~IPC(){
-
-}
-
-void IPC::action_quit(){
+void action_quit(){
 	Log::message(Log_Verbose, "IPC: Quit\n");
-	kernel->quit();
+	global_fubar_kernel->quit();
 }
 
-void IPC::action_reload(){
+void action_reload(){
 	Log::message(Log_Verbose, "IPC: Reload browser\n");
-	kernel->reload_browser();
+	global_fubar_kernel->reload_browser();
 }
 
-void IPC::action_debug(){
+void action_debug(){
 	Log::message(Log_Verbose, "IPC: Debug\n");
-	kernel->debug_dumpqueue();
+	global_fubar_kernel->debug_dumpqueue();
 }
 
-void IPC::action_set_queue(int id){
+void action_set_queue(int id){
 	Log::message(Log_Verbose, "IPC: Changing queue to %d\n", id);
-	kernel->queue_set(id);
+	global_fubar_kernel->queue_set(id);
 }

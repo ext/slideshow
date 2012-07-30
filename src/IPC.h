@@ -19,44 +19,53 @@
 #ifndef SLIDESHOW_IPC_H
 #define SLIDESHOW_IPC_H
 
-class Kernel;
+#include "module_loader.h"
 
-class IPC {
-public:
-	virtual ~IPC();
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/**
+ * Quit application.
+ */
+void action_quit();
+
+/**
+ * Reload configuration.
+ */
+void action_reload();
+
+/**
+ * Output debugging information to log.
+ */
+void action_debug();
+
+/**
+ * Set active queue.
+ */
+void action_set_queue(int id);
+
+struct ipc_module_t {
+	struct module_t module;
 
 	/**
-	 * Poll IPC implementation.
+	 * Poll IPC implementation. If non-null it will be called periodically by
+	 * kernel.
 	 *
 	 * @param timeout Time in ms it can block, 0 means no blocking.
 	 */
-	virtual void poll(int timeout) = 0;
-
-	/**
-	 * Quit application.
-	 */
-	void action_quit();
-
-	/**
-	 * Reload configuration.
-	 */
-	void action_reload();
-
-	/**
-	 * Output debugging information to log.
-	 */
-	void action_debug();
-
-	/**
-	 * Set active queue.
-	 */
-	void action_set_queue(int id);
-
-protected:
-	IPC(Kernel* kernel);
-
-private:
-	Kernel* kernel;
+	void (*poll)(struct ipc_module_t* self, int timeout);
 };
+
+#ifdef __cplusplus
+}
+#endif
+
+#ifdef __cplusplus
+#include <string>
+namespace IPC {
+	ipc_module_t* factory(const std::string& name);
+}
+#endif
 
 #endif // SLIDESHOW_IPC_H

@@ -20,7 +20,6 @@
 #define STATE_H
 
 #include "Browser.h"
-#include "IPC.hpp"
 #include <portable/time.h>
 
 class State {
