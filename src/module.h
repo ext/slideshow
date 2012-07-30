@@ -24,6 +24,7 @@ enum module_type_t {
 	TRANSITION_MODULE,
 	ASSEMBLER_MODULE,
 	BROWSER_MODULE,
+	IPC_MODULE,
 };
 
 #ifdef WIN32
@@ -36,9 +37,19 @@ enum module_type_t {
 #	define EXPORT
 #endif
 
+#ifdef __cpluscpls
+#define EXTERN extern "C"
+#else
+#define EXTERN extern
+#endif
+
+#define DECLARE(x,y) EXTERN const x y
+#define DEFINE(x,y,z) EXPORT const x y = z
+#define MODULE_CONST(x,y,z) DECLARE(x,y); DEFINE(x,y,z)
+
 #define MODULE_INFO(name, type, author) \
-	EXPORT const char *             __module_name = name; \
-	EXPORT const enum module_type_t __module_type = type; \
-	EXPORT const char *             __module_author = author
+	MODULE_CONST(char *,              __module_name, name); \
+	MODULE_CONST(enum module_type_t,  __module_type, type); \
+	MODULE_CONST(char *,              __module_author, author)
 
 #endif // SLIDESHOW_MODULE_H

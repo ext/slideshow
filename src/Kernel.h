@@ -19,7 +19,6 @@
 #ifndef KERNEL_H
 #define KERNEL_H
 
-class IPC;
 class State;
 class PlatformBackend;
 class UDSServer;
@@ -76,7 +75,7 @@ class Kernel {
 
 		void reload_browser();
 		void play_video(const char* fullpath);
-		void change_bin(unsigned int id);
+		void queue_set(unsigned int id);
 
 		void debug_dumpqueue();
 
@@ -120,7 +119,7 @@ class Kernel {
 
 		browser_module_t* _browser;
 		PlatformBackend* _backend;
-		std::vector<IPC*> _ipc;
+		std::vector<struct ipc_module_t*> _ipc;
 
 		bool _running;
 };

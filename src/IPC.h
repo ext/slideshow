@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2012 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -19,25 +19,53 @@
 #ifndef SLIDESHOW_IPC_H
 #define SLIDESHOW_IPC_H
 
-class Kernel;
+#include "module_loader.h"
 
-class IPC {
-	public:
-		IPC(Kernel* kernel): _kernel(kernel){}
-		virtual ~IPC(){}
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-		/**
-		 * Poll IPC implementation.
-		 *
-		 * @param timeout Time in ms it can block, 0 means no blocking.
-		 */
-		virtual void poll(int timeout) = 0;
+/**
+ * Quit application.
+ */
+void action_quit();
 
-	protected:
-		Kernel* kernel(){ return _kernel; }
+/**
+ * Reload configuration.
+ */
+void action_reload();
 
-	private:
-		Kernel* _kernel;
+/**
+ * Output debugging information to log.
+ */
+void action_debug();
+
+/**
+ * Set active queue.
+ */
+void action_set_queue(int id);
+
+struct ipc_module_t {
+	struct module_t module;
+
+	/**
+	 * Poll IPC implementation. If non-null it will be called periodically by
+	 * kernel.
+	 *
+	 * @param timeout Time in ms it can block, 0 means no blocking.
+	 */
+	void (*poll)(struct ipc_module_t* self, int timeout);
 };
+
+#ifdef __cplusplus
+}
+#endif
+
+#ifdef __cplusplus
+#include <string>
+namespace IPC {
+	ipc_module_t* factory(const std::string& name);
+}
+#endif
 
 #endif // SLIDESHOW_IPC_H
