@@ -3,6 +3,7 @@
 
 import types
 import cherrypy
+import traceback
 
 _subscribers = {}
 
@@ -38,7 +39,10 @@ def trigger(event, *args, **kwargs):
         return
 
     for func in _subscribers[event]:
-        func(*args, **kwargs)
+        try:
+            func(*args, **kwargs)
+        except:
+            traceback.print_exc()
 
 def subscribe(event, callback):
     if not isinstance(event, basestring):
