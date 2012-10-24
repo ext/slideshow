@@ -237,6 +237,7 @@ class EventListener:
         slides = [Slide(queue=None, **x) for x in c.execute("""
             SELECT
                 id,
+                DATETIME(`timestamp`) AS `timestamp`,
                 path,
                 active,
                 assembler,
