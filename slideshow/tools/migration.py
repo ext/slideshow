@@ -23,7 +23,7 @@ class Migration(SimplePlugin):
             self.bus.log("Migration table doesn't exist, creating it.")
             db.execute("""
                 CREATE TABLE `migration` (
-                    `filename` TEXT PRIMARY KEY,
+                    `filename` VARCHAR(256) PRIMARY KEY,
                     `timestamp` TIMESTAMP NOT NULL
                 );""")
 
