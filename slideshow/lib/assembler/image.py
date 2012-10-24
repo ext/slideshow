@@ -12,6 +12,14 @@ class ImageAssembler(Assembler):
 		return False
 	
 	def assemble(self, slide, filename, **kwargs):
+		# this _hack_ is needed because when the image slide is rebuild (e.g.
+		# by resolution changed trigger) only a filename instead of upload
+		# handle is passed. Since an image slide does not need any content to be
+		# changed it directly returns the correct data. Very fugly but the clock
+		# is past midnight and I have to get up at 06:40 tomorrow.
+		if isinstance(filename, basestring):
+			return {'filename': filename}
+
 		if filename.filename == '':
 			raise RuntimeError, 'No file selected'
 
