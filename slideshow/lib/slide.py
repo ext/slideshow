@@ -105,7 +105,7 @@ def all(c, validate_path=True):
     return [Slide(queue=None, validate_path=validate_path, **x) for x in c.execute("""
         SELECT
             id,
-            `timestamp`,
+            DATETIME(`timestamp`) AS `timestamp`,
             path,
             active,
             assembler,
@@ -118,7 +118,7 @@ def from_id(c, id):
     row = c.execute("""
         SELECT
             id,
-            `timestamp`,
+            DATETIME(`timestamp`) AS `timestamp`,
             path,
             active,
             assembler,
@@ -237,6 +237,7 @@ class EventListener:
         slides = [Slide(queue=None, **x) for x in c.execute("""
             SELECT
                 id,
+                DATETIME(`timestamp`) AS `timestamp`,
                 path,
                 active,
                 assembler,
@@ -251,12 +252,13 @@ class EventListener:
 
     @event.callback('config.resolution_changed')
     def resolution_changed(self, resolution):
+        cherrypy.engine.log('Resolution changed, rebuilding cache')
         c = cherrypy.thread_data.db
 
         slides = [Slide(queue=None, **x) for x in c.execute("""
             SELECT
                 id,
-                `timestamp`,
+                DATETIME(`timestamp`) AS `timestamp`,
                 path,
                 active,
                 assembler,

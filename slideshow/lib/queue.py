@@ -23,7 +23,7 @@ class Queue:
         self.slides = [Slide(queue=self, **x) for x in c.execute("""
             SELECT
                 `id`,
-                `timestamp`,
+                DATETIME(`timestamp`) AS `timestamp`,
                 `path`,
                 `active`,
                 `assembler`,
@@ -35,10 +35,10 @@ class Queue:
             ORDER BY
                 `sortorder`
         """, {'queue': id}).fetchall()]
-    
+
     def __len__(self):
         return len(self.slides)
-    
+
     def rename(self, c, name):
         c.execute("""
             UPDATE
@@ -72,14 +72,14 @@ def from_id(c, id):
             `id` = :id
         LIMIT 1
     """, dict(id=id)).fetchone()
-    
+
     if row is None:
         return None
-    
-    return Queue(c, **row) 
+
+    return Queue(c, **row)
 
 def add(c, name):
-    
+
     c.execute("""
         INSERT INTO `queue` (
             `name`
@@ -87,7 +87,7 @@ def add(c, name):
             :name
         )
     """, dict(name=name))
-    
+
     row_id = c.last_row_id()
     n = int(c.execute("SELECT COUNT(*) as `count` FROM `queue`").fetchone()['count'])
 
@@ -99,7 +99,7 @@ def add(c, name):
 def delete(c, id):
     if id <= 0:
         return False
-    
+
     c.execute("""
         UPDATE
             `slide`
@@ -114,15 +114,15 @@ def delete(c, id):
         WHERE
             `id` = :id
     """, dict(id=id))
-    
+
     return True
 
 def activate(id):
     settings = Settings()
-    
+
     with settings:
         settings['Runtime.queue'] = id
-    
+
     settings.persist()
     event.trigger('config.queue_changed', id)
 
@@ -137,6 +137,6 @@ def set_loop(id, state):
             `id` = :id
     """, dict(id=id, state=state))
     c.commit()
-    
+
     # to force reloading of queue settings
     event.trigger('config.queue_changed', id)

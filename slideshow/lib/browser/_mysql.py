@@ -6,18 +6,22 @@ from slideshow.lib.browser import Browser, register, on_install
 from slideshow.settings import Settings
 from MySQLdb.cursors import DictCursor
 from MySQLdb.constants import CR
-pattern = re.compile(r':([A-Za-z0-9]+)')
-retrim  = re.compile(r'\s+')
 
 # This hack "enables" using ? and :name as placeholders (MySQLdb.paramstyle is 'format', not 'qmark')
 class QCursor(DictCursor):
+    replace = [
+        (re.compile(r':([A-Za-z0-9]+)'), r'%(\1)s'),
+        (re.compile(r'\s+'), ' '),
+        (re.compile(r'DATETIME\(([^\)]*)\)'), r"DATE_FORMAT(\1, GET_FORMAT(DATETIME,'ISO'))"), # have to use GET_FORMAT instead of % since % is used as placeholders
+    ]
+
     def execute(self, query, args=None):
-        query = query.replace('?', '%s')
-        query = re.sub(pattern, r'%(\1)s', query.strip())
+        query = query.replace('?', '%s').strip()
+        for pattern, sub in QCursor.replace:
+            query = re.sub(pattern, sub, query)
 
         if False:
-            temp = re.sub(retrim, ' ', query)
-            cherrypy.engine.log('Query: "%s" %s' % (temp, args))
+            cherrypy.engine.log('Query: "%s" %s' % (query, args))
         return DictCursor.execute(self, query, args)
 
 @register('mysql')
