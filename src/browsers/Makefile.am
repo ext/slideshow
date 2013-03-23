@@ -1,4 +1,4 @@
-AM_CFLAGS = -I${top_srcdir}/src ${libportable_CFLAGS} -D_GNU_SOURCE -Wall
+AM_CFLAGS = -I${top_srcdir}/src ${libportable_CFLAGS} ${json_CFLAGS} -D_GNU_SOURCE -Wall
 AM_LDFLAGS = -shared -module -avoid-version
 
 plugin_LTLIBRARIES = frontend.la
