@@ -25,6 +25,10 @@
 #include <errno.h>
 #include <csignal>
 
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
 DaemonApp::DaemonApp(const argument_set_t& arg, PlatformBackend* backend):
 	Kernel(arg, backend){
 

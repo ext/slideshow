@@ -1,6 +1,8 @@
 #ifndef __PTR_H
 #define __PTR_H
 
+#include <cstdlib>
+
 template <class T>
 class Ptr {
 public:
