@@ -64,7 +64,8 @@ FileDestination::FileDestination(const char* filename)
 	: _fp(NULL)
 	, _autoclose(true) {
 
-	if ( fopen_s(&_fp, filename, "a") != 0 ){
+	FILE* fp = fopen(filename, "a");
+	if ( !fp ){
 		fprintf(stderr, "Failed to open logfile '%s' ! Fatal error!\n", filename);
 		exit(1);
 	}
@@ -96,7 +97,8 @@ FIFODestination::FIFODestination(const char* filename)
 	_filename = strdup(filename);
 	mkfifo(filename, 0600);
 
-	if ( fopen_s(&_fp, filename, "w") != 0 ){
+	FILE* fp = fopen(filename, "w");
+	if ( !fp ){
 		fprintf(stderr, "Failed to open logfile '%s' ! Fatal error!\n", filename);
 		exit(1);
 	}
@@ -207,9 +209,13 @@ namespace Log {
 
 	void vmessage(Severity severity, const char* fmt, va_list ap){
 		static char buf[255]; /* this isn't thread-safe anyway, might as well make it static */
+		char* tmp;
 
-		Ptr<char> content( vasprintf2(fmt, ap) );
-		Ptr<char> decorated( asprintf2("(%s) [%s] %s", severity_string(severity), timestring(buf, 255), content.get()) );
+		vasprintf(&tmp, fmt, ap);
+		Ptr<char> content(tmp);
+
+		asprintf(&tmp, "(%s) [%s] %s", severity_string(severity), timestring(buf, 255), content.get());
+		Ptr<char> decorated(tmp);
 
 		for ( iterator it = destinations.begin(); it != destinations.end(); ++it ){
 			Destination* dst = *it;
