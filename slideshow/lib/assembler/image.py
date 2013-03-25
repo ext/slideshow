@@ -22,16 +22,17 @@ class ImageAssembler(Assembler):
 
         if filename.filename == '':
             raise RuntimeError, 'No file selected'
+        return self.upload(slide, filename)
 
-        dst = open(slide.src_path(filename.filename), 'wb')
+    def upload(self, slide, src):
+        dst = open(slide.src_path(src.filename), 'wb')
 
         while True:
-            chunk = filename.file.read(8192)
-            if not chunk:
-                break
+            chunk = src.file.read(8192)
+            if not chunk: break
             dst.write(chunk)
 
-        return {'filename': filename.filename}
+        return {'filename': src.filename}
 
     def rasterize(self, slide, size, params):
         if isinstance(size, tuple):
