@@ -74,6 +74,8 @@ class Slide(object):
         return os.path.join(base_path, image_path, self._path, 'src', item)
 
     def update(self, db, variables):
+        for k,v in variables.iteritems():
+            variables[k] = v.decode('string_escape').encode('utf-8')
         self._data.update(variables)
         with db:
             db.execute('UPDATE `slide` SET `data` = :data, `timestamp` = CURRENT_TIMESTAMP WHERE id = :id', dict(id=self.id, data=json.dumps(self._data)))
