@@ -3,6 +3,10 @@ SUBDIRS = transitions browsers IPC
 noinst_LIBRARIES = libmodule_loader.a libfsm.a
 bin_PROGRAMS = slideshow-daemon
 
+if WITH_SDL
+bin_PROGRAMS += slideshow-transition
+endif
+
 warning_flags = -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-optimizations -Wcast-qual -Wconversion -Wmissing-field-initializers
 
 AM_LDFLAGS = -shared -module -avoid-version
@@ -20,7 +24,6 @@ slideshow_daemon_CFLAGS    = ${AM_CFLAGS} $(ARCH_FLAGS) ${libdaemon_CFLAGS} ${De
 slideshow_daemon_CXXFLAGS  = ${slideshow_daemon_CFLAGS}
 slideshow_daemon_LDFLAGS   = ${AM_LDFLAGS} -rdynamic
 slideshow_daemon_LDADD     = libmodule_loader.a libfsm.a -lltdl ${libportable_LIBS} ${libdaemon_LIBS} ${GL_LIBS} ${DevIL_LIBS} ${glew_LIBS} ${json_LIBS} ${CURL_LIBS}
-
 slideshow_daemon_SOURCES = \
 	backend/factory.cpp backend/platform.h \
 	argument_parser.c argument_parser.h \
@@ -52,6 +55,11 @@ slideshow_daemon_LDADD    += ${SDL_LIBS}
 endif
 
 libmodule_loader_a_SOURCES = module_loader.c module_loader.h assembler.h
+
+if WITH_SDL
+slideshow_transition_SOURCES = slideshow_transition.c path.c log.cpp
+slideshow_transition_LDADD = libmodule_loader.a -lltdl ${SDL_LIBS} ${GL_LIBS} ${DevIL_LIBS} ${glew_LIBS}
+endif
 
 CLEANFILES = browser_context.cpp
 

@@ -1,0 +1,244 @@
+/**
+ * This file is part of Slideshow.
+ * Copyright (C) 2013 David Sveningsson <ext@sidvind.com>
+ *
+ * Slideshow is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Slideshow is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "module_loader.h"
+#include "path.h"
+#include "Transition.h"
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <math.h>
+#include <SDL/SDL.h>
+#include <GL/glew.h>
+#include <IL/il.h>
+#include <IL/ilu.h>
+
+static const char* program_name;
+static int fullscreen = 0;
+static int width = 800;
+static int height = 600;
+static int running = 1;
+static GLuint texture[2];
+static const char* name = "fade";
+static transition_module_t* transition;
+static int automatic = 1;
+static float s = 0.0f;
+
+static float min(float a, float b){
+	return a < b ? a : b;
+}
+
+static float max(float a, float b){
+	return a > b ? a : b;
+}
+
+static float clamp(float x, float hi, float lo){
+	if ( x > hi ) return hi;
+	if ( x < lo ) return lo;
+	return x;
+}
+
+static void gl_setup(){
+	glShadeModel(GL_SMOOTH);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_LIGHTING);
+	glDisable(GL_ALPHA_TEST);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glClearColor(1, 0, 1, 1);
+	glColor4f(1, 1, 1, 1);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, 1, 0, 1, -1.0, 1.0);
+	glScalef(1, -1, 1);
+	glTranslated(0, -1, 0);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+}
+
+static GLuint load_texture(const char* filename){
+	char* fullpath = real_path(filename);
+	ILuint image;
+	GLuint texture;
+
+	ilGenImages(1, &image);
+	ilBindImage(image);
+	ilLoadImage(fullpath);
+
+	ILuint devilError = ilGetError();
+	if( devilError != IL_NO_ERROR ){
+		fprintf(stderr, "Failed to load image '%s' (ilLoadImage: %s)\n", fullpath, iluErrorString(devilError));
+		free(fullpath);
+		return 0;
+	}
+	free(fullpath);
+
+	const ILubyte* pixels = ilGetData();
+	const ILint width  = ilGetInteger(IL_IMAGE_WIDTH);
+	const ILint height = ilGetInteger(IL_IMAGE_HEIGHT);
+	const ILint format = ilGetInteger(IL_IMAGE_FORMAT);
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, (GLenum)format, GL_UNSIGNED_BYTE, pixels);
+
+	return texture;
+}
+
+static void init(){
+	/* Initialize SDL */
+	if ( SDL_Init(SDL_INIT_VIDEO) < 0 ){
+		fprintf(stderr, "%s: Failed to initialize SDL: %s", program_name, SDL_GetError());
+	}
+	if ( SDL_SetVideoMode(width, height, 0, (fullscreen ? SDL_FULLSCREEN : 0) | SDL_OPENGL) == NULL ){
+		fprintf(stderr, "%s: Faeiled to initialize SDL: %s", program_name, SDL_GetError());
+	}
+	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
+	gl_setup();
+
+	/* Initialize GLEW */
+	GLenum err = glewInit();
+	if (GLEW_OK != err){
+		fprintf(stderr, "%s: Failed to initialize GLEW\n", program_name);
+		exit(1);
+	}
+
+	/* Initialize DevIL */
+	ilInit();
+	ILuint devilError = ilGetError();
+	if (devilError != IL_NO_ERROR) {
+		fprintf(stderr, "%s: Failed to initialize DevIL: %s\n", program_name, iluErrorString(devilError));
+		exit(1);
+	}
+	iluInit();
+
+	/* Load images */
+	texture[0] = load_texture("resources/transition_a.png");
+	texture[1] = load_texture("resources/transition_b.png");
+
+	/* load transition module */
+	moduleloader_init(pluginpath());
+	transition = (transition_module_t*)module_open(name, TRANSITION_MODULE, 0);
+	if ( !transition ){
+		fprintf(stderr, "%s: Failed to load transition plugin `%s'.\n", program_name, name);
+		exit(1);
+	}
+}
+
+static void cleanup(){
+	SDL_Quit();
+}
+
+static void update(){
+	SDL_Event event;
+	while(SDL_PollEvent(&event) ){
+		switch(event.type){
+		case SDL_KEYDOWN:
+			switch ( event.key.keysym.sym ){
+			case SDLK_ESCAPE:
+				running = 0;
+				break;
+
+			case SDLK_LEFT:
+			case SDLK_RIGHT:
+				automatic = 0;
+				break;
+
+			case SDLK_SPACE:
+				automatic = 1;
+				break;
+
+			default:
+				break;
+			}
+			break;
+
+		case SDL_MOUSEBUTTONDOWN:
+			if ( event.button.button == 4){
+				automatic = 0;
+				s = max(s - 0.02f, 0.0f);
+			} else if ( event.button.button == 5){
+				automatic = 0;
+				s = min(s + 0.02f, 1.0f);
+			}
+			break;
+
+		case SDL_QUIT:
+			running = 0;
+			break;
+		}
+	}
+
+	Uint8* keys = SDL_GetKeyState(NULL);
+	if ( keys[SDLK_LEFT]  ) s = max(s - 0.01f, 0.0f);
+	if ( keys[SDLK_RIGHT] ) s = min(s + 0.01f, 1.0f);
+
+	if ( automatic ){
+		const Uint32 t = SDL_GetTicks();
+		const float x = (float)t / 1000.0f;
+		s = clamp(asinf(sinf(x)) / (float)M_PI_2, 0.5f, -0.5f) + 0.5f;
+	}
+}
+
+static void render(){
+	transition_context_t context = {
+		.texture = {texture[0], texture[1]},
+		.state = 1.0f - s,
+	};
+
+	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+	transition->render(&context);
+}
+
+static void run(){
+	while ( running ){
+		update();
+		render();
+		SDL_GL_SwapBuffers();
+	}
+}
+
+int main(int argc, char* argv[]){
+	/* extract program name from path. e.g. /path/to/foo -> foo */
+	const char* separator = strrchr(argv[0], '/');
+	if ( separator ){
+		program_name = separator + 1;
+	} else {
+		program_name = argv[0];
+	}
+
+	init();
+	run();
+	cleanup();
+	return 0;
+}
