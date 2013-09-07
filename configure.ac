@@ -70,7 +70,10 @@ PKG_CHECK_MODULES([libportable], [libportable >= 0.2.2])
 PKG_CHECK_MODULES([libdaemon], [libdaemon >= 0.13])
 PKG_CHECK_MODULES([DevIL], [IL ILU])
 PKG_CHECK_MODULES([glew], [glew])
-PKG_CHECK_MODULES([json], [json])
+PKG_CHECK_MODULES([json_c], [json-c],[
+  json_CFLAGS=$json_c_CFLAGS
+  json_LIBS=$json_c_LIBS
+], [PKG_CHECK_MODULES([json], [json])])
 AX_LIB_CURL([],,AC_MSG_ERROR([Required library libcurl not found]))
 
 dnl #######################################################################
