@@ -44,6 +44,7 @@ CREATE TABLE `migration` (
        `filename` TEXT PRIMARY KEY,
        `timestamp` TIMESTAMP NOT NULL
 );
+INSERT INTO `migration` VALUES ('20120426184724_add_timestamp_to_slide.sql', CURRENT_TIMESTAMP);    -- Included in schema
 
 INSERT INTO queue (id, name) VALUES (-1, 'Intermediate');
 INSERT INTO queue (id, name) VALUES ( 0, 'Unsorted');
