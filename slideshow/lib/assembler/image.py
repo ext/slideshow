@@ -73,3 +73,6 @@ class ImageAssembler(Assembler):
 
     def title(self):
         return 'Image'
+
+    def update(self, slide, current, file):
+        return self.upload(slide, file)

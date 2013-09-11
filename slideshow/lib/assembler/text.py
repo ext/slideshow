@@ -361,3 +361,9 @@ class TextAssembler(Assembler):
             'preview': urllib.urlencode(content),
             'template': Theme(settings['Appearance.Theme'])
         }
+
+    def update(self, slide, current, **variables):
+        for k,v in variables.iteritems():
+            variables[k] = v.decode('string_escape').encode('utf-8')
+        current.update(variables)
+        return current
