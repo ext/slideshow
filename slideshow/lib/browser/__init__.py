@@ -1,4 +1,5 @@
 import os
+from os.path import join, dirname
 
 class Browser:
     # registered factories
@@ -13,9 +14,10 @@ class Browser:
 
     def install(self):
         import slideshow
-        filename = os.path.join(os.path.dirname(slideshow.__file__), 'install', self.__class__._install)
-        lines = "\n".join(open(filename, 'r').readlines())
-        self.executescript(lines)
+        directory = join(dirname(slideshow.__file__), 'install')
+        for filename in [self.__class__._install, 'common.sql']:
+            lines = open(join(directory, filename), 'r').read()
+            self.executescript(lines)
 
     def __str__(self):
         return self.string(password=False)

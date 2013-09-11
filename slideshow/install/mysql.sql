@@ -47,11 +47,3 @@ CREATE TABLE `migration` (
 INSERT INTO `migration` VALUES ('20120426184724_add_timestamp_to_slide.sql', CURRENT_TIMESTAMP);    -- Included in schema
 
 COMMIT;
-
-INSERT INTO `queue` (id, name) VALUES (-1, 'Intermediate');
-INSERT INTO `queue` (id, name) VALUES ( 0, 'Unsorted');
-INSERT INTO `queue` (id, name) VALUES ( 1, 'Default queue');
-UPDATE `queue` SET `id` = 0 WHERE `id` = 100;
-INSERT INTO user (name, host) VALUES ('daemon', NULL);
-
-COMMIT;
