@@ -21,6 +21,7 @@
 #endif
 
 #include "module_loader.h"
+#include "opengl.h"
 #include "path.h"
 #include "Transition.h"
 
@@ -56,31 +57,6 @@ static float clamp(float x, float hi, float lo){
 	if ( x > hi ) return hi;
 	if ( x < lo ) return lo;
 	return x;
-}
-
-static void gl_setup(){
-	glShadeModel(GL_SMOOTH);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_LIGHTING);
-	glDisable(GL_ALPHA_TEST);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glClearColor(1, 0, 1, 1);
-	glColor4f(1, 1, 1, 1);
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, 1, 0, 1, -1.0, 1.0);
-	glScalef(1, -1, 1);
-	glTranslated(0, -1, 0);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
 }
 
 static GLuint load_texture(const char* filename){

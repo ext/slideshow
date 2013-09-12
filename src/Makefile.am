@@ -41,6 +41,7 @@ slideshow_daemon_SOURCES = \
 	main.cpp \
 	mathutils.h \
 	module.h \
+	opengl.c opengl.h \
 	path.c path.h \
 	ptr.h \
 	slidelib.h \
@@ -57,7 +58,7 @@ endif
 libmodule_loader_a_SOURCES = module_loader.c module_loader.h assembler.h
 
 if WITH_SDL
-slideshow_transition_SOURCES = slideshow_transition.cpp path.c log.cpp
+slideshow_transition_SOURCES = slideshow_transition.cpp path.c log.cpp opengl.c
 slideshow_transition_LDADD = libmodule_loader.a -lltdl ${SDL_LIBS} ${GL_LIBS} ${DevIL_LIBS} ${glew_LIBS}
 endif
 
