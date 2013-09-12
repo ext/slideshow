@@ -1,6 +1,7 @@
 slideshow-0.4.0
 ---------------
 
+	* [frontend] Allow dynamic text-slides with variables.
 	* [daemon] During letterboxing the image is now cleared to black. Fixes
 	           #111.
 	* [daemon] proper mysql browser.

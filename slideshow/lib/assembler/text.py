@@ -14,6 +14,7 @@ from os.path import join, dirname, basename, abspath, realpath
 import htmlcolor
 import urllib
 import traceback
+import string
 
 def decode_position(str, size):
     """
@@ -291,10 +292,21 @@ class Theme:
 
         self.paint_background(cr, realsize, self._template.getAttribute('background'))
 
+        class Formatter(string.Formatter):
+            def get_value(self, key, args, kwargs):
+                try:
+                    if hasattr(key, "mod"):
+                        return args[key]
+                    else:
+                        return kwargs[key]
+                except:
+                    return "{%s}" % key
+        fmt = Formatter()
+
         for item in self.items():
             cr.save()
             try:
-                item.raster(cr, size, realsize, scale, params.get(item.name, ''))
+                item.raster(cr, size, realsize, scale, fmt.format(params.get(item.name, ''), **params))
             finally:
                 cr.restore()
 
@@ -349,3 +361,9 @@ class TextAssembler(Assembler):
             'preview': urllib.urlencode(content),
             'template': Theme(settings['Appearance.Theme'])
         }
+
+    def update(self, slide, current, **variables):
+        for k,v in variables.iteritems():
+            variables[k] = v.decode('string_escape').encode('utf-8')
+        current.update(variables)
+        return current

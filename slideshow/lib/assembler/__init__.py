@@ -90,6 +90,9 @@ class Assembler:
         """
         return '.png'
 
+    def update(self, slide, current, **kwargs):
+        raise RuntimeError, 'Assembler %s does not support dynamic updates' % self.name
+
 import image
 import text
 import video

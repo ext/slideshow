@@ -225,6 +225,12 @@ class Handler(object):
         return content
 
     @cherrypy.expose
+    def update(self, id, **kwargs):
+        db = cherrypy.thread_data.db
+        s = slide.from_id(db, id)
+        s.update(db, kwargs)
+
+    @cherrypy.expose
     def delete(self, id):
         cherrypy.thread_data.db.transaction()
         try:

@@ -302,3 +302,8 @@ h1 {
 #assembler_text .fields textarea {
 		width: 280px;
 }
+
+#assembler_text .help {
+		font-size: 0.8em;
+		width: 300px;
+}
