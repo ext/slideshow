@@ -7,7 +7,7 @@
 # Licenced under the GNU Affero General Public License, version 3
 #
 
-export SLIDESHOW_EXEC="@abs_builddir@/src/slideshow-daemon"
+export SLIDESHOW_EXEC="@abs_builddir@/src/$(basename $0)"
 export SLIDESHOW_DATA_DIR="@abs_top_srcdir@/data"
 export SLIDESHOW_PLUGIN_DIR="@abs_builddir@/src/transitions:@abs_builddir@/src/assembler:@abs_builddir@/src/browsers:@abs_builddir@/src/IPC"
 export SDL_VIDEO_X11_XRANDR=0
@@ -38,14 +38,16 @@ else # if -- isn't found, everything is considered daemon arguments
     tool_args=()
 fi
 
-case `basename $0` in
+case $(basename $0) in
     slideshow-gdb)
-	exec gdb ${tool_args[@]} --args ${SLIDESHOW_EXEC} ${daemon_args[@]}
-	;;
+		exec gdb ${tool_args[@]} --args "@abs_builddir@/src/slideshow-daemon" ${daemon_args[@]}
+		;;
+
     slideshow-valgrind)
-	exec valgrind ${tool_args[@]} -- ${SLIDESHOW_EXEC} ${daemon_args[@]}
-	;;
+		exec valgrind ${tool_args[@]} -- "@abs_builddir@/src/slideshow-daemon" ${daemon_args[@]}
+		;;
+
     *)
-	exec ${SLIDESHOW_EXEC} ${daemon_args[@]}
-	;;
+		exec ${SLIDESHOW_EXEC} ${daemon_args[@]}
+		;;
 esac;
