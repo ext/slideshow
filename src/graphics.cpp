@@ -105,15 +105,13 @@ int graphics_cleanup(){
 }
 
 void graphics_render(float state){
-	transition_context_t context;
+	if ( !transition ) return;
 
-	context.texture[0] = texture[0];
-	context.texture[1] = texture[1];
-	context.state = state;
-
-	if ( transition ){
-		transition->render(&context);
-	}
+	transition_context_t context = {
+		.texture = {texture[0], texture[1]},
+		.state = state,
+	};
+	transition->render(&context);
 }
 
 #ifdef WIN32
