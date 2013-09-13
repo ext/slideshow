@@ -28,6 +28,7 @@
 #include "Transition.h"
 #include "path.h"
 #include "gl.h"
+#include "opengl.h"
 #include "ptr.h"
 #include "curl_local.h"
 
@@ -37,8 +38,6 @@
 #include <cassert>
 #include <cerrno>
 
-#include <portable/string.h>
-
 #include <IL/il.h>
 #include <IL/ilu.h>
 
@@ -47,31 +46,6 @@ static transition_module_t* transition = NULL;
 static unsigned int texture[2] = {0,0};
 static int width;
 static int height;
-
-static void gl_setup(){
-	glShadeModel(GL_SMOOTH);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_LIGHTING);
-	glDisable(GL_ALPHA_TEST);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glClearColor(0, 0, 0, 1);
-	glColor4f(1, 1, 1, 1);
-	glClear(GL_COLOR_BUFFER_BIT);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, 1, 0, 1, -1.0, 1.0);
-	glScalef(1, -1, 1);
-	glTranslated(0, -1, 0);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-}
 
 int graphics_init(int w, int h){
 	width = w;
@@ -131,15 +105,13 @@ int graphics_cleanup(){
 }
 
 void graphics_render(float state){
-	transition_context_t context;
+	if ( !transition ) return;
 
-	context.texture[0] = texture[0];
-	context.texture[1] = texture[1];
-	context.state = state;
-
-	if ( transition ){
-		transition->render(&context);
-	}
+	transition_context_t context = {
+		.texture = {texture[0], texture[1]},
+		.state = state,
+	};
+	transition->render(&context);
 }
 
 #ifdef WIN32
@@ -214,7 +186,9 @@ static int load_file(const char* filename, unsigned int dst){
 
 	Ptr<char> real_name(strdup(filename));
 	if ( is_slide(filename) ){
-		real_name.reset(asprintf2("%s/raster/%dx%d.png", filename, width, height));
+		char* tmp;
+		asprintf(&tmp, "%s/raster/%dx%d.png", filename, width, height);
+		real_name.reset(tmp);
 	}
 
 #ifdef UNICODE

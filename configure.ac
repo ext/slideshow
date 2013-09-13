@@ -12,7 +12,13 @@ AC_CONFIG_FILES([
 	src/browsers/Makefile
 	src/IPC/Makefile
 ])
-AC_CONFIG_FILES([slideshow-daemon], [chmod +x slideshow-daemon])
+AC_CONFIG_FILES([slideshow-wrapper], [
+  chmod +x slideshow-wrapper
+  test -e slideshow-daemon     || ln -s slideshow-wrapper slideshow-daemon
+  test -e slideshow-valgrind   || ln -s slideshow-wrapper slideshow-valgrind
+  test -e slideshow-gdb        || ln -s slideshow-wrapper slideshow-gdb
+  test -e slideshow-transition || ln -s slideshow-wrapper slideshow-transition
+])
 
 AC_GNU_SOURCE
 

@@ -1,6 +1,7 @@
 slideshow-0.4.0
 ---------------
 
+	* [tools] adding tool for previewing and managing transition plugins
 	* [frontend] Allow dynamic text-slides with variables.
 	* [daemon] During letterboxing the image is now cleared to black. Fixes
 	           #111.
