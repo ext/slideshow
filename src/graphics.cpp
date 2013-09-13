@@ -38,8 +38,6 @@
 #include <cassert>
 #include <cerrno>
 
-#include <portable/string.h>
-
 #include <IL/il.h>
 #include <IL/ilu.h>
 
@@ -190,7 +188,9 @@ static int load_file(const char* filename, unsigned int dst){
 
 	Ptr<char> real_name(strdup(filename));
 	if ( is_slide(filename) ){
-		real_name.reset(asprintf2("%s/raster/%dx%d.png", filename, width, height));
+		char* tmp;
+		asprintf(&tmp, "%s/raster/%dx%d.png", filename, width, height);
+		real_name.reset(tmp);
 	}
 
 #ifdef UNICODE
