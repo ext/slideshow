@@ -24,24 +24,24 @@
 #include "path.h"
 #include "Transition.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <cmath>
 #include <SDL/SDL.h>
 #include <GL/glew.h>
 #include <IL/il.h>
 #include <IL/ilu.h>
 
 static const char* program_name;
-static int fullscreen = 0;
+static bool fullscreen = false;
 static int width = 800;
 static int height = 600;
-static int running = 1;
+static bool running = true;
 static GLuint texture[2];
 static const char* name = "fade";
 static transition_module_t* transition;
-static int automatic = 1;
+static bool automatic = true;
 static float s = 0.0f;
 
 static float min(float a, float b){
@@ -166,16 +166,16 @@ static void update(){
 		case SDL_KEYDOWN:
 			switch ( event.key.keysym.sym ){
 			case SDLK_ESCAPE:
-				running = 0;
+				running = false;
 				break;
 
 			case SDLK_LEFT:
 			case SDLK_RIGHT:
-				automatic = 0;
+				automatic = false;
 				break;
 
 			case SDLK_SPACE:
-				automatic = 1;
+				automatic = true;
 				break;
 
 			default:
@@ -185,7 +185,7 @@ static void update(){
 
 		case SDL_MOUSEBUTTONDOWN:
 			if ( event.button.button == 4){
-				automatic = 0;
+				automatic = false;
 				s = max(s - 0.02f, 0.0f);
 			} else if ( event.button.button == 5){
 				automatic = 0;
@@ -194,7 +194,7 @@ static void update(){
 			break;
 
 		case SDL_QUIT:
-			running = 0;
+			running = false;
 			break;
 		}
 	}

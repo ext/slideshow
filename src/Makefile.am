@@ -57,7 +57,7 @@ endif
 libmodule_loader_a_SOURCES = module_loader.c module_loader.h assembler.h
 
 if WITH_SDL
-slideshow_transition_SOURCES = slideshow_transition.c path.c log.cpp
+slideshow_transition_SOURCES = slideshow_transition.cpp path.c log.cpp
 slideshow_transition_LDADD = libmodule_loader.a -lltdl ${SDL_LIBS} ${GL_LIBS} ${DevIL_LIBS} ${glew_LIBS}
 endif
 
