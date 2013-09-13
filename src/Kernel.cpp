@@ -367,9 +367,12 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 		return false;
 	}
 
-	if ( n == argc ){
+	const bool normal_operation = arg.mode == ForegroundMode || arg.mode == DaemonMode;
+	if ( n == argc && normal_operation ){
 		printf("%s: Warning: No frontend url given.\n", argv[0]);
 		printf("Try `%s --help' for more information.\n", argv[0]);
+	} else if ( !normal_operation) {
+		/* ignore */
 	} else {
 		arg.url = strdup(argv[n+1]);
 	}
