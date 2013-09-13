@@ -1,0 +1,2 @@
+fragment_shader:noise.frag
+vertex_shader:fsquad.vert
