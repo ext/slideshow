@@ -23,6 +23,7 @@
 #include "module_loader.h"
 #include "opengl.h"
 #include "graphics.h"
+#include "log.hpp"
 #include "path.h"
 #include "Transition.h"
 
@@ -245,5 +246,6 @@ int main(int argc, char* argv[]){
 		list_transitions,
 	};
 
+	Log::add_destination(new FileDestination(stdout));
 	return func[mode]();
 }
