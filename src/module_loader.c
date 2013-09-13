@@ -177,7 +177,7 @@ static int filter(const struct dirent* el){
 	return fnmatch("*" SO_SUFFIX , el->d_name, 0) == 0;
 }
 
-void module_enumerate(enum module_type_t type, void (*callback)(const module_handle mod)){
+void module_enumerate(enum module_type_t type, void (*callback)(const char* name, const module_handle mod)){
 	char* ctx;
 	char* path_list = strdup(pluginpath());
 	char* path = strtok_r(path_list, ":", &ctx);
@@ -187,16 +187,23 @@ void module_enumerate(enum module_type_t type, void (*callback)(const module_han
 		struct dirent **namelist;
 		if ( (n=scandir(path, &namelist, filter, NULL)) >= 0 ){
 			for ( int i = 0; i < n; i++ ){
-				module_handle context = module_open(namelist[i]->d_name, ANY_MODULE, MODULE_CALLER_INIT);
-				free(namelist[i]);
+				char* name = namelist[i]->d_name;
+				char* ext = strrchr(name, '.'); /* remove extension from name */
+				if ( ext ) *ext = 0;
+
+				module_handle context = module_open(name, ANY_MODULE, MODULE_CALLER_INIT);
 
 				if ( !context ) continue;
 				if ( !(type == ANY_MODULE || module_type(context) == type) ){
 					continue;
 				}
 
-				callback(context);
+				callback(name, context);
 				module_close(context);
+			}
+
+			for ( int i = 0; i < n; i++ ){
+				free(namelist[i]);
 			}
 			free(namelist);
 		} else {

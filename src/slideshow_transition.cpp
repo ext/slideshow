@@ -177,8 +177,8 @@ static int preview(){
 
 static int list_transitions(){
 	moduleloader_init(pluginpath());
-	module_enumerate(TRANSITION_MODULE, [](const module_handle mod){
-		printf("%s\n", module_get_name(mod));
+	module_enumerate(TRANSITION_MODULE, [](const char* name, const module_handle mod){
+		printf("%s:%s\n", name, module_get_name(mod));
 	});
 	return 0;
 }

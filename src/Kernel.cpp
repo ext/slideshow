@@ -320,7 +320,7 @@ void Kernel::print_licence_statement() const {
 
 void Kernel::print_transitions(){
 	Log::info("Available transitions: \n");
-	module_enumerate(TRANSITION_MODULE, [](const module_handle mod){
+	module_enumerate(TRANSITION_MODULE, [](const char* name, const module_handle mod){
 		Log::info(" * %s\n", module_get_name(mod));
 	});
 }
