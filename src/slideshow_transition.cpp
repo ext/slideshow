@@ -44,8 +44,8 @@ enum Mode {
 static const char* program_name;
 static enum Mode mode = MODE_PREVIEW;
 static bool fullscreen = false;
-static int width = 800;
-static int height = 600;
+static int width = 0;
+static int height = 0;
 static bool running = true;
 static GLuint texture[2];
 static const char* name = "fade";
@@ -100,6 +100,13 @@ static GLuint load_texture(const char* filename){
 }
 
 static void init(){
+	/* use default resolution 0x0 (native) for fullscreen and 800x600 for
+	   windowed */
+	if ( !fullscreen && width == 0 ){
+		width = 800;
+		height = 600;
+	}
+
 	/* Initialize SDL */
 	if ( SDL_Init(SDL_INIT_VIDEO) < 0 ){
 		fprintf(stderr, "%s: Failed to initialize SDL: %s", program_name, SDL_GetError());
