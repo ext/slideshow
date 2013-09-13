@@ -28,13 +28,21 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
+#include <cerrno>
 #include <cmath>
+#include <getopt.h>
 #include <SDL/SDL.h>
 #include <GL/glew.h>
 #include <IL/il.h>
 #include <IL/ilu.h>
 
+enum Mode {
+	MODE_PREVIEW,
+	MODE_LIST,
+};
+
 static const char* program_name;
+static enum Mode mode = MODE_PREVIEW;
 static bool fullscreen = false;
 static int width = 800;
 static int height = 600;
@@ -204,6 +212,34 @@ static void run(){
 	}
 }
 
+static int list_transitions(){
+	moduleloader_init(pluginpath());
+	module_enumerate(TRANSITION_MODULE, [](const module_handle mod){
+		printf("%s\n", module_get_name(mod));
+	});
+	return 0;
+}
+
+static const char* shortopts = "lfbh";
+static struct option longopts[] = {
+	{"list",        no_argument, 0, 'l'},
+	{"fullscreen",  no_argument, 0, 'f'},
+	{"help",        no_argument, 0, 'h'},
+	{0, 0, 0, 0}, /* sentinel */
+};
+
+static void show_usage(void){
+	printf("%s-%s\n", program_name, VERSION);
+	printf("(c) 2013 David Sveningsson <ext@sidvind.com>\n\n");
+	printf("Preview and manage slideshow transitions.\n");
+	printf("Usage: %s [OPTIONS] [TRANSITION]\n\n"
+	       "  -l, --list                 List available transitions\n"
+	       "  -f, --fullscreen           Run in fullscreen mode\n"
+	       "  -b                         Format output as machine-parsable text\n"
+	       "  -h, --help                 Show this text.\n",
+	       program_name);
+}
+
 int main(int argc, char* argv[]){
 	/* extract program name from path. e.g. /path/to/foo -> foo */
 	const char* separator = strrchr(argv[0], '/');
@@ -213,8 +249,42 @@ int main(int argc, char* argv[]){
 		program_name = argv[0];
 	}
 
-	init();
-	run();
-	cleanup();
+	int option_index = 0;
+	int op;
+
+	/* parse arguments */
+	while ( (op=getopt_long(argc, argv, shortopts, longopts, &option_index)) != -1 ){
+		switch ( op ){
+		case 'l': /* --list */
+			mode = MODE_LIST;
+			break;
+
+		case 'f': /* --fullscreen */
+			fullscreen = true;
+			break;
+
+		case 'b':
+			/* not implemented as of now as the output is already machine-parsable but
+			   in case it changes this should be implemented */
+			break;
+
+		case 'h': /* --help */
+			show_usage();
+			return 0;
+		}
+	}
+
+	switch ( mode ){
+	case MODE_PREVIEW:
+		init();
+		run();
+		cleanup();
+		break;
+
+	case MODE_LIST:
+		list_transitions();
+		break;
+	}
+
 	return 0;
 }
