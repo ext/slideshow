@@ -65,6 +65,7 @@ libmodule_loader_a_SOURCES = module_loader.c module_loader.h assembler.h
 
 if WITH_SDL
 slideshow_transition_SOURCES = slideshow_transition.cpp
+slideshow_transition_LDFLAGS = ${AM_LDFLAGS} -rdynamic
 slideshow_transition_LDADD = libmodule_loader.a libslideshow_base.la -lm -lltdl ${SDL_LIBS}
 endif
 
