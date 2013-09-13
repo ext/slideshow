@@ -37,7 +37,7 @@
 #include <IL/ilu.h>
 
 enum Mode {
-	MODE_PREVIEW,
+	MODE_PREVIEW = 0,
 	MODE_LIST,
 };
 
@@ -209,14 +209,18 @@ static void render(){
 
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	transition->render(&context);
+
+	SDL_GL_SwapBuffers();
 }
 
-static void run(){
+static int preview(){
+	init();
 	while ( running ){
 		update();
 		render();
-		SDL_GL_SwapBuffers();
 	}
+	cleanup();
+	return 0;
 }
 
 static int list_transitions(){
@@ -281,17 +285,10 @@ int main(int argc, char* argv[]){
 		}
 	}
 
-	switch ( mode ){
-	case MODE_PREVIEW:
-		init();
-		run();
-		cleanup();
-		break;
+	int (*func[])() = {
+		preview,
+		list_transitions,
+	};
 
-	case MODE_LIST:
-		list_transitions();
-		break;
-	}
-
-	return 0;
+	return func[mode]();
 }
