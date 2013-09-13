@@ -22,6 +22,7 @@
 
 #include "module_loader.h"
 #include "opengl.h"
+#include "graphics.h"
 #include "path.h"
 #include "Transition.h"
 
@@ -47,9 +48,7 @@ static bool fullscreen = false;
 static int width = 0;
 static int height = 0;
 static bool running = true;
-static GLuint texture[2];
 static const char* name = "fade";
-static transition_module_t* transition;
 static bool automatic = true;
 static float s = 0.0f;
 
@@ -67,38 +66,6 @@ static float clamp(float x, float hi, float lo){
 	return x;
 }
 
-static GLuint load_texture(const char* filename){
-	char* fullpath = real_path(filename);
-	ILuint image;
-	GLuint texture;
-
-	ilGenImages(1, &image);
-	ilBindImage(image);
-	ilLoadImage(fullpath);
-
-	ILuint devilError = ilGetError();
-	if( devilError != IL_NO_ERROR ){
-		fprintf(stderr, "Failed to load image '%s' (ilLoadImage: %s)\n", fullpath, iluErrorString(devilError));
-		free(fullpath);
-		return 0;
-	}
-	free(fullpath);
-
-	const ILubyte* pixels = ilGetData();
-	const ILint width  = ilGetInteger(IL_IMAGE_WIDTH);
-	const ILint height = ilGetInteger(IL_IMAGE_HEIGHT);
-	const ILint format = ilGetInteger(IL_IMAGE_FORMAT);
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, (GLenum)format, GL_UNSIGNED_BYTE, pixels);
-
-	return texture;
-}
-
 static void init(){
 	/* use default resolution 0x0 (native) for fullscreen and 800x600 for
 	   windowed */
@@ -110,40 +77,30 @@ static void init(){
 	/* Initialize SDL */
 	if ( SDL_Init(SDL_INIT_VIDEO) < 0 ){
 		fprintf(stderr, "%s: Failed to initialize SDL: %s", program_name, SDL_GetError());
+		exit(1);
 	}
 	if ( SDL_SetVideoMode(width, height, 0, (fullscreen ? SDL_FULLSCREEN : 0) | SDL_OPENGL) == NULL ){
-		fprintf(stderr, "%s: Faeiled to initialize SDL: %s", program_name, SDL_GetError());
+		fprintf(stderr, "%s: Failed to initialize SDL: %s", program_name, SDL_GetError());
+		exit(1);
 	}
 	SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 1);
-	gl_setup();
 
-	/* Initialize GLEW */
-	GLenum err = glewInit();
-	if (GLEW_OK != err){
-		fprintf(stderr, "%s: Failed to initialize GLEW\n", program_name);
+	/* read actual resolution */
+	const SDL_VideoInfo* vi = SDL_GetVideoInfo();
+	if ( !vi ){
+		fprintf(stderr, "%s: SDL_GetVideoInfo() failed\n", program_name);
 		exit(1);
 	}
+	width = vi->current_w;
+	height = vi->current_h;
 
-	/* Initialize DevIL */
-	ilInit();
-	ILuint devilError = ilGetError();
-	if (devilError != IL_NO_ERROR) {
-		fprintf(stderr, "%s: Failed to initialize DevIL: %s\n", program_name, iluErrorString(devilError));
-		exit(1);
-	}
-	iluInit();
-
-	/* Load images */
-	texture[0] = load_texture("resources/transition_a.png");
-	texture[1] = load_texture("resources/transition_b.png");
+	graphics_init(width, height);
+	graphics_load_image("resources/transition_a.png", 1);
+	graphics_load_image("resources/transition_b.png", 1);
 
 	/* load transition module */
 	moduleloader_init(pluginpath());
-	transition = (transition_module_t*)module_open(name, TRANSITION_MODULE, 0);
-	if ( !transition ){
-		fprintf(stderr, "%s: Failed to load transition plugin `%s'.\n", program_name, name);
-		exit(1);
-	}
+	graphics_set_transition(name);
 }
 
 static void cleanup(){
@@ -202,14 +159,8 @@ static void update(){
 }
 
 static void render(){
-	transition_context_t context = {
-		.texture = {texture[0], texture[1]},
-		.state = 1.0f - s,
-	};
-
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	transition->render(&context);
-
+	graphics_render(s);
 	SDL_GL_SwapBuffers();
 }
 
@@ -283,6 +234,10 @@ int main(int argc, char* argv[]){
 			show_usage();
 			return 0;
 		}
+	}
+
+	if ( optind < argc ){
+		name = argv[optind];
 	}
 
 	int (*func[])() = {
