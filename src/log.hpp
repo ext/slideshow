@@ -113,8 +113,9 @@ namespace Log {
 	/**
 	 * Add a logging destination.
 	 * @param dst Memory will be release using delete.
+	 * @param Lowest severity that will be written.
 	 */
-	void add_destination(Destination* dst);
+	void add_destination(Destination* dst, Severity severity = Log_Debug);
 
 	void  message(Severity severity, const char* fmt, ...) __attribute__ ((format (printf, 2, 3)));
 	void vmessage(Severity severity, const char* fmt, va_list ap);

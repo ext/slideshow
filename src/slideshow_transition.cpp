@@ -52,7 +52,7 @@ static bool running = true;
 static const char* name = "fade";
 static bool automatic = true;
 static float s = 0.0f;
-
+static enum Severity severity = Log_Info;
 static float min(float a, float b){
 	return a < b ? a : b;
 }
@@ -183,10 +183,11 @@ static int list_transitions(){
 	return 0;
 }
 
-static const char* shortopts = "lfbh";
+static const char* shortopts = "lfbvh";
 static struct option longopts[] = {
 	{"list",        no_argument, 0, 'l'},
 	{"fullscreen",  no_argument, 0, 'f'},
+	{"vebose",      no_argument, 0, 'v'},
 	{"help",        no_argument, 0, 'h'},
 	{0, 0, 0, 0}, /* sentinel */
 };
@@ -199,6 +200,7 @@ static void show_usage(void){
 	       "  -l, --list                 List available transitions\n"
 	       "  -f, --fullscreen           Run in fullscreen mode\n"
 	       "  -b                         Format output as machine-parsable text\n"
+	       "  -v, --verbose              Verbose output\n"
 	       "  -h, --help                 Show this text.\n",
 	       program_name);
 }
@@ -231,6 +233,10 @@ int main(int argc, char* argv[]){
 			   in case it changes this should be implemented */
 			break;
 
+		case 'v':
+			severity = Log_Debug;
+			break;
+
 		case 'h': /* --help */
 			show_usage();
 			return 0;
@@ -246,6 +252,6 @@ int main(int argc, char* argv[]){
 		list_transitions,
 	};
 
-	Log::add_destination(new FileDestination(stdout));
+	Log::add_destination(new FileDestination(stdout), severity);
 	return func[mode]();
 }

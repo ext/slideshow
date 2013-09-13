@@ -55,7 +55,7 @@ int syslog_severity[5] = {
 };
 #endif /* HAVE_SYSLOG */
 
-typedef std::vector<Destination*> vector;
+typedef std::vector<std::pair<Destination*, Severity>> vector;
 typedef vector::iterator iterator;
 
 static vector destinations;
@@ -191,13 +191,13 @@ namespace Log {
 
 	void cleanup(){
 		for ( iterator it = destinations.begin(); it != destinations.end(); ++it ){
-			delete *it;
+			delete it->first;
 		}
 		destinations.clear();
 	}
 
-	void add_destination(Destination* dst){
-		destinations.push_back(dst);
+	void add_destination(Destination* dst, Severity severity){
+		destinations.push_back(std::pair<Destination*, Severity>(dst, severity));
 	}
 
 	void message(Severity severity, const char* fmt, ...){
@@ -218,7 +218,8 @@ namespace Log {
 		Ptr<char> decorated(tmp);
 
 		for ( iterator it = destinations.begin(); it != destinations.end(); ++it ){
-			Destination* dst = *it;
+			if ( severity < it->second ) continue;
+			Destination* dst = it->first;
 			dst->write(content.get(), decorated.get());
 		}
 	}
