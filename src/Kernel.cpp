@@ -294,7 +294,7 @@ void Kernel::print_config() const {
 	char* cwd = get_current_dir_name();
 
 	Log::info("Slideshow configuration\n");
-	Log::info("  version: "VERSION"\n");
+	Log::info("  version: " VERSION "\n");
 	Log::info("  cwd: %s\n", cwd);
 	Log::info("  pidfile: %s\n", pidfile);
 	Log::info("  datapath: %s\n", datapath());

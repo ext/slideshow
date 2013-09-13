@@ -163,8 +163,8 @@ int main( int argc, const char* argv[] ){
 			cwd[0] = '\0';
 		}
 
-		fprintf(stderr, " *** "PACKAGE" unhandled exception ***\n");
-		fprintf(stderr, "\tversion: "PACKAGE"-"VERSION"\n");
+		fprintf(stderr, " *** " PACKAGE " unhandled exception ***\n");
+		fprintf(stderr, "\tversion: " PACKAGE "-" VERSION "\n");
 		fprintf(stderr, "\tcwd:     %s\n", cwd);
 		fprintf(stderr, "\tSource:  %s:%d\n", e.file(), e.line());
 		fprintf(stderr, "\tMessage: %s\n\n", e.what());
