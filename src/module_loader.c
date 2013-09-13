@@ -21,11 +21,21 @@
 #include "assembler.h"
 #include "Browser.h"
 #include "log.h"
+#include "path.h"
 #include "Transition.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <dirent.h>
+#include <errno.h>
+#include <fnmatch.h>
+
+#ifdef WIN32
+#	define SO_SUFFIX ".dll"
+#else
+#	define SO_SUFFIX ".la"
+#endif
 
 struct module_context_t {
 	lt_dlhandle handle;
@@ -161,6 +171,42 @@ void module_close(module_handle module){
 
 	/* release handle */
 	module->free(module);
+}
+
+static int filter(const struct dirent* el){
+	return fnmatch("*" SO_SUFFIX , el->d_name, 0) == 0;
+}
+
+void module_enumerate(enum module_type_t type, void (*callback)(const module_handle mod)){
+	char* ctx;
+	char* path_list = strdup(pluginpath());
+	char* path = strtok_r(path_list, ":", &ctx);
+
+	while ( path ){
+		int n;
+		struct dirent **namelist;
+		if ( (n=scandir(path, &namelist, filter, NULL)) >= 0 ){
+			for ( int i = 0; i < n; i++ ){
+				module_handle context = module_open(namelist[i]->d_name, ANY_MODULE, MODULE_CALLER_INIT);
+				free(namelist[i]);
+
+				if ( !context ) continue;
+				if ( !(type == ANY_MODULE || module_type(context) == type) ){
+					continue;
+				}
+
+				callback(context);
+				module_close(context);
+			}
+			free(namelist);
+		} else {
+			log_message(Log_Warning, "Failed to read %s: %s\n", path, strerror(errno));
+		}
+
+		path = strtok_r(NULL, ":", &ctx);
+	}
+
+	free(path_list);
 }
 
 const char* module_get_name(const module_handle module){

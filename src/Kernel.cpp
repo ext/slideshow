@@ -318,53 +318,11 @@ void Kernel::print_licence_statement() const {
 	Log::info("\n");
 }
 
-#ifdef WIN32
-#	define SO_SUFFIX ".dll"
-#else
-#	define SO_SUFFIX ".la"
-#endif
-
-static int filter(const struct dirent* el){
-	return fnmatch("*" SO_SUFFIX , el->d_name, 0) == 0;
-}
-
 void Kernel::print_transitions(){
 	Log::info("Available transitions: \n");
-
-	struct dirent **namelist;
-	int n;
-
-	char* path_list = strdup(pluginpath());
-	char* ctx;
-	char* path = strtok_r(path_list, ":", &ctx);
-	while ( path ){
-		n = scandir(path, &namelist, filter, NULL);
-		if (n < 0){
-			perror("scandir");
-		} else {
-			for ( int i = 0; i < n; i++ ){
-				module_handle context = module_open(namelist[i]->d_name, ANY_MODULE, MODULE_CALLEE_INIT);
-				free(namelist[i]);
-
-				if ( !context ){
-					continue;
-				}
-
-				if ( module_type(context) != TRANSITION_MODULE ){
-					continue;
-				}
-
-				Log::info(" * %s\n", module_get_name(context));
-
-				module_close(context);
-			}
-			free(namelist);
-		}
-
-		path = strtok_r(NULL, ":", &ctx);
-	}
-
-	free(path_list);
+	module_enumerate(TRANSITION_MODULE, [](const module_handle mod){
+		Log::info(" * %s\n", module_get_name(mod));
+	});
 }
 
 bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){

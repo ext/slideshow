@@ -79,6 +79,14 @@ const char* module_get_name(const module_handle handle);
 const char* module_get_author(const module_handle handle);
 enum module_type_t module_type(const module_handle handle);
 
+/**
+ * Find all available modules.
+ *
+ * @param type Limit to type (or set ANY_MODULE for all)
+ * @param callback Function called for each module.
+ */
+void module_enumerate(enum module_type_t type, void (*callback)(const module_handle mod));
+
 #ifdef __cplusplus
 }
 #endif
