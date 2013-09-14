@@ -112,10 +112,13 @@ class ItemSelect(Item):
 
     def __init__(self, allow_empty=False, **kwargs):
         Item.__init__(self, **kwargs)
-        self._extra = []
+        self.values = []
 
         if allow_empty:
-            self._extra.append(('',''))
+            self.values.insert(0, ('',''))
+
+    def get_options(self):
+        return []
 
     def __str__(self):
         def f(x):
@@ -124,7 +127,8 @@ class ItemSelect(Item):
             else:
                 return '<option value="{key}">{value}</option>'
 
-        options = [f(k).format(key=k, value=v) for k,v in self._extra + self.values]
+        all = self.values + self.get_options() + self.__class__.values
+        options = [f(k).format(key=k, value=v) for k,v in all]
         head = '<select name="{group}.{name}" class="{cls}">'.format(**self._values())
         content = '\n'.join(options)
         tail = '</select>'
@@ -279,7 +283,7 @@ def resolutions(dpy):
 
 class ItemResolution(ItemSelect):
     default = None
-    values = []
+    values = [] # set later
 
 class ItemDisplay(ItemSelect):
     default = ':0.0'
