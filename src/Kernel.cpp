@@ -433,11 +433,6 @@ void Kernel::reload_browser(){
 		curl_easy_perform(curl_handle_settings);
 		curl_easy_getinfo(curl_handle_settings, CURLINFO_RESPONSE_CODE, &response);
 
-		/* get json data */
-		curl_easy_setopt(curl_handle_settings, CURLOPT_WRITEDATA, (void *)&chunk);
-		curl_easy_perform(curl_handle_settings);
-		curl_easy_getinfo(curl_handle_settings, CURLINFO_RESPONSE_CODE, &response);
-
 		if ( response != 200 ){ /* HTTP OK */
 			Log::warning("Server replied with code %ld\n", response);
 			return;
