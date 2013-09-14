@@ -6,7 +6,7 @@ import time, os, re, signal, socket, sqlite3
 import cherrypy
 from select import select
 from settings import Settings
-from slideshow.lib import browser
+from slideshow.lib import browser as Browser
 import event
 import resource
 from cherrypy.process import plugins
@@ -66,6 +66,9 @@ def settings(browser, resolution=None, fullscreen=True):
         '--browser', str(browser),
         '--queue-id', str(settings['Runtime.queue']),
         ]
+
+    if browser.have_password():
+        args.append('--stdin-password')
 
     args.append('--resolution')
     if resolution:
@@ -182,7 +185,8 @@ class DaemonProcess:
         if self._proc is not None:
             return
 
-        cmd, args, env, cwd = settings(browser.from_settings(Settings()), resolution, fullscreen)
+        browser = Browser.from_settings(Settings())
+        cmd, args, env, cwd = settings(browser, resolution, fullscreen)
 
         def preexec():
             resource.setrlimit(resource.RLIMIT_CORE, (-1, -1))
@@ -197,6 +201,10 @@ class DaemonProcess:
                 )
         except Exception, e:
             raise RuntimeError, 'Failed to run `%s`: %s' % (' '.join([pipes.quote(x) for x in [cmd] + args]), e)
+
+        # password is passed using --stdin-password
+        if browser.have_password():
+            self._proc.stdin.write(browser.password + '\n')
 
         self._logobj = self._connect_log(self._proc, cwd)
         time.sleep(1.0) # let daemon settle

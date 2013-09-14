@@ -22,6 +22,9 @@ class Browser:
     def __str__(self):
         return self.string(password=False)
 
+    def have_password(self):
+        return len(self.password) > 0
+
     def string(self, password=False):
         credentials = ''
         if self.username != '':
