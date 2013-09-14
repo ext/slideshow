@@ -7,6 +7,8 @@ from slideshow.settings import Settings
 from MySQLdb.cursors import DictCursor
 from MySQLdb.constants import CR
 
+strip_comment = re.compile(r'--.*\n')
+
 # This hack "enables" using ? and :name as placeholders (MySQLdb.paramstyle is 'format', not 'qmark')
 class QCursor(DictCursor):
     replace = [
@@ -74,16 +76,17 @@ class MySQL(Browser):
             code, msg = e.args
             if code != CR.SERVER_GONE_ERROR:
                 raise
-            
+
             cherrypy.engine.log('OperationalError: %s (will try to reconnect)' % msg)
             self.real_connect()
             self.cursor.executemany(*args, **kwargs)
 
         return self # to allow chaining
-    
+
     def executescript(self, lines):
+        global strip_comment
         for line in lines.split(';'):
-            line = line.strip()
+            line = strip_comment.sub('', line).strip()
             if line == '': continue
             self.execute(line)
 
