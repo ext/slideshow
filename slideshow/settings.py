@@ -8,6 +8,7 @@ import pprint
 import threading
 import event
 import itertools
+import subprocess
 from glob import glob
 from lib.resolution import Resolution
 from os.path import join, basename, dirname
@@ -359,6 +360,13 @@ class ItemCheckbox(Item):
     def __str__(self):
         return '<input name="{group}.{name}" type="checkbox" {checked} />'.format(**self._values())
 
+class ItemTransition(ItemSelect):
+    default = 'vfade'
+    values = []
+
+    def get_options(self):
+        return [x.split(':', 1) for x in subprocess.check_output(['slideshow-transition', '-lb']).splitlines()]
+
 itemfactory = {
     'directory': ItemDirectory,
     'file':      ItemFile,
@@ -372,6 +380,7 @@ itemfactory = {
     'filelist':  ItemFilelist,
     'textarea':  ItemTextArea,
     'checkbox':  ItemCheckbox,
+    'transition':ItemTransition,
 }
 
 for k,v in itemfactory.items():
