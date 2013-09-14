@@ -512,7 +512,12 @@ class Settings(object):
                 type  = attrs['type']
                 del attrs['type']
 
-                item = itemfactory[type](group=g, **attrs)
+                try:
+                    item = itemfactory[type](group=g, **attrs)
+                except KeyError, e:
+                    traceback.print_exc()
+                    print >> sys.stderr, 'Invalid type \"%s\" in settings.xml' % type
+                    item = itemfactory['string'](group=g, **attrs)
                 g.add(item)
 
             self.groups[grpname] = g
