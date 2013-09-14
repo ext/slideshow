@@ -229,6 +229,9 @@ void Kernel::init_browser(){
 	if ( _arg.queue_id >= 0 ){
 		queue_set(_arg.queue_id);
 	}
+
+	/* make initial reload */
+	reload_browser();
 }
 
 char* Kernel::get_password(){
