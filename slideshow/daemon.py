@@ -64,8 +64,7 @@ def settings(browser, resolution=None, fullscreen=True):
         '--uds-log', 'slideshow.sock',
         '--file-log', 'slideshow.log',
         '--browser', str(browser),
-        '--queue-id', str(settings['Runtime.queue']),
-        ]
+    ]
 
     if browser.have_password():
         args.append('--stdin-password')
