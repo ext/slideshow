@@ -106,6 +106,31 @@ class Item:
     def get(self):
         return self._value
 
+class ItemSelect(Item):
+    default = None
+    values = []
+
+    def __init__(self, allow_empty=False, **kwargs):
+        Item.__init__(self, **kwargs)
+        self._extra = []
+
+        if allow_empty:
+            self._extra.append(('',''))
+
+    def __str__(self):
+        def f(x):
+            if self._value == x:
+                return '<option value="{key}" selected="selected">{value}</option>'
+            else:
+                return '<option value="{key}">{value}</option>'
+
+        options = [f(k).format(key=k, value=v) for k,v in self._extra + self.values]
+        head = '<select name="{group}.{name}" class="{cls}">'.format(**self._values())
+        content = '\n'.join(options)
+        tail = '</select>'
+
+        return head + content + tail
+
 class ItemDummy(Item):
     default = None
 
@@ -252,55 +277,13 @@ def resolutions(dpy):
     # sort and drop extra element
     return [(k,v) for (k,v,w,h) in sorted(formated, cmp=cmpfn)]
 
-class ItemResolution(Item):
+class ItemResolution(ItemSelect):
     default = None
     values = []
 
-    def __init__(self, allow_empty=False, **kwargs):
-        Item.__init__(self, **kwargs)
-        self._extra = []
-
-        if allow_empty:
-            self._extra.append(('',''))
-
-    def __str__(self):
-        def f(x):
-            if self._value == x:
-                return '<option value="{key}" selected="selected">{value}</option>'
-            else:
-                return '<option value="{key}">{value}</option>'
-
-        options = [f(k).format(key=k, value=v) for k,v in self._extra + self.values]
-        head = '<select name="{group}.{name}" class="{cls}">'.format(**self._values())
-        content = '\n'.join(options)
-        tail = '</select>'
-
-        return head + content + tail
-
-class ItemDisplay(Item):
+class ItemDisplay(ItemSelect):
     default = ':0.0'
     values = map(lambda x: (x,x), xorg_query.screens())
-
-    def __init__(self, allow_empty=False, **kwargs):
-        Item.__init__(self, **kwargs)
-        self._extra = []
-
-        if allow_empty:
-            self._extra.append(('',''))
-
-    def __str__(self):
-        def f(x):
-            if self._value == x:
-                return '<option value="{key}" selected="selected">{value}</option>'
-            else:
-                return '<option value="{key}">{value}</option>'
-
-        options = [f(k).format(key=k, value=v) for k,v in self._extra + self.values]
-        head = '<select name="{group}.{name}" class="{cls}">'.format(**self._values())
-        content = '\n'.join(options)
-        tail = '</select>'
-
-        return head + content + tail
 
 class ItemStatic(Item):
     default = None
