@@ -171,7 +171,7 @@ def create(c, assembler, params):
             data
         ) VALUES (
             CURRENT_TIMESTAMP,
-            0,
+            1,
             :path,
             :assembler,
             :data
