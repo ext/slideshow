@@ -61,15 +61,10 @@ typedef vector::iterator iterator;
 static vector destinations;
 
 FileDestination::FileDestination(const char* filename)
-	: _fp(NULL)
-	, _autoclose(true) {
+	: FileDestination(fopen(filename, "a")){
 
-	FILE* fp = fopen(filename, "a");
-	if ( !fp ){
-		fprintf(stderr, "Failed to open logfile '%s' ! Fatal error!\n", filename);
-		exit(1);
-	}
 }
+
 FileDestination::FileDestination(FILE* fp)
 	: _fp(fp)
 	, _autoclose(false) {
