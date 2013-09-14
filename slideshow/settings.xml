@@ -14,7 +14,6 @@
 	<group name="Files">
 		<description>All file paths are either relative to BasePath or an absolute path.</description>
 		
-		<item name="BinaryPath" title="Exectuable path" description="Path where slideshow binaries exist." type="file">slideshow-daemon</item>
 		<item name="BaseLog" title="Logfile" type="file">slideshow.log</item>
 		<item name="ActivityLog" title="Activity logfile" type="file">activity.log</item>
 		<item name="PID" type="file"  rel="Path.BasePath">slideshow.pid</item>

@@ -50,15 +50,15 @@ class StartError(Exception):
     def __init__(self, message, stdout):
         Exception.__init__(self, message)
         self.stdout = stdout
-        
+
     def __str__(self):
         stdout = ''.join(self.stdout)
         return self.message + '\n\n' + stdout
 
 def settings(browser, resolution=None, fullscreen=True):
     settings = Settings()
-    
-    cmd = settings['Files.BinaryPath']
+
+    cmd = 'slideshow-daemon'
     url = settings['Database.URL']
     args = [
         '--uds-log', 'slideshow.sock',

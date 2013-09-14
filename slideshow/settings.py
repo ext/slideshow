@@ -613,8 +613,11 @@ class Settings(object):
 
                             print >> sys.stderr, '"%s.%s" contains illegal data ("%s": %s), resetting to default' % (k, name, value, str(e))
                         except KeyError:
-                            traceback.print_exc()
-                            print >> sys.stderr, '"%s.%s"found in config but is not defined in xml' % (k, name)
+                            fullname = '%s.%s' % (k, name)
+                            ignore = ['Files.BinaryPath']
+                            if fullname not in ignore:
+                                traceback.print_exc()
+                                print >> sys.stderr, '"%s"found in config but is not defined in xml' % fullname
 
                 if n == 0:
                     break
