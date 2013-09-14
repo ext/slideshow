@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS `log`;
 DROP TABLE IF EXISTS `user`;
 
 CREATE TABLE `queue` (
-	id INTEGER PRIMARY KEY AUTO_INCREMENT,          -- ID of queue
+	`id` INTEGER PRIMARY KEY AUTO_INCREMENT,         -- ID of queue
 	`name` TEXT NOT NULL,                            -- Name of queue
 	`loop` TINYINT NOT NULL DEFAULT 1                -- 1 if looping is enabled, 0 if disabled.
 ) ENGINE=INNODB AUTO_INCREMENT=100;
@@ -41,7 +41,7 @@ CREATE TABLE `user` (
 -- Database schema migrations.
 -- Each row contains a filename with a migration that has been executed.
 CREATE TABLE `migration` (
-       `filename` TEXT PRIMARY KEY,
+       `filename` VARCHAR(255) PRIMARY KEY,
        `timestamp` TIMESTAMP NOT NULL
 );
 INSERT INTO `migration` VALUES ('20120426184724_add_timestamp_to_slide.sql', CURRENT_TIMESTAMP);    -- Included in schema
