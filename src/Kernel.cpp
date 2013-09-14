@@ -226,7 +226,9 @@ void Kernel::init_browser(){
 	assert(_browser->queue_dump);
 	assert(_browser->queue_set);
 
-	queue_set(_arg.queue_id);
+	if ( _arg.queue_id >= 0 ){
+		queue_set(_arg.queue_id);
+	}
 }
 
 char* Kernel::get_password(){
