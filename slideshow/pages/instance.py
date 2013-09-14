@@ -18,6 +18,7 @@ class Handler(object):
 		
 		return json.dumps({
 			'Queue': settings['Runtime.queue'],
+			'Transition': settings['Appearance.Transition'],
 			'TransitionTime': settings['Appearance.TransitionTime'],
 			'SwitchTime': settings['Appearance.SwitchTime'],
 		}, indent=4)
