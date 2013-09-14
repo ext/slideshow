@@ -133,10 +133,10 @@ class _Log:
                 ) VALUES (
                     0,
                     :severity,
-                    FROM_UNIXTIME(:stamp),
+                    :stamp,
                     :message
                 )
-            """, dict(severity=self.severity_lut.get(severity, 2), stamp=int(stamp), message=message))
+            """, dict(severity=self.severity_lut.get(severity, 2), stamp=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stamp)), message=message))
             cherrypy.thread_data.db.commit()
         except:
             traceback.print_exc()
@@ -148,7 +148,7 @@ class _Log:
             SELECT
                 log.severity AS severity,
                 user.name AS user,
-                log.stamp+0 AS stamp,
+                log.stamp AS stamp,
                 log.message AS message
             FROM
                 log,
@@ -165,7 +165,7 @@ class _Log:
 
         def f(severity, user, stamp, message):
             severity_str = self.severity_revlut[severity].replace(' ', '&nbsp;')
-            formated_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(stamp))
+            formated_time = stamp
             return severity, '({severity}) {stamp} {user} {message}'.format(severity=severity_str, user=user, stamp=formated_time, message=message)
 
         lines = [f(**x) for x in lines]
