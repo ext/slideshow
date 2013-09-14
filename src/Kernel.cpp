@@ -452,6 +452,11 @@ void Kernel::reload_browser(){
 				continue;
 			}
 
+			if ( strcasecmp(key, "transition") == 0 ){
+				graphics_set_transition(json_object_get_string(value));
+				continue;
+			}
+
 			if ( strcasecmp(key, "transitiontime") == 0 ){
 				TransitionState::set_transition_time((float)json_object_get_double(value));
 				continue;
