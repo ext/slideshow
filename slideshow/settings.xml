@@ -52,8 +52,8 @@
 		<item name="String" title="" type="static" cls="browserstring"></item>
 		<item name="Provider" type="string" cls="browserblur">sqlite3</item>
 		<item name="Username" type="string" cls="browserblur"></item>
-		<item name="Password" type="password" cls="browserblur"></item>
-		<item name="Hostname" type="string" cls="browserblur"></item>
+		<item name="Password" type="password" cls="browserblur" autocomplete="false"></item>
+		<item name="Hostname" type="string" cls="browserblur" autocomplete="false"></item>
 		<item name="Name" type="string" cls="browserblur">site.db</item>
 		<item name="URL" type="string">http://localhost</item>
 	</group>
