@@ -185,10 +185,10 @@ static int list_transitions(){
 
 static const char* shortopts = "lfbvh";
 static struct option longopts[] = {
-	{"list",        no_argument, 0, 'l'},
-	{"fullscreen",  no_argument, 0, 'f'},
-	{"vebose",      no_argument, 0, 'v'},
-	{"help",        no_argument, 0, 'h'},
+	{"list",        no_argument,       0, 'l'},
+	{"fullscreen",  no_argument,       0, 'f'},
+	{"vebose",      no_argument,       0, 'v'},
+	{"help",        no_argument,       0, 'h'},
 	{0, 0, 0, 0}, /* sentinel */
 };
 
