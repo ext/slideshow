@@ -74,30 +74,32 @@ class ValidationError(Exception):
 class Item:
     typename = '' # automatically set
 
-    def __init__(self, group, name, title=None, description='', rel=None, cls=''):
+    def __init__(self, group, name, title=None, description='', rel=None, **kwargs):
         self.group = group
         self.name = name
         self.title = name
         self.description = description
         self.rel = rel
         self._value = self.default
-        self.cls = cls
+
+        self._attributes = {'name': '%s.%s' % (group.name, name)}
+        self._attributes.update(kwargs)
 
         if title is not None:
             self.title = title
 
+    def attribute_string(self):
+        return ' '.join(['%s="%s"' % x for x in self._attributes.iteritems()])
+
     def _values(self):
         return dict(
-            group=self.group.name,
-            name=self.name,
             title=self.title,
             type=self.typename,
             value=unicode(self._value),
-            cls=self.cls,
         )
 
     def __str__(self):
-        return '<input type="text" class="{cls}" name="{group}.{name}" value="{value}"/>'.format(**self._values())
+        return '<input type="text" {0} value="{value}"/>'.format(self.attribute_string(), **self._values())
 
     def set(self, value, rollback=False):
         tmp = self._value
@@ -130,7 +132,7 @@ class ItemSelect(Item):
 
         all = self.values + self.get_options() + self.__class__.values
         options = [f(k).format(key=k, value=v) for k,v in all]
-        head = '<select name="{group}.{name}" class="{cls}">'.format(**self._values())
+        head = '<select {0}>'.format(self.attribute_string(), **self._values())
         content = '\n'.join(options)
         tail = '</select>'
 
@@ -242,7 +244,7 @@ class ItemPassword(Item):
     default = ''
 
     def __str__(self):
-        return '<input type="password" class="{cls}" name="{group}.{name}" value=""/>'.format(**self._values())
+        return '<input type="password" {0} value="&#13;"/>'.format(self.attribute_string(), **self._values())
 
 _aspects = [
     (4, 3),   # Regular 4:3 (VGA, PAL, SVGA, etc)
@@ -293,8 +295,12 @@ class ItemDisplay(ItemSelect):
 class ItemStatic(Item):
     default = None
 
+    def __init__(self, *args, **kwargs):
+        kwargs['cls'] = kwargs.get('cls', '') + ' static'
+        Item.__init__(self, *args, **kwargs)
+
     def __str__(self):
-        return '<div class="static {cls}" name="{group}.{name}">&nbsp;</div>'.format(**self._values())
+        return '<div {0}>&nbsp;</div>'.format(self.attribute_string(), **self._values())
 
 class ItemFilelist(Item):
     """Select file from available choices.
@@ -324,7 +330,7 @@ class ItemFilelist(Item):
                 return '<option>{value}</option>'
 
         options = [f(x).format(value=x) for x in files]
-        head = '<select name="{group}.{name}" class="{cls}">'.format(**self._values())
+        head = '<select {0}>'.format(self.attribute_string(), **self._values())
         content = '\n'.join(options)
         tail = '</select>'
 
@@ -337,7 +343,7 @@ class ItemTextArea(Item):
         Item.__init__(self, *args, **kwargs)
 
     def __str__(self):
-        return '<textarea name="{group}.{name}">{value}</textarea>'.format(**self._values())
+        return '<textarea {0}>{value}</textarea>'.format(self.attribute_string(), **self._values())
 
 class ItemCheckbox(Item):
     default = False
@@ -345,20 +351,16 @@ class ItemCheckbox(Item):
     def __init__(self, *args, **kwargs):
         Item.__init__(self, *args, **kwargs)
 
+        if self._value:
+            self._attributes['checked'] = 'checked'
+
     def set(self, value, rollback=False):
         if isinstance(value, basestring):
             value = value.lower() == 'on'
         Item.set(self, value, rollback)
 
-    def _values(self):
-        checked = ''
-        if self._value: checked = 'checked="checked"'
-        d = Item._values(self)
-        d['checked'] = checked
-        return d
-
     def __str__(self):
-        return '<input name="{group}.{name}" type="checkbox" {checked} />'.format(**self._values())
+        return '<input type="checkbox" {0} />'.format(self.attribute_string(), **self._values())
 
 class ItemTransition(ItemSelect):
     default = 'vfade'
