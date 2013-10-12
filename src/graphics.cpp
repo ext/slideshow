@@ -372,7 +372,9 @@ int graphics_load_image(const char* name, int letterbox){
 	return 0;
 }
 
-int graphics_set_transition(const char* name){
+int graphics_set_transition(const char* name, transition_module_t** mod){
+	if ( mod ) *mod = NULL;
+
 	if ( !name ){
 		return EINVAL;
 	}
@@ -389,5 +391,6 @@ int graphics_set_transition(const char* name){
 		return EINVAL;
 	}
 
+	if ( mod ) *mod = transition;
 	return 0;
 }

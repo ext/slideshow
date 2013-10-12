@@ -31,7 +31,7 @@ int graphics_cleanup();
 void graphics_render(float state);
 void graphics_swap_textures();
 int graphics_load_image(const char* filename, int letterbox);
-int graphics_set_transition(const char* name);
+int graphics_set_transition(const char* name, transition_module_t** mod = NULL);
 
 #ifdef __cplusplus
 }
