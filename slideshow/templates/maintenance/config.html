@@ -45,7 +45,7 @@
 			<fieldset py:for="group in settings" py:if="not group.hidden" id="conf_${group.name}" title="${group.name}">
 				<legend>${group.name}</legend>
 				<div class="description">
-					<p py:for="desc in group.description">${Markup(desc)}</p>
+					<p py:for="desc, attr in group.description" py:attrs="attr">${Markup(desc)}</p>
 				</div>
 				
 				<py:for each="item in group">

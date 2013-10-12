@@ -509,7 +509,7 @@ class Settings(object):
             grpdesc = None
 
             # Parse group description
-            grpdesc = [''.join([x.toxml() for x in t.childNodes]) for t in group.getElementsByTagName('description')]
+            grpdesc = [(''.join([x.toxml() for x in t.childNodes]), t.attributes) for t in group.getElementsByTagName('description')]
 
             g = Group(name=grpname, description=grpdesc, hidden=hidden, ignore=ignore)
 
