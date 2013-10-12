@@ -137,6 +137,7 @@ module_handle module_open(const char* name, enum module_type_t type, int flags){
 	/* create base structure (later copied into the real struct */
 	struct module_t base;
 	base.handle  = handle;
+	base.info    = lt_dlgetinfo(handle);
 	base.init    = (module_init_callback)module_init;
 	base.cleanup = (module_cleanup_callback)module_cleanup;
 	base.alloc   = module_alloc ? (module_alloc_callback)module_alloc : default_alloc;
@@ -230,4 +231,8 @@ const char* module_get_author(const module_handle module){
 enum module_type_t module_type(const module_handle module){
 	void* sym = lt_dlsym(module->handle, "__module_type");
 	return *((enum module_type_t*)sym);
+}
+
+const char* module_get_filename(const module_handle handle){
+	return handle->info->filename;
 }

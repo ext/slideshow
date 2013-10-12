@@ -1,6 +1,7 @@
 slideshow-0.4.0
 ---------------
 
+	* [frontend] preview transitions during configuration
 	* [daemon] new transition: vertical fade
 	* [tools] adding tool for previewing and managing transition plugins
 	* [frontend] Allow dynamic text-slides with variables.

@@ -509,11 +509,7 @@ class Settings(object):
             grpdesc = None
 
             # Parse group description
-            t = group.getElementsByTagName('description')
-            if len(t) == 1:
-                grpdesc = ''.join([x.toxml() for x in t[0].childNodes])
-            elif len(t) > 1:
-                raise ValueError, 'Multiple descriptions for group %s' % grpname
+            grpdesc = [(''.join([x.toxml() for x in t.childNodes]), t.attributes) for t in group.getElementsByTagName('description')]
 
             g = Group(name=grpname, description=grpdesc, hidden=hidden, ignore=ignore)
 

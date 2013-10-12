@@ -36,11 +36,13 @@
 			as the slides will be stretched. It is suggested to use a resolution
 			which matches either dimension and is an as close match as possible.
 		</description>
+		<description id="transition_preview">
+		</description>
 
 		<item name="Resolution" type="resolution" description="Display resolution" allow_empty="1">1280x1024</item>
 		<item name="VirtualResolution" title="Virtual resolution" type="resolution" description="Window resolution" allow_empty="1"></item>
 		<item name="Theme" title="Theme" type="filelist" path="{0[Path.BasePath]}/{0[Path.Theme]}/*.xml;{root}/themes/*.xml;./*.xml" description="Theme for text-based slides">default.xml</item>
-		<item name="Transition" title="Transition" type="transition" description="Animation when switching slides">vfade</item>
+		<item name="Transition" title="Transition" type="transition" description="Animation when switching slides" class="transition">vfade</item>
 		<item name="TransitionTime" title="Transition time" type="float" description="Time in sec it takes to change slide">3.0</item>
 		<item name="SwitchTime" title="Switch time" type="float" description="Time in sec each slide will be shown">10.0</item>
 		<item name="Display" title="Display" type="display" description="X display to use">:0.0</item>

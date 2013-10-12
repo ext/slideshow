@@ -134,7 +134,7 @@ void Kernel::cleanup_backend(){
 
 void Kernel::init_graphics(){
 	graphics_init(_arg.width, _arg.height);
-	graphics_set_transition( _arg.transition_string ? _arg.transition_string : "fade" );
+	graphics_set_transition(_arg.transition_string ? _arg.transition_string : "fade");
 }
 
 void Kernel::init_IPC(){

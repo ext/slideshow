@@ -143,6 +143,17 @@ var slide = function(){
 	}
 }();
 
+var config = function(){
+	function preview_transition(){
+		var selected = $('.conf .transition :selected').val();
+		$('#transition_preview').html('<img src="/transition/' + selected + '.gif" />');
+	}
+
+	return {
+		preview_transition: preview_transition,
+	};
+}();
+
 $(document).ready(function(){
 	/* enable sorting on main page */
 	queue.sorting();
@@ -163,6 +174,12 @@ $(document).ready(function(){
 		expanded_html: '',
 		collapsed_html: '',
 		connected: $f,
+	});
+
+	/* preview transition during configuration */
+	config.preview_transition();
+	$('.conf .transition').change(function(){
+		config.preview_transition();
 	});
 });
 
