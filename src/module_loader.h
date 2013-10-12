@@ -39,6 +39,7 @@ typedef void  (*module_free_callback)(struct module_t* handle);
 
 struct module_t {
 	lt_dlhandle handle;
+	const lt_dlinfo* info;
 
 	/**
 	 * Called when loading the plugin.
@@ -78,6 +79,7 @@ void module_close(module_handle handle);
 const char* module_get_name(const module_handle handle);
 const char* module_get_author(const module_handle handle);
 enum module_type_t module_type(const module_handle handle);
+const char* module_get_filename(const module_handle handle);
 
 /**
  * Find all available modules.
