@@ -329,14 +329,14 @@ static void apply_letterbox(unsigned int src, unsigned int dst){
 	iluFlipImage();
 }
 
-static void swap_textures(){
+void graphics_swap_textures(){
 	const unsigned int tmp = texture[0];
 	texture[0] = texture[1];
 	texture[1] = tmp;
 }
 
 int graphics_load_image(const char* name, int letterbox){
-	swap_textures();
+	graphics_swap_textures();
 	glBindTexture(GL_TEXTURE_2D, texture[0]);
 
 	/* null is passed when the screen should go blank (e.g. queue is empty) */
