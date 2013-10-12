@@ -8,6 +8,9 @@ import re
 import argparse
 import traceback
 import json
+import subprocess
+import threading
+import time
 
 import slideshow
 from slideshow.lib import template, browser as browser_factory, slide
@@ -24,11 +27,64 @@ import slideshow.tools.ipblock
 def get_resource_path(*path):
     return os.path.join(os.path.dirname(slideshow.__file__), *path)
 
+class Command:
+    def __init__(self, *args):
+        self.cmd = args
+        self.process = None
+        self.buffer = ''
+
+    def __str__(self):
+        return ' '.join(self.cmd)
+
+    def run(self, timeout):
+        def target():
+            self.process = subprocess.Popen(self.cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            self.buffer += self.process.communicate()[0]
+
+        thread = threading.Thread(target=target)
+        thread.start()
+
+        thread.join(timeout)
+        if thread.is_alive():
+            self.process.terminate()
+            thread.join()
+        return self.process.returncode, self.buffer
+
 class Root(object):
     slides = slides.Handler()
     maintenance = maintenance.Handler()
     queue = queue.Handler()
     instance = instance.Handler()
+
+    @cherrypy.expose
+    def transition(self, name):
+        name, ext = os.path.splitext(name)
+        if ext != '.gif':
+            raise cherrypy._cperror.NotFound()
+
+        settings = Settings()
+        filename = 'transition_%s.gif' % name
+        dst = os.path.join(settings['Path']['BasePath'], settings['Path']['Temp'], filename)
+
+        cmd = Command('slideshow-transition', '-G', dst, name)
+        returncode, output = cmd.run(timeout=15)
+        if returncode != 0:
+            raise RuntimeError, 'Failed to generate preview: %s' % output
+
+        age = 60 * 60 * 24 * 365
+        expires = time.time() + age
+        cherrypy.response.headers['Content-Type'] = 'image/gif'
+        cherrypy.response.headers['Cache-Control'] = 'public, max-age=%d' % age
+        cherrypy.response.headers['Expires'] = time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(expires))
+
+        def stream():
+            with open(dst, 'rb') as fp:
+                data = fp.read(4096)
+                while len(data) > 0:
+                    yield data
+                    data = fp.read(4096)
+        return stream()
+    transition._cp_config = {'response.stream': True}
 
     @cherrypy.expose
     def index(self):

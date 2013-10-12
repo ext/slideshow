@@ -385,7 +385,7 @@ static int create_gif(){
 		      "-coalesce",
 		      "-layers", "Optimize",
 		      buffer,
-		      "-resize", "250",
+		      "-resize", "228",
 		      "-loop", "0",
 		      gif_dst,
 		      NULL);
