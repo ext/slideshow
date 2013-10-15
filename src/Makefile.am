@@ -23,7 +23,7 @@ libfsm_a_SOURCES = \
 slideshow_daemon_CFLAGS    = ${AM_CFLAGS} $(ARCH_FLAGS) ${libdaemon_CFLAGS} ${json_CFLAGS} ${CURL_CFLAGS}
 slideshow_daemon_CXXFLAGS  = ${slideshow_daemon_CFLAGS}
 slideshow_daemon_LDFLAGS   = ${AM_LDFLAGS} -rdynamic
-slideshow_daemon_LDADD     = libmodule_loader.a libslideshow_base.la libfsm.a -lltdl ${libportable_LIBS} ${libdaemon_LIBS} ${json_LIBS} ${CURL_LIBS}
+slideshow_daemon_LDADD     = libmodule_loader.a libslideshow_base.la libfsm.a -lltdl ${datapack_LIBS} ${libportable_LIBS} ${libdaemon_LIBS} ${json_LIBS} ${CURL_LIBS}
 slideshow_daemon_SOURCES = \
 	backend/factory.cpp backend/platform.h \
 	argument_parser.c argument_parser.h \
@@ -66,7 +66,7 @@ libmodule_loader_a_SOURCES = module_loader.c module_loader.h assembler.h
 if WITH_SDL
 slideshow_transition_SOURCES = slideshow_transition.cpp
 slideshow_transition_LDFLAGS = ${AM_LDFLAGS} -rdynamic
-slideshow_transition_LDADD = libmodule_loader.a libslideshow_base.la -lm -lltdl -lX11 ${SDL_LIBS}
+slideshow_transition_LDADD = libmodule_loader.a libslideshow_base.la -lm -lltdl -lX11 ${datapack_LIBS} ${SDL_LIBS}
 endif
 
 CLEANFILES = browser_context.cpp
