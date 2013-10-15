@@ -134,7 +134,7 @@ void Kernel::cleanup_backend(){
 
 void Kernel::init_graphics(){
 	graphics_init(_arg.width, _arg.height);
-	graphics_set_transition(_arg.transition_string ? _arg.transition_string : "fade");
+	graphics_set_transition(_arg.transition_string ? _arg.transition_string : "fade", NULL);
 }
 
 void Kernel::init_IPC(){
@@ -252,7 +252,7 @@ void Kernel::init_fsm(){
 }
 
 void Kernel::load_transition(const char* name){
-	graphics_set_transition(name);
+	graphics_set_transition(name, NULL);
 }
 
 void Kernel::run(){
@@ -453,7 +453,7 @@ void Kernel::reload_browser(){
 			}
 
 			if ( strcasecmp(key, "transition") == 0 ){
-				graphics_set_transition(json_object_get_string(value));
+				graphics_set_transition(json_object_get_string(value), NULL);
 				continue;
 			}
 
