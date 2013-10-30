@@ -258,6 +258,9 @@ def run():
                 'tools.auth_digest.get_ha1': cherrypy.lib.auth_digest.get_ha1_file_htdigest(passwd),
                 'tools.auth_digest.key': None,
             })
+            application.config['/instance'] = {
+                'tools.auth_digest.on': False,
+            }
             application.config['/logout'] = {'error_page.401': root.logout_error_401}
 
         # add ipblock tool
