@@ -293,6 +293,9 @@ class DaemonProcess:
     def _connect_log(instance, cwd):
         s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
+        logfile = os.path.join(cwd, 'slideshow.sock')
+        print >> sys.stderr, 'Connecting to log', logfile
+
         for n in range(0, 20):
             instance.poll()
 
@@ -301,7 +304,7 @@ class DaemonProcess:
                 raise error
 
             try:
-                s.connect(os.path.join(cwd, 'slideshow.sock'))
+                s.connect(logfile)
                 return s
             except socket.error:
                 time.sleep(0.1)
