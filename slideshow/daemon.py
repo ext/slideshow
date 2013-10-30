@@ -199,6 +199,12 @@ class DaemonProcess:
                 preexec_fn=preexec
                 )
         except Exception, e:
+            traceback.print_exc()
+            print >> sys.stderr, 'When executing', [cmd] + args
+            print >> sys.stderr, 'Working directory:', cwd
+            print >> sys.stderr, 'Env:'
+            for k,v in env.iteritems():
+                print >> sys.stderr, '%s=%s' % (k,v)
             raise RuntimeError, 'Failed to run `%s`: %s' % (' '.join([pipes.quote(x) for x in [cmd] + args]), e)
 
         # password is passed using --stdin-password
