@@ -162,21 +162,29 @@ def create(c, assembler, params):
     slide._data = json.loads(slide.assemble(params))
     slide.rebuild_cache(settings.resolution())
 
-    c.execute("""
-        INSERT INTO slide (
-            `timestamp`,
-            queue_id,
-            path,
-            assembler,
-            data
-        ) VALUES (
-            CURRENT_TIMESTAMP,
-            1,
-            :path,
-            :assembler,
-            :data
-        )
-    """, dict(path=slide._path, assembler=slide.assembler.name, data=json.dumps(slide._data)))
+    data = dict(path=slide._path, assembler=slide.assembler.name, data=json.dumps(slide._data))
+    try:
+        c.execute("""
+            INSERT INTO slide (
+                `timestamp`,
+                queue_id,
+                path,
+                assembler,
+                data
+            ) VALUES (
+                CURRENT_TIMESTAMP,
+                1,
+                :path,
+                :assembler,
+                :data
+            )
+        """, data)
+    except:
+        traceback.print_exc()
+        print >> sys.stderr, 'Data'
+        for k,v in data.iteritems():
+            print >> sys.stderr, '%s=%s' % (k,v)
+        raise
 
     return slide
 
