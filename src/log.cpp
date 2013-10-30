@@ -145,14 +145,22 @@ UDSServer::UDSServer(const char* filename)
 	socklen_t address_length;
 
 	_socket = socket(PF_UNIX, SOCK_STREAM, 0);
+	if ( _socket == -1 ){
+		fprintf(stderr, "socket error %d: %s\n", errno, strerror(errno));
+	}
 
 	unlink(filename);
 	address.sun_family = AF_UNIX;
 	address_length = (socklen_t)sizeof(address.sun_family) +
 		(socklen_t)sprintf(address.sun_path, "%s", filename);
 
-	bind(_socket, (struct sockaddr *) &address, address_length);
-	listen(_socket, 5);
+	printf("listening on %s\n", filename);
+	if ( bind(_socket, (struct sockaddr *) &address, address_length) == -1 ){
+		fprintf(stderr, "bind error %d: %s\n", errno, strerror(errno));
+	}
+	if ( listen(_socket, 5) == -1 ){
+		fprintf(stderr, "listen error %d: %s\n", errno, strerror(errno));
+	}
 }
 
 UDSServer::~UDSServer(){
