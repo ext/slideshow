@@ -159,11 +159,10 @@ def switch(dst, config_file):
 
     # load browser
     browser = browser_factory.from_settings(settings)
-    conn = browser._connect()
+    browser.connect()
 
     # update path in  all slides
-    [x.switch(conn, dst) for x in slide.all(conn, validate_path=False)]
-    conn.commit()
+    [x.switch(browser, dst) for x in slide.all(browser, validate_path=False)]
 
     # save settings
     settings.persist(dst=config_file)
