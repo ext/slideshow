@@ -3,12 +3,13 @@ AM_CPPFLAGS = -I${top_srcdir}/src
 AM_LDFLAGS = -shared -module -avoid-version
 
 plugin_LTLIBRARIES = fade.la spin.la vfade.la
-DATAFILES = fade_files.dpl
+DATAFILES = fade_files.dpl vfade_files.dpl
 
 BUILT_SOURCES = $(DATAFILES:.dpl=.c)
 CLEANFILES = $(DATAFILES:.dpl=.c) $(DATAFILES:.dpl=.h)
 
 fade_la_SOURCES = fade.c fade_files.dpl
+vfade_la_SOURCES = vfade.c vfade_files.dpl
 
 .dpl.c:
 	@test x"$(@D)" = x || $(MKDIR_P) "$(@D)"
