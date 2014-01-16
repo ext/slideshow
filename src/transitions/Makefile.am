@@ -1,3 +1,4 @@
+AM_CFLAGS = -Wall
 AM_CPPFLAGS = -I${top_srcdir}/src
 AM_LDFLAGS = -shared -module -avoid-version
 
