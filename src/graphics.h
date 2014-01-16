@@ -49,6 +49,12 @@ int graphics_set_transition(const char* name, transition_module_t** mod);
  */
 int graphics_load_shader(enum shader_spec_t spec, ...);
 
+/**
+ * Transition helper: render a fullscreen quad.
+ * Use together with "fsquad.vert". Assumes caller binds shader before render.
+ */
+void graphics_render_fsquad();
+
 #ifdef __cplusplus
 }
 #endif

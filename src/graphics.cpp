@@ -48,6 +48,14 @@ static transition_module_t* transition = NULL;
 static unsigned int texture[2] = {0,0};
 static int width;
 static int height;
+static GLuint fsquad = 0;
+static float fsquad_vertices[] = {
+	/* x y */
+	 1,  1,
+	-1,  1,
+	 1, -1,
+	-1, -1,
+};
 
 int graphics_init(int w, int h){
 	width = w;
@@ -95,6 +103,12 @@ int graphics_init(int w, int h){
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
+
+	/* initialize fsquad VBO */
+	glGenBuffers(1, &fsquad);
+	glBindBuffer(GL_ARRAY_BUFFER, fsquad);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(fsquad_vertices), fsquad_vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return 0;
 }
@@ -493,4 +507,15 @@ int graphics_load_shader(enum shader_spec_t spec, ...){
 	loc = glGetUniformLocation(sp, "texture_1"); glUniform1i(loc, 1);
 
 	return sp;
+}
+
+void graphics_render_fsquad(){
+	glBindBuffer(GL_ARRAY_BUFFER, fsquad);
+	glEnableVertexAttribArray(0);
+	{
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float)*2, NULL);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, sizeof(fsquad_vertices) / sizeof(float));
+	}
+	glDisableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
