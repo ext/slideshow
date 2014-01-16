@@ -127,7 +127,8 @@ void graphics_render(float state){
 		.texture = {texture[0], texture[1]},
 		.state = state,
 	};
-	transition->render(&context);
+
+	transition->render(transition, &context);
 }
 
 #ifdef WIN32
@@ -388,6 +389,16 @@ int graphics_load_image(const char* name, int letterbox){
 	return 0;
 }
 
+static void default_render(transition_module_t* transition, transition_context_t* context){
+	glUseProgram(transition->shader);
+
+	glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, context->texture[0]);
+	glActiveTexture(GL_TEXTURE0);	glBindTexture(GL_TEXTURE_2D, context->texture[1]);
+	glUniform1f(transition->state_uniform, context->state);
+
+	graphics_render_fsquad();
+}
+
 int graphics_set_transition(const char* name, transition_module_t** mod){
 	if ( mod ) *mod = NULL;
 
@@ -405,6 +416,11 @@ int graphics_set_transition(const char* name, transition_module_t** mod){
 	if ( !transition ){
 		Log::fatal("Failed to load transition plugin `%s'.\n", name);
 		return EINVAL;
+	}
+
+	/* setup default callbacks */
+	if ( !transition->render ){
+		transition->render = default_render;
 	}
 
 	if ( mod ) *mod = transition;
