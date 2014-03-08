@@ -37,7 +37,9 @@
 #include <memory>
 #include <cassert>
 #include <cerrno>
+#include <cstdlib>
 
+#include <datapack.h>
 #include <IL/il.h>
 #include <IL/ilu.h>
 
@@ -46,6 +48,14 @@ static transition_module_t* transition = NULL;
 static unsigned int texture[2] = {0,0};
 static int width;
 static int height;
+static GLuint fsquad = 0;
+static float fsquad_vertices[] = {
+	/* x y */
+	 1,  1,
+	-1,  1,
+	 1, -1,
+	-1, -1,
+};
 
 int graphics_init(int w, int h){
 	width = w;
@@ -94,6 +104,12 @@ int graphics_init(int w, int h){
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	}
 
+	/* initialize fsquad VBO */
+	glGenBuffers(1, &fsquad);
+	glBindBuffer(GL_ARRAY_BUFFER, fsquad);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(fsquad_vertices), fsquad_vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	return 0;
 }
 
@@ -111,7 +127,8 @@ void graphics_render(float state){
 		.texture = {texture[0], texture[1]},
 		.state = state,
 	};
-	transition->render(&context);
+
+	transition->render(transition, &context);
 }
 
 #ifdef WIN32
@@ -372,6 +389,16 @@ int graphics_load_image(const char* name, int letterbox){
 	return 0;
 }
 
+static void default_render(transition_module_t* transition, transition_context_t* context){
+	glUseProgram(transition->shader);
+
+	glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, context->texture[0]);
+	glActiveTexture(GL_TEXTURE0);	glBindTexture(GL_TEXTURE_2D, context->texture[1]);
+	glUniform1f(transition->state_uniform, context->state);
+
+	graphics_render_fsquad();
+}
+
 int graphics_set_transition(const char* name, transition_module_t** mod){
 	if ( mod ) *mod = NULL;
 
@@ -391,6 +418,120 @@ int graphics_set_transition(const char* name, transition_module_t** mod){
 		return EINVAL;
 	}
 
+	/* setup default callbacks */
+	if ( !transition->render ){
+		transition->render = default_render;
+	}
+
 	if ( mod ) *mod = transition;
 	return 0;
+}
+
+static void check_log(GLuint target, const char* filename){
+	void (*query_func)(GLuint target, GLenum pname, GLint* param) = NULL;
+	void (*get_func)(GLuint target, GLsizei maxLength, GLsizei* length, GLchar* infoLog) = NULL;
+
+	/* setup function pointers depending on whenever we want the log for a
+	 * shader object or shader program. */
+	if ( glIsShader(target) ){
+		query_func = glGetShaderiv;
+		get_func = glGetShaderInfoLog;
+	} else{
+		query_func = glGetProgramiv;
+		get_func = glGetProgramInfoLog;
+	}
+
+	GLint size;
+	query_func(target, GL_INFO_LOG_LENGTH, &size);
+	if ( size > 1 ){ /* ignore line with only a \n */
+		std::unique_ptr<char> log((char*)malloc(size));
+		get_func(target, size, &size, log.get());
+		log_message(Log_Info, "Shader log (%d) %s:\n%s\n", size, filename, log.get());
+	}
+}
+
+static int attach_shader(GLint sp, GLenum type, struct datapack_entry* src){
+	/* because sometimes c aliasing/const qualifier rules sucks */
+	union {
+		GLchar* rw;
+		const GLchar* ro;
+	} source;
+
+	unpack(src, &source.rw);
+	GLint shader = glCreateShader(type);
+	glShaderSource(shader, 1, &source.ro, 0);
+	glCompileShader(shader);
+	free(source.rw);
+
+	GLint r;
+	check_log(shader, src->filename);
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &r);
+	if ( r == GL_FALSE ){
+		log_message(Log_Fatal, "Failed to compile shader\n");
+		return 1;
+	}
+
+	glAttachShader(sp, shader);
+	return 0;
+}
+
+int graphics_load_shader(enum shader_spec_t spec, ...){
+	va_list ap;
+	va_start(ap, spec);
+
+	GLint sp = glCreateProgram();
+	if ( !sp ) return 0;
+
+	while ( spec != SHADER_NONE ){
+		auto ptr = va_arg(ap, struct datapack_entry*);
+		int  ret = 0;
+
+		switch ( spec ){
+		case SHADER_VERTEX:
+			ret = attach_shader(sp, GL_VERTEX_SHADER, ptr);
+			break;
+
+		case SHADER_FRAGMENT:
+			ret = attach_shader(sp, GL_FRAGMENT_SHADER, ptr);
+			break;
+
+		case SHADER_NONE:
+			break;
+		}
+
+		if ( ret != 0 ){
+			return 0;
+		}
+
+		spec = (enum shader_spec_t)va_arg(ap, int);
+	}
+
+	/* link program */
+	GLint r;
+	glLinkProgram(sp);
+	check_log(sp, "during linkage");
+	glGetProgramiv(sp, GL_LINK_STATUS, &r);
+	if ( r == GL_FALSE ){
+		log_message(Log_Fatal, "Failed to link program\n");
+		return 0;
+	}
+	glUseProgram(sp);
+
+	/* setup texture units */
+	GLint loc;
+	loc = glGetUniformLocation(sp, "texture_0"); glUniform1i(loc, 0);
+	loc = glGetUniformLocation(sp, "texture_1"); glUniform1i(loc, 1);
+
+	return sp;
+}
+
+void graphics_render_fsquad(){
+	glBindBuffer(GL_ARRAY_BUFFER, fsquad);
+	glEnableVertexAttribArray(0);
+	{
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float)*2, NULL);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, sizeof(fsquad_vertices) / sizeof(float));
+	}
+	glDisableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

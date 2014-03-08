@@ -53,6 +53,15 @@ case "$host" in
 		AC_MSG_RESULT([unknown]) ;;
 esac
 
+dnl Require datapack for packing shaders and other resources into transition
+dnl plugins.
+dnl https://github.com/ext/datapack
+AC_PATH_PROG([DATAPACKER], [datapacker])
+AS_IF([test -z "${DATAPACKER}"], [
+  AC_MSG_ERROR([datapacker (datapack) not found in PATH])
+])
+PKG_CHECK_MODULES([datapack], [datapack >= 0.3])
+
 dnl #######################################################################
 dnl # Paths
 dnl #######################################################################

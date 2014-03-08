@@ -27,7 +27,7 @@
 
 MODULE_INFO("Spin", TRANSITION_MODULE, "David Sveningsson");
 
-static void render(transition_context_t* context){
+static void render(transition_module_t* transition, transition_context_t* context){
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glPushMatrix();

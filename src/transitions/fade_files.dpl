@@ -1,0 +1,2 @@
+fragment_shader:fade.frag
+vertex_shader:fsquad.vert

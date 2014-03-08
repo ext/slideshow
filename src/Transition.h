@@ -20,17 +20,26 @@
 #define TRANSITION_H
 
 #include "module_loader.h"
+#include "gl.h"
 
-typedef struct {
+struct transition_context;
+struct transition_module;
+typedef struct transition_context transition_context_t;
+typedef struct transition_module transition_module_t;
+
+typedef void (*render_callback)(transition_module_t* transition, transition_context_t* context);
+
+struct transition_context {
 	unsigned int texture[2];
-	float state;
-} transition_context_t;
+	float state;                  /* [0,1] 0: current slide fully visible 1: new slide fully visible */
+};
 
-typedef void (*render_callback)(transition_context_t* context);
-
-typedef struct {
+struct transition_module {
 	struct module_t base;
-	render_callback render;
-} transition_module_t;
+	render_callback render;       /* function to call when rendering or NULL for default (using fsquad) */
+
+	GLuint state_uniform;         /* uniform location of last loaded shader for this transition (be vary if using multiple shaders) */
+	GLuint shader;                /* shader used by default render */
+};
 
 #endif // TRANSITION_H
