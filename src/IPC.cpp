@@ -20,8 +20,8 @@
 #include "config.h"
 #endif
 
-#include "IPC.h"
-#include "Kernel.h"
+#include "IPC.hpp"
+#include "kernel.hpp"
 #include "log.hpp"
 
 extern Kernel* global_fubar_kernel;

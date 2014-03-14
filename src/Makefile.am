@@ -13,12 +13,12 @@ warning_flags = -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-
 AM_CFLAGS = ${libportable_CFLAGS} ${warning_flags}
 
 libfsm_a_SOURCES = \
-	state/State.h \
-	state/InitialState.cpp state/InitialState.h \
-	state/SwitchState.cpp state/SwitchState.h \
-	state/TransitionState.cpp state/TransitionState.h \
-	state/VideoState.cpp state/VideoState.h \
-	state/ViewState.cpp state/ViewState.h
+	state/state.hpp \
+	state/initial.cpp state/initial.hpp \
+	state/switch.cpp state/switch.hpp \
+	state/transition.cpp state/transition.hpp \
+	state/video.cpp state/video.hpp \
+	state/view.cpp state/view.hpp
 
 slideshow_daemon_CFLAGS    = ${AM_CFLAGS} $(ARCH_FLAGS) ${libdaemon_CFLAGS} ${json_CFLAGS} ${CURL_CFLAGS}
 slideshow_daemon_CXXFLAGS  = ${slideshow_daemon_CFLAGS}
@@ -34,7 +34,7 @@ slideshow_daemon_SOURCES = \
 	gl.h \
 	graphics.cpp graphics.h \
 	IPC.cpp IPC.hpp \
-	Kernel.cpp Kernel.h \
+	kernel.cpp kernel.hpp \
 	main.cpp \
 	mathutils.h \
 	module.h \

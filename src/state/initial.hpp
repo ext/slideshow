@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008-2012 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,21 +16,17 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef HAVE_CONFIG_H
-#	include "config.h"
-#endif
+#ifndef STATE_INITIALSTATE_HPP
+#define STATE_INITIALSTATE_HPP
 
-#include "InitialState.h"
-#include "graphics.h"
-#include "TransitionState.h"
+#include "state/state.hpp"
 
-State* InitialState::action(bool &flip){
-	graphics_load_image(NULL, 0); /* load blank image */
-	graphics_load_image("resources/splash.png", 0);
+class InitialState: public State {
+public:
+	InitialState(browser_module_t* browser): State(browser){}
+	virtual ~InitialState(){}
 
-	/* force something on screen */
-	graphics_render(0.0);
-	flip = true;
+	virtual State* action(bool &flip);
+};
 
-	return new TransitionState(this);
-}
+#endif /* STATE_INITIALSTATE_HPP */

@@ -19,7 +19,7 @@
 #ifndef FOREGROUND_APP_H
 #define FOREGROUND_APP_H
 
-#include "Kernel.h"
+#include "kernel.hpp"
 
 class ForegroundApp: public Kernel {
 	public:

@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2012 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,22 +16,21 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VIEWSTATE_H
-#define VIEWSTATE_H
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
-#include "State.h"
+#include "state/initial.hpp"
+#include "state/transition.hpp"
+#include "graphics.h"
 
-class ViewState: public State {
-	public:
-		ViewState(State* state): State(state){}
-		virtual ~ViewState(){}
+State* InitialState::action(bool &flip){
+	graphics_load_image(NULL, 0); /* load blank image */
+	graphics_load_image("resources/splash.png", 0);
 
-		virtual State* action(bool &flip);
+	/* force something on screen */
+	graphics_render(0.0);
+	flip = true;
 
-		static void set_view_time(double t){ view_time = t; }
-
-	private:
-		static double view_time;
-};
-
-#endif // VIEWSTATE_H
+	return new TransitionState(this);
+}

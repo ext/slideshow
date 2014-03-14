@@ -20,7 +20,7 @@
 #	include "config.h"
 #endif
 
-#include "Kernel.h"
+#include "kernel.hpp"
 #include "ForegroundApp.h"
 
 #ifdef BUILD_DAEMON

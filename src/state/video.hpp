@@ -16,22 +16,26 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef HAVE_CONFIG_H
-#	include "config.h"
-#endif
+#ifndef STATE_VIDEO_HPP
+#define STATE_VIDEO_HPP
 
-#include "ViewState.h"
-#include "SwitchState.h"
+#include "state/state.hpp"
 
-double ViewState::view_time = 1.0;
+class VideoState: public State {
+public:
+	VideoState(State* state, const char* filename);
+	virtual ~VideoState();
 
-State* ViewState::action(bool &flip){
-	if ( age() > view_time ){
-		return new SwitchState(this);
-	}
+	virtual State* action(bool &flip);
 
-	// Sleep for a while
-	sleepd( 0.1 );
+	static int init();
+	static int cleanup();
+	static void poll();
 
-	return this;
-}
+private:
+	static void command(const char* fmt, ...);
+
+	char* _filename;
+};
+
+#endif /* STATE_VIDEO_HPP */

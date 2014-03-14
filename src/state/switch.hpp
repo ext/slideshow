@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008-2012 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,37 +16,17 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef STATE_H
-#define STATE_H
+#ifndef STATE_SWITCH_HPP
+#define STATE_SWITCH_HPP
 
-#include "Browser.h"
-#include <portable/time.h>
+#include "state/state.hpp"
 
-class State {
-	public:
-		State(browser_module_t* browser): _browser(browser) {
-			_created = getTimef();
-		}
-		virtual ~State(){}
+class SwitchState: public State {
+public:
+	SwitchState(State* state): State(state){}
+	virtual ~SwitchState(){}
 
-		State(State* state): _browser(state->_browser) {
-			_created = getTimef();
-			delete state;
-		}
-
-		virtual State* action(bool &flip) = 0;
-
-		slide_context_t next_slide(){
-			return _browser->next_slide(_browser);
-		}
-
-		browser_module_t* browser(){ return _browser; }
-
-		float age(){ return getTimef() - _created; }
-
-	private:
-		browser_module_t* _browser;
-		float _created;
+	virtual State* action(bool &flip);
 };
 
-#endif // STATE_H
+#endif /* SWITCHSTATE_HPP */

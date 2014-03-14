@@ -20,9 +20,9 @@
 #	include "config.h"
 #endif
 
+#include "state/video.hpp"
+#include "state/switch.hpp"
 #include "log.hpp"
-#include "VideoState.h"
-#include "SwitchState.h"
 #include <cstdlib>
 #include <cstring>
 #include <cerrno>

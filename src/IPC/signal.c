@@ -20,7 +20,7 @@
 #include "config.h"
 #endif
 
-#include "IPC.h"
+#include "IPC.hpp"
 #include <signal.h>
 
 MODULE_INFO("signal", IPC_MODULE, "David Sveningsson");

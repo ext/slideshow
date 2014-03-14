@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2012 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,22 +16,37 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRANSITIONSTATE_H
-#define TRANSITIONSTATE_H
+#ifndef STATE_STATE_HPP
+#define STATE_STATE_HPP
 
-#include "State.h"
+#include "Browser.h"
+#include <portable/time.h>
 
-class TransitionState: public State {
-	public:
-		TransitionState(State* state): State(state){}
-		virtual ~TransitionState(){}
+class State {
+public:
+	State(browser_module_t* browser): _browser(browser) {
+		_created = getTimef();
+	}
+	virtual ~State(){}
 
-		virtual State* action(bool &flip);
+	State(State* state): _browser(state->_browser) {
+		_created = getTimef();
+		delete state;
+	}
 
-		static void set_transition_time(float t){ transition_time = t; }
+	virtual State* action(bool &flip) = 0;
 
-	private:
-		static float transition_time;
+	slide_context_t next_slide(){
+		return _browser->next_slide(_browser);
+	}
+
+	browser_module_t* browser(){ return _browser; }
+
+	float age(){ return getTimef() - _created; }
+
+private:
+	browser_module_t* _browser;
+	float _created;
 };
 
-#endif // TRANSITIONSTATE_H
+#endif /* STATE_STATE_HPP */

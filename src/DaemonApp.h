@@ -19,7 +19,7 @@
 #ifndef DAEMON_APP_H
 #define DAEMON_APP_H
 
-#include "Kernel.h"
+#include "kernel.hpp"
 #include "exception.h"
 #include <sys/select.h>
 

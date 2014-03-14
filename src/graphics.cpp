@@ -22,7 +22,7 @@
 
 #include "graphics.h"
 #include "exception.h"
-#include "Kernel.h"
+#include "kernel.hpp"
 #include "module_loader.h"
 #include "log.hpp"
 #include "Transition.h"

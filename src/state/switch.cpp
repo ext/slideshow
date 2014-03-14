@@ -20,11 +20,11 @@
 #	include "config.h"
 #endif
 
-#include "SwitchState.h"
+#include "state/switch.hpp"
+#include "state/transition.hpp"
+#include "state/video.hpp"
+#include "state/view.hpp"
 #include "graphics.h"
-#include "TransitionState.h"
-#include "VideoState.h"
-#include "ViewState.h"
 #include "log.hpp"
 #include <cstring>
 

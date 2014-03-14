@@ -16,17 +16,22 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SWITCHSTATE_H
-#define SWITCHSTATE_H
+#ifndef STATE_TRANSITION_HPP
+#define STATE_TRANSITION_HPP
 
-#include "State.h"
+#include "state/state.hpp"
 
-class SwitchState: public State {
-	public:
-		SwitchState(State* state): State(state){}
-		virtual ~SwitchState(){}
+class TransitionState: public State {
+public:
+	TransitionState(State* state): State(state){}
+	virtual ~TransitionState(){}
 
-		virtual State* action(bool &flip);
+	virtual State* action(bool &flip);
+
+	static void set_transition_time(float t){ transition_time = t; }
+
+private:
+	static float transition_time;
 };
 
-#endif // SWITCHSTATE_H
+#endif /* STATE_TRANSITION_HPP */

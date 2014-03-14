@@ -20,24 +20,24 @@
 #	include "config.h"
 #endif
 
+#include "kernel.hpp"
 #include "argument_parser.h"
-#include "IPC.h"
+#include "IPC.hpp"
 #include "module.h"
 #include "module_loader.h"
-#include "Kernel.h"
 #include "graphics.h"
 #include "path.h"
 #include "log.hpp"
 #include "exception.h"
 #include "Transition.h"
-#include "state/VideoState.h" /* must be initialized */
 
 // FSM
-#include "state/State.h"
-#include "state/InitialState.h"
-#include "state/SwitchState.h"
-#include "state/TransitionState.h"
-#include "state/ViewState.h"
+#include "state/state.hpp"
+#include "state/initial.hpp"
+#include "state/switch.hpp"
+#include "state/transition.hpp"
+#include "state/view.hpp"
+#include "state/video.hpp" /* must be initialized */
 
 // Backend
 #include "backend/platform.h"

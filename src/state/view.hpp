@@ -16,17 +16,22 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef INITIALSTATE_H
-#define INITIALSTATE_H
+#ifndef STATE_VIEW_H
+#define STATE_VIEW_H
 
-#include "State.h"
+#include "state/state.hpp"
 
-class InitialState: public State {
-	public:
-		InitialState(browser_module_t* browser): State(browser){}
-		virtual ~InitialState(){}
+class ViewState: public State {
+public:
+	ViewState(State* state): State(state){}
+	virtual ~ViewState(){}
 
-		virtual State* action(bool &flip);
+	virtual State* action(bool &flip);
+
+	static void set_view_time(double t){ view_time = t; }
+
+private:
+	static double view_time;
 };
 
-#endif // INITIALSTATE_H
+#endif /* STATE_VIEW_HPP */

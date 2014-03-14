@@ -20,21 +20,18 @@
 #	include "config.h"
 #endif
 
-#include "TransitionState.h"
-#include "graphics.h"
-#include "ViewState.h"
+#include "state/view.hpp"
+#include "state/switch.hpp"
 
-float TransitionState::transition_time = 1.0f;
+double ViewState::view_time = 1.0;
 
-State* TransitionState::action(bool &flip){
-	float s = age() / transition_time;
-
-	graphics_render(s);
-	flip = true;
-
-	if ( s > 1.0f ){
-		return new ViewState(this);
+State* ViewState::action(bool &flip){
+	if ( age() > view_time ){
+		return new SwitchState(this);
 	}
+
+	// Sleep for a while
+	sleepd( 0.1 );
 
 	return this;
 }

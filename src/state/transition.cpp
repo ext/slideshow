@@ -16,26 +16,25 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef VIDEOSTATE_H
-#define VIDEOSTATE_H
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
-#include "State.h"
+#include "state/transition.hpp"
+#include "state/view.hpp"
+#include "graphics.h"
 
-class VideoState: public State {
-	public:
-		VideoState(State* state, const char* filename);
-		virtual ~VideoState();
+float TransitionState::transition_time = 1.0f;
 
-		virtual State* action(bool &flip);
+State* TransitionState::action(bool &flip){
+	float s = age() / transition_time;
 
-		static int init();
-		static int cleanup();
-		static void poll();
+	graphics_render(s);
+	flip = true;
 
-	private:
-		static void command(const char* fmt, ...);
+	if ( s > 1.0f ){
+		return new ViewState(this);
+	}
 
-		char* _filename;
-};
-
-#endif /* VIDEOSTATE_H */
+	return this;
+}
