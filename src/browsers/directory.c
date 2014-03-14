@@ -36,9 +36,10 @@ static int filter(const struct dirent* d){
 	    strcmp(d->d_name, ".") == 0 ||
 	    strcmp(d->d_name, "..") == 0 ||
 	    strcmp(d->d_name, "Thumbs.db") == 0 ){
-
 		return 0;
 	}
+
+	if ( d->d_type == DT_DIR ) return 0;
 	return 1;
 }
 
