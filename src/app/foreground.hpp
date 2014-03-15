@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008-2013 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2012 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,8 +16,17 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "transition.h"
-#include "fade_files.h"
-#include "default.c"
+#ifndef FOREGROUND_APP_H
+#define FOREGROUND_APP_H
 
-MODULE_INFO("Fade", TRANSITION_MODULE, "David Sveningsson");
+#include "core/kernel.hpp"
+
+class ForegroundApp: public Kernel {
+	public:
+		ForegroundApp(const argument_set_t& arg, PlatformBackend* backend);
+		~ForegroundApp();
+
+		virtual void init();
+};
+
+#endif // FOREGROUND_APP_H

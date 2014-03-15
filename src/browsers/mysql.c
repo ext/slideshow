@@ -16,9 +16,8 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "module.h"
-#include "Browser.h"
-#include "log.h"
+#include "browser.h"
+#include "core/log.h"
 #include <string.h>
 #include <mysql/mysql.h>
 

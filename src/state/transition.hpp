@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008-2013 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,8 +16,22 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "transition.h"
-#include "fade_files.h"
-#include "default.c"
+#ifndef STATE_TRANSITION_HPP
+#define STATE_TRANSITION_HPP
 
-MODULE_INFO("Fade", TRANSITION_MODULE, "David Sveningsson");
+#include "state/state.hpp"
+
+class TransitionState: public State {
+public:
+	TransitionState(State* state): State(state){}
+	virtual ~TransitionState(){}
+
+	virtual State* action(bool &flip);
+
+	static void set_transition_time(float t){ transition_time = t; }
+
+private:
+	static float transition_time;
+};
+
+#endif /* STATE_TRANSITION_HPP */

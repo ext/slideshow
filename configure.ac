@@ -22,6 +22,10 @@ AC_CONFIG_FILES([slideshow-wrapper], [
 
 AC_GNU_SOURCE
 
+AC_LANG_PUSH([C++])
+AX_CHECK_COMPILE_FLAG([-std=c++0x], [CXXFLAGS="$CXXFLAGS -std=c++0x"], [AC_MSG_ERROR([Support for C++11 is required])])
+AC_LANG_POP
+
 # automake 1.12 needs AM_PROG_AR but automake 1.11 doesn't have it
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 

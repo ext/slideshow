@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008-2013 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2012 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,8 +16,37 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "transition.h"
-#include "fade_files.h"
-#include "default.c"
+#ifndef STATE_STATE_HPP
+#define STATE_STATE_HPP
 
-MODULE_INFO("Fade", TRANSITION_MODULE, "David Sveningsson");
+#include "browsers/browser.h"
+#include <portable/time.h>
+
+class State {
+public:
+	State(browser_module_t* browser): _browser(browser) {
+		_created = getTimef();
+	}
+	virtual ~State(){}
+
+	State(State* state): _browser(state->_browser) {
+		_created = getTimef();
+		delete state;
+	}
+
+	virtual State* action(bool &flip) = 0;
+
+	slide_context_t next_slide(){
+		return _browser->next_slide(_browser);
+	}
+
+	browser_module_t* browser(){ return _browser; }
+
+	float age(){ return getTimef() - _created; }
+
+private:
+	browser_module_t* _browser;
+	float _created;
+};
+
+#endif /* STATE_STATE_HPP */

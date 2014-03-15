@@ -16,8 +16,25 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "transition.h"
-#include "fade_files.h"
-#include "default.c"
+#ifndef SLIDESHOW_OPENGL_H
+#define SLIDESHOW_OPENGL_H
 
-MODULE_INFO("Fade", TRANSITION_MODULE, "David Sveningsson");
+#ifdef WIN32
+#	include "windows.h"
+#endif /* WIN32 */
+
+#include <GL/glew.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void gl_setup();
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* SLIDESHOW_OPENGL_H */

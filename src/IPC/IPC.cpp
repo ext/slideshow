@@ -21,44 +21,33 @@
 #endif
 
 #include "IPC.hpp"
-#include <signal.h>
+#include "core/kernel.hpp"
+#include "core/log.hpp"
 
-MODULE_INFO("signal", IPC_MODULE, "David Sveningsson");
+extern Kernel* global_fubar_kernel;
 
-static void sighandler(int signum){
-	switch ( signum ){
-	case SIGINT:
-	case SIGTERM:
-		action_quit();
-		break;
-	case SIGHUP:
-		action_reload();
-		break;
-	case SIGUSR1:
-		action_debug();
-	}
+ipc_module_t* IPC::factory(const std::string& name){
+	ipc_module_t* module = (ipc_module_t*)module_open(name.c_str(), IPC_MODULE, 0);
+	if ( !module ) Log::warning("Failed to load IPC module `%s'.\n", name.c_str());
+	return module;
 }
 
-void* module_alloc(){
-	return malloc(sizeof(struct ipc_module_t));
+void action_quit(){
+	Log::message(Log_Verbose, "IPC: Quit\n");
+	global_fubar_kernel->quit();
 }
 
-int module_init(struct ipc_module_t* module){
-	module->poll = NULL;
-
-	signal(SIGINT, sighandler);
-	signal(SIGHUP, sighandler);
-	signal(SIGTERM, sighandler);
-	signal(SIGUSR1, sighandler);
-
-	return 0;
+void action_reload(){
+	Log::message(Log_Verbose, "IPC: Reload browser\n");
+	global_fubar_kernel->reload_browser();
 }
 
-int module_cleanup(struct ipc_module_t* module){
-	signal(SIGINT, SIG_DFL);
-	signal(SIGHUP, SIG_DFL);
-	signal(SIGTERM, SIG_DFL);
-	signal(SIGUSR1, SIG_DFL);
+void action_debug(){
+	Log::message(Log_Verbose, "IPC: Debug\n");
+	global_fubar_kernel->debug_dumpqueue();
+}
 
-	return 0;
+void action_set_queue(int id){
+	Log::message(Log_Verbose, "IPC: Changing queue to %d\n", id);
+	global_fubar_kernel->queue_set(id);
 }

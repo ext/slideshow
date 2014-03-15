@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008-2013 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,8 +16,25 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "transition.h"
-#include "fade_files.h"
-#include "default.c"
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
-MODULE_INFO("Fade", TRANSITION_MODULE, "David Sveningsson");
+#include "state/transition.hpp"
+#include "state/view.hpp"
+#include "core/graphics.h"
+
+float TransitionState::transition_time = 1.0f;
+
+State* TransitionState::action(bool &flip){
+	float s = age() / transition_time;
+
+	graphics_render(s);
+	flip = true;
+
+	if ( s > 1.0f ){
+		return new ViewState(this);
+	}
+
+	return this;
+}

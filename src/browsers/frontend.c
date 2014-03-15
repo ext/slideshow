@@ -16,11 +16,10 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "module.h"
-#include "Browser.h"
-#include "log.h"
+#include "browser.h"
+#include "core/log.h"
 #include <curl/curl.h>
-#include "curl_local.h"
+#include "core/curl_local.h"
 #include <json/json.h>
 #include <string.h>
 #include <portable/asprintf.h>

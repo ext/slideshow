@@ -16,8 +16,19 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "transition.h"
-#include "fade_files.h"
-#include "default.c"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-MODULE_INFO("Fade", TRANSITION_MODULE, "David Sveningsson");
+#include "log.h"
+
+void log_message(enum Severity severity, const char* fmt, ...){
+	va_list ap;
+	va_start(ap, fmt);
+	log_vmessage(severity, fmt, ap);
+	va_end(ap);
+}
+
+void log_vmessage(enum Severity severity, const char* fmt, va_list ap){
+	Log::vmessage(severity, fmt, ap);
+}

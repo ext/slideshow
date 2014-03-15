@@ -22,7 +22,7 @@
 #endif
 
 #include "backend/SDLbackend.h"
-#include "exception.h"
+#include "core/exception.hpp"
 
 #ifdef WIN32
 #	include "win32.h"
@@ -57,7 +57,7 @@ int SDLBackend::init(const Vector2ui &resolution, bool fullscreen){
 	}
 
 	_fullscreen = fullscreen;
-	
+
 	if ( SDL_Init(SDL_INIT_VIDEO) < 0 ){
 		throw exception("Unable to init SDL: %s", SDL_GetError());
 	}
@@ -88,24 +88,24 @@ void SDLBackend::poll(bool& running){
 			if ( event.key.keysym.sym == SDLK_ESCAPE ){
 				running = false;
 			}
-			
+
 			if ( (event.key.keysym.sym == SDLK_RETURN) && (event.key.keysym.mod & KMOD_ALT)){
 				_fullscreen = !_fullscreen;
 				int flags = sdl_flags;
-				
+
 				if ( _fullscreen ){
 					flags |= SDL_FULLSCREEN;
 				}
-								
+
 				SDL_SetVideoMode(resolution().width, resolution().height, 0, flags);
 			}
-			
+
 			break;
-			
+
 		case SDL_VIDEORESIZE:
 			set_resolution(event.resize.w, event.resize.h);
 			break;
-			
+
 		case SDL_QUIT:
 			running = false;
 			break;
