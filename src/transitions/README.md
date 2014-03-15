@@ -12,7 +12,7 @@ It is good practice to allow the transition effect to work both forwards and bac
 
 For advanced effects override `int module_init(transition_module_t*)` setting a custom rendering callback:
 
-    int EXPORT module_init(transition_module_t* module){
+    int EXPORT module_init(transition_module_t module){
     	module->render = my_render_callback;
     	return 0;
     }

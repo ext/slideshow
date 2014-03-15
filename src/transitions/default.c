@@ -29,10 +29,10 @@
 #include "gl.h"
 
 void* EXPORT module_alloc(){
-	return malloc(sizeof(transition_module_t));
+	return malloc(sizeof(struct transition_module));
 }
 
-int EXPORT module_init(transition_module_t* module){
+int EXPORT module_init(transition_module_t module){
 	module->render = NULL; /* use default renderer using fsquad */
 
 	/* create shader */

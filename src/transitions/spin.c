@@ -27,7 +27,7 @@
 
 MODULE_INFO("Spin", TRANSITION_MODULE, "David Sveningsson");
 
-static void render(transition_module_t* transition, transition_context_t* context){
+static void render(transition_module_t transition, transition_context_t context){
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glPushMatrix();
@@ -58,10 +58,10 @@ static void render(transition_module_t* transition, transition_context_t* contex
 }
 
 void* module_alloc(){
-	return malloc(sizeof(transition_module_t));
+	return malloc(sizeof(struct transition_module));
 }
 
-int EXPORT module_init(transition_module_t* module){
+int EXPORT module_init(transition_module_t module){
 	module->render = render;
 	return 0;
 }

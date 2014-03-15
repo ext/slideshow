@@ -44,7 +44,7 @@
 #include <IL/ilu.h>
 
 static CURL* curl = NULL;
-static transition_module_t* transition = NULL;
+static transition_module_t transition = NULL;
 static unsigned int texture[2] = {0,0};
 static int width;
 static int height;
@@ -123,7 +123,7 @@ int graphics_cleanup(){
 void graphics_render(float state){
 	if ( !transition ) return;
 
-	transition_context_t context = {
+	struct transition_context context = {
 		.texture = {texture[0], texture[1]},
 		.state = state,
 	};
@@ -389,7 +389,7 @@ int graphics_load_image(const char* name, int letterbox){
 	return 0;
 }
 
-static void default_render(transition_module_t* transition, transition_context_t* context){
+static void default_render(transition_module_t transition, transition_context_t context){
 	glUseProgram(transition->shader);
 
 	glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, context->texture[0]);
@@ -399,7 +399,7 @@ static void default_render(transition_module_t* transition, transition_context_t
 	graphics_render_fsquad();
 }
 
-int graphics_set_transition(const char* name, transition_module_t** mod){
+int graphics_set_transition(const char* name, transition_module_t* mod){
 	if ( mod ) *mod = NULL;
 
 	if ( !name ){
@@ -412,7 +412,7 @@ int graphics_set_transition(const char* name, transition_module_t** mod){
 	}
 
 	/* load new */
-	transition = (transition_module_t*)module_open(name, TRANSITION_MODULE, 0);
+	transition = (transition_module_t)module_open(name, TRANSITION_MODULE, 0);
 	if ( !transition ){
 		Log::fatal("Failed to load transition plugin `%s'.\n", name);
 		return EINVAL;

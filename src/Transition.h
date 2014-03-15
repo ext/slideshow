@@ -24,10 +24,10 @@
 
 struct transition_context;
 struct transition_module;
-typedef struct transition_context transition_context_t;
-typedef struct transition_module transition_module_t;
+typedef struct transition_context* transition_context_t;
+typedef struct transition_module* transition_module_t;
 
-typedef void (*render_callback)(transition_module_t* transition, transition_context_t* context);
+typedef void (*render_callback)(transition_module_t transition, transition_context_t context);
 
 struct transition_context {
 	unsigned int texture[2];
