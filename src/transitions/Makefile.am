@@ -8,8 +8,10 @@ DATAFILES = fade_files.dpl vfade_files.dpl
 BUILT_SOURCES = $(DATAFILES:.dpl=.c)
 CLEANFILES = $(DATAFILES:.dpl=.c) $(DATAFILES:.dpl=.h)
 
-fade_la_SOURCES = fade.c fade_files.dpl
-vfade_la_SOURCES = vfade.c vfade_files.dpl
+fade_la_SOURCES = fade.c fade_files.dpl fade.frag
+vfade_la_SOURCES = vfade.c vfade_files.dpl vfade.frag
+
+EXTRA_DIST = default.c fsquad.vert
 
 .dpl.c:
 	@test x"$(@D)" = x || $(MKDIR_P) "$(@D)"
