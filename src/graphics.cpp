@@ -48,6 +48,7 @@ static transition_module_t transition = NULL;
 static unsigned int texture[2] = {0,0};
 static int width;
 static int height;
+static unsigned int counter = 0;
 static GLuint fsquad = 0;
 static float fsquad_vertices[] = {
 	/* x y */
@@ -126,6 +127,7 @@ void graphics_render(float state){
 	struct transition_context context = {
 		.texture = {texture[0], texture[1]},
 		.state = state,
+		.counter = counter,
 	};
 
 	transition->render(transition, &context);
@@ -355,6 +357,7 @@ void graphics_swap_textures(){
 int graphics_load_image(const char* name, int letterbox){
 	graphics_swap_textures();
 	glBindTexture(GL_TEXTURE_2D, texture[0]);
+	counter++;
 
 	/* null is passed when the screen should go blank (e.g. queue is empty) */
 	if ( !name ){
@@ -395,6 +398,7 @@ static void default_render(transition_module_t transition, transition_context_t 
 	glActiveTexture(GL_TEXTURE1); glBindTexture(GL_TEXTURE_2D, context->texture[0]);
 	glActiveTexture(GL_TEXTURE0);	glBindTexture(GL_TEXTURE_2D, context->texture[1]);
 	glUniform1f(transition->state_uniform, context->state);
+	glUniform1i(transition->counter_uniform, context->counter);
 
 	graphics_render_fsquad();
 }

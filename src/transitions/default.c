@@ -45,6 +45,7 @@ int EXPORT module_init(transition_module_t module){
 
 	/* setup uniforms */
 	module->state_uniform = glGetUniformLocation(module->shader, "s");
+	module->counter_uniform = glGetUniformLocation(module->shader, "counter");
 
 	return 0;
 }

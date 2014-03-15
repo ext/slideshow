@@ -32,6 +32,7 @@ typedef void (*render_callback)(transition_module_t transition, transition_conte
 struct transition_context {
 	unsigned int texture[2];
 	float state;                  /* [0,1] 0: current slide fully visible 1: new slide fully visible */
+	unsigned int counter;         /* an incrementing number which can be used to seed deterministic randomness (incremented each time a new slide is loaded) */
 };
 
 struct transition_module {
@@ -39,6 +40,7 @@ struct transition_module {
 	render_callback render;       /* function to call when rendering or NULL for default (using fsquad) */
 
 	GLuint state_uniform;         /* uniform location of last loaded shader for this transition (be vary if using multiple shaders) */
+	GLuint counter_uniform;       /* uniform location of for counter */
 	GLuint shader;                /* shader used by default render */
 };
 
