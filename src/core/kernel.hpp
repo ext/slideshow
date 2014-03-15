@@ -16,8 +16,8 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef KERNEL_H
-#define KERNEL_H
+#ifndef KERNEL_HPP
+#define KERNEL_HPP
 
 class State;
 class PlatformBackend;
@@ -27,101 +27,101 @@ class UDSServer;
 #include <vector>
 
 class Kernel {
-	public:
-		typedef struct argument_set_t {
-			int mode;
-			int loglevel;
-			int fullscreen;
-			int have_password;
-			int queue_id;
-			int width;
-			int height;
-			float transition_time;
-			float switch_time;
-			char* connection_string;
-			char* transition_string;
-			char* log_file;     /* log: file */
-			char* log_fifo;     /* log: named pipe */
-			char* log_domain;   /* log: unix domain socket */
+public:
+	typedef struct argument_set_t {
+		int mode;
+		int loglevel;
+		int fullscreen;
+		int have_password;
+		int queue_id;
+		int width;
+		int height;
+		float transition_time;
+		float switch_time;
+		char* connection_string;
+		char* transition_string;
+		char* log_file;     /* log: file */
+		char* log_fifo;     /* log: named pipe */
+		char* log_domain;   /* log: unix domain socket */
 
-			/* frontend settings */
-			char* url;
-			char* instance;
-		} argument_set_t;
+		/* frontend settings */
+		char* url;
+		char* instance;
+	} argument_set_t;
 
-		enum Mode {
-			InvalidMode,
-			ForegroundMode,
-			DaemonMode,
-			HelpMode,
-			ListTransitionMode
-		};
+	enum Mode {
+		InvalidMode,
+		ForegroundMode,
+		DaemonMode,
+		HelpMode,
+		ListTransitionMode
+	};
 
-		static void print_transitions();
+	static void print_transitions();
 
-		Kernel(const argument_set_t& arg, PlatformBackend* backend);
-		virtual ~Kernel();
+	Kernel(const argument_set_t& arg, PlatformBackend* backend);
+	virtual ~Kernel();
 
-		virtual void init();
-		virtual void cleanup();
-		virtual void run();
-		virtual void poll();
-		virtual void action();
+	virtual void init();
+	virtual void cleanup();
+	virtual void run();
+	virtual void poll();
+	virtual void action();
 
-		bool running(){ return _running; }
+	bool running(){ return _running; }
 
-		void start();
-		void quit();
+	void start();
+	void quit();
 
-		void reload_browser();
-		void play_video(const char* fullpath);
-		void queue_set(unsigned int id);
+	void reload_browser();
+	void play_video(const char* fullpath);
+	void queue_set(unsigned int id);
 
-		void debug_dumpqueue();
+	void debug_dumpqueue();
 
-		static bool parse_arguments(argument_set_t& arg, int argc, const char* argv[]);
+	static bool parse_arguments(argument_set_t& arg, int argc, const char* argv[]);
 
-	protected:
-		static const char* pidpath();
+protected:
+	static const char* pidpath();
 
-		void print_config() const;
-		void print_licence_statement() const;
+	void print_config() const;
+	void print_licence_statement() const;
 
-	private:
+private:
 
-		void create_pidpath();
+	void create_pidpath();
 
-		void view_state(double t);
-		void transition_state(double t);
-		void switch_state(double t);
+	void view_state(double t);
+	void transition_state(double t);
+	void switch_state(double t);
 
-		browser_module_t* browser(){ return _browser; }
+	browser_module_t* browser(){ return _browser; }
 
-		void load_transition(const char* name);
+	void load_transition(const char* name);
 
-		char* get_password();
+	char* get_password();
 
-		void init_backend();
-		void cleanup_backend();
-		void init_graphics();
-		void init_IPC();
-		void cleanup_IPC();
-		void init_browser();
-		void init_fsm();
+	void init_backend();
+	void cleanup_backend();
+	void init_graphics();
+	void init_IPC();
+	void cleanup_IPC();
+	void init_browser();
+	void init_fsm();
 
 
 
-		argument_set_t _arg;
+	argument_set_t _arg;
 
-		char* _password;
+	char* _password;
 
-		State* _state;
+	State* _state;
 
-		browser_module_t* _browser;
-		PlatformBackend* _backend;
-		std::vector<struct ipc_module_t*> _ipc;
+	browser_module_t* _browser;
+	PlatformBackend* _backend;
+	std::vector<struct ipc_module_t*> _ipc;
 
-		bool _running;
+	bool _running;
 };
 
-#endif // KERNEL_H
+#endif /* KERNEL_HPP */
