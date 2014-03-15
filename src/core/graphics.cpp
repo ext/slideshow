@@ -26,7 +26,6 @@
 #include "core/log.hpp"
 #include "transitions/transition.h"
 #include "path.h"
-#include "ptr.h"
 #include <curl/curl.h>
 #include "curl_local.h"
 
@@ -54,6 +53,10 @@ static float fsquad_vertices[] = {
 	-1,  1,
 	 1, -1,
 	-1, -1,
+};
+
+struct free_delete {
+	void operator()(void* x) { free(x); }
 };
 
 int graphics_init(int w, int h){
@@ -201,7 +204,7 @@ static int load_file(const char* filename, unsigned int dst){
 
 	Log::debug("Loading '%s' as local file.\n", filename);
 
-	Ptr<char> real_name(strdup(filename));
+	std::unique_ptr<char, free_delete> real_name(strdup(filename));
 	if ( is_slide(filename) ){
 		char* tmp;
 		asprintf(&tmp, "%s/raster/%dx%d.png", filename, width, height);
@@ -210,10 +213,10 @@ static int load_file(const char* filename, unsigned int dst){
 
 #ifdef UNICODE
 	char* tmp = real_path(real_name.get());
-	Ptr<wchar_t> path(to_tchar(tmp));
+	std::unique_ptr<wchar_t, free_delete> path(to_tchar(tmp));
 	free(tmp);
 #else /* UNICODE */
-	Ptr<char> path(real_path(real_name.get()));
+	std::unique_ptr<char, free_delete> path(real_path(real_name.get()));
 #endif /* UNICODE */
 
 	ilBindImage(dst);
@@ -446,7 +449,7 @@ static void check_log(GLuint target, const char* filename){
 	GLint size;
 	query_func(target, GL_INFO_LOG_LENGTH, &size);
 	if ( size > 1 ){ /* ignore line with only a \n */
-		std::unique_ptr<char> log((char*)malloc(size));
+		std::unique_ptr<char, free_delete> log((char*)malloc(size));
 		get_func(target, size, &size, log.get());
 		log_message(Log_Info, "Shader log (%d) %s:\n%s\n", size, filename, log.get());
 	}

@@ -20,8 +20,7 @@
 #	include "config.h"
 #endif
 
-#include "log.hpp"
-#include "ptr.h"
+#include "core/log.hpp"
 #include "core/exception.hpp"
 #include <stdarg.h>
 #include <cstdlib>
@@ -59,6 +58,10 @@ typedef std::vector<std::pair<Destination*, Severity>> vector;
 typedef vector::iterator iterator;
 
 static vector destinations;
+
+struct free_delete {
+	void operator()(void* x) { free(x); }
+};
 
 FileDestination::FileDestination(const char* filename)
 	: FileDestination(fopen(filename, "a")){
@@ -215,10 +218,10 @@ namespace Log {
 		char* tmp;
 
 		vasprintf(&tmp, fmt, ap);
-		Ptr<char> content(tmp);
+		std::unique_ptr<char, free_delete> content(tmp);
 
 		asprintf(&tmp, "(%s) [%s] %s", severity_string(severity), timestring(buf, 255), content.get());
-		Ptr<char> decorated(tmp);
+		std::unique_ptr<char, free_delete> decorated(tmp);
 
 		for ( iterator it = destinations.begin(); it != destinations.end(); ++it ){
 			if ( severity < it->second ) continue;
