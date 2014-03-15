@@ -22,7 +22,7 @@
 
 #include "state/video.hpp"
 #include "state/switch.hpp"
-#include "log.hpp"
+#include "core/log.hpp"
 #include <cstdlib>
 #include <cstring>
 #include <cerrno>

@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2012 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,35 +16,17 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DAEMON_APP_H
-#define DAEMON_APP_H
+#ifndef FOREGROUND_APP_H
+#define FOREGROUND_APP_H
 
-#include "kernel.hpp"
-#include "exception.h"
-#include <sys/select.h>
+#include "core/kernel.hpp"
 
-class DaemonApp: public Kernel {
+class ForegroundApp: public Kernel {
 	public:
-		DaemonApp(const argument_set_t& arg, PlatformBackend* backend);
-		~DaemonApp();
+		ForegroundApp(const argument_set_t& arg, PlatformBackend* backend);
+		~ForegroundApp();
 
 		virtual void init();
-		virtual void cleanup();
-
-		void daemon_start();
-		void daemon_ready();
-		void daemon_poll();
-		void daemon_stop();
-
-		void pass_exception(const exception &e);
-		void pass_exception(const ExitException &e);
-
-	private:
-		int fd;
-		fd_set fds;
-
-		int _readfd;
-		int _writefd;
 };
 
-#endif // DAEMON_APP_H
+#endif // FOREGROUND_APP_H

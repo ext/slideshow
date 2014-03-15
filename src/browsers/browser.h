@@ -19,7 +19,7 @@
 #ifndef BROWSER_H
 #define BROWSER_H
 
-#include "module_loader.h"
+#include "core/module_loader.h"
 
 typedef struct {
 	char* provider;

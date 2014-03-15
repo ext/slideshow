@@ -23,7 +23,7 @@ class State;
 class PlatformBackend;
 class UDSServer;
 
-#include "Browser.h"
+#include "browsers/browser.h"
 #include <vector>
 
 class Kernel {

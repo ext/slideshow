@@ -21,7 +21,7 @@
 #	include "config.h"
 #endif
 
-#include "Browser.h"
+#include "browsers/browser.h"
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
@@ -47,22 +47,22 @@ struct state_t {
 	action append { if ( fsm->buflen < BUFLEN ) fsm->buffer[fsm->buflen++] = fc; }
 	action clear { fsm->buflen = 0; }
 	action term { if ( fsm->buflen < BUFLEN ) fsm->buffer[fsm->buflen++] = 0; }
-	
+
 	action set_provider { ctx->provider = strdup(fsm->buffer); }
 	action set_user     { ctx->user = strdup(fsm->buffer); }
 	action set_pass     { ctx->pass = strdup(fsm->buffer); }
 	action set_host     { ctx->host = strdup(fsm->buffer); }
 	action set_src      { ctx->name = strdup(fsm->buffer); }
-	
+
 	name = alnum+ >clear $append %term;
 	string = [^\0]+ >clear $append %term;
-	
+
 	provider = name %set_provider;
 	user = name %set_user;
 	pass = name %set_pass;
 	host = name %set_host;
 	src = string %set_src 0;
-	
+
 	main := provider '://' (
 		user ':' pass '@' host '/' src |
 		user '@' host '/' src |
@@ -72,7 +72,7 @@ struct state_t {
 		    # filebacked browsers. Rather the slash is considered a parth of the
 		    # path instead of as a separator.
 		    #
-		    # eg sqlite:///abs/path would be sqlite:////abs/path 
+		    # eg sqlite:///abs/path would be sqlite:////abs/path
 	);
 }%%
 
@@ -81,21 +81,21 @@ struct state_t {
 int parse(struct state_t* fsm, browser_context_t* ctx, const char* line){
 	assert(fsm);
 	assert(ctx);
-	
+
 	fsm->buflen = 0;
-	
+
 	%% write init;
-	
+
 	const char* p = line;
 	const char* pe = line + (strlen(p) + 1);
-	
+
 	%% write exec;
-		
+
 	if ( fsm->cs == fx_parser_error ) {
 		printf("parse error\n");
 		return -1;
 	}
-	
+
 	return 0;
 }
 
@@ -111,14 +111,14 @@ browser_context_t get_context(const char* string){
 	ctx.pass = NULL;
 	ctx.host = NULL;
 	ctx.name = NULL;
-	
+
 //	fsm.stack = NULL;
 //	fsm.stack_size = 0;
 
 	if ( parse(&fsm, &ctx, string) != 0 ){
 		fprintf(stderr, "Failed to parse browser-string\n");
 	}
-	
+
 	return ctx;
 }
 

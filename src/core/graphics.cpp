@@ -20,16 +20,14 @@
 #	include "config.h"
 #endif
 
-#include "graphics.h"
-#include "exception.h"
-#include "kernel.hpp"
-#include "module_loader.h"
-#include "log.hpp"
-#include "Transition.h"
+#include "core/graphics.h"
+#include "core/exception.hpp"
+#include "core/module_loader.h"
+#include "core/log.hpp"
+#include "transitions/transition.h"
 #include "path.h"
-#include "gl.h"
-#include "opengl.h"
 #include "ptr.h"
+#include <curl/curl.h>
 #include "curl_local.h"
 
 #include <cstdlib>

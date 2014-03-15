@@ -16,7 +16,7 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "module.h"
+#include "transition.h"
 #include "vfade_files.h"
 #include "default.c"
 

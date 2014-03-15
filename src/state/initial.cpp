@@ -22,7 +22,7 @@
 
 #include "state/initial.hpp"
 #include "state/transition.hpp"
-#include "graphics.h"
+#include "core/graphics.h"
 
 State* InitialState::action(bool &flip){
 	graphics_load_image(NULL, 0); /* load blank image */

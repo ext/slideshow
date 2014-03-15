@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008-2012 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,23 +16,17 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef HAVE_CONFIG_H
-#	include "config.h"
-#endif
+#ifndef SLIDESHOW_ASSEMBLER_H
+#define SLIDESHOW_ASSEMBLER_H
 
-#include "Browser.h"
+#include "module_loader.h"
+#include "core/slidelib.h"
 
-int browser_default_queue_reload(struct browser_module_t*){
-	/* do nothing */
-	return 0;
-}
+typedef int (*assemble_callback)(const slide_t* slide, const resolution_t* resolution);
 
-int browser_default_queue_dump(struct browser_module_t*){
-	/* do nothing */
-	return 0;
-}
+typedef struct {
+	struct module_t base;
+	assemble_callback assemble;
+} assembler_module_t;
 
-int browser_default_queue_set(struct browser_module_t*, unsigned int){
-	/* do nothing */
-	return 0;
-}
+#endif /* SLIDESHOW_ASSEMBLER_H */

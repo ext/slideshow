@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2013 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -17,24 +17,18 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
-#include "ForegroundApp.h"
-#include <cstdio>
+#include "log.h"
 
-ForegroundApp::ForegroundApp(const argument_set_t& arg, PlatformBackend* backend):
-	Kernel(arg, backend){
-
+void log_message(enum Severity severity, const char* fmt, ...){
+	va_list ap;
+	va_start(ap, fmt);
+	log_vmessage(severity, fmt, ap);
+	va_end(ap);
 }
 
-ForegroundApp::~ForegroundApp(){
-
-}
-
-void ForegroundApp::init(){
-	print_licence_statement();
-	print_config();
-
-	Kernel::init();
+void log_vmessage(enum Severity severity, const char* fmt, va_list ap){
+	Log::vmessage(severity, fmt, ap);
 }

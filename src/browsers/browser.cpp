@@ -17,37 +17,22 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#	include "config.h"
 #endif
 
-#include "IPC.hpp"
-#include "kernel.hpp"
-#include "log.hpp"
+#include "browsers/browser.h"
 
-extern Kernel* global_fubar_kernel;
-
-ipc_module_t* IPC::factory(const std::string& name){
-	ipc_module_t* module = (ipc_module_t*)module_open(name.c_str(), IPC_MODULE, 0);
-	if ( !module ) Log::warning("Failed to load IPC module `%s'.\n", name.c_str());
-	return module;
+int browser_default_queue_reload(struct browser_module_t*){
+	/* do nothing */
+	return 0;
 }
 
-void action_quit(){
-	Log::message(Log_Verbose, "IPC: Quit\n");
-	global_fubar_kernel->quit();
+int browser_default_queue_dump(struct browser_module_t*){
+	/* do nothing */
+	return 0;
 }
 
-void action_reload(){
-	Log::message(Log_Verbose, "IPC: Reload browser\n");
-	global_fubar_kernel->reload_browser();
-}
-
-void action_debug(){
-	Log::message(Log_Verbose, "IPC: Debug\n");
-	global_fubar_kernel->debug_dumpqueue();
-}
-
-void action_set_queue(int id){
-	Log::message(Log_Verbose, "IPC: Changing queue to %d\n", id);
-	global_fubar_kernel->queue_set(id);
+int browser_default_queue_set(struct browser_module_t*, unsigned int){
+	/* do nothing */
+	return 0;
 }

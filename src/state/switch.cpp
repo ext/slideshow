@@ -24,8 +24,8 @@
 #include "state/transition.hpp"
 #include "state/video.hpp"
 #include "state/view.hpp"
-#include "graphics.h"
-#include "log.hpp"
+#include "core/graphics.h"
+#include "core/log.hpp"
 #include <cstring>
 
 State* SwitchState::action(bool &flip){

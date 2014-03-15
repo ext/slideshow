@@ -19,8 +19,8 @@
 #ifndef TRANSITION_H
 #define TRANSITION_H
 
-#include "module_loader.h"
-#include "gl.h"
+#include "core/module_loader.h"
+#include "core/graphics.h"
 
 struct transition_context;
 struct transition_module;

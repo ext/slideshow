@@ -19,7 +19,7 @@
 #ifndef STATE_STATE_HPP
 #define STATE_STATE_HPP
 
-#include "Browser.h"
+#include "browsers/browser.h"
 #include <portable/time.h>
 
 class State {

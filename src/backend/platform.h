@@ -21,7 +21,7 @@
 
 // Derived from blueflower (c) David Sveningsson 2009-2010
 
-#include "vector.h"
+#include "core/vector.h"
 
 class PlatformBackend {
 	public:

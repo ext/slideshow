@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008-2012 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,17 +16,25 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FOREGROUND_APP_H
-#define FOREGROUND_APP_H
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
-#include "kernel.hpp"
+#include "app/foreground.hpp"
+#include <cstdio>
 
-class ForegroundApp: public Kernel {
-	public:
-		ForegroundApp(const argument_set_t& arg, PlatformBackend* backend);
-		~ForegroundApp();
+ForegroundApp::ForegroundApp(const argument_set_t& arg, PlatformBackend* backend):
+	Kernel(arg, backend){
 
-		virtual void init();
-};
+}
 
-#endif // FOREGROUND_APP_H
+ForegroundApp::~ForegroundApp(){
+
+}
+
+void ForegroundApp::init(){
+	print_licence_statement();
+	print_config();
+
+	Kernel::init();
+}

@@ -16,9 +16,12 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
-#include "DaemonApp.h"
-#include "log.hpp"
+#endif
+
+#include "app/daemon.hpp"
+#include "core/log.hpp"
 #include <libdaemon/daemon.h>
 #include <cstring>
 #include <cstdlib>

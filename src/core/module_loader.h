@@ -19,7 +19,7 @@
 #ifndef SLIDESHOW_MODULE_LOADER_H
 #define SLIDESHOW_MODULE_LOADER_H
 
-#include "module.h"
+#include "core/module.h"
 
 #ifdef __cplusplus
 extern "C" {

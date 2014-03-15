@@ -16,9 +16,7 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "module.h"
-#include "Transition.h"
-#include "gl.h"
+#include "transition.h"
 #include <math.h>
 
 #ifndef M_PI

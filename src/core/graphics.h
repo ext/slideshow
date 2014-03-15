@@ -19,8 +19,9 @@
 #ifndef SLIDESHOW_GRAPHICS_H
 #define SLIDESHOW_GRAPHICS_H
 
-#include "Transition.h"
-#include <curl/curl.h>
+#include "core/opengl.h"
+
+typedef struct transition_module* transition_module_t;
 
 #ifdef __cplusplus
 extern "C" {

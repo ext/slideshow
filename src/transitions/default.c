@@ -24,9 +24,8 @@
  * rendering is used.
  */
 
-#include "graphics.h"
-#include "Transition.h"
-#include "gl.h"
+#include "core/graphics.h"
+#include "transitions/transition.h"
 
 void* EXPORT module_alloc(){
 	return malloc(sizeof(struct transition_module));

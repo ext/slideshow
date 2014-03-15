@@ -20,12 +20,12 @@
 #include "config.h"
 #endif
 
-#include "module_loader.h"
-#include "opengl.h"
-#include "graphics.h"
-#include "log.hpp"
-#include "path.h"
-#include "Transition.h"
+#include "core/module_loader.h"
+#include "core/opengl.h"
+#include "core/graphics.h"
+#include "core/log.hpp"
+#include "core/path.h"
+#include "transitions/transition.h"
 
 #include <cstdio>
 #include <cstring>

@@ -22,7 +22,7 @@
 
 #include "log.hpp"
 #include "ptr.h"
-#include "exception.h"
+#include "core/exception.hpp"
 #include <stdarg.h>
 #include <cstdlib>
 #include <cstring>

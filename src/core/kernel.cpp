@@ -20,16 +20,16 @@
 #	include "config.h"
 #endif
 
-#include "kernel.hpp"
+#include "core/kernel.hpp"
 #include "argument_parser.h"
-#include "IPC.hpp"
-#include "module.h"
-#include "module_loader.h"
-#include "graphics.h"
+#include "IPC/IPC.hpp"
+#include "core/module.h"
+#include "core/module_loader.h"
+#include "core/graphics.h"
 #include "path.h"
-#include "log.hpp"
-#include "exception.h"
-#include "Transition.h"
+#include "core/log.hpp"
+#include "core/exception.hpp"
+#include "transitions/transition.h"
 
 // FSM
 #include "state/state.hpp"

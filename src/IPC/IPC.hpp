@@ -19,7 +19,7 @@
 #ifndef SLIDESHOW_IPC_H
 #define SLIDESHOW_IPC_H
 
-#include "module_loader.h"
+#include "core/module_loader.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -16,17 +16,35 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SLIDESHOW_ASSEMBLER_H
-#define SLIDESHOW_ASSEMBLER_H
+#ifndef DAEMON_APP_H
+#define DAEMON_APP_H
 
-#include "module_loader.h"
-#include "slidelib.h"
+#include "core/kernel.hpp"
+#include "core/exception.hpp"
+#include <sys/select.h>
 
-typedef int (*assemble_callback)(const slide_t* slide, const resolution_t* resolution);
+class DaemonApp: public Kernel {
+	public:
+		DaemonApp(const argument_set_t& arg, PlatformBackend* backend);
+		~DaemonApp();
 
-typedef struct {
-	struct module_t base;
-	assemble_callback assemble;
-} assembler_module_t;
+		virtual void init();
+		virtual void cleanup();
 
-#endif /* SLIDESHOW_ASSEMBLER_H */
+		void daemon_start();
+		void daemon_ready();
+		void daemon_poll();
+		void daemon_stop();
+
+		void pass_exception(const exception &e);
+		void pass_exception(const ExitException &e);
+
+	private:
+		int fd;
+		fd_set fds;
+
+		int _readfd;
+		int _writefd;
+};
+
+#endif // DAEMON_APP_H

@@ -20,24 +20,24 @@
 #	include "config.h"
 #endif
 
-#include "kernel.hpp"
-#include "ForegroundApp.h"
+#include "core/kernel.hpp"
+#include "app/foreground.hpp"
 
 #ifdef BUILD_DAEMON
-#	include "DaemonApp.h"
+#	include "app/daemon.hpp"
 #endif /* BUILD_DAEMON */
 
-#include "log.hpp"
-#include "exception.h"
-#include "module_loader.h"
-#include "path.h"
+#include "core/log.hpp"
+#include "core/exception.hpp"
+#include "core/module_loader.h"
+#include "core/path.h"
 #include <cstring>
 #include <cstdlib>
 #include <limits.h>
 #include <portable/portable.h>
 #include <portable/time.h>
 #include "backend/platform.h"
-#include "Browser.h"
+#include "browsers/browser.h"
 
 // for getcwd
 #ifdef WIN32

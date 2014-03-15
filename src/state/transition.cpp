@@ -22,7 +22,7 @@
 
 #include "state/transition.hpp"
 #include "state/view.hpp"
-#include "graphics.h"
+#include "core/graphics.h"
 
 float TransitionState::transition_time = 1.0f;
 
