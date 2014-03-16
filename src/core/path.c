@@ -57,7 +57,7 @@ const char* datapath(){
 const char* pluginpath(){
 	const char* path = getenv("SLIDESHOW_PLUGIN_DIR");
 	if ( !path ){
-		path = PLUGIN_DIR;
+		path = "src/transitions/.libs:" PLUGIN_DIR;
 	}
 	return path;
 }
