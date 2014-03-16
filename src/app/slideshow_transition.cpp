@@ -78,7 +78,7 @@ static float max(float a, float b){
 	return a > b ? a : b;
 }
 
-static float clamp(float x, float hi, float lo){
+static float clamp(float x, float lo, float hi){
 	if ( x > hi ) return hi;
 	if ( x < lo ) return lo;
 	return x;
@@ -238,7 +238,7 @@ static void poll(){
 				automatic = false;
 				s = max(s - 0.02f, 0.0f);
 			} else if ( event.button.button == 5){
-				automatic = 0;
+				automatic = false;
 				s = min(s + 0.02f, 1.0f);
 			}
 			break;
@@ -256,15 +256,17 @@ static void update(){
 	if ( keys[SDLK_RIGHT] ) s = min(s + 0.01f, 1.0f);
 
 	if ( automatic ){
+		static float prev = 0.0f;
 		const Uint32 t = SDL_GetTicks();
-		const float x = (float)t / 1000.0f;
-		s = clamp(asinf(sinf(x)) / (float)M_PI_2, 0.5f, -0.5f) + 0.5f;
+		s = fmodf(static_cast<float>(t) / 1000.0f, 2.0f);
+		if ( s < prev ) graphics_swap_textures();
+		prev = s;
 	}
 }
 
 static void render(){
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	graphics_render(s);
+	graphics_render(clamp(s, 0.0f, 1.0f));
 }
 
 static int preview(){
