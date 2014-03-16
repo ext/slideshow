@@ -111,7 +111,7 @@ module_handle module_open(const char* name, enum module_type_t type, int flags){
 	lt_dlhandle handle = lt_dlopenext(name);
 
 	if ( !handle ){
-		log_message(Log_Debug, "Plugin '%s' not found in search path.\n", name);
+		log_message(Log_Debug, "Failed to load plugin '%s': %s\n", name, lt_dlerror());
 		errnum = MODULE_NOT_FOUND;
 		return NULL;
 	}
