@@ -353,12 +353,12 @@ void graphics_swap_textures(){
 	const unsigned int tmp = texture[0];
 	texture[0] = texture[1];
 	texture[1] = tmp;
+	counter++;
 }
 
 int graphics_load_image(const char* name, int letterbox){
 	graphics_swap_textures();
 	glBindTexture(GL_TEXTURE_2D, texture[0]);
-	counter++;
 
 	/* null is passed when the screen should go blank (e.g. queue is empty) */
 	if ( !name ){
