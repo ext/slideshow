@@ -21,6 +21,7 @@
 #endif
 
 #include "core/log.hpp"
+#include "core/asprintf.h"
 #include "core/exception.hpp"
 #include <stdarg.h>
 #include <cstdlib>
@@ -32,8 +33,6 @@
 #include <sys/un.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
-#include <portable/asprintf.h>
-#include <portable/file.h>
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>

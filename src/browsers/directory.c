@@ -18,9 +18,9 @@
 
 #include "browser.h"
 #include "core/log.h"
+#include "core/asprintf.h"
 #include <string.h>
 #include <dirent.h>
-#include <portable/asprintf.h>
 
 typedef struct {
 	struct browser_module_t module;

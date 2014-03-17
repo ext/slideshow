@@ -23,7 +23,7 @@
 #include <cstdarg>
 #include <cstdlib>
 
-#include <portable/asprintf.h>
+#include "core/asprintf.h"
 
 /**
  * @brief Base exception.
@@ -44,7 +44,7 @@ class exception: public std::exception {
 		const char* _file;
 		unsigned int _line;
 		char* _buf;
-		
+
 };
 
 #define exception(x, ...) exception(__FILE__, __LINE__, x, ## __VA_ARGS__)

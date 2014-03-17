@@ -22,6 +22,7 @@
 
 #include "state/video.hpp"
 #include "state/switch.hpp"
+#include "core/asprintf.h"
 #include "core/log.hpp"
 #include <cstdlib>
 #include <cstring>
@@ -31,7 +32,6 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/wait.h>
-#include <portable/asprintf.h>
 
 static char read_buffer[1024];
 static int child_pid = -1;
