@@ -57,3 +57,6 @@ class SQLite3(Browser):
 
     def connect(self, *args):
         cherrypy.thread_data.db = SQLite3(self.hostname, self.username, self.password, self.database)
+
+    def last_row_id(self):
+        return self.cursor.lastrowid
