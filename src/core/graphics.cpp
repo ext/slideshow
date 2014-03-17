@@ -126,9 +126,9 @@ void graphics_render(float state){
 	if ( !transition ) return;
 
 	struct transition_context context = {
-		.texture = {texture[0], texture[1]},
-		.state = state,
-		.counter = counter,
+		/* .texture = */  {texture[0], texture[1]},
+		/* .state = */    state,
+		/* .counter = */  counter,
 	};
 
 	transition->render(transition, &context);

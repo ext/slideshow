@@ -64,8 +64,13 @@ struct free_delete {
 };
 
 FileDestination::FileDestination(const char* filename)
-	: FileDestination(fopen(filename, "a")){
+	: _fp(fopen(filename, "a"))
+	, _autoclose(true) {
 
+	if ( !_fp ){
+		fprintf(stderr, "Failed to open `%s' for writing: %s!\n", filename, strerror(errno));
+		exit(1);
+	}
 }
 
 FileDestination::FileDestination(FILE* fp)
