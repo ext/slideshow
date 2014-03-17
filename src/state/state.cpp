@@ -16,27 +16,43 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef STATE_STATE_HPP
-#define STATE_STATE_HPP
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-#include "browsers/browser.h"
+#include "state/state.hpp"
+#include <time.h>
+#include <sys/time.h>
 
-class State {
-public:
-	State(browser_module_t* browser);
-	State(State* state);
-	virtual ~State();
+static unsigned long utime(){
+	struct timeval cur;
+	gettimeofday(&cur, NULL);
+	return (unsigned long)(cur.tv_sec * 1000000 + cur.tv_usec);
+}
 
-	virtual State* action(bool &flip) = 0;
+State::State(browser_module_t* browser)
+	: _browser(browser) {
+	_created = utime();
+}
 
-	slide_context_t next_slide() const;
-	browser_module_t* browser() const;
+State::State(State* state)
+	: _browser(state->_browser) {
+	_created = utime();
+	delete state;
+}
 
-	float age() const;
+State::~State(){
 
-private:
-	browser_module_t* _browser;
-	unsigned long _created;
-};
+}
 
-#endif /* STATE_STATE_HPP */
+slide_context_t State::next_slide() const {
+	return _browser->next_slide(_browser);
+}
+
+browser_module_t* State::browser() const {
+	return _browser;
+}
+
+float State::age() const {
+	return static_cast<float>(utime() - _created) / 1e6;
+}

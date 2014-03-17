@@ -13,7 +13,7 @@ warning_flags = -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-
 AM_CFLAGS = ${libportable_CFLAGS} ${warning_flags}
 
 libfsm_a_SOURCES = \
-	state/state.hpp \
+	state/state.cpp state/state.hpp \
 	state/initial.cpp state/initial.hpp \
 	state/switch.cpp state/switch.hpp \
 	state/transition.cpp state/transition.hpp \
