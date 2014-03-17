@@ -22,6 +22,7 @@
 
 #include "state/video.hpp"
 #include "state/switch.hpp"
+#include "core/asprintf.h"
 #include "core/log.hpp"
 #include <cstdlib>
 #include <cstring>
@@ -31,7 +32,6 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/wait.h>
-#include <portable/asprintf.h>
 
 static char read_buffer[1024];
 static int child_pid = -1;
@@ -63,7 +63,9 @@ void VideoState::command(const char* fmt, ...){
 	va_list ap;
 	va_start(ap, fmt);
 	char* tmp = vasprintf2(fmt, ap);
-	write(child_stdin, tmp, strlen(tmp));
+	if ( write(child_stdin, tmp, strlen(tmp)) == -1 ){
+		fprintf(stderr, "write failed: %s\n", strerror(errno));
+	}
 	free(tmp);
 	va_end(ap);
 }
@@ -114,8 +116,8 @@ int VideoState::init(){
 	int pipefds1[2];
 	int pipefds2[2];
 
-	pipe2(pipefds1, O_NONBLOCK);
-	pipe2(pipefds2, O_NONBLOCK);
+	if ( pipe2(pipefds1, O_NONBLOCK) == -1 ) fprintf(stderr, "pipe2 failed: %s\n", strerror(errno));
+	if ( pipe2(pipefds2, O_NONBLOCK) == -1 ) fprintf(stderr, "pipe2 failed: %s\n", strerror(errno));
 
 	child_pid = fork();
 

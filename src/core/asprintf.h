@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2014 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -16,23 +16,25 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef HAVE_CONFIG_H
-#	include "config.h"
-#endif
+#ifndef SLIDESHOW_ASPRINTF_H
+#define SLIDESHOW_ASPRINTF_H
 
-#include "state/view.hpp"
-#include "state/switch.hpp"
-#include <unistd.h>
+#include <stdio.h>
+#include <stdarg.h>
 
-double ViewState::view_time = 1.0;
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
 
-State* ViewState::action(bool &flip){
-	if ( age() > view_time ){
-		return new SwitchState(this);
-	}
+/**
+ * Wrapper functions for {,v}asprintf which returns the string or NULL if an
+ * error has occurred.
+ */
+char*  asprintf2(const char* fmt, ...);
+char* vasprintf2(const char* fmt, va_list ap);
 
-	// Sleep for a while
-	usleep(100 /* ms */ * 1000);
-
-	return this;
+#ifdef __cplusplus
 }
+#endif /* __cplusplus */
+
+#endif /* SLIDESHOW_ASPRINTF_H */

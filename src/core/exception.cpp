@@ -25,8 +25,6 @@
 #include <cstdarg>
 #include <cstdlib>
 
-#include <portable/asprintf.h>
-
 #undef exception
 
 exception::exception(const char* file, unsigned int line, const char* fmt, ...)

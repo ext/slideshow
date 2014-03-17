@@ -17,12 +17,11 @@
  */
 
 #include "browser.h"
-#include "core/log.h"
-#include <curl/curl.h>
+#include "core/asprintf.h"
 #include "core/curl_local.h"
+#include "core/log.h"
 #include <json/json.h>
 #include <string.h>
-#include <portable/asprintf.h>
 
 #define FRONTEND_API_VERSION "1"
 

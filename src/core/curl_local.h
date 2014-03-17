@@ -2,6 +2,7 @@
 #define CURL_LOCAL_H
 
 #include <stdlib.h>
+#include <curl/curl.h>
 
 #ifdef __cplusplus
 extern "C" {

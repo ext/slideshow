@@ -20,33 +20,23 @@
 #define STATE_STATE_HPP
 
 #include "browsers/browser.h"
-#include <portable/time.h>
 
 class State {
 public:
-	State(browser_module_t* browser): _browser(browser) {
-		_created = getTimef();
-	}
-	virtual ~State(){}
-
-	State(State* state): _browser(state->_browser) {
-		_created = getTimef();
-		delete state;
-	}
+	State(browser_module_t* browser);
+	State(State* state);
+	virtual ~State();
 
 	virtual State* action(bool &flip) = 0;
 
-	slide_context_t next_slide(){
-		return _browser->next_slide(_browser);
-	}
+	slide_context_t next_slide() const;
+	browser_module_t* browser() const;
 
-	browser_module_t* browser(){ return _browser; }
-
-	float age(){ return getTimef() - _created; }
+	float age() const;
 
 private:
 	browser_module_t* _browser;
-	float _created;
+	unsigned long _created;
 };
 
 #endif /* STATE_STATE_HPP */

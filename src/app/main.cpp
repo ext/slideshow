@@ -34,8 +34,6 @@
 #include <cstring>
 #include <cstdlib>
 #include <limits.h>
-#include <portable/portable.h>
-#include <portable/time.h>
 #include "backend/platform.h"
 #include "browsers/browser.h"
 
@@ -80,7 +78,6 @@ int main( int argc, const char* argv[] ){
 			throw exception("Failed to parse commandline arguments");
 		}
 
-		portable_init(stderr);
 		moduleloader_init(pluginpath());
 		PlatformBackend::register_all();
 

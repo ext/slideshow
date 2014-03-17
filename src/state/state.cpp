@@ -1,6 +1,6 @@
 /**
  * This file is part of Slideshow.
- * Copyright (C) 2008-2010 David Sveningsson <ext@sidvind.com>
+ * Copyright (C) 2008-2012 David Sveningsson <ext@sidvind.com>
  *
  * Slideshow is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -17,22 +17,42 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#	include "config.h"
+#include "config.h"
 #endif
 
-#include "state/view.hpp"
-#include "state/switch.hpp"
-#include <unistd.h>
+#include "state/state.hpp"
+#include <time.h>
+#include <sys/time.h>
 
-double ViewState::view_time = 1.0;
+static unsigned long utime(){
+	struct timeval cur;
+	gettimeofday(&cur, NULL);
+	return (unsigned long)(cur.tv_sec * 1000000 + cur.tv_usec);
+}
 
-State* ViewState::action(bool &flip){
-	if ( age() > view_time ){
-		return new SwitchState(this);
-	}
+State::State(browser_module_t* browser)
+	: _browser(browser) {
+	_created = utime();
+}
 
-	// Sleep for a while
-	usleep(100 /* ms */ * 1000);
+State::State(State* state)
+	: _browser(state->_browser) {
+	_created = utime();
+	delete state;
+}
 
-	return this;
+State::~State(){
+
+}
+
+slide_context_t State::next_slide() const {
+	return _browser->next_slide(_browser);
+}
+
+browser_module_t* State::browser() const {
+	return _browser;
+}
+
+float State::age() const {
+	return static_cast<float>(utime() - _created) / 1e6;
 }

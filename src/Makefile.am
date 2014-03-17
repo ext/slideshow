@@ -13,7 +13,7 @@ warning_flags = -Wall -Wextra -Wno-unused-parameter -Wfloat-equal -Wunsafe-loop-
 AM_CFLAGS = ${libportable_CFLAGS} ${warning_flags}
 
 libfsm_a_SOURCES = \
-	state/state.hpp \
+	state/state.cpp state/state.hpp \
 	state/initial.cpp state/initial.hpp \
 	state/switch.cpp state/switch.hpp \
 	state/transition.cpp state/transition.hpp \
@@ -51,6 +51,7 @@ libslideshow_core_la_CFLAGS    = ${AM_CFLAGS} ${GL_CFLAGS} ${DevIL_CFLAGS} ${gle
 libslideshow_core_la_CXXFLAGS  = ${libslideshow_core_a_CFLAGS}
 libslideshow_core_la_LIBADD    = ${GL_LIBS} ${DevIL_LIBS} ${glew_LIBS} ${CURL_LIBS}
 libslideshow_core_la_SOURCES   = \
+	core/asprintf.c core/asprintf.h \
 	core/curl_local.c core/curl_local.h \
 	core/exception.cpp core/exception.hpp \
 	core/graphics.cpp core/graphics.h \
