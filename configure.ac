@@ -82,7 +82,6 @@ dnl #######################################################################
 dnl # Required libraries
 dnl #######################################################################
 
-PKG_CHECK_MODULES([libportable], [libportable >= 0.2.2])
 PKG_CHECK_MODULES([libdaemon], [libdaemon >= 0.13])
 PKG_CHECK_MODULES([DevIL], [IL ILU])
 PKG_CHECK_MODULES([glew], [glew])

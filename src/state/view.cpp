@@ -22,6 +22,7 @@
 
 #include "state/view.hpp"
 #include "state/switch.hpp"
+#include <unistd.h>
 
 double ViewState::view_time = 1.0;
 
@@ -31,7 +32,7 @@ State* ViewState::action(bool &flip){
 	}
 
 	// Sleep for a while
-	sleepd( 0.1 );
+	usleep(100 /* ms */ * 1000);
 
 	return this;
 }

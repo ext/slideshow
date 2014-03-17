@@ -25,7 +25,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include <portable/vscanf.h>
 
 #ifdef WIN32
 #	include "win32.h"
@@ -290,7 +289,7 @@ void option_display_help(option_set_t* option){
 	}
 
 	printf("Options:\n");
-	
+
 	while ( node ){
 		argument_t* arg = node->argument;
 
