@@ -206,9 +206,7 @@ static int load_file(const char* filename, unsigned int dst){
 
 	std::unique_ptr<char, free_delete> real_name(strdup(filename));
 	if ( is_slide(filename) ){
-		char* tmp;
-		asprintf(&tmp, "%s/raster/%dx%d.png", filename, width, height);
-		real_name.reset(tmp);
+		real_name.reset(asprintf2("%s/raster/%dx%d.png", filename, width, height));
 	}
 
 #ifdef UNICODE

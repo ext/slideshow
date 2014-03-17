@@ -219,13 +219,9 @@ namespace Log {
 
 	void vmessage(Severity severity, const char* fmt, va_list ap){
 		static char buf[255]; /* this isn't thread-safe anyway, might as well make it static */
-		char* tmp;
 
-		vasprintf(&tmp, fmt, ap);
-		std::unique_ptr<char, free_delete> content(tmp);
-
-		asprintf(&tmp, "(%s) [%s] %s", severity_string(severity), timestring(buf, 255), content.get());
-		std::unique_ptr<char, free_delete> decorated(tmp);
+		std::unique_ptr<char, free_delete> content(vasprintf2(fmt, ap));
+		std::unique_ptr<char, free_delete> decorated(asprintf2("(%s) [%s] %s", severity_string(severity), timestring(buf, 255), content.get()));
 
 		for ( iterator it = destinations.begin(); it != destinations.end(); ++it ){
 			if ( severity < it->second ) continue;
