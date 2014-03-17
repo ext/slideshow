@@ -160,6 +160,7 @@ class Handler(object):
         localdata = dict(itertools.chain(*[x.localdata(content).items() for x in sorted]))
 
         return template.render(
+            id=None,
             assemblers=sorted,
             context='upload', content=content,
             resolution=resolution,
