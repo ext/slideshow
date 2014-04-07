@@ -560,7 +560,7 @@ class Settings(object):
                         # Failed to apply default value, this shouldn't happen.
                         # It means the default value specified in the xml is not a legal value
                         # for the datatype, eg expecting an int but got a string instead.
-                        traceback.print_exc()
+                        pass
                 elif n > 1:
                     raise RuntimeError, 'Got multiple default values for %s: %s' % (item, item.childNodes)
 
