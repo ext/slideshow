@@ -26,3 +26,9 @@ Slideshow is a kiosk-style application for showing text, image and video in a co
 
 * SDL
 * sqlite3 or mysql
+
+# Usage
+
+## Theme preview
+
+    python slideshow/theme.py THEME OUTPUT.PNG
