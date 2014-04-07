@@ -8,6 +8,7 @@ from slideshow.lib.resolution import Resolution
 # arguments
 parser = argparse.ArgumentParser()
 parser.add_argument('-s', '--size', default=(800,600), type=lambda x: x.split('x'))
+parser.add_argument('-d', dest='data', action='append', metavar='KEY=VALUE', help='Changes the text content, e.g. title=foo')
 parser.add_argument('src', metavar='THEME')
 parser.add_argument('dst', metavar='OUTPUT')
 args = parser.parse_args()
@@ -19,9 +20,9 @@ settings.load(join(root, 'settings.xml'), config_file=None, format_keys=dict(bas
 
 # load assembler
 asm = TextAssembler()
-params = {
-    'resolution': args.size,
-}
+params = {'resolution': args.size}
+for k,v in [x.split('=') for x in args.data]:
+    params[k] = v
 
 # load theme
 theme = Theme(args.src)
