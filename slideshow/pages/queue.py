@@ -21,7 +21,10 @@ class Ajax(object):
     @cherrypy.expose
     def remove(self, id):
         id = int(id)
-        
+
+        if id <= 1:
+            raise ValueError, 'Cannot remove default queues'
+
         c = cherrypy.thread_data.db
         if not queue.delete(c, id):
             return 'false'
