@@ -55,6 +55,10 @@ class Handler(object):
                                 kwargs[fullname] = 'off'
 
                 for k,v in kwargs.items():
+                    # ignore database password unless something was entered
+                    if k == 'Database.Password' and len(v) == 0:
+                        continue
+
                     try:
                         settings[k] = v
                     except ValueError as e:
