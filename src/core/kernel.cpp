@@ -58,6 +58,10 @@
 #	include <sys/wait.h>
 #endif
 
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif /* HAVE_UNISTD_H */
+
 #ifdef WIN32
 #	include "win32.h"
 #	include <direct.h>

@@ -37,6 +37,10 @@
 #include "backend/platform.h"
 #include "browsers/browser.h"
 
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif /* HAVE_UNISTD_H */
+
 // for getcwd
 #ifdef WIN32
 #	include <direct.h>
