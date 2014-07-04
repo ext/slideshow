@@ -32,7 +32,7 @@ Slideshow is a kiosk-style application for showing text, image and video in a co
     autoreconf -si
     mkdir build
     cd build
-    ../configure
+    ../configure --with-sdl
     make
 
 # Usage
