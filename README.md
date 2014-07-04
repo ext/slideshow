@@ -27,7 +27,20 @@ Slideshow is a kiosk-style application for showing text, image and video in a co
 * SDL
 * sqlite3 or mysql
 
+## Building daemon
+
+  autoreconf -si
+  mkdir build
+  cd build
+  ../configure
+  make
+
 # Usage
+
+  (hack to run inplace)
+  export PYTHONPATH=.
+  python slideshow/web --install /path/to/storage
+  python slideshow/web -f /path/to/storage/settings.conf
 
 ## Theme preview
 
