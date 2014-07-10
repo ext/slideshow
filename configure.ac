@@ -132,7 +132,7 @@ dnl #######################################################################
 dnl # Backends
 dnl #######################################################################
 
-AC_ARG_WITH([sdl], [AS_HELP_STRING([--with-sdl], [support for SDL backend @<:@default=no@:>@])], [],	[with_sdl=no])
+AC_ARG_WITH([sdl], [AS_HELP_STRING([--with-sdl], [support for SDL backend @<:@default=no@:>@])], [],	[with_sdl=yes])
 AS_IF([test "x$with_sdl" != xno], [
   AM_PATH_SDL
   AC_DEFINE(HAVE_SDL, 1, [Define if libsdl is available])
