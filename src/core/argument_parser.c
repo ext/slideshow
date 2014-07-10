@@ -155,7 +155,7 @@ int option_parse(option_set_t* option_set){
 	const char* const* argv = option_set->argv;
 
 	const argument_node_t* node = NULL;
-	const argument_t* extracted_option = NULL;
+	argument_t* extracted_option = NULL;
 
 	int i = 1;
 
@@ -243,7 +243,7 @@ int option_parse(option_set_t* option_set){
 
 			case arg_fmt:
 			{
-				const argument_format_t* real_option = (const argument_format_t*)extracted_option;
+				argument_format_t* real_option = (argument_format_t*)extracted_option;
 
 				/* copy the va_list since the same option might be passed twice
 				 * and the va_list would then be consumed. */
