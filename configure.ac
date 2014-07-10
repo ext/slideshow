@@ -58,7 +58,8 @@ dnl plugins.
 dnl https://github.com/ext/datapack
 AC_PATH_PROG([DATAPACKER], [datapacker])
 AS_IF([test -z "${DATAPACKER}"], [
-  AC_MSG_ERROR([datapacker (datapack) not found in PATH])
+  AC_MSG_ERROR([datapacker (datapack) not found in PATH.
+See https://github.com/ext/datapack])
 ])
 PKG_CHECK_MODULES([datapack], [datapack >= 0.3])
 

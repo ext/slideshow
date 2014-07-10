@@ -21,6 +21,7 @@ Slideshow is a kiosk-style application for showing text, image and video in a co
 * libdaemon
 * libjson
 * libportable
+* [datapack](https://github.com/ext/datapack)
 
 ## Optional
 
