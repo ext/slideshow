@@ -20,13 +20,15 @@ Slideshow is a kiosk-style application for showing text, image and video in a co
 * GLEW
 * libdaemon
 * libjson
-* libportable
+* libcurl
 * [datapack](https://github.com/ext/datapack)
 
 ## Optional
 
 * SDL
 * sqlite3 or mysql
+* DBus
+* Ragel
 
 ## Building daemon
 
