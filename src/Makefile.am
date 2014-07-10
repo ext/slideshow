@@ -29,8 +29,7 @@ slideshow_daemon_SOURCES = \
 	app/foreground.cpp app/foreground.hpp \
 	app/main.cpp \
 	backend/factory.cpp backend/platform.h \
-	browsers/context.rl \
-	browsers/browser.cpp browsers/browser.h \
+	browsers/context.rl browsers/browser.cpp browsers/browser.h \
 	core/argument_parser.c core/argument_parser.h \
 	core/kernel.cpp core/kernel.hpp \
 	core/mathutils.h \
@@ -67,7 +66,7 @@ slideshow_transition_LDFLAGS = ${AM_LDFLAGS} -rdynamic
 slideshow_transition_LDADD = libmodule_loader.a libslideshow_core.la -lm -lltdl -lX11 ${datapack_LIBS} ${SDL_LIBS}
 endif
 
-CLEANFILES = browser_context.cpp
+DISTCLEANFILES = src/browser/context.cpp
 
 .rl.cpp:
 	$(AM_V_GEN)$(RAGEL) $(RAGELFLAGS) -C $< -o $@
