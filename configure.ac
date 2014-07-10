@@ -36,22 +36,25 @@ CHECK_RAGEL([src/browsers/context.cpp])
 AX_CHECK_GL
 AC_FUNC_FORK
 
+dnl Test if va_copy is present on the system
+AC_MSG_CHECKING([if va_copy is present])
+AC_TRY_COMPILE([
+  #include <stdarg.h>
+  void func(const char* fmt, ...){
+    va_list ap, bp;
+    va_start(ap, fmt);
+    va_copy(bp, ap);
+    va_end(ap);
+  }
+], [], [ac_cv_func_va_copy=yes], [ac_cv_func_va_copy=no])
+AC_MSG_RESULT([$ac_cv_func_va_copy])
+AS_IF([test $ac_cv_func_va_copy = yes], [
+  AC_DEFINE([HAVE_VA_COPY], [1], [Define to 1 if va_copy is present])
+])
+
 dnl Windows does not support daemon mode yet, but any platform where autotools
 dnl is used is assumed to.
 AC_DEFINE([BUILD_DAEMON], [1], [Define to 1 to build daemon mode support])
-
-dnl Only needed because of an ugly hack in argument parser, breaks cross-compiling =/
-AC_MSG_CHECKING([host architecture])
-case "$host" in
-	x86_64-*)
-		AC_MSG_RESULT([amd64])
-		AC_SUBST(ARCH_FLAGS, [-DARCH_AMD64=1]) ;;
-	i[3456]86-*)
-		AC_MSG_RESULT([x86])
-		AC_SUBST(ARCH_FLAGS, [-DARCH_X86=1]) ;;
-	*)
-		AC_MSG_RESULT([unknown]) ;;
-esac
 
 dnl Require datapack for packing shaders and other resources into transition
 dnl plugins.
