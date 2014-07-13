@@ -288,10 +288,6 @@ class ItemResolution(ItemSelect):
     default = None
     values = [] # set later
 
-class ItemDisplay(ItemSelect):
-    default = ':0.0'
-    values = map(lambda x: (x,x), xorg_query.screens())
-
 class ItemStatic(Item):
     default = None
 
@@ -381,7 +377,6 @@ itemfactory = {
     'float':     ItemFloat,
     'password':  ItemPassword,
     'resolution':ItemResolution,
-    'display':   ItemDisplay,
     'static':    ItemStatic,
     'filelist':  ItemFilelist,
     'textarea':  ItemTextArea,
