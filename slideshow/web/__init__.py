@@ -11,6 +11,7 @@ import json
 import subprocess
 import threading
 import time
+import cairo
 
 import slideshow
 from slideshow.lib import template, browser as browser_factory, slide
@@ -26,6 +27,22 @@ import slideshow.tools.ipblock
 
 def get_resource_path(*path):
     return os.path.join(os.path.dirname(slideshow.__file__), *path)
+
+def daemon_exists():
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    for program in ['slideshow-daemon', 'slideshow-transition']:
+        for path in os.environ["PATH"].split(os.pathsep):
+            path = path.strip('"')
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                break
+        else:
+            print >> sys.stderr, program, 'could not be found in PATH.'
+            return False
+
+    return True
 
 class Command:
     def __init__(self, *args):
@@ -66,16 +83,31 @@ class Root(object):
         filename = 'transition_%s.gif' % name
         dst = os.path.join(settings['Path']['BasePath'], settings['Path']['Temp'], filename)
 
-        cmd = Command('slideshow-transition', '-G', dst, name)
-        returncode, output = cmd.run(timeout=15)
-        if returncode != 0:
-            raise RuntimeError, 'Failed to generate preview: %s' % output
-
-        age = 60 * 60 * 24 * 365
+        age = 60 * 60 * 24 # 1 day
         expires = time.time() + age
         cherrypy.response.headers['Content-Type'] = 'image/gif'
         cherrypy.response.headers['Cache-Control'] = 'public, max-age=%d' % age
         cherrypy.response.headers['Expires'] = time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(expires))
+
+        cmd = Command('slideshow-transition', '-G', dst, name)
+        returncode, output = cmd.run(timeout=15)
+        if returncode != 0:
+            surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 228, 170)
+            ctx = cairo.Context (surface)
+            ctx.set_source_rgb(0.7, 0.7, 0.7)
+            ctx.fill()
+            ctx.select_font_face('Monospace')
+            ctx.set_font_size(9)
+            ctx.set_source_rgb(0, 0, 0)
+            ctx.move_to(1, 10)
+            ctx.show_text('Failed to generate preview:')
+            ctx.stroke()
+            ctx.move_to(1, 20)
+            ctx.show_text(output)
+            ctx.stroke()
+
+            cherrypy.response.headers['Content-Type'] = "image/png"
+            surface.write_to_png(dst)
 
         def stream():
             with open(dst, 'rb') as fp:
@@ -204,6 +236,12 @@ def run():
         if not os.access(args.config_file, os.W_OK):
             print >> sys.stderr, 'Could not write to configuration file:', args.config_file
             print >> sys.stderr, 'Make sure the user has proper permissions.'
+            sys.exit(1)
+
+        # verify slideshow daemon exists in path
+        if not daemon_exists():
+            # Notice about specific application is written by `daemon_exists`.
+            print >> sys.stderr, 'Either install to a location in PATH or adjust PATH to include the directory where it is installed.'
             sys.exit(1)
 
         # update basepath and references if using --switch

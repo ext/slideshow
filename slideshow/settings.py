@@ -367,7 +367,11 @@ class ItemTransition(ItemSelect):
     values = []
 
     def get_options(self):
-        return [x.split(':', 1) for x in subprocess.check_output(['slideshow-transition', '-lb']).splitlines()]
+        try:
+            return [x.split(':', 1) for x in subprocess.check_output(['slideshow-transition', '-lb']).splitlines()]
+        except OSError:
+            traceback.print_exc()
+            return []
 
 itemfactory = {
     'directory': ItemDirectory,
