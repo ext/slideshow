@@ -11,6 +11,7 @@ import json
 import subprocess
 import threading
 import time
+import cairo
 
 import slideshow
 from slideshow.lib import template, browser as browser_factory, slide
@@ -82,16 +83,31 @@ class Root(object):
         filename = 'transition_%s.gif' % name
         dst = os.path.join(settings['Path']['BasePath'], settings['Path']['Temp'], filename)
 
-        cmd = Command('slideshow-transition', '-G', dst, name)
-        returncode, output = cmd.run(timeout=15)
-        if returncode != 0:
-            raise RuntimeError, 'Failed to generate preview: %s' % output
-
-        age = 60 * 60 * 24 * 365
+        age = 60 * 60 * 24 # 1 day
         expires = time.time() + age
         cherrypy.response.headers['Content-Type'] = 'image/gif'
         cherrypy.response.headers['Cache-Control'] = 'public, max-age=%d' % age
         cherrypy.response.headers['Expires'] = time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(expires))
+
+        cmd = Command('slideshow-transition', '-G', dst, name)
+        returncode, output = cmd.run(timeout=15)
+        if returncode != 0:
+            surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, 228, 170)
+            ctx = cairo.Context (surface)
+            ctx.set_source_rgb(0.7, 0.7, 0.7)
+            ctx.fill()
+            ctx.select_font_face('Monospace')
+            ctx.set_font_size(9)
+            ctx.set_source_rgb(0, 0, 0)
+            ctx.move_to(1, 10)
+            ctx.show_text('Failed to generate preview:')
+            ctx.stroke()
+            ctx.move_to(1, 20)
+            ctx.show_text(output)
+            ctx.stroke()
+
+            cherrypy.response.headers['Content-Type'] = "image/png"
+            surface.write_to_png(dst)
 
         def stream():
             with open(dst, 'rb') as fp:
