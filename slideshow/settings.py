@@ -3,7 +3,7 @@
 
 from xml.dom import minidom
 import os, sys, stat, traceback
-import json, xorg_query
+import json
 import pprint
 import threading
 import event
@@ -12,6 +12,10 @@ import subprocess
 from glob import glob
 from lib.resolution import Resolution
 from os.path import join, basename, dirname
+import Xlib.support.connect
+import Xlib.display
+import Xlib.ext.randr
+import Xlib.error
 
 try:
     # python 3.0
@@ -268,8 +272,19 @@ def resolutions(dpy):
     def get_value(w,h,a):
         return '{width}x{height} ({aspect})'.format(width=w, height=h, aspect=a)
 
+    # open display and screen
+    _, _, _, screenno = Xlib.support.connect.get_display(dpy)
+    try:
+        d = Xlib.display.Display(dpy)
+    except Xlib.error.DisplayConnectionError:
+        traceback.print_exc()
+        return []
+    if screenno >= d.screen_count(): return []
+    s = d.screen(screenno)
+
     # get all available resolution, ignoring refresh-rate
-    all = frozenset([(w,h,_calc_aspect(w,h)) for (w,h,r) in xorg_query.resolutions(dpy)])
+    modes = Xlib.ext.randr.get_screen_resources(s.root).modes
+    all = frozenset([(mode.width, mode.height, _calc_aspect(mode.width, mode.height)) for mode in modes])
 
     # format resolution, builing a list of ('WxH', 'WxH (A)', W, H) tuples (last elements is used for sorting)
     formated = [ (get_key(*x), get_value(*x), x[0], x[1]) for x in all]
@@ -287,10 +302,6 @@ def resolutions(dpy):
 class ItemResolution(ItemSelect):
     default = None
     values = [] # set later
-
-class ItemDisplay(ItemSelect):
-    default = ':0.0'
-    values = map(lambda x: (x,x), xorg_query.screens())
 
 class ItemStatic(Item):
     default = None
@@ -381,7 +392,6 @@ itemfactory = {
     'float':     ItemFloat,
     'password':  ItemPassword,
     'resolution':ItemResolution,
-    'display':   ItemDisplay,
     'static':    ItemStatic,
     'filelist':  ItemFilelist,
     'textarea':  ItemTextArea,
@@ -489,8 +499,14 @@ class Settings(object):
             h = int(h)
             return Resolution(w,h)
         else:
-            size = xorg_query.current_resolution(use_rotation=True)
-            return Resolution(size[0], size[1])
+            try:
+                d = Xlib.display.Display(self['Appearance.Display'])
+            except Xlib.error.DisplayConnectionError:
+                traceback.print_exc()
+                return Resolution(800,600)
+            s = d.screen()
+            geometry = s.root.get_geometry()
+            return Resolution(geometry.width, geometry.height)
 
     def load(self, base, config_file=None, format_keys={}, errors=[]):
         """
