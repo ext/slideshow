@@ -15,6 +15,7 @@ from os.path import join, basename, dirname
 import Xlib.support.connect
 import Xlib.display
 import Xlib.ext.randr
+import Xlib.error
 
 try:
     # python 3.0
@@ -273,7 +274,11 @@ def resolutions(dpy):
 
     # open display and screen
     _, _, _, screenno = Xlib.support.connect.get_display(dpy)
-    d = Xlib.display.Display(dpy)
+    try:
+        d = Xlib.display.Display(dpy)
+    except Xlib.error.DisplayConnectionError:
+        traceback.print_exc()
+        return []
     if screenno >= d.screen_count(): return []
     s = d.screen(screenno)
 
@@ -494,7 +499,11 @@ class Settings(object):
             h = int(h)
             return Resolution(w,h)
         else:
-            d = Xlib.display.Display(self['Appearance.Display'])
+            try:
+                d = Xlib.display.Display(self['Appearance.Display'])
+            except Xlib.error.DisplayConnectionError:
+                traceback.print_exc()
+                return Resolution(800,600)
             s = d.screen()
             geometry = s.root.get_geometry()
             return Resolution(geometry.width, geometry.height)
