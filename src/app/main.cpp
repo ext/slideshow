@@ -62,6 +62,7 @@ int main( int argc, const char* argv[] ){
 			false,					// fullscreen
 			false,					// have_password
 			-1, 						// queue_id
+			NULL,           // resolution
 			800,					// width
 			600,					// height
 			3.0f,					// transition_time;

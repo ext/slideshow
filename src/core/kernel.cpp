@@ -349,7 +349,7 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 	option_add_string(&options, "transition",       't', "Set slide transition plugin [fade]", &arg.transition_string);
 	option_add_int(&options,    "collection-id",    'c', "ID of the queue to display (deprecated, use `--queue-id')",  &arg.queue_id);
 	option_add_int(&options,    "queue-id",         'c', "ID of the queue to display", &arg.queue_id);
-	option_add_format(&options, "resolution",       'r', "Resolution", "WIDTHxHEIGHT", "%dx%d", &arg.width, &arg.height);
+	option_add_string(&options, "resolution",       'r', "Resolution (WIDTHxHEIGHT)", &arg.resolution);
 	option_add_string(&options, "name",             'n', "Instance name [machine hostname]", &arg.instance);
 
 	/* logging options */
@@ -359,6 +359,11 @@ bool Kernel::parse_arguments(argument_set_t& arg, int argc, const char* argv[]){
 
 	int n = option_parse(&options);
 	option_finalize(&options);
+
+	/* parse resolution */
+	if ( arg.resolution ){
+		sscanf(arg.resolution, "%dx%d", &arg.width, &arg.height);
+	}
 
 	/* If no browser was provided but the --directory option was given construct a browser-string from it */
 	if ( !arg.connection_string && directory ){

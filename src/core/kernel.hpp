@@ -34,6 +34,7 @@ public:
 		int fullscreen;
 		int have_password;
 		int queue_id;
+		char* resolution;
 		int width;
 		int height;
 		float transition_time;
