@@ -57,24 +57,23 @@ int main( int argc, const char* argv[] ){
 
 		// Default arguments
 		Kernel::argument_set_t arguments = {
-			Kernel::ForegroundMode, // mode
-			Log_Info, 				// loglevel
-			false,					// fullscreen
-			false,					// have_password
-			-1, 						// queue_id
-			NULL,           // resolution
-			800,					// width
-			600,					// height
-			3.0f,					// transition_time;
-			5.0f,					// switch_time;
-			NULL,					// connection_string
-			NULL,					// transition_string
-			NULL,					// file log
-			NULL,					// named pipe log
-			NULL,					// unix domain socket log
-
-			NULL,                   // Frontend URL.
-			NULL,                   // Instance name.
+			Kernel::ForegroundMode,      // mode
+			Log_Info,                    // loglevel
+			false,                       // fullscreen
+			false,                       // have_password
+			-1,                          // queue_id
+			NULL,                        // resolution
+			800,                         // width
+			600,                         // height
+			3.0f,                        // transition_time;
+			5.0f,                        // switch_time;
+			NULL,                        // connection_string
+			NULL,                        // transition_string
+			NULL,                        // file log
+			NULL,                        // named pipe log
+			NULL,                        // unix domain socket log
+			NULL,                        // Frontend URL.
+			NULL,                        // Instance name.
 		};
 
 		// Parse the cli arguments, overriding the defaults. Throw an exception
