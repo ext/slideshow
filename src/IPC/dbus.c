@@ -16,8 +16,8 @@
  * along with Slideshow.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "IPC.h"
-#include "log.h"
+#include "IPC.hpp"
+#include "core/log.h"
 #include <dbus/dbus.h>
 
 MODULE_INFO("dbus", IPC_MODULE, "David Sveningsson");
@@ -52,7 +52,7 @@ static void handle_set_queue(DBusMessage* message){
 		return;
 	}
 
-	action_set_queue(queue_id);
+	action_set_queue((int)queue_id);
 }
 
 static DBusHandlerResult signal_filter (DBusConnection* bus, DBusMessage* message, void* user_data){

@@ -20,7 +20,7 @@
 #include "config.h"
 #endif
 
-#include "IPC.hpp"
+#include "IPC/IPC.hpp"
 #include "core/kernel.hpp"
 #include "core/log.hpp"
 
