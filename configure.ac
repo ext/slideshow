@@ -8,9 +8,6 @@ AC_CONFIG_HEADERS([src/config.h])
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
-	src/transitions/Makefile
-	src/browsers/Makefile
-	src/IPC/Makefile
 ])
 AC_CONFIG_FILES([slideshow-wrapper], [
   chmod +x slideshow-wrapper
