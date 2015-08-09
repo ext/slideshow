@@ -90,7 +90,8 @@ def settings(browser, resolution=None, fullscreen=True):
         SDL_VIDEO_X11_XRANDR='0',
         HOME=os.environ['HOME'],
         PATH=os.environ['PATH'],
-        )
+        SDL_VIDEODRIVER='x11',
+    )
     for k,v in settings['Env'].items():
         env['SLIDESHOW_' + k] = v
 
