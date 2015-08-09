@@ -1,8 +1,12 @@
-SUBDIRS = transitions browsers IPC
-
 noinst_LIBRARIES = libmodule_loader.a libfsm.a
 noinst_LTLIBRARIES = libslideshow_core.la
 bin_PROGRAMS = slideshow-daemon
+plugin_LTLIBRARIES =
+
+DATAFILES =
+EXTRA_DIST =
+BUILT_SOURCES =
+CLEANFILES =
 
 if WITH_SDL
 bin_PROGRAMS += slideshow-transition
@@ -25,7 +29,7 @@ slideshow_daemon_CXXFLAGS  = ${slideshow_daemon_CFLAGS}
 slideshow_daemon_LDFLAGS   = ${AM_LDFLAGS} -rdynamic
 slideshow_daemon_LDADD     = libmodule_loader.a libslideshow_core.la libfsm.a -lltdl ${datapack_LIBS} ${libportable_LIBS} ${libdaemon_LIBS} ${json_LIBS} ${CURL_LIBS}
 slideshow_daemon_SOURCES = \
-	app/daemon.cpp src/daemon.hpp \
+	app/daemon.cpp app/daemon.hpp \
 	app/foreground.cpp app/foreground.hpp \
 	app/main.cpp \
 	backend/factory.cpp backend/platform.h \
@@ -37,8 +41,7 @@ slideshow_daemon_SOURCES = \
 	core/vector.h \
 	core/win32.h \
 	IPC/IPC.cpp IPC/IPC.hpp \
-	ptr.h \
-	transitions/ransition.h
+	transitions/transition.h
 
 if WITH_SDL
 slideshow_daemon_SOURCES  += backend/SDLbackend.cpp backend/SDLbackend.h
@@ -66,7 +69,107 @@ slideshow_transition_LDFLAGS = ${AM_LDFLAGS} -rdynamic
 slideshow_transition_LDADD = libmodule_loader.a libslideshow_core.la -lm -lltdl -lX11 ${datapack_LIBS} ${SDL_LIBS}
 endif
 
-DISTCLEANFILES = src/browser/context.cpp
+#
+# Transitions
+#
+
+TRANSITION_CFLAGS = -I${top_srcdir}/src -Itransitions ${warning_flags}
+TRANSITION_LDFLAGS = -shared -module -avoid-version
+
+plugin_LTLIBRARIES += fade.la spin.la vfade.la noise.la
+
+fade_la_SOURCES   = transitions/fade.c transitions/fade_files.dpl transitions/fade.frag
+fade_la_DATAFILES = transitions/fade_files.dpl
+fade_la_CFLAGS    = ${TRANSITION_CFLAGS}
+fade_la_LDFLAGS   = ${TRANSITION_LDFLAGS}
+
+vfade_la_SOURCES   = transitions/vfade.c transitions/vfade_files.dpl transitions/vfade.frag
+vfade_la_DATAFILES = transitions/vfade_files.dpl
+vfade_la_CFLAGS    = ${TRANSITION_CFLAGS}
+vfade_la_LDFLAGS   = ${TRANSITION_LDFLAGS}
+
+noise_la_SOURCES   = transitions/noise.c transitions/noise_files.dpl transitions/noise.frag
+noise_la_DATAFILES = transitions/noise_files.dpl
+noise_la_CFLAGS    = ${TRANSITION_CFLAGS}
+noise_la_LDFLAGS   = ${TRANSITION_LDFLAGS}
+
+spin_la_SOURCES   = transitions/spin.c
+spin_la_CFLAGS    = ${TRANSITION_CFLAGS}
+spin_la_LDFLAGS   = ${TRANSITION_LDFLAGS}
+
+DATAFILES += ${fade_la_DATAFILES} ${vfade_la_DATAFILES} ${noise_la_DATAFILES}
+BUILT_SOURCES += $(DATAFILES:.dpl=.c)
+CLEANFILES += $(DATAFILES:.dpl=.c) $(DATAFILES:.dpl=.h) $(addprefix $(DEPDIR)/, $(notdir $(DATAFILES:=.d)))
+
+EXTRA_DIST += transitions/default.c transitions/fsquad.vert
+
+#
+# Browsers
+#
+
+BROWSER_CFLAGS = -I${top_srcdir}/src ${warning_flags}
+BROWSER_LDFLAGS = -shared -module -avoid-version
+
+plugin_LTLIBRARIES += frontend.la
+frontend_la_SOURCES = browsers/frontend.c
+frontend_la_CFLAGS  = ${BROWSER_CFLAGS} ${json_CFLAGS}
+frontend_la_LDFLAGS = ${BROWSER_LDFLAGS}
+frontend_la_LIBADD  = -lcurl ${json_LIBS}
+
+if WITH_SQLITE3
+plugin_LTLIBRARIES += sqlite3.la
+sqlite3_la_SOURCES  = browsers/sqlite.c
+sqlite3_la_CFLAGS   = ${BROWSER_CFLAGS}
+sqlite3_la_LDFLAGS  = ${BROWSER_LDFLAGS}
+sqlite3_la_LIBADD   = ${sqlite3_LIBS}
+endif
+
+if WITH_DIRECTORY
+plugin_LTLIBRARIES   += directory.la
+directory_la_SOURCES  = browsers/directory.c
+directory_la_CFLAGS   = ${BROWSER_CFLAGS}
+directory_la_LDFLAGS  = ${BROWSER_LDFLAGS}
+endif
+
+if WITH_MYSQL
+plugin_LTLIBRARIES += mysql.la
+mysql_la_SOURCES    = browsers/mysql.c
+mysql_la_CFLAGS     = ${BROWSER_CFLAGS} ${MYSQL_CLIENT_CFLAGS}
+mysql_la_LDFLAGS    = ${BROWSER_LDFLAGS}
+mysql_la_LIBADD     = ${MYSQL_CLIENT_LIBS}
+endif
+
+#
+# IPC
+#
+
+IPC_CFLAGS = -I${top_srcdir}/src ${warning_flags}
+IPC_LDFLAGS = -shared -module -avoid-version
+
+plugin_LTLIBRARIES += signal.la
+signal_la_SOURCES = IPC/signal.c
+signal_la_CFLAGS = ${IPC_CFLAGS}
+signal_la_LDFLAGS = ${IPC_LDFLAGS}
+signal_la_LIBADD = ${dbus_LIBS}
+
+if WITH_DBUS
+plugin_LTLIBRARIES += dbus.la
+dbus_la_SOURCES = IPC/dbus.c
+dbus_la_CFLAGS = ${IPC_CFLAGS} ${dbus_CFLAGS}
+dbus_la_LDFLAGS = ${IPC_LDFLAGS}
+dbus_la_LIBADD = ${dbus_LIBS}
+endif
+
+# Misc
+
+DISTCLEANFILES = browsers/context.cpp
 
 .rl.cpp:
 	$(AM_V_GEN)$(RAGEL) $(RAGELFLAGS) -C $< -o $@
+
+.dpl.c:
+	@test x"$(@D)" = x || $(MKDIR_P) "$(@D)"
+	@$(MKDIR_P) "$(DEPDIR)"
+	$(AM_V_GEN)${DATAPACKER} -f $< -s $(dir $<) -d $(DEPDIR)/$(notdir $<).d -e $(basename $@).h -o $@
+
+-include $(addprefix $(DEPDIR)/, $(notdir $(DATAFILES:=.d)))
