@@ -12,14 +12,18 @@ setup(
         '': [
             'install/*.sql',
             'lib/assembler/*.html',
-            'static/*/*',
+            'static/js/*.js',
+            'static/icon/*.png',
+            'static/css/*.css',
+            'static/css/*.png',
+            'static/css/images/*.png',
             'templates/*.html',
             'templates/*/*.html',
             'settings.xml',
             'default.xml',
             'template.dtd',
             ]},
-    
+
     entry_points = """
 [console_scripts]
 slideshow = slideshow.web:run
