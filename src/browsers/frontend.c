@@ -35,14 +35,19 @@ typedef struct {
 MODULE_INFO("Frontend Browser", BROWSER_MODULE, "David Sveningsson");
 
 static int next_slide_v1(frontend_context_t* this, slide_context_t* slide, struct json_object* data){
-	struct json_object* assembler = json_object_object_get(data, "assembler");
-	struct json_object* slide_id  = json_object_object_get(data, "slide-id");
-	struct json_object* filename  = json_object_object_get(data, "filename");
-	struct json_object* context   = json_object_object_get(data, "context");
+	struct json_object* assembler = NULL;
+	struct json_object* slide_id  = NULL;
+	struct json_object* filename  = NULL;
+	struct json_object* context   = NULL;
 
 	/* is assembler isn't set, no field can be assumed to be. It means no slide could be fetched (e.g. empty queue). */
-	if ( assembler ){
+	if ( json_object_object_get_ex(data, "assembler", &assembler) ){
 		slide->assembler = strdup(json_object_get_string(assembler));
+
+		/** @todo add error checking */
+		json_object_object_get_ex(data, "slide-id", &slide_id);
+		json_object_object_get_ex(data, "filename", &filename);
+		json_object_object_get_ex(data, "context", &context);
 
 		if ( strcmp(slide->assembler, "video") != 0 ){
 			slide->filename = asprintf2("%s/slides/show/%d", this->module.context.host, json_object_get_int(slide_id));
@@ -52,11 +57,6 @@ static int next_slide_v1(frontend_context_t* this, slide_context_t* slide, struc
 
 		this->id = json_object_get_int(context);
 	}
-
-	json_object_put(context);
-	json_object_put(filename);
-	json_object_put(slide_id);
-	json_object_put(assembler);
 
 	return 0;
 }
@@ -92,11 +92,10 @@ static slide_context_t next_slide(frontend_context_t* this){
 		return slide;
 	}
 
-	int version;
-	{
-		struct json_object* tmp = json_object_object_get(data, "version");
+	int version = -1;
+	struct json_object* tmp;
+	if ( json_object_object_get_ex(data, "version", &tmp) ){
 		version = json_object_get_int(tmp);
-		json_object_put(tmp);
 	}
 
 	int ret;
@@ -104,6 +103,9 @@ static slide_context_t next_slide(frontend_context_t* this){
 	case 1:
 		ret = next_slide_v1(this, &slide, data);
 		break;
+	case -1:
+		log_message(Log_Warning, "frontend did not reply with a version %d\n", version);
+		return slide;
 	default:
 		log_message(Log_Warning, "frontend replied with unsuppored version %d\n", version);
 		return slide;
