@@ -30,7 +30,7 @@ static void render(transition_module_t transition, transition_context_t context)
 
 	glPushMatrix();
 
-	glRotatef( 20 * sinf(M_PI * context->state), 1, 0, 0);
+	glRotatef(20 * sinf((float)M_PI * context->state), 1, 0, 0);
 	glTranslatef(0.5f, 0, 0);
 	glRotatef( 180 * context->state, 0, 1, 0);
 

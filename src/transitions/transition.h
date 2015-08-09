@@ -39,8 +39,8 @@ struct transition_module {
 	struct module_t base;
 	render_callback render;       /* function to call when rendering or NULL for default (using fsquad) */
 
-	GLuint state_uniform;         /* uniform location of last loaded shader for this transition (be vary if using multiple shaders) */
-	GLuint counter_uniform;       /* uniform location of for counter */
+	GLint state_uniform;          /* uniform location of last loaded shader for this transition (be vary if using multiple shaders) */
+	GLint counter_uniform;        /* uniform location of for counter */
 	GLuint shader;                /* shader used by default render */
 };
 

@@ -42,13 +42,13 @@ int graphics_set_transition(const char* name, transition_module_t* mod);
 
 /**
  * Load a shader.
- *   GLint sp = graphics_load_shader(SHADER_VERTEX, &datapack_handle, SHADER_FRAGMENT, &datapack_handle, SHADER_NONE);
+ *   GLuint sp = graphics_load_shader(SHADER_VERTEX, &datapack_handle, SHADER_FRAGMENT, &datapack_handle, SHADER_NONE);
  *
  * The shader will stay loaded, manually call glUseProgram(..) to unload/change.
  *
  * @return Non-zero if successful, 0 on errors (which is written to log).
  */
-int graphics_load_shader(enum shader_spec_t spec, ...);
+GLuint graphics_load_shader(enum shader_spec_t spec, ...);
 
 /**
  * Transition helper: render a fullscreen quad.

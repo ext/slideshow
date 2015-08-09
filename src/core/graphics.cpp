@@ -478,11 +478,11 @@ static int attach_shader(GLint sp, GLenum type, struct datapack_entry* src){
 	return 0;
 }
 
-int graphics_load_shader(enum shader_spec_t spec, ...){
+GLuint graphics_load_shader(enum shader_spec_t spec, ...){
 	va_list ap;
 	va_start(ap, spec);
 
-	GLint sp = glCreateProgram();
+	GLuint sp = glCreateProgram();
 	if ( !sp ) return 0;
 
 	while ( spec != SHADER_NONE ){
