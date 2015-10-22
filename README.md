@@ -32,7 +32,7 @@ Slideshow is a kiosk-style application for showing text, image and video in a co
 
 ## Debian/ubuntu requirements
 
-    sudo apt-get install build-essentials libtool autoconf pkg-config ragel libdaemon-dev libdevil-dev libjson-c-dev libcurl4-openssl-dev python-cherrypy3 python-genshi python-xlib python-pythonmagick python-gamin
+    sudo apt-get install build-essentials libtool autoconf pkg-config ragel libdaemon-dev libdevil-dev libjson-c-dev libcurl4-openssl-dev libsqlite3-dev python-cherrypy3 python-genshi python-xlib python-pythonmagick python-gamin
     sudo pip install htmlcolor
 
 ## Building daemon
