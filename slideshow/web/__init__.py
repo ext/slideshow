@@ -208,7 +208,7 @@ def run():
     parser.add_argument('-v', '--verbose', dest='verbose', action='store_true')
     parser.add_argument('-q', '--quiet', dest='verbose', action='store_false')
     parser.add_argument('-p', '--port', type=int, default=8000)
-    parser.add_argument('--install', default=None)
+    parser.add_argument('-i', '--install', default=None)
     parser.add_argument('--switch', default=None)
 
     # parse args
