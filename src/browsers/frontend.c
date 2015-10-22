@@ -20,7 +20,7 @@
 #include "core/asprintf.h"
 #include "core/curl_local.h"
 #include "core/log.h"
-#include <json/json.h>
+#include <json.h>
 #include <string.h>
 
 #define FRONTEND_API_VERSION "1"
