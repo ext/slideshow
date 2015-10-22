@@ -50,7 +50,7 @@
 
 // Loading settings
 #include <curl/curl.h>
-#include <json/json.h>
+#include <json.h>
 #include "curl_local.h"
 
 // Platform
