@@ -32,6 +32,12 @@ Slideshow is a kiosk-style application for showing text, image and video in a co
 
 ## Building daemon
 
+### Debian requirements
+
+    sudo apt-get install build-essentials libtool autoconf pkg-config ragel libdaemon-dev libdevil-dev libjson-c-dev libcurl4-openssl-dev
+
+### Compiling
+
     autoreconf -si
     mkdir build
     cd build
