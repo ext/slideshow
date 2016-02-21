@@ -14,19 +14,19 @@
 		<script src="/static/js/jquery.jeditable.js" type="text/javascript"></script>
 		<script src="/static/js/jquery-foldable-1.0.js" type="text/javascript"></script>
 		<script src="/static/js/slideshow.js" type="text/javascript"></script>
-		
+
 		<title py:with="title = list(select('title/text()'))">Slideshow<py:if test="title"> &gt; ${title}</py:if></title>
 		${select('*[local-name()!="title"]')}
 	</head>
 	</py:match>
-	
+
 	<?python
 		from slideshow.settings import Settings
 
 		class Menu:
 			def __init__(self, *items):
 				self.items = items
-			
+
 			def attrs_li(self, i):
 				c = []
 				if i == 0:
@@ -35,25 +35,25 @@
 					c.append('last')
 				if self.items[i][0] == parent:
 					c.append('selection')
-				
+
 				return {'class': ' '.join(c)}
-			
+
 			def attrs_a(self, i):
 				return {'class': 'menu_' + self.items[i][0]}
-			
+
 		menu = Menu(
 			('main', _('main'), '/'),
 			('slides', _('slides'), '/slides/upload'),
 			('queues', _('queues'), '/queue'),
 			('maintenance', _('maintenance'), '/maintenance'))
 	?>
-	
+
 	<py:match path="body" once="true">
 	<body py:attrs="select('@*')">
 		<div id="header">
 			<h1>${Settings()['Slideshow.Title']}</h1>
 		</div>
-	
+
 		<div id="bar">
 			<span class="daemonstatus">Status: ${daemonstr}</span>
 
@@ -68,16 +68,16 @@
 				</ul>
 			</div>
 		</div>
-	
+
 		<div id="content">
 			${select('*|text()')}
 		</div>
-	
+
 		<div id="footer">
 			<p py:if="username is not None">Logged in as ${username} (<a href="/logout">logout</a>)</p>
 			<p>Powered by <a href="http://ext.github.com/slideshow">Slideshow 0.4.0</a></p>
 		</div>
-	
+
 	</body>
 	</py:match>
 
