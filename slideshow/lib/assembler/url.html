@@ -1,0 +1,12 @@
+<assembler xmlns:py="http://genshi.edgewall.org/">
+	<fieldset id="assembler_url" class="assembler foldable">
+		<legend>Url <a href="#" onclick="$('#assembler_image').foldable('toggle');" class="folding"></a></legend>
+		
+		<input type="hidden" name="assembler" value="${assembler.name}" />
+		<input type="hidden" name="context" value="${context}" />
+		<p class="description">Render and rasterize webpage.</p>
+
+		<input type="url" id="${assembler.name}-url" name="url" />
+		<input type="submit" value="Upload"/>
+	</fieldset>
+</assembler>
