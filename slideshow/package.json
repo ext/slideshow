@@ -1,0 +1,13 @@
+{
+  "name": "slideshow-frontend",
+  "version": "0.4.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "David Sveningsson <ext@sidvind.com>",
+  "license": "AGPL-3.0",
+  "devDependencies": {
+  }
+}
