@@ -349,9 +349,6 @@ class TextAssembler(Assembler):
         template = Theme(theme)
         template.rasterize(dst=dst, size=size, params=params)
 
-    def raster_is_valid(reference, resolution, **kwargs):
-        return reference == resolution
-
     def title(self):
         return 'Text'
 

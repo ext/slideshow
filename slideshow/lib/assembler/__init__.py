@@ -53,7 +53,7 @@ class Assembler:
         """
         raise NotImplementedError
 
-    def raster_is_valid(**kwargs):
+    def raster_is_valid(self, size, params):
         """
         Determines whenever the cached raster is valid
         """

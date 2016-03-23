@@ -8,6 +8,8 @@ import subprocess, pipes
 import os, sys, traceback
 from os.path import normpath, join, dirname
 
+preview_width = 200
+
 class UrlAssembler(Assembler):
     def is_editable(self):
         return False
@@ -22,6 +24,10 @@ class UrlAssembler(Assembler):
     @staticmethod
     def _rasterize_path():
         return normpath(join(dirname(__file__), 'url.js'))
+
+    def raster_is_valid(self, size, params):
+        # hack: dont update preview (causes infinite recursion is trying to render the slideshow overview page)
+        return size.w == preview_width
 
     def rasterize(self, slide, size, params):
         print repr(params)
