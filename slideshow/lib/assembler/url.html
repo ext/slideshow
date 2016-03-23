@@ -4,9 +4,16 @@
 		
 		<input type="hidden" name="assembler" value="${assembler.name}" />
 		<input type="hidden" name="context" value="${context}" />
+		<input type="hidden" name="cache" value="1" />
 		<p class="description">Render and rasterize webpage.</p>
 
 		<input type="url" id="${assembler.name}-url" name="url" />
+
+		<label>
+			<input type="checkbox" name="cache" value="0" />
+			Disable caching.
+		</label>
+
 		<input type="submit" value="Upload"/>
 	</fieldset>
 </assembler>

@@ -14,8 +14,11 @@ class UrlAssembler(Assembler):
     def is_editable(self):
         return False
 
-    def assemble(self, slide, url, **kwargs):
-        return {'url': url}
+    def assemble(self, slide, url, cache, **kwargs):
+        return {
+            'url': url,
+            'cache': cache == '1',
+        }
 
     @staticmethod
     def _phantomjs_path():
@@ -26,8 +29,12 @@ class UrlAssembler(Assembler):
         return normpath(join(dirname(__file__), 'url.js'))
 
     def raster_is_valid(self, size, params):
+        if params['cache']: return True
+
         # hack: dont update preview (causes infinite recursion is trying to render the slideshow overview page)
-        return size.w == preview_width
+        if size.w == preview_width: return True
+
+        return False
 
     def rasterize(self, slide, size, params):
         print repr(params)
