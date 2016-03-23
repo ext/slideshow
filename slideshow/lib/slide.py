@@ -88,7 +88,7 @@ class Slide(object):
         Rasterizes the slide for the given resolution, if needed.
         :param size: Size of the raster
         """
-        if not self._has_raster(size):
+        if not self._has_raster(size) or not self.assembler.raster_is_valid(size=size, params=self._data):
             self.assembler.rasterize(slide=self, size=size, params=self._data)
 
     def _invalidate(self):

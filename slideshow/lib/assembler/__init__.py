@@ -53,7 +53,7 @@ class Assembler:
         """
         raise NotImplementedError
 
-    def raster_is_valid(**kwargs):
+    def raster_is_valid(self, size, params):
         """
         Determines whenever the cached raster is valid
         """
@@ -96,11 +96,13 @@ class Assembler:
 import image
 import text
 import video
+import url
 
 _assemblers = {
     'text': text.TextAssembler,
     'image': image.ImageAssembler,
-    'video': video.VideoAssembler
+    'video': video.VideoAssembler,
+    'url': url.UrlAssembler,
 }
 
 # setup reverse names

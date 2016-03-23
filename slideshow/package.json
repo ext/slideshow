@@ -8,6 +8,8 @@
   },
   "author": "David Sveningsson <ext@sidvind.com>",
   "license": "AGPL-3.0",
-  "devDependencies": {
+  "devDependencies": {},
+  "dependencies": {
+    "phantomjs-prebuilt": "^2.1.6"
   }
 }
