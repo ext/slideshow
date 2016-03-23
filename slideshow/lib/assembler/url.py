@@ -37,7 +37,6 @@ class UrlAssembler(Assembler):
         return False
 
     def rasterize(self, slide, size, params):
-        print repr(params)
         args = [
             self._phantomjs_path(),
             self._rasterize_path(),
@@ -45,9 +44,6 @@ class UrlAssembler(Assembler):
             slide.raster_path(size),
             '%dpx*%dpx' % tuple(iter(size))
         ]
-
-        print os.getcwd()
-        print repr(args)
 
         try:
             retcode = subprocess.call(args)
