@@ -182,7 +182,7 @@ static int filter(const struct dirent* el){
 }
 
 void module_enumerate(enum module_type_t type, void (*callback)(const char* name, const module_handle mod)){
-	char* ctx;
+	char* ctx = NULL;
 	char* path_list = strdup(pluginpath());
 	char* path = strtok_r(path_list, ":", &ctx);
 
